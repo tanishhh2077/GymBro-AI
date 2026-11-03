@@ -18,7 +18,12 @@
 - An understanding checkpoint is not a request to choose build options. Ask separate clarification questions only when a material requirement is missing.
 - Get a working development environment running before feature code. Treat an existing `node_modules` folder or an old build result as insufficient evidence of a reproducible setup.
 - Preserve unrelated and preexisting uncommitted work. Report failures, skipped checks, and mistaken assumptions plainly.
-- Commit and push regularly ([D-018](docs/DECISIONS.md#d-018-regular-commits-and-reviewed-merges-to-master)). After each work chunk whose relevant tests, lint, and build pass and whose documents are updated, stage only that chunk's paths, check the staged diff for secrets, private media, and personal paths, commit on `feat/gymbro-video-landmarks`, and push it. When a plan task is complete and its fresh review is resolved, fast-forward `master` to the feature branch and push `master`. Never commit a failing state, force-push, or rewrite published history; if a push fails, report it rather than changing credentials.
+- Git practice ([D-018](docs/DECISIONS.md#d-018-regular-commits-and-reviewed-merges-to-master), [D-019](docs/DECISIONS.md#d-019-one-branch-per-feature-one-commit-per-step)):
+  - Build each feature (plan task) on its own branch, `feat/task<N>-<short-name>`, created from an up-to-date `master`.
+  - Make each plan step its own commit once its checks pass and its documents are updated, and push it. A step that only writes failing tests is committed together with the step that makes them pass, so every commit builds and passes. Review fixes get their own commit.
+  - Stage only the step's paths; check the staged diff for secrets, private media, and personal paths. Write an imperative subject naming the task and step, and a body saying what changed and what was verified.
+  - When the feature's fresh review is resolved, fast-forward `master` to the branch, push `master`, and start the next feature's branch from it. Delete a merged branch only with the user's agreement.
+  - Never commit a failing state, force-push, or rewrite published history; if a push fails, report it rather than changing credentials.
 - Never add `Co-Authored-By` lines or attribution trailers of any kind to commits.
 
 ## Product boundaries
@@ -62,6 +67,15 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
 - Treat the model and runtime as vendor files and never hand-edit them. `@mediapipe/tasks-vision` is pinned to an exact version in `package.json`, and `public/wasm/` must be a byte-identical copy of that package's `wasm/` folder. Upgrade the package, the runtime copy, and the model compatibility check together in one reviewed change, recording source, version, license, and checksum.
 - Keep runtime loading local. A remote model or runtime URL changes network and privacy behavior and needs an accepted decision.
 - A filename or a successful file request does not show that model initialization, inference, or phone support works. Validate a replacement with real footage, including missing poses.
+
+## Coding practice
+
+- Keep each change to one plan step. Do not mix in refactors, reformatting, or unrelated fixes; record those as separate follow-ups.
+- Before changing behavior, write or update a test and watch it fail for the right reason. Fake only what the test environment cannot provide (MediaPipe, real media decoding, object URLs) and use the real modules otherwise.
+- Match the surrounding code's naming, comment density, and idiom. Comments explain why, not what. Remove placeholders, dead code, and debugging output before committing.
+- Validate inputs at module boundaries and fail with typed, actionable errors; never substitute zeros or defaults for missing or invalid data.
+- Release everything a job acquires (timers, listeners, object URLs, detectors, video sources) on every exit path, and test that release.
+- Run `npm test`, `npm run lint`, and `npm run build` before every commit.
 
 ## Verification and code review
 

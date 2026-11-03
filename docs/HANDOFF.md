@@ -16,22 +16,24 @@ Updated 2026-11-03. Start here in Claude Code or Codex; no prior chat is require
   picks whichever has more remaining usage ([D-016](DECISIONS.md#d-016-provider-neutral-documentation-first-continuity)).
   These Markdown files are the only handoff. Update every affected document
   before reporting a work chunk done, and record which tool and model did the work.
-- Git ([D-018](DECISIONS.md#d-018-regular-commits-and-reviewed-merges-to-master)):
-  after each verified, documented chunk, commit its paths on the feature branch and
-  push; after each reviewed plan task, fast-forward `master` and push it. Never
+- Git ([D-018](DECISIONS.md#d-018-regular-commits-and-reviewed-merges-to-master),
+  [D-019](DECISIONS.md#d-019-one-branch-per-feature-one-commit-per-step)): one
+  branch per plan task (`feat/task<N>-<short-name>`, from `master`), one commit per
+  plan step (failing tests travel with the step that makes them pass), push after
+  each commit, fast-forward and push `master` after each reviewed task. Never
   force-push, reset, clean, or discard working files, and never add commit
   attribution trailers.
 
 ## Repository state
 
 - Local folder: `D:\Programming\summer 2026 projects\GymBro AI`.
-- Branch: `feat/gymbro-video-landmarks` (pushed to origin
-  `https://github.com/tanishhh2077/GymBro-AI.git`). `master` holds only the
-  original scaffold commit and is not yet on GitHub; it is first fast-forwarded
-  when Task 2's review is resolved, so its code and documents always agree.
-- Work through Task 2 Step 6 is committed on the feature branch in three grouped
-  commits (documents; test tooling and Task 1; Task 2 Steps 1–6); see `git log`.
-  Check `git status` for anything newer before starting.
+- Origin: `https://github.com/tanishhh2077/GymBro-AI.git`. Tasks 1–2 live on
+  `feat/gymbro-video-landmarks` (they predate the one-branch-per-task rule).
+  `master` is on GitHub but still at the scaffold commit; it is fast-forwarded to
+  the feature branch when Task 2's review is resolved. GitHub's default branch is
+  still the feature branch until the user switches it to `master` in Settings.
+- Task 3 will be the first task on its own branch, created from `master` after that
+  fast-forward. Check `git log` and `git status` for the latest commits first.
 - Layout, file responsibilities, and the engine lifecycle are in
   [ARCHITECTURE.md](ARCHITECTURE.md#repository-layout). `public/` deliberately holds
   no Markdown; its rules are in [root AGENTS.md](../AGENTS.md#static-files-in-public).

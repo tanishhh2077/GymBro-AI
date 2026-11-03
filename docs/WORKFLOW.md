@@ -88,9 +88,11 @@ brief/specification or shared agent rules.
 Update `STATUS.md` with the outcome, changed paths, commands actually run and results, checks not run, limitations, unresolved review findings, prerequisites, and the next concrete action. Update architecture/decisions when their facts change. Keep one clear next task; the full vision belongs in the brief.
 
 Also refresh the concise `HANDOFF.md` and actual plan progress after each work
-chunk. Then commit and push that chunk on the feature branch, and fast-forward
-`master` after each reviewed plan task ([D-018](DECISIONS.md#d-018-regular-commits-and-reviewed-merges-to-master)),
-so the pushed history and the documents describe the same state. Keep old detailed command evidence in STATUS so repeated startup does not
+chunk. Then commit that step on the task's own branch and push it, and
+fast-forward `master` after each reviewed plan task
+([D-018](DECISIONS.md#d-018-regular-commits-and-reviewed-merges-to-master),
+[D-019](DECISIONS.md#d-019-one-branch-per-feature-one-commit-per-step)), so the
+pushed history and the documents describe the same state. Keep old detailed command evidence in STATUS so repeated startup does not
 require loading the entire development history.
 
 Do not equate "implemented," "compiled," "mock-tested," "tested with real video," "benchmarked on a phone," and "ready to ship." Record exactly which claim the evidence supports.

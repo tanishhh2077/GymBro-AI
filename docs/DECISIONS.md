@@ -178,6 +178,32 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
 - The repository's first branch is named `master`; no `main` branch exists. The
   GitHub CLI is not installed, so merges are local fast-forwards rather than pull
   requests unless that changes.
+- D-019 refines the branch and commit granularity.
+
+### D-019: One branch per feature, one commit per step
+
+- On 2026-11-03 the user asked that each new feature be built on a new branch,
+  every new step be its own commit, and good coding practices be followed.
+- A feature is one plan task. Each starts on its own branch named
+  `feat/task<N>-<short-name>` (for example `feat/task3-overlay-playback`),
+  created from an up-to-date `master` after the previous task was merged. Tasks 1
+  and 2 predate this rule and share `feat/gymbro-video-landmarks`; their pushed
+  history is not rewritten.
+- Each plan step is its own commit, made once its checks pass and its documents are
+  updated, and is pushed right away. Exception: a step that only writes failing
+  tests is committed together with the step that makes them pass, so that every
+  commit builds and passes (any commit can be checked out or bisected safely).
+  Fixes for review findings get their own commit.
+- Commit subjects are imperative and name the plan task and step, for example
+  "Add selection check (plan Task 2 Steps 1-2)"; the body says what changed and
+  what was verified.
+- When the feature's fresh review is resolved: fast-forward `master` to the branch,
+  push `master`, then create the next feature's branch from it. A merged branch is
+  deleted only with the user's agreement.
+- On 2026-11-03 `master` was pushed to GitHub for the first time, still at the
+  scaffold commit. GitHub's default branch is still the feature branch; the user
+  changes it under Settings > General > Default branch once `master` holds the
+  reviewed work, because no GitHub CLI or token is available to agents.
 
 ## Specification-author defaults and later acceptance
 
