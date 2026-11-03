@@ -21,7 +21,7 @@
   holds, unknown visibility, input preservation, and CSS-pixel letterboxing.
 - `icons.tsx`: shared interface icons.
 
-Task 3 Steps 1–4 are implemented. Sampling and detection badges use neutral wording
+Task 3 is implemented, verified, and freshly reviewed. Sampling and detection badges use neutral wording
 without source-frame-rate or form-quality claims. Component tests simulate media,
 layout, and canvas calls; actual rendering and real bench footage remain Task 4.
 Follow [local rules](AGENTS.md) and [current scope](../../docs/HANDOFF.md).

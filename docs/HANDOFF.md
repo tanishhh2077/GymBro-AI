@@ -29,11 +29,12 @@ Updated 2026-11-03. Start here in Claude Code or Codex; no prior chat is require
 - Local folder: `D:\Programming\summer 2026 projects\GymBro AI`.
 - Origin: `https://github.com/tanishhh2077/GymBro-AI.git`. Tasks 1–2 live on
   `feat/gymbro-video-landmarks` (they predate the one-branch-per-task rule).
-  `master` holds Tasks 1–2: it is fast-forwarded to the feature branch once the
-  Task 2 review fixes are committed, and pushed. GitHub's default branch is still
-  the feature branch until the user switches it to `master` in Settings.
-- Task 3 is the first task on its own branch, created from `master`. Check
-  `git log`, `git status`, and `git branch -vv` for the latest state first.
+  Tasks 1–3 are reviewed. The completion flow fast-forwards/pushes `master` to each
+  reviewed feature tip. GitHub's default branch was last recorded as the older
+  feature branch; its current setting was not rechecked in this step.
+- Task 3 was developed on `feat/task3-overlay-playback`, created from `master`.
+  Retain that branch. Check `git log`, `git status`, and `git branch -vv` for
+  current local/remote pointers rather than assuming an older handoff hash.
 - Layout, file responsibilities, and the engine lifecycle are in
   [ARCHITECTURE.md](ARCHITECTURE.md#repository-layout). `public/` deliberately holds
   no Markdown; its rules are in [root AGENTS.md](../AGENTS.md#static-files-in-public).
@@ -112,15 +113,20 @@ including the review disposition, are in [STATUS.md](STATUS.md).
 - **Task 3 Step 5 is verified.** On pushed component commit `62486db`, all checks
   passed again: 236 tests, lint without issues, production build (400 modules).
   No new dependency or real-browser/media check was needed for this step.
-- **Next: Task 3 Step 6 fresh review/handoff and merge.** These are
-  normal completion checks within the approved display step. All checks have
-  passed; a fresh read-only whole-Task-3 Codex review returned no significant
-  findings. Record final completion and finish the step commits before merging.
-  No real bench-press alignment is verified.
+- **Task 3 Step 6 is complete, so Task 3 is reviewed.** A fresh read-only Codex
+  review against base `03185f5` and M1-05/M1-06 returned **no significant findings**
+  and independently passed **78/78** helper/overlay/player tests. No fixes or
+  deferred code findings remain. The same-provider review's model identifier was
+  unavailable; actual browser rendering and bench-press alignment are unverified.
+- **Next: Task 4 Step 1, permitted fixture gate.** Its teaching checkpoint has
+  **not** been approved. Explain real media versus simulated tests, ask
+  **"Is this clear?"**, and wait before fixture/browser-test work. No permitted
+  side-view bench recording is available. Do not relax the view requirement or
+  fabricate inference/alignment results to unblock acceptance.
 - The server started for this step on `127.0.0.1:5179` was stopped and its port
   verified free. The earlier `5176` listener was left untouched.
-- User action pending: switch GitHub's default branch to `master` (Settings >
-  General > Default branch).
+- GitHub's default branch may still need switching to `master` in Settings; this
+  is the last recorded state, not a fresh remote-setting check.
 - Task 4 prerequisite: no permitted side-view H.264 MP4 exists. Inspected Commons
   candidates are not side views; the user must choose an option (STATUS, "Fixture
   candidate research").
@@ -145,6 +151,6 @@ work based on old unchecked scratch briefs under ignored `.superpowers/`.
 
 Confirm which instructions loaded, summarize the latest checks above, explain the
 next task with its reason and alternative, ask **"Is this clear?"**, and wait. The
-component-wiring checkpoint was approved; finish its verification/review and Git
-handoff without asking again. Task 4 requires a new teaching checkpoint. After an approved work chunk,
+display task is complete and reviewed. Task 4 requires a new teaching checkpoint.
+After an approved work chunk,
 update this handoff, STATUS, ARCHITECTURE where facts changed, and plan progress.

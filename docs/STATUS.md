@@ -10,7 +10,7 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Tasks 1–2 are complete and reviewed. Task 3 Steps 1–4 (display calculations and component wiring) are implemented; final verification/review is in progress. Whole `npm test` is **236 passed / 236 total**, exit **0** (58 media-helper, 55 engine, 22 selection, 12 store, 11 dropzone, 56 display calculations, 10 overlay, 12 player). Lint and build pass. `master` still holds only Tasks 1–2; Task 3 is on `feat/task3-overlay-playback`. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted in the specification. Execution follows the user's explanation-and-understanding checkpoint before each meaningful step.
+The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Tasks 1–3 are complete and reviewed. Whole `npm test` is **236 passed / 236 total**, exit **0** (58 media-helper, 55 engine, 22 selection, 12 store, 11 dropzone, 56 display calculations, 10 overlay, 12 player). Lint and build pass. Task 3 was developed on `feat/task3-overlay-playback`; D-019 integrates the reviewed tip into `master` by fast-forward and push. Check Git for current branch pointers. Task 4 is next, after its teaching checkpoint and permitted fixture gate. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted in the specification. Execution follows the user's explanation-and-understanding checkpoint before each meaningful step.
 
 The working folder is now `D:\Programming\summer 2026 projects\GymBro AI`; older folder paths in historical records are not the current working directory.
 
@@ -117,7 +117,7 @@ The reviewer classified the redundant `result` initialization as a **low-severit
 
 ## One next task
 
-Finish Task 3 Steps 5–6: record final verification, resolve the fresh whole-task review, update handoff, and fast-forward/push `master` once reviewed. The component-wiring teaching checkpoint was approved; ordinary checks and review do not need another checkpoint. Task 4 needs a new explanation before work. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
+Task 4 Step 1: establish a permitted side-view bench-press recording for actual browser acceptance. Explain why real media is needed instead of relying on simulated event/canvas tests, ask **"Is this clear?"**, and wait. No Task 4 teaching checkpoint has been approved yet. No fixture, browser-test dependency, or inference result is supplied by Task 3. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
 
 The user has no personal fixture available, and no openly licensed candidate inspected so far is a standardized side view; see "Fixture candidate research" below. Before Task 4 acceptance, the user must choose how to obtain a permitted side-view H.264 MP4. Do not claim a candidate or a mock is a validated result.
 
@@ -688,6 +688,29 @@ candidates.
 - `git diff --check` passes; build output contains no Markdown. This is a
   verification/documentation step with no further application changes. Fresh
   review handoff is next; actual browser/bench-press acceptance remains Task 4.
+
+## Task 3 fresh review and handoff (Step 6)
+
+- Fresh context, read-only Codex review of the whole Task 3 change against base
+  `03185f5`, the current specification (M1-05/M1-06), and the plan. The reviewer
+  saw committed helpers plus the then-uncommitted component diff, tests, scoped
+  rules, surrounding App controls, and ownership references. No implementation
+  conversation was inherited. Its exact served model identifier was unavailable.
+- Result: **no significant findings**. The reviewer independently ran helper,
+  overlay, and player suites: **78/78** across three files, exit **0**; scoped
+  whitespace check passed. It did not repeat full-suite/lint/build, use a browser,
+  edit files, or spawn other agents. No second-provider review is claimed.
+- No review fix or deferred code finding remains. The coordinator's full checks
+  are recorded above. Simulated DOM/canvas tests do not prove actual rendering,
+  monitor/DPR transitions, screen-reader announcements, media presentation timing,
+  bench-lifter inference, or anatomical accuracy; Task 4 owns that acceptance.
+- Updated shared instructions, root/components/planning READMEs, architecture,
+  status, compact handoff, and plan progress. Task 3 is complete; D-019 calls for
+  pushing this final step and fast-forwarding/pushing `master`, retaining the
+  feature branch. Verify Git refs rather than treating an earlier hash as current.
+- Next: Task 4 fixture gate after its understanding checkpoint. The user has no
+  personal recording; previously inspected public candidates did not meet side
+  view. Missing footage blocks real-video acceptance, and must remain explicit.
 
 ## Planning handoff
 
