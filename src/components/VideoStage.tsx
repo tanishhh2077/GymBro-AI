@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import type { Clip } from "@/types";
+import type { Clip, ProcessingFailureKind } from "@/types";
 import { EXERCISES } from "@/core/exercises";
 import { SkeletonOverlay } from "./SkeletonOverlay";
 import {
@@ -14,19 +14,43 @@ import {
 interface VideoStageProps {
   clip: Clip;
   accent?: string;
+  /** Lease the clip's URL while this player shows it; returns the release. */
+  retainMedia: (id: string) => () => void;
 }
 
 const SPEEDS = [0.25, 0.5, 1] as const;
 
-export function VideoStage({ clip, accent = EXERCISES.squat.accent }: VideoStageProps) {
+export function VideoStage({
+  clip,
+  accent = EXERCISES.bench.accent,
+  retainMedia,
+}: VideoStageProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1);
 
+  // The overlay needs detected poses; playback only needs a completed clip, so a
+  // no-pose clip can still be replayed without implying anything about its quality.
   const ready = clip.status === "ready" && !!clip.pose;
+  const playable = ready || clip.status === "no-pose";
   const frames = clip.pose?.frames ?? [];
+
+  // The source is set here rather than as a JSX prop so a StrictMode remount
+  // re-attaches it after cleanup detached it.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const release = retainMedia(clip.id);
+    v.src = clip.url;
+    return () => {
+      v.pause();
+      v.removeAttribute("src");
+      v.load();
+      release();
+    };
+  }, [clip.id, clip.url, retainMedia]);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -84,7 +108,6 @@ export function VideoStage({ clip, accent = EXERCISES.squat.accent }: VideoStage
         <div className="relative min-h-[220px]">
           <video
             ref={videoRef}
-            src={clip.url}
             playsInline
             muted
             preload="auto"
@@ -103,13 +126,15 @@ export function VideoStage({ clip, accent = EXERCISES.squat.accent }: VideoStage
         </div>
       </div>
 
+      {clip.status === "no-pose" && <NoPoseNotice />}
+
       {/* Controls */}
       <div className="flex flex-col gap-3 px-4 py-3">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={togglePlay}
-            disabled={!ready}
+            disabled={!playable}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-ink-950 shadow-glow transition-transform hover:scale-105 disabled:opacity-40"
             aria-label={playing ? "Pause" : "Play"}
           >
@@ -118,7 +143,7 @@ export function VideoStage({ clip, accent = EXERCISES.squat.accent }: VideoStage
           <button
             type="button"
             onClick={restart}
-            disabled={!ready}
+            disabled={!playable}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-slate-300 transition-colors hover:bg-white/10 disabled:opacity-40"
             aria-label="Restart"
           >
@@ -132,7 +157,7 @@ export function VideoStage({ clip, accent = EXERCISES.squat.accent }: VideoStage
             max={duration || 0}
             step={0.01}
             value={time}
-            disabled={!ready}
+            disabled={!playable}
             onChange={(e) => scrub(parseFloat(e.target.value))}
           />
 
@@ -151,7 +176,7 @@ export function VideoStage({ clip, accent = EXERCISES.squat.accent }: VideoStage
                 key={s}
                 type="button"
                 onClick={() => setSpeed(s)}
-                disabled={!ready}
+                disabled={!playable}
                 className={`rounded-md px-2 py-1 text-xs font-medium transition-colors disabled:opacity-40 ${
                   speed === s
                     ? "bg-accent/20 text-accent-100"
@@ -224,14 +249,56 @@ function ProcessingLayer({ clip, accent }: { clip: Clip; accent: string }) {
   );
 }
 
+const FAILURE_TITLES: Partial<Record<ProcessingFailureKind, string>> = {
+  validation: "This video is outside the supported limits",
+  "video-load": "The video could not be read",
+  "no-duration": "The video's length could not be read",
+  init: "The pose model could not start",
+  timeout: "Processing took too long",
+  detect: "Pose estimation failed",
+  busy: "The pose engine was busy",
+};
+
+/** A processing failure: the job did not complete, so nothing can be replayed. */
 function ErrorLayer({ clip }: { clip: Clip }) {
   if (clip.status !== "error") return null;
+  const title = (clip.errorKind && FAILURE_TITLES[clip.errorKind]) ?? "Processing failed";
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-ink-950/85 px-6 text-center backdrop-blur-sm">
+    <div
+      role="alert"
+      className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-ink-950/85 px-6 text-center backdrop-blur-sm"
+    >
       <span className="flex h-12 w-12 items-center justify-center rounded-full bg-danger/15 text-danger">
-        <AlertIcon width={24} />
+        <AlertIcon width={24} aria-hidden="true" />
       </span>
-      <div className="max-w-sm text-sm text-slate-300">{clip.error}</div>
+      <div className="max-w-sm text-sm">
+        <div className="font-semibold text-white">{title}</div>
+        <div className="mt-1 text-slate-300">{clip.error}</div>
+        <div className="mt-2 text-xs text-slate-500">Remove the clip to try another.</div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A completed result with no detected pose. It does not cover the video, which
+ * can still be replayed, and it says nothing about the lifter's technique.
+ */
+function NoPoseNotice() {
+  return (
+    <div
+      role="status"
+      className="flex items-start gap-2 border-t border-warn/20 bg-warn/10 px-4 py-3 text-sm"
+    >
+      <AlertIcon width={18} className="mt-0.5 shrink-0 text-warn" aria-hidden="true" />
+      <div>
+        <div className="font-semibold text-white">No pose detected in the sampled frames</div>
+        <div className="mt-0.5 text-slate-300">
+          This is not a judgment of your form. Check that one lifter&apos;s shoulders,
+          elbows, and wrists are visible from the side in good light, then try another
+          clip. You can still replay this video.
+        </div>
+      </div>
     </div>
   );
 }

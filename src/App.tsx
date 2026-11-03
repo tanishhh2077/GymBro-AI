@@ -1,31 +1,22 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useSessionStore } from "@/store/useSessionStore";
 import { ANGLES, EXERCISES } from "@/core/exercises";
-import { ExercisePicker } from "@/components/ExercisePicker";
 import { ClipDropzone } from "@/components/ClipDropzone";
 import { VideoStage } from "@/components/VideoStage";
 import { ShieldIcon, TrashIcon } from "@/components/icons";
-import type { CameraAngle } from "@/types";
 
 export default function App() {
   const exercise = useSessionStore((s) => s.exercise);
   const clips = useSessionStore((s) => s.clips);
-  const setExercise = useSessionStore((s) => s.setExercise);
-  const addClip = useSessionStore((s) => s.addClip);
-  const processClip = useSessionStore((s) => s.processClip);
+  const processingState = useSessionStore((s) => s.processingState);
+  const startClip = useSessionStore((s) => s.startClip);
   const removeClip = useSessionStore((s) => s.removeClip);
+  const retainClipMedia = useSessionStore((s) => s.retainClipMedia);
 
-  const accent = exercise ? EXERCISES[exercise].accent : EXERCISES.squat.accent;
-
-  const handleAdd = (file: File, angle: CameraAngle) => {
-    const id = addClip({
-      file,
-      name: file.name,
-      source: "upload",
-      angle,
-    });
-    void processClip(id);
-  };
+  // Only the names are shown; the legacy taglines/descriptions claim measurements
+  // that are not implemented.
+  const { name: exerciseName, accent } = EXERCISES[exercise];
+  const admissionBlocked = clips.length > 0 || processingState !== "idle";
 
   return (
     <div className="relative min-h-full">
@@ -37,30 +28,26 @@ export default function App() {
 
         <Section
           step={1}
-          title="Choose your lift"
-          subtitle="Pick the exercise you filmed. Each lift uses a tailored analyzer."
+          title="Add your bench press video"
+          subtitle="Film one set from the side, then choose the MP4 file."
         >
-          <ExercisePicker value={exercise} onChange={setExercise} />
-        </Section>
-
-        <AnimatePresence>
-          {exercise && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.4 }}
+          <div className="mb-3 flex flex-wrap gap-2">
+            <span
+              className="chip text-xs font-semibold"
+              style={{ background: `${accent}1f`, color: accent }}
             >
-              <Section
-                step={2}
-                title="Add a clip of your set"
-                subtitle="Upload a video and tag the camera angle it was filmed from."
-              >
-                <ClipDropzone onAdd={handleAdd} />
-              </Section>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              {exerciseName}
+            </span>
+            <span
+              className="chip text-xs font-semibold"
+              style={{ background: `${accent}1f`, color: accent }}
+            >
+              {ANGLES.side.name} view
+            </span>
+          </div>
+          <RecordingGuide />
+          <ClipDropzone onSelect={startClip} disabled={admissionBlocked} />
+        </Section>
 
         <AnimatePresence>
           {clips.length > 0 && (
@@ -70,9 +57,9 @@ export default function App() {
               exit={{ opacity: 0 }}
             >
               <Section
-                step={3}
-                title="Pose analysis"
-                subtitle="The skeleton is overlaid on your footage, synced to playback."
+                step={2}
+                title="Pose overlay"
+                subtitle="Estimated landmarks drawn over your video, synced to playback. Remove the clip to cancel or start over."
               >
                 <div className="space-y-6">
                   {clips.map((clip) => (
@@ -91,7 +78,7 @@ export default function App() {
                               color: accent,
                             }}
                           >
-                            {ANGLES[clip.angle].name} view
+                            {exerciseName} · {ANGLES[clip.angle].name} view
                           </span>
                           <span className="max-w-[40vw] truncate text-xs text-slate-500">
                             {clip.name}
@@ -101,12 +88,20 @@ export default function App() {
                           type="button"
                           onClick={() => removeClip(clip.id)}
                           className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-slate-400 transition-colors hover:bg-danger/15 hover:text-danger"
-                          aria-label="Remove clip"
+                          aria-label={
+                            clip.status === "processing"
+                              ? "Cancel processing and remove clip"
+                              : "Remove clip"
+                          }
                         >
                           <TrashIcon width={16} />
                         </button>
                       </div>
-                      <VideoStage clip={clip} accent={accent} />
+                      <VideoStage
+                        clip={clip}
+                        accent={accent}
+                        retainMedia={retainClipMedia}
+                      />
                     </motion.div>
                   ))}
                 </div>
@@ -129,15 +124,16 @@ function Header() {
             <div className="text-sm font-extrabold tracking-tight text-white">
               GymBro AI
             </div>
-            <div className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
-              Form Analysis
+            <div className="mt-0.5 text-[11px] text-slate-500">
+              Your second set of eyes.
             </div>
           </div>
         </div>
+        {/* Narrow claim: the video is processed locally; the page still loads web fonts. */}
         <span className="chip border border-white/5 bg-white/5 text-[11px] text-slate-300">
           <ShieldIcon width={13} className="text-accent" />
-          <span className="hidden sm:inline">100% on-device</span>
-          <span className="sm:hidden">Private</span>
+          <span className="hidden sm:inline">On-device processing</span>
+          <span className="sm:hidden">On-device</span>
         </span>
       </div>
     </header>
@@ -168,16 +164,42 @@ function Hero() {
       className="mb-8 mt-2"
     >
       <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
-        Coach-grade form analysis,
+        See your bench press pose,
         <br />
-        <span className="text-gradient">right in your browser.</span>
+        <span className="text-gradient">sample by sample.</span>
       </h1>
       <p className="mt-3 max-w-xl text-sm text-slate-400 sm:text-base">
-        Upload a video of your squat, deadlift, or bench and GymBro AI estimates
-        your pose frame-by-frame to measure depth, angles, tempo, and symmetry —
-        no uploads, no account, nothing leaves your device.
+        Choose a side-view video of one barbell bench press set. GymBro AI
+        estimates body landmarks in sampled frames and draws them over playback.
+        It does not count reps, track the bar, or judge your technique. The video
+        is processed on this device and is not uploaded.
       </p>
     </motion.div>
+  );
+}
+
+function RecordingGuide() {
+  return (
+    <div className="mb-4 rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 text-sm text-slate-300">
+      <div className="mb-1.5 font-semibold text-white">For the clearest overlay</div>
+      <ul className="list-disc space-y-1 pl-5 text-slate-400">
+        <li>Film from the side with the camera steady, at about bench height.</li>
+        <li>Keep your shoulders, elbows, and wrists in frame for the whole set.</li>
+        <li>
+          Keep the bar&apos;s path in frame so you can review it yourself; GymBro AI
+          does not track the bar.
+        </li>
+        <li>
+          Have only one lifter in view where possible; other people, such as a
+          spotter, can confuse the pose estimate.
+        </li>
+        <li>Use even, adequate light.</li>
+      </ul>
+      <p className="mt-2 text-xs text-slate-500">
+        Landmarks are estimates. They can be missing or wrong where body parts are
+        hidden, and a clear overlay is not a judgment of your form.
+      </p>
+    </div>
   );
 }
 

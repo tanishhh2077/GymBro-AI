@@ -443,10 +443,3 @@ function computeCoverage(frames: PoseFrame[]): PoseCoverage {
     meanVisibility: visCount > 0 ? visSum / visCount : 0,
   };
 }
-
-/** Shared engine instance for the existing store; Task 2 replaces this accessor. */
-let singleton: PoseEngine | null = null;
-export function getPoseEngine(): PoseEngine {
-  if (!singleton) singleton = new PoseEngine();
-  return singleton;
-}
