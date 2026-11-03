@@ -10,9 +10,14 @@
   the store while mounted (`retainMedia` prop), sets the video source in an effect,
   shows kind-specific failures, and keeps no-pose clips replayable with a notice.
 - `SkeletonOverlay.tsx`: canvas overlay.
+- `poseDisplay.ts`: pure sampling, drawing eligibility, and centered video-content
+  geometry. Its 56 tests cover missing samples, bounded interpolation/endpoint
+  holds, unknown visibility, input preservation, and CSS-pixel letterboxing.
 - `icons.tsx`: shared interface icons.
 
-Honest overlay sampling, projection, and coverage labels are Task 3; do not assume
-existing rendering is verified. VideoStage and SkeletonOverlay have no tests yet.
+Task 3 Steps 1–2 are complete: the pure helpers are tested, but the existing
+overlay does not use them yet. Wiring, coverage labels, and playback/accessibility
+are next. VideoStage and SkeletonOverlay have no component tests yet; existing
+rendering is not verified by the helper tests.
 Follow [local rules](AGENTS.md) and [current scope](../../docs/HANDOFF.md).
 Processing belongs in [core](../core/README.md).

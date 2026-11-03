@@ -98,9 +98,11 @@ npm test
 
 Vitest runs `src/**/*.test.{ts,tsx}` once using jsdom's simulated browser
 objects and the app's existing Vite settings, including the `@` source alias.
-All 158 tests pass: 58 media-helper cases, 55 pose-engine contract cases, 22
-selection-check cases, 12 session-store cases, and 11 dropzone component cases.
-See [current status](docs/STATUS.md) for exact results.
+All 214 tests pass: 58 media-helper cases, 55 pose-engine contract cases, 22
+selection-check cases, 12 session-store cases, 11 dropzone component cases, and
+56 pure display-calculation cases.
+See [current status](docs/STATUS.md) for exact results. The display calculations
+are implemented separately; connecting them to the canvas and player is next.
 Metadata-helper tests cover already-available details, event-driven loading,
 unknown-duration recovery, invalid loaded values, one deadline under repeated
 events, cancellation, media errors, and listener cleanup on terminal paths.

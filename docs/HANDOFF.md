@@ -43,19 +43,20 @@ Updated 2026-11-03. Start here in Claude Code or Codex; no prior chat is require
   stop it, confirm the port is free: stopping the `npm run dev` wrapper on Windows
   can leave the `vite.js` node process running.
 
-## Latest checks (2026-11-03, after the Task 2 review fixes)
+## Latest checks (2026-11-03, after Task 3 calculation helpers)
 
 | Command / suite | Observed result |
 | --- | --- |
-| Whole `npm test` | **158 passed / 158**, exit 0 |
+| Whole `npm test` | **214 passed / 214**, exit 0 |
 | `src/core/video.test.ts` | 58 passed |
 | `src/core/PoseEngine.test.ts` | 55 passed |
 | `src/core/clipPolicy.test.ts` | 22 passed (16 failed first against a placeholder) |
 | `src/store/useSessionStore.test.ts` | 12 passed (all 12 failed first: API missing) |
 | `src/components/ClipDropzone.test.tsx` | 11 passed (the first 9 failed first against the old component) |
+| `src/components/poseDisplay.test.ts` | 56 passed; all 56 failed first against API-only placeholders |
 | `npm run lint` | exit 0 |
 | `npm run build` | exit 0; 399 modules; stale Browserslist warning; 0 Markdown files in `dist/` |
-| Real browser (Step 7) | Chromium `Chrome/156`; inputs, removal, reselection, and a synthetic no-pose clip on GPU behaved as designed |
+| Real browser (Task 2 Step 7, historical) | Chromium `Chrome/156`; inputs, removal, reselection, and a synthetic no-pose clip on GPU behaved as designed |
 | `npm ls @mediapipe/tasks-vision` | exit 0; 0.10.35, pinned exactly |
 
 Mocks establish coordination, not real decoding, inference, or accuracy. Details,
@@ -94,11 +95,20 @@ including the review disposition, are in [STATUS.md](STATUS.md).
   findings were fixed (focus after removal, a "releasing" message, page-wide drop
   claiming, clearing `engineDelegate`). `master` is fast-forwarded to this work
   and pushed. Details in STATUS under "Task 2 review and fixes".
-- **Next task: plan Task 3, honest overlay and playback**, on a new branch
-  `feat/task3-overlay-playback` created from `master`. Its teaching checkpoint has
-  **not** been given: explain Task 3 and wait for the user's confirmation first.
-  Review items already queued for Task 3 are listed in STATUS ("Task 2 review and
-  fixes").
+- **Task 3 Steps 1–2 are complete** on `feat/task3-overlay-playback`: Codex added
+  tested `samplePose`, `isDrawableLandmark`, and `videoContentRect` helpers in
+  `src/components/poseDisplay.ts`. They preserve raw input and unknown visibility,
+  prevent missing-neighbor/large-gap carry-forward, and keep geometry in CSS pixels.
+  A fresh-context Codex reviewer found no significant findings and ran all 56
+  helper tests. Served model identifiers were not exposed for either session.
+- **Next: Task 3 Steps 3–4, component tests and wiring.** The user approved only
+  the calculations step; the next teaching checkpoint has **not** been given.
+  Explain connecting the helpers to SkeletonOverlay/VideoStage, then wait. Include
+  paused seeking, resizing/DPR, play/restart rejection feedback, accessible controls,
+  and the queued Task 2 review items in STATUS. The canvas/player are unchanged
+  and still have their documented sampling, geometry, and playback gaps.
+- The server started for this step on `127.0.0.1:5179` was stopped and its port
+  verified free. The earlier `5176` listener was left untouched.
 - User action pending: switch GitHub's default branch to `master` (Settings >
   General > Default branch).
 - Task 4 prerequisite: no permitted side-view H.264 MP4 exists. Inspected Commons
@@ -118,13 +128,13 @@ The bench specification review is complete: [GOLDFISH_BENCH_REVIEW.md](GOLDFISH_
 The working plan has preexisting stale "pending" wording and lacks an earlier
 intended-lifter substep. The current spec still requires useful observations of the
 bench lifter, not a spotter. Preserve unrelated edits and resolve that narrative
-before fixture acceptance; it does not block Task 2. Do not redo completed
+before fixture acceptance; it does not block the display task. Do not redo completed
 work based on old unchecked scratch briefs under ignored `.superpowers/`.
 
 ## First response in a new session
 
 Confirm which instructions loaded, summarize the latest checks above, explain the
 next task with its reason and alternative, ask **"Is this clear?"**, and wait. The
-Task 2 checkpoint above is already approved, but a new session should still state
-what it is about to do and confirm before editing. After an approved work chunk,
+calculation step is already complete; the component-wiring checkpoint is pending.
+State what is about to change and confirm before editing. After an approved work chunk,
 update this handoff, STATUS, ARCHITECTURE where facts changed, and plan progress.

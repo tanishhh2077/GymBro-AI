@@ -123,7 +123,7 @@ expect(validateSelection([{ name: 'set.webm', size: 10, type: 'video/webm' }])?.
 - `isDrawableLandmark` rejects nonfinite/out-of-image x/y and unknown/nonfinite/below-floor visibility without modifying observations. Retain floor 0.3, explicitly heuristic.
 - `videoContentRect` computes centered `object-fit: contain` content in CSS pixels; zero/nonfinite dimensions yield null. VideoStage pins that fit mode. Overlay canvas position follows the video element's box, not a padded/min-height parent; device-pixel ratio is applied exactly once.
 
-- [ ] **Step 1 — Write failing pure display tests.** In `poseDisplay.test.ts`, test exact missing sample, missing neighbor, gap beyond 2/30, just-within/at boundary, endpoint beyond 1/30, invalid targetFps, unknown visibility, NaN/out-of-image coordinates, and landscape/portrait letterboxing. Build explicit small PoseFrame arrays in this test file; no hidden fixture factory is required by the plan.
+- [x] **Step 1 — Write failing pure display tests.** In `poseDisplay.test.ts`, test exact missing sample, missing neighbor, gap beyond 2/30, just-within/at boundary, endpoint beyond 1/30, invalid targetFps, unknown visibility, NaN/out-of-image coordinates, and landscape/portrait letterboxing. Build explicit small PoseFrame arrays in this test file; no hidden fixture factory is required by the plan.
 
 ```ts
 expect(isDrawableLandmark({ x: .5, y: .5, z: 0 }, .3)).toBe(false);
@@ -137,7 +137,7 @@ const frames: PoseFrame[] = [
 expect(samplePose(frames, .05, 30)).toBeNull(); // .1 > 2/30: no bridge.
 ```
 
-- [ ] **Step 2 — Observe failure, then implement the helpers.** Run `npm test -- src/components/poseDisplay.test.ts`. Use explicit video times and named tolerances; never infer source FPS or replace missing data with zeros/neighbor carry-forward.
+- [x] **Step 2 — Observe failure, then implement the helpers.** Run `npm test -- src/components/poseDisplay.test.ts`. Use explicit video times and named tolerances; never infer source FPS or replace missing data with zeros/neighbor carry-forward.
 - [ ] **Step 3 — Write failing integration-level display tests.** `SkeletonOverlay.test.tsx` captures canvas calls with controlled video/DOM rectangles: normalized (.25,.25) in the 80x140 example must draw at CSS (20,58.75), including DPR=2 without double scaling. Exact-null/gap/reset clears the canvas; paused seeking refreshes. `VideoStage.test.tsx` asserts accessible seek/removal controls, no-pose replay/feedback, and that a rejected play/restart promise shows actionable feedback without unhandled rejection. Use ReactDOM act, unmount cleanup, and a test-local React act environment flag; no extra component-test framework is required.
 - [ ] **Step 4 — Observe failures, then wire the display.** Run those files first. Replace the existing neighbor-substitution sampler, apply real video-content geometry on resize/orientation/clip change, and cancel animation/listener ownership on unmount. Keep playback/scrub state synchronized after seeks, restart and speed changes. Label pose coverage as sampled detection, not a form score; if target FPS is shown, call it sampling rate. Do not add production debug controls for tests.
 - [ ] **Step 5 — Verify.** Run all unit tests, lint, build. Expect exit 0 and no retained callback/timer leaks in controlled tests. The canvas call assertions are not proof of real pose accuracy or every browser layout; Task 4 checks actual media/rendering behavior.

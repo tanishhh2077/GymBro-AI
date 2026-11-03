@@ -10,7 +10,7 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Task 1 is complete, including its fresh critical review (no significant findings; five Low findings resolved). Task 2 is complete, including its real-browser check and fresh critical review (no significant findings; four Low code and three Low documentation findings resolved). Whole `npm test` is **158 passed / 158 total**, exit **0** (58 media-helper, 55 engine, 22 selection, 12 store, 11 dropzone). Lint and build pass. `master` holds Tasks 1–2. Task 3 (honest overlay and playback) is next, on its own branch, after its teaching checkpoint. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted in the specification. Execution follows the user's explanation-and-understanding checkpoint before each meaningful step.
+The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Tasks 1–2 are complete and reviewed. Task 3 Steps 1–2 (pure display calculations) are implemented and reviewed; component tests/wiring are next after their teaching checkpoint. Whole `npm test` is **214 passed / 214 total**, exit **0** (58 media-helper, 55 engine, 22 selection, 12 store, 11 dropzone, 56 display calculations). Lint and build pass. `master` still holds only Tasks 1–2; Task 3 is on `feat/task3-overlay-playback`. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted in the specification. Execution follows the user's explanation-and-understanding checkpoint before each meaningful step.
 
 The working folder is now `D:\Programming\summer 2026 projects\GymBro AI`; older folder paths in historical records are not the current working directory.
 
@@ -119,7 +119,7 @@ The reviewer classified the redundant `result` initialization as a **low-severit
 
 ## One next task
 
-Plan Task 3 (honest overlay and playback), on a new branch `feat/task3-overlay-playback` created from `master` (D-019). Its teaching checkpoint has not been given: explain the task and wait for the user's confirmation before editing. Include the items queued for Task 3 under "Task 2 review and fixes" below. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
+Continue Task 3 with Steps 3–4: write component tests and wire the tested display calculations into SkeletonOverlay/VideoStage. Explain this next step and wait for understanding before editing. Cover canvas geometry/DPR and missing-data clearing, paused seeks/restarts/speed changes, actionable rejected-play feedback, and the accessibility/coverage items queued under "Task 2 review and fixes". Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
 
 The user has no personal fixture available, and no openly licensed candidate inspected so far is a standardized side view; see "Fixture candidate research" below. Before Task 4 acceptance, the user must choose how to obtain a permitted side-view H.264 MP4. Do not claim a candidate or a mock is a validated result.
 
@@ -598,6 +598,43 @@ candidates.
   hidden. The reviewer once saw two file-chooser dialogs open after an Enter
   press; it did not reproduce under instrumentation and is attributed to the tool
   unless it reproduces manually.
+
+## Task 3 calculation helpers (Steps 1–2)
+
+- Implemented by Codex on 2026-11-03 after the user confirmed the three calculation
+  responsibilities. Exact served model identifier was not exposed. Started from
+  clean `feat/task3-overlay-playback` at `03185f5` (also the reviewed Tasks 1–2 base).
+- Added only `src/components/poseDisplay.ts` and `poseDisplay.test.ts` as production/
+  test source. API-only placeholders gave **56 failing tests** before implementation;
+  all 56 now pass. No placeholder remains. No dependencies or existing component
+  behavior changed. Updated affected instructions, READMEs, architecture, handoff,
+  and plan progress.
+- Sampling preserves exact missing observations, uses only adjacent detected
+  neighbors within two target intervals, and holds endpoints for at most one.
+  Output records actual sample time or requested interpolation time, copies point
+  objects, and never mutates stored observations. Visibility is interpolated only
+  when both endpoint values are known/in range; otherwise it stays unknown.
+- Drawing eligibility requires finite image-bound x/y and known visibility at the
+  supplied floor. The configured floor remains 0.3 when wired later, a heuristic.
+  Centered contain geometry uses CSS pixels, handles letterboxing and fractional
+  layout, and leaves DPR scaling to the canvas step.
+- A named four-machine-epsilon, timestamp-scaled allowance handles subtraction
+  roundoff at timing boundaries; it does not add a sampling interval or bridge
+  missing poses. Tests just 1 microsecond beyond the limit still hide the gap.
+- Verification: whole `npm test` **214/214**, lint exit **0**, build exit **0**
+  (399 modules; existing Browserslist warning); zero Markdown files in `dist`.
+  Own dev server on `127.0.0.1:5179` returned HTTP **200** with GymBro AI title
+  before implementation, then was stopped; the port was verified free. The older
+  `5176` server was not stopped.
+- Fresh read-only Codex review: **no significant findings**. Reviewer inspected
+  the scoped implementation/spec and independently ran **56/56** helper tests.
+  Its model identifier was unavailable; it did not repeat full-suite/lint/build
+  checks or browser rendering. No cross-provider review is claimed.
+- Task 3 remains incomplete. The new helpers are not yet used by the existing
+  overlay/player, so sampling/drawing/playback defects there remain open until
+  Steps 3–4. No real-media alignment, bench-press accuracy, or mobile claim follows
+  from these pure tests. Commit Steps 1–2 together under D-019; do not merge the
+  unfinished feature to `master`.
 
 ## Planning handoff
 
