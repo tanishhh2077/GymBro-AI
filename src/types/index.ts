@@ -15,6 +15,19 @@ export type CameraAngle = "front" | "side" | "45";
 /** How a clip was added to a session. */
 export type ClipSource = "upload" | "record";
 
+/** Processing stage attached to a recoverable pipeline failure. */
+export type ProcessingStage = "metadata" | "initialization" | "seek" | "processing";
+
+export type ProcessingFailureKind =
+  | "init"
+  | "video-load"
+  | "no-duration"
+  | "aborted"
+  | "detect"
+  | "timeout"
+  | "busy"
+  | "validation";
+
 /**
  * A single 2D landmark in normalized image space (0..1 across width/height).
  * Used for drawing the overlay onto the video.
@@ -94,17 +107,24 @@ export interface Clip {
   /** Object URL for the underlying video element. */
   url: string;
   status: ClipStatus;
-  /** Populated once processing succeeds. */
+  /** Populated once processing completes, including when no pose was detected. */
   pose?: PoseResult;
   error?: string;
+  /** Typed failure category when `status` is "error" and the cause is known. */
+  errorKind?: ProcessingFailureKind;
   /** Live progress while processing. */
   progress?: PoseProgress;
 }
 
+/**
+ * "no-pose" is a completed observation result in which no sampled frame had a
+ * detected pose; it is not a processing failure or a judgment of lifting form.
+ */
 export type ClipStatus =
   | "pending"
   | "processing"
   | "ready"
+  | "no-pose"
   | "error";
 
 /** Phase of a rep at a given moment. */
