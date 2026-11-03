@@ -1,0 +1,122 @@
+# Product and development decisions
+
+Updated: 2026-11-02 (America/Chicago).
+
+The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions below capture explicit conversation clarifications; they are not inferred from the existing prototype. The user confirmed the revised direction with "clear" on 2026-11-02.
+
+## Accepted direction
+
+### D-001: Narrow the initial supported workflow
+
+- One uploaded side-view barbell back-squat video, one lifter, standardized recording guidance.
+- First milestone: real pose estimation and a synchronized landmark overlay, input validation, basic failure handling, run instructions, and practical automated verification.
+- Rep detection, phases, movement measurements, evidence-backed findings, saved sessions, and comparison follow incrementally.
+- Existing deadlift/bench/multiple-view choices and unvalidated claims are legacy prototype behavior. Their existence does not broaden the approved MVP.
+
+### D-002: Evidence and uncertainty are product requirements
+
+- Findings must be traceable to observations, measurements, and video time. Decline unsupported conclusions.
+- No invented metrics, arbitrary numeric form scores, LLM-invented technique feedback, medical claims, or claims of verified 3D biomechanics.
+- Pose coverage and model visibility have narrower meanings than accuracy or movement quality.
+- This supersedes legacy required score fields and comments that imply view-invariant measured biomechanics. Those types remain unchanged until an approved implementation task revises them.
+
+### D-003: On-device processing for the first milestone
+
+- Reuse the existing browser pipeline as the initial implementation baseline.
+- Measure actual behavior on a real phone before adding a video-processing backend.
+- A backend remains an option if demonstrated device limitations or another concrete product requirement justify uploads and operational costs.
+- The brief's Python/FastAPI/NumPy preference remains relevant for later analysis experiments, evaluation, or services; it does not require a server in milestone one.
+- Centralized deployment can control versions; it does not establish measurement validity or eliminate decoder/runtime differences.
+- Saved analysis data and raw-video upload are separate decisions. No video upload or retention policy has been approved.
+
+### D-004: Installed mobile app is the intended release direction
+
+- Keep the browser implementation useful for early validation; do not build a second polished public frontend as part of the first milestone.
+- Capacitor is the first candidate for a small mobile prototype because it can reuse the React application. Its video, overlay, device-integration, and performance behavior must be tested before treating the approach as production-ready.
+- A React Native rewrite is deferred, not ruled out. An installed-app target does not determine processing location.
+- No Android/iOS project has been scaffolded. Initial test platform, available devices, distribution tooling, and release requirements remain to be established before mobile implementation.
+
+### D-005: Elephant-Goldfish specification review
+
+- Elephant has broad context and writes a bounded `spec.md`.
+- A fresh Goldfish receives the original approved brief, accepted amendments, specification, and relevant read-only repository access. It receives no Elephant conversation or argument defending the design.
+- Goldfish assesses fidelity, ambiguity, consistency, and implementability. A specification alone cannot prove fidelity to an unseen request.
+- Use this for consequential specifications and architectural changes; routine wording edits do not require another full cycle.
+- A favorable review is not scientific validation, implementation approval, or evidence that code works.
+
+### D-006: Independent judgment and implementation review
+
+- Agreement and criticism both need reasons. Treat reviewer feedback and the author's assumptions skeptically and fairly.
+- After code implementation, use a fresh critical reviewer with concrete evidence-based findings. No hostility, invented issues, or required finding count.
+- Resolve acceptance-blocking findings before completion; record fixes, reasoned disagreements, and verification limits.
+
+### D-007: Teaching and documentation-stage authorization
+
+- Before each meaningful step: explain what, why, and the obvious alternative; ask "Is this clear?" and wait. An explicit task-specific request can authorize a larger step.
+- The initial documentation-stage approval covered project documentation, scoped instructions, a proposed first-milestone specification, and its independent review.
+- That approval did not authorize implementing milestone one, adding dependencies, moving inference to a server, scaffolding mobile apps, or creating persistence.
+- No commit attribution trailers of any kind.
+
+### D-008: Reproducible environment verification
+
+- On 2026-11-02 the user confirmed the next step: verify the declared development environment before feature work.
+- Use a temporary clean copy to install the existing locked dependencies and check install/build/lint/dev behavior without replacing the working repository's `node_modules` or altering source.
+- Record actual failures and verification limits. A failing check is not permission to expand scope silently; explain the proposed tooling repair at the next understanding checkpoint.
+- This step does not authorize new dependencies, feature implementation, a test-framework setup, backend work, or mobile scaffolding.
+
+### D-009: Restore declared lint tooling
+
+- On 2026-11-02 the user confirmed adding the six missing lint tools as development dependencies, updating the lockfile, and checking a clean install, lint, and build.
+- Use the maintained ESLint 10 line with compatible JavaScript, TypeScript, React Hooks, React Refresh, and browser-globals packages. The verified Node 20.20.2 baseline meets their engine requirements. This does not establish support for older Node versions.
+- Retain existing lint configuration/rules and application code. Report any source findings separately before changing code; do not disable a rule merely to obtain a passing result.
+- The repair adds only development tooling. Existing dependency specifications and existing locked package records remain unchanged.
+- Tooling support/reference: [ESLint version support](https://eslint.org/version-support/), [Node requirements](https://eslint.org/docs/latest/use/getting-started#prerequisites), and [typescript-eslint compatibility](https://typescript-eslint.io/users/dependency-versions/).
+
+### D-010: Current product identity
+
+- On 2026-11-02 the user changed the app name to **Gym Bro AI** and confirmed applying the rename to app branding, package metadata, and current project instructions.
+- The user subsequently corrected the display spacing to **GymBro AI**. Current display name and brand: **GymBro AI**. Technical package name remains `gym-bro-ai`.
+- This supersedes the **Spotter AI / spotter.** identity in the original brief. The existing tagline, **Your second set of eyes.**, remains unchanged.
+- Preserve the original user-supplied brief and completed review records as historical sources. Read them with this amendment; do not rewrite them to imply the new identity existed earlier.
+- The identity change does not alter the supported exercise/view, processing architecture, review process, or pending source lint cleanup.
+
+### D-011: Remove unused detector-result initializer
+
+- On 2026-11-02 the user confirmed the one-line source cleanup and lint/build verification.
+- Remove only the unused initial `null` assignment in `src/core/PoseEngine.ts`; retain the declared type, detection call, and existing catch/throw path.
+- Keep the lint rule enabled. This cleanup does not authorize broader pose-processing changes or implement the first feature milestone.
+- The next stage is the bounded first-milestone implementation plan, with the proposed engineering defaults kept explicit before feature work.
+
+### D-012: Draft the first-milestone implementation plan
+
+- On 2026-11-02 the user confirmed writing a bounded implementation plan before feature code.
+- The [plan](superpowers/plans/2026-11-02-video-landmarks.md) proposes four dependent deliverables: bounded extraction, one-clip admission/ownership, honest overlay/playback, and permitted real-video acceptance.
+- Test tools, per-job detector ownership, numeric pilot limits, and execution steps remain proposals for review. No test packages, feature files, or fixtures were installed or created by the planning step.
+- The existing teaching checkpoints remain in effect. Drafting or reviewing the plan does not silently authorize feature implementation or waive later checkpoints.
+
+### D-013: Execute the reviewed first-milestone plan
+
+- On 2026-11-02 the user said "ok i like this plan, go ahead" after reviewing the plan and pilot limits.
+- Execute the bounded video-to-landmarks milestone, including test setup, configurable engineering limits, per-job detector ownership, and fresh task reviews. The subsequent exercise amendment in D-014 takes precedence.
+- Initial pilot values are not calibrated scientific thresholds or performance guarantees. Explain and record revisions supported by evidence.
+- Approval does not provide a fixture or authorize publishing private footage. Teaching and review requirements remain in effect.
+
+### D-014: First supported exercise is bench press
+
+- The user changed the first exercise to **barbell bench press** before analysis implementation began. This supersedes the back-squat-first scope in D-001 and the original brief; keep those historical sources unchanged.
+- The first milestone remains local video decoding, actual human-pose observations, and synchronized playback/overlay. No bench repetition counting, technique verdicts, bar detection/tracking, or bar-path measurements are added.
+- Retain a standardized side view as the initial camera assumption. Guide framing toward the lifter's upper body with shoulders, elbows, wrists and the moving bar in frame; do not assume visibility of hidden lower-body landmarks or claim automatic view verification. Bar framing helps human review but does not imply the model tracks the bar.
+- Bench/occlusion performance must be established on real footage. Low visibility or missing poses remain explicit; do not invent confidence or anatomical measurements.
+- The user has no fixture available. An openly licensed clip may be used with recorded provenance/attribution and appropriate adaptation rights; inspect framing and decoding before treating a candidate as an acceptance fixture.
+- The earlier Goldfish review covered the squat specification. Record a fresh bench-revision review separately rather than rewriting that completed review.
+
+## Specification-author defaults and later acceptance
+
+The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
+
+## Open prerequisites
+
+- A real side-view bench-press fixture with permission/license and privacy handling is needed before real-video acceptance can be demonstrated.
+- A supported browser/device matrix and first mobile test platform must be established at the relevant milestone.
+- Exact measurement definitions, quality thresholds, evaluation references, and dataset methodology belong to later bounded specifications.
+- Backend processing, accounts, video retention, database deployment, custom training, and multi-camera work remain unapproved future work.

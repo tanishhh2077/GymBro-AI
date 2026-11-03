@@ -1,0 +1,264 @@
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import type { Clip } from "@/types";
+import { EXERCISES } from "@/core/exercises";
+import { SkeletonOverlay } from "./SkeletonOverlay";
+import {
+  AlertIcon,
+  CpuIcon,
+  PauseIcon,
+  PlayIcon,
+  RestartIcon,
+} from "./icons";
+
+interface VideoStageProps {
+  clip: Clip;
+  accent?: string;
+}
+
+const SPEEDS = [0.25, 0.5, 1] as const;
+
+export function VideoStage({ clip, accent = EXERCISES.squat.accent }: VideoStageProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [time, setTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1);
+
+  const ready = clip.status === "ready" && !!clip.pose;
+  const frames = clip.pose?.frames ?? [];
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const onTime = () => setTime(v.currentTime);
+    const onMeta = () => setDuration(v.duration || 0);
+    const onPlay = () => setPlaying(true);
+    const onPause = () => setPlaying(false);
+    const onEnd = () => setPlaying(false);
+    v.addEventListener("timeupdate", onTime);
+    v.addEventListener("loadedmetadata", onMeta);
+    v.addEventListener("play", onPlay);
+    v.addEventListener("pause", onPause);
+    v.addEventListener("ended", onEnd);
+    return () => {
+      v.removeEventListener("timeupdate", onTime);
+      v.removeEventListener("loadedmetadata", onMeta);
+      v.removeEventListener("play", onPlay);
+      v.removeEventListener("pause", onPause);
+      v.removeEventListener("ended", onEnd);
+    };
+  }, []);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) v.playbackRate = speed;
+  }, [speed]);
+
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) void v.play();
+    else v.pause();
+  };
+
+  const restart = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.currentTime = 0;
+    void v.play();
+  };
+
+  const scrub = (value: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.currentTime = value;
+    setTime(value);
+  };
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-white/5 bg-black">
+      <div className="flex w-full justify-center bg-black">
+        {/* Wrapper hugs the video's true rendered box so the overlay canvas
+            (inset-0) aligns pixel-for-pixel with the frame — no letterboxing. */}
+        <div className="relative min-h-[220px]">
+          <video
+            ref={videoRef}
+            src={clip.url}
+            playsInline
+            muted
+            preload="auto"
+            className="block max-h-[70vh] max-w-full"
+          />
+          {ready && (
+            <SkeletonOverlay
+              videoRef={videoRef}
+              frames={frames}
+              color={accent}
+            />
+          )}
+
+          <ProcessingLayer clip={clip} accent={accent} />
+          <ErrorLayer clip={clip} />
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="flex flex-col gap-3 px-4 py-3">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={togglePlay}
+            disabled={!ready}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-ink-950 shadow-glow transition-transform hover:scale-105 disabled:opacity-40"
+            aria-label={playing ? "Pause" : "Play"}
+          >
+            {playing ? <PauseIcon width={20} /> : <PlayIcon width={20} />}
+          </button>
+          <button
+            type="button"
+            onClick={restart}
+            disabled={!ready}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-slate-300 transition-colors hover:bg-white/10 disabled:opacity-40"
+            aria-label="Restart"
+          >
+            <RestartIcon width={18} />
+          </button>
+
+          <input
+            type="range"
+            className="scrubber min-w-0 flex-1"
+            min={0}
+            max={duration || 0}
+            step={0.01}
+            value={time}
+            disabled={!ready}
+            onChange={(e) => scrub(parseFloat(e.target.value))}
+          />
+
+          <span className="shrink-0 font-mono text-xs tabular-nums text-slate-400">
+            {fmt(time)} / {fmt(duration)}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] uppercase tracking-wider text-slate-500">
+              Speed
+            </span>
+            {SPEEDS.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setSpeed(s)}
+                disabled={!ready}
+                className={`rounded-md px-2 py-1 text-xs font-medium transition-colors disabled:opacity-40 ${
+                  speed === s
+                    ? "bg-accent/20 text-accent-100"
+                    : "bg-white/5 text-slate-400 hover:bg-white/10"
+                }`}
+              >
+                {s}×
+              </button>
+            ))}
+          </div>
+
+          {clip.pose && <CoverageBadges clip={clip} />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProcessingLayer({ clip, accent }: { clip: Clip; accent: string }) {
+  const pct = clip.progress ? Math.round(clip.progress.fraction * 100) : 0;
+  return (
+    <AnimatePresence>
+      {clip.status === "processing" && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-ink-950/80 backdrop-blur-sm"
+        >
+          <div className="relative h-20 w-20">
+            <svg className="h-20 w-20 -rotate-90" viewBox="0 0 80 80">
+              <circle
+                cx="40"
+                cy="40"
+                r="34"
+                fill="none"
+                stroke="rgba(255,255,255,0.08)"
+                strokeWidth="6"
+              />
+              <circle
+                cx="40"
+                cy="40"
+                r="34"
+                fill="none"
+                stroke={accent}
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeDasharray={2 * Math.PI * 34}
+                strokeDashoffset={2 * Math.PI * 34 * (1 - pct / 100)}
+                style={{ transition: "stroke-dashoffset 0.2s linear" }}
+              />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center font-mono text-sm font-semibold text-white">
+              {pct}%
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm font-semibold text-white">
+              Estimating pose…
+            </div>
+            <div className="mt-0.5 text-xs text-slate-400">
+              {clip.progress
+                ? `${clip.progress.processedFrames} frames · ${clip.progress.currentTime.toFixed(1)}s`
+                : "Loading model…"}
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function ErrorLayer({ clip }: { clip: Clip }) {
+  if (clip.status !== "error") return null;
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-ink-950/85 px-6 text-center backdrop-blur-sm">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-danger/15 text-danger">
+        <AlertIcon width={24} />
+      </span>
+      <div className="max-w-sm text-sm text-slate-300">{clip.error}</div>
+    </div>
+  );
+}
+
+function CoverageBadges({ clip }: { clip: Clip }) {
+  const pose = clip.pose!;
+  const rate = Math.round(pose.coverage.detectionRate * 100);
+  const rateColor =
+    rate >= 85 ? "text-accent" : rate >= 60 ? "text-warn" : "text-danger";
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-[11px]">
+      <span className="chip bg-white/5 text-slate-300">
+        <CpuIcon width={13} /> {pose.delegate}
+      </span>
+      <span className="chip bg-white/5 text-slate-300">
+        {pose.frames.length} frames · {pose.fps}fps
+      </span>
+      <span className={`chip bg-white/5 ${rateColor}`}>
+        {rate}% pose coverage
+      </span>
+    </div>
+  );
+}
+
+function fmt(s: number): string {
+  if (!Number.isFinite(s)) return "0:00";
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2, "0")}`;
+}
