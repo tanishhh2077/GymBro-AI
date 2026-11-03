@@ -38,7 +38,7 @@ Updated 2026-11-03. Start here in Claude Code or Codex; no prior chat is require
 - A development server was observed earlier on `http://127.0.0.1:5176/`; verify it
   is still serving this project before using it. Do not kill unrelated servers.
 
-## Latest checks (2026-11-03, after Task 2 Step 6)
+## Latest checks (2026-11-03, after Task 2 Step 7)
 
 | Command / suite | Observed result |
 | --- | --- |
@@ -50,6 +50,7 @@ Updated 2026-11-03. Start here in Claude Code or Codex; no prior chat is require
 | `src/components/ClipDropzone.test.tsx` | 9 passed (all 9 failed first against the old component) |
 | `npm run lint` | exit 0 |
 | `npm run build` | exit 0; 399 modules; stale Browserslist warning; 0 Markdown files in `dist/` |
+| Real browser (Step 7) | Chromium `Chrome/156`; inputs, removal, reselection, and a synthetic no-pose clip on GPU behaved as designed |
 | `npm ls @mediapipe/tasks-vision` | exit 0; 0.10.35, pinned exactly |
 
 Mocks establish coordination, not real decoding, inference, or accuracy. Details,
@@ -79,10 +80,14 @@ including the review disposition, are in [STATUS.md](STATUS.md).
   view, recording guidance, and honest scope copy; no-pose clips stay replayable
   with a notice; failures show kind-specific titles. The rewired app has **not
   yet been checked in a browser**.
-- **Next task: plan Task 2 Step 7 (verification with a manual browser check), then
-  Step 8 (fresh review of all of Task 2).** The user approved the Task 2
-  explanation on 2026-11-03 and asked to pause after each part, so **confirm with
-  the user before starting**. The check list is in STATUS under "One next task".
+- **Task 2 Step 7 is done.** In a real Chromium browser, rejected inputs, an
+  undecodable `.mp4`, removal with URL revocation, reselection, and a synthetic
+  decodable clip (real GPU model start, real detection, no-pose result, playback)
+  all behaved as designed; no request sent the video anywhere. Details in STATUS.
+  No bench-press video has been processed yet.
+- **Next task: plan Task 2 Step 8, the fresh critical review of all of Task 2**,
+  then fixes, the disposition record, and the first fast-forward of `master`.
+  Details in STATUS under "One next task".
 - Task 4 prerequisite: no permitted side-view H.264 MP4 exists. Inspected Commons
   candidates are not side views; the user must choose an option (STATUS, "Fixture
   candidate research").

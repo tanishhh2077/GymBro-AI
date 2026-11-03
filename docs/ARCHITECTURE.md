@@ -101,7 +101,7 @@ The engine-level gaps found by earlier inspection (unbounded seek and initializa
 Still open, owned by later tasks:
 
 - Coverage badges still show `{n} frames · {fps}fps` (the sampling rate, which reads like source FPS) and color the coverage rate green/amber/red, which can read as a quality grade (Task 3).
-- The rewired interface has not yet been checked in a real browser (Task 2 Step 7).
+- The interface was checked in a real Chromium browser on 2026-11-03 (Task 2 Step 7, recorded in STATUS) with rejected inputs, an undecodable file, and a synthetic decodable clip without a person. No bench-press video has been processed, so overlay alignment and landmark quality remain unverified (Task 4).
 - Overlay sampling can substitute a neighboring pose when one is missing (Task 3).
 - The UI no longer offers other exercises or views, and its copy describes pose visualization only. Legacy code remains but is not rendered: `ExercisePicker.tsx`, the squat/deadlift and front/45° metadata, and future analysis types that imply analyzers, view-invariant biomechanics, and numeric scores. Unreferenced Vite template assets remain in `src/assets/` and `public/`.
 

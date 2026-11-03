@@ -10,7 +10,7 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Task 1 is complete, including its fresh critical review (no significant findings; five Low findings resolved). Task 2 Steps 1–6 (selection check, store job ownership, bench-only interface) are complete. Whole `npm test` is **156 passed / 156 total**, exit **0** (58 media-helper, 55 engine, 22 selection, 12 store, 9 dropzone). Lint and build pass. Task 2 Step 7 (verification including a manual browser check) and Step 8 (fresh review) are next; the user asked to confirm before each part. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted in the specification. Execution follows the user's explanation-and-understanding checkpoint before each meaningful step.
+The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Task 1 is complete, including its fresh critical review (no significant findings; five Low findings resolved). Task 2 Steps 1–6 (selection check, store job ownership, bench-only interface) are complete. Whole `npm test` is **156 passed / 156 total**, exit **0** (58 media-helper, 55 engine, 22 selection, 12 store, 9 dropzone). Lint and build pass. Task 2 Step 7 (verification, including a real-browser check) is complete; Step 8 (fresh review of all of Task 2) is next. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted in the specification. Execution follows the user's explanation-and-understanding checkpoint before each meaningful step.
 
 The working folder is now `D:\Programming\summer 2026 projects\GymBro AI`; older folder paths in historical records are not the current working directory.
 
@@ -119,7 +119,7 @@ The reviewer classified the redundant `result` initialization as a **low-severit
 
 ## One next task
 
-Plan Task 2 Step 7: rerun the three Task 2 test files, all unit tests, lint, and build; then check the running app in a browser against the dev server: the bench/side-view labels and guidance, dropzone rejection alerts (a non-MP4, a multi-file drop), the disabled dropzone while a clip is loaded, and the remove/reselect flow. Without a real fixture, an undecodable file named `.mp4` can exercise admission, the error panel, removal, and reselection; real decoding and the overlay stay unverified until Task 4. Then Step 8: a fresh critical review of all of Task 2 against M1-02/M1-03/M1-08/M1-09/M1-10, focusing on teardown ordering and rejected/deferred callbacks. The user asked to confirm before each part starts. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
+Plan Task 2 Step 8: a fresh critical review of all of Task 2 (commits `c5bcda8..HEAD` on the feature branch, Task 2 paths) against M1-02/M1-03/M1-08/M1-09/M1-10, focusing on teardown ordering and rejected/deferred callbacks, run in a session without the implementer's conversation. Evaluate and fix supported findings, rerun checks, record the disposition, then fast-forward `master` and push it (D-018). Task 3 (honest overlay and playback) follows with its own teaching checkpoint. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
 
 The user has no personal fixture available, and no openly licensed candidate inspected so far is a standardized side view; see "Fixture candidate research" below. Before Task 4 acceptance, the user must choose how to obtain a permitted side-view H.264 MP4. Do not claim a candidate or a mock is a validated result.
 
@@ -485,6 +485,53 @@ candidates.
 - Not done: the App copy and VideoStage changes have no automated tests (component
   tests for VideoStage are Task 3); nothing has been checked in a real browser
   yet (Step 7). Coverage badges still say `fps` and color-grade the rate (Task 3).
+
+## Task 2 Step 7: verification and real-browser check
+
+- Done by Claude Code (Opus 5.5) on 2026-11-03, after committing and pushing Task 2
+  Steps 1–6 (`008a088`). Automated: whole `npm test` **156/156**, exit **0**;
+  lint exit **0**; build exit **0**, 399 modules.
+- Real browser: a Chromium-based browser reporting `Chrome/156` on Windows, driven
+  through the Playwright MCP plugin, against `npm run dev -- --host 127.0.0.1
+  --port 5177 --strictPort` (started for this check and stopped afterwards).
+  Observed:
+  - The page shows the tagline, Bench Press / Side view, the recording guide, the
+    labelled drop area, and a "Choose video" button; no exercise or angle choices.
+  - A `.mov` chosen through the button: alert "Video not accepted — Choose an .mp4
+    video…"; no clip created.
+  - A two-file drop (real `DragEvent` with a `DataTransfer`): alert "Choose only one
+    video at a time."; drop default prevented; no clip created.
+  - A 4,096-byte random file named `.mp4`: admitted, then the error panel "The video
+    could not be read / The browser could not load this video. / Remove the clip to
+    try another."; playback controls and "Choose video" disabled.
+  - Remove: clip and video gone, dropzone enabled again, and `fetch` of the clip's
+    former `blob:` URL failed, confirming revocation. Choosing the junk file again
+    was admitted and failed the same way (remove/reselect flow).
+  - A synthetic H.264 MP4 recorded in the page with `MediaRecorder`
+    (`video/mp4;codecs=avc1.42E01E`, 640x360, 3.002 s, 8,125 bytes, moving shapes,
+    no person), delivered by drop: real decoding, the real MediaPipe runtime and
+    model on the **GPU** delegate (WebGL 2), 91 retained samples at 30/s, result
+    **no-pose** with the notice, no overlay canvas, enabled controls, and real
+    playback (reached 0.71 s). MediaPipe logged "Graph finished closing
+    successfully" and destroyed its WebGL context after the job, which is evidence
+    for review concern U3 that the per-job GPU context is released. Console
+    timestamps put detection at about 9 s for 91 samples (roughly 100 ms per sample
+    at 640x360 on GPU); one rough observation on one machine, not a benchmark.
+  - Network: all 41 requests were `GET` to the dev server or Google Fonts; no
+    request carried the video anywhere.
+  - Console: only the default `/favicon.ico` 404 (no icon is linked), MediaPipe's
+    own info/warning lines, and one error caused by the revocation check itself.
+- Found and fixed during the check: `index.html`'s title ("AI Barbell Form
+  Analysis") and description (squat/deadlift, multiple angles, "100% private")
+  still overclaimed; now "GymBro AI — Your second set of eyes." and an honest
+  bench/side-view description. Added `.playwright-mcp/` (the browser tool's output
+  folder inside the project) to `.gitignore`.
+- Tool notes: the Playwright plugin only uploads files from inside the project, so
+  test inputs were copied into the ignored `.playwright-mcp/` folder. An early
+  refused upload left stacked file-chooser dialogs that closed the page twice; a
+  clean retry and an idle test showed this was the tool, not the app.
+- Not verified: any bench-press footage, overlay alignment, landmark quality, the
+  CPU delegate, portrait video, phone browsers, or a 60 s clip's timing (U1).
 
 ## Planning handoff
 
