@@ -35,6 +35,9 @@ Updated 2026-11-03. Start here in Claude Code or Codex; no prior chat is require
 - Task 3 was developed on `feat/task3-overlay-playback`, created from `master`.
   Retain that branch. Check `git log`, `git status`, and `git branch -vv` for
   current local/remote pointers rather than assuming an older handoff hash.
+- Task 4 fixture investigation is on `feat/task4-browser-acceptance`, created
+  from verified local/remote `master` at `680201d`. No Task 4 application code,
+  browser-test dependency, or accepted fixture exists yet.
 - Layout, file responsibilities, and the engine lifecycle are in
   [ARCHITECTURE.md](ARCHITECTURE.md#repository-layout). `public/` deliberately holds
   no Markdown; its rules are in [root AGENTS.md](../AGENTS.md#static-files-in-public).
@@ -44,7 +47,7 @@ Updated 2026-11-03. Start here in Claude Code or Codex; no prior chat is require
   stop it, confirm the port is free: stopping the `npm run dev` wrapper on Windows
   can leave the `vite.js` node process running.
 
-## Latest checks (2026-11-03, after Task 3 component wiring)
+## Latest checks (2026-11-03, repeated during Task 4 fixture investigation)
 
 | Command / suite | Observed result |
 | --- | --- |
@@ -118,11 +121,17 @@ including the review disposition, are in [STATUS.md](STATUS.md).
   and independently passed **78/78** helper/overlay/player tests. No fixes or
   deferred code findings remain. The same-provider review's model identifier was
   unavailable; actual browser rendering and bench-press alignment are unverified.
-- **Next: Task 4 Step 1, permitted fixture gate.** Its teaching checkpoint has
-  **not** been approved. Explain real media versus simulated tests, ask
-  **"Is this clear?"**, and wait before fixture/browser-test work. No permitted
-  side-view bench recording is available. Do not relax the view requirement or
-  fabricate inference/alignment results to unblock acceptance.
+- **Task 4 Step 1's teaching checkpoint is approved.** The user answered "yes"
+  after the explanation of real media versus simulated tests. Codex inspected
+  seven additional public-stock previews; none meets the side-view exercise/
+  framing requirement (details in STATUS). No full video was downloaded or tested.
+- **Next: resolve the missing fixture.** A question is pending about whether the
+  user can arrange a consenting 10–20-second side-view barbell bench-press recording
+  or wants further public-footage research. If already available, request its
+  local path and privacy/retention permission. Step 1 and real-video acceptance
+  remain blocked on footage. Do not repeat the already-approved Step 1 checkpoint,
+  relax the view requirement, or invent a manifest, checksum, or reference times.
+  Step 2 browser-test implementation needs its own teaching checkpoint.
 - The server started for this step on `127.0.0.1:5179` was stopped and its port
   verified free. The earlier `5176` listener was left untouched.
 - GitHub's default branch may still need switching to `master` in Settings; this
@@ -151,6 +160,7 @@ work based on old unchecked scratch briefs under ignored `.superpowers/`.
 
 Confirm which instructions loaded, summarize the latest checks above, explain the
 next task with its reason and alternative, ask **"Is this clear?"**, and wait. The
-display task is complete and reviewed. Task 4 requires a new teaching checkpoint.
+display task is complete and reviewed. Task 4 Step 1 was approved; resolve its
+pending footage question. Later browser-test implementation has not been approved.
 After an approved work chunk,
 update this handoff, STATUS, ARCHITECTURE where facts changed, and plan progress.

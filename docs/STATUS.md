@@ -117,7 +117,7 @@ The reviewer classified the redundant `result` initialization as a **low-severit
 
 ## One next task
 
-Task 4 Step 1: establish a permitted side-view bench-press recording for actual browser acceptance. Explain why real media is needed instead of relying on simulated event/canvas tests, ask **"Is this clear?"**, and wait. No Task 4 teaching checkpoint has been approved yet. No fixture, browser-test dependency, or inference result is supplied by Task 3. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
+Task 4 Step 1: establish a permitted side-view bench-press recording for actual browser acceptance. Its teaching checkpoint is now approved; the user answered "yes" after the real-media versus simulated-test explanation. Seven additional public-stock previews were inspected without a suitable candidate. A question is pending about arranging a consenting recording or continuing public-footage research. Step 1 and real-video acceptance remain blocked on the missing fixture. No browser-test implementation checkpoint has been approved. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
 
 The user has no personal fixture available, and no openly licensed candidate inspected so far is a standardized side view; see "Fixture candidate research" below. Before Task 4 acceptance, the user must choose how to obtain a permitted side-view H.264 MP4. Do not claim a candidate or a mock is a validated result.
 
@@ -380,6 +380,51 @@ record a short consenting side-view clip kept outside Git through
 use a stock clip whose license permits this use (kept outside Git unless
 redistribution is allowed), and/or install `ffmpeg` to inspect, trim, and convert
 candidates.
+
+## Task 4 fixture investigation (Step 1, incomplete)
+
+- On 2026-11-03, the user approved establishing the real-video fixture. Codex
+  checked prior research, current spec/plan, and clean local/remote `master` at
+  `680201d`, then created `feat/task4-browser-acceptance`. Exact served model
+  identifier unavailable. No implementation/reviewer agent was used for this
+  research-only step.
+- Browsed the candidate source pages and stock terms, then inspected seven
+  downloaded public preview images in ignored scratch storage. These are cover
+  images only; rejection here is based on visible framing/exercise, not measured
+  model performance or inspection of the whole video.
+
+| Candidate source | Preview observation and disposition |
+| --- | --- |
+| [Pexels 4945122, Anastasia Shuraeva](https://www.pexels.com/video/man-working-out-at-the-gym-4945122/) | Tight oblique upper-body crop; near arm/hand extends out of frame. Not a standardized side view. |
+| [Pexels 30075431, JULLIAN PRODUCTION](https://www.pexels.com/video/strength-training-with-bench-press-in-compact-gym-30075431/) | Dark view looking along the bench from the foot end, not from the side. |
+| [Pexels 6892975, Kampus Production](https://www.pexels.com/video/a-woman-assisting-a-man-doing-bench-press-with-a-barbell-rod-6892975/) | Spotter dominates the crop; the lifter's body/arms are mostly outside it. |
+| [Pexels 34131257, JULLIAN PRODUCTION](https://www.pexels.com/cs-cz/video/cviceni-na-bench-press-v-tlumene-osvetlene-posilovne-34131257/) | End-on view of a seated/inclined machine press, not side-view barbell bench press. |
+| [Pexels 35965996, JULLIAN PRODUCTION](https://www.pexels.com/id-id/video/latihan-intensif-di-gym-latihan-kekuatan-bench-press-35965996/) | Dumbbells and inclined bench visible; wrong exercise for this fixture. |
+| [Pexels 4921642, Antoni Shkraba](https://www.pexels.com/video/a-man-working-out-in-the-gym-4921642/) | Tight oblique crop; one arm/hand extends outside the image. |
+| [YMove free Barbell Bench Press](https://ymove.app/free-exercise-videos) | Clean studio footage, but camera looks along the bench from the foot end. Not a side view. |
+
+- Also found source listings for Pexels 5320001 and Mixkit 100543, but did not
+  inspect their footage or accept them as fixtures. Direct Pexels page access
+  from PowerShell encountered a site challenge; no bypass was attempted. Web
+  preview rendering failed for several image URLs, while direct public image
+  downloads succeeded for the seven inspected previews.
+- Reviewed [Pexels terms](https://www.pexels.com/terms-of-service/) and the
+  [YMove download page's license section](https://ymove.app/free-exercise-videos)
+  as candidate-source evidence. No full clip was downloaded, converted, committed,
+  or passed through inference. No fixture permission was asserted merely from a
+  search snippet. `ffmpeg`/`ffprobe` remain unavailable on PATH; no tool was installed.
+- The user previously had no personal footage. Asked whether they can arrange a
+  consenting 10–20-second side-view barbell recording; if already available,
+  requested its local path and whether it must stay private. Response pending.
+- Step 1 and real-video acceptance remain **blocked by missing suitable footage**.
+  No manifest/hash/reference timestamps are fabricated, no plan checkbox is
+  completed, and no browser-test dependencies or application code were changed.
+  The first-step understanding checkpoint is approved; a later implementation
+  step needs its own explanation and confirmation. Required pre-commit checks on
+  the unchanged Task 3 source were repeated: **236/236** tests across eight files,
+  lint exit **0** with no warnings, and build exit **0**, 400 modules with the
+  existing Browserslist warning. Whitespace check passes. No new development
+  server, browser run, inference, or code review was needed for research-only docs.
 
 ## Task 2 part 1: selection check (Steps 1–2)
 
