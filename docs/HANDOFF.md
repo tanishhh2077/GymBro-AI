@@ -109,7 +109,10 @@ including the review disposition, are in [STATUS.md](STATUS.md).
   Player controls follow seek events, show guarded play/restart errors, reset on
   source change, expose seek/speed accessibility state, and use a persistent no-pose
   live region and neutral sampling/detection labels. New component tests pass.
-- **Next: Task 3 Steps 5–6 verification and fresh review/handoff.** These are
+- **Task 3 Step 5 is verified.** On pushed component commit `62486db`, all checks
+  passed again: 236 tests, lint without issues, production build (400 modules).
+  No new dependency or real-browser/media check was needed for this step.
+- **Next: Task 3 Step 6 fresh review/handoff and merge.** These are
   normal completion checks within the approved display step. All checks have
   passed; a fresh read-only whole-Task-3 Codex review returned no significant
   findings. Record final completion and finish the step commits before merging.

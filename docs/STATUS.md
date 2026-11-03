@@ -679,6 +679,16 @@ candidates.
   Steps 3–4 form one green commit under D-019; record final verification and
   review handoff in their own step commits before merging Task 3.
 
+## Task 3 final verification (Step 5)
+
+- Steps 3–4 are committed and pushed as `62486db`. On that committed source,
+  repeated required checks: `npm test` **236/236** in eight files; lint exit **0**,
+  no warnings; build exit **0**, 400 modules and the existing Browserslist warning.
+  Controlled tests verify RAF/observer/media listener and URL-lease cleanup.
+- `git diff --check` passes; build output contains no Markdown. This is a
+  verification/documentation step with no further application changes. Fresh
+  review handoff is next; actual browser/bench-press acceptance remains Task 4.
+
 ## Planning handoff
 
 - User authorization: [D-012](DECISIONS.md#d-012-draft-the-first-milestone-implementation-plan).
