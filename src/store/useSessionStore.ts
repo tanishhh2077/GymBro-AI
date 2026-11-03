@@ -29,7 +29,7 @@ interface SessionState {
   /** At most one clip. */
   clips: Clip[];
   processingState: ProcessingState;
-  /** Delegate the current clip's detector ran on, surfaced in the UI. */
+  /** Delegate (GPU or CPU) the current clip's completed job ran on; null otherwise. */
   engineDelegate: PoseDelegate | null;
 
   /** Admit one file or explain why not; processing continues in the background. */
@@ -119,14 +119,15 @@ export function createSessionStore(overrides: Partial<SessionDeps> = {}) {
         }));
       };
 
-      const video = deps.createVideo();
-      video.preload = "auto";
-      video.muted = true;
-      video.playsInline = true;
-      video.crossOrigin = "anonymous";
-      video.src = url;
-
+      let video: HTMLVideoElement | null = null;
       try {
+        video = deps.createVideo();
+        video.preload = "auto";
+        video.muted = true;
+        video.playsInline = true;
+        video.crossOrigin = "anonymous";
+        video.src = url;
+
         const pose = await engine.processVideo(video, {
           signal: controller.signal,
           onProgress: (progress) => patch({ progress }),
@@ -148,8 +149,10 @@ export function createSessionStore(overrides: Partial<SessionDeps> = {}) {
       } finally {
         engine.close();
         // Detach the hidden decoder before giving up its lease on the URL.
-        video.removeAttribute("src");
-        video.load();
+        if (video) {
+          video.removeAttribute("src");
+          video.load();
+        }
         if (job === current) job = null;
         releaseLease(clipId);
         refreshState();
@@ -176,14 +179,12 @@ export function createSessionStore(overrides: Partial<SessionDeps> = {}) {
         const issue = validateSelection([file]);
         if (issue) return issue;
 
+        // Create the engine before the URL, so a failure here cannot strand a URL.
+        const engine = deps.createEngine();
         const id = nextId("clip");
         const url = deps.createObjectURL(file);
         media.set(id, { url, leases: 1, retired: false });
-        const current: Job = {
-          clipId: id,
-          controller: new AbortController(),
-          engine: deps.createEngine(),
-        };
+        const current: Job = { clipId: id, controller: new AbortController(), engine };
         job = current;
         set({
           clips: [{ id, name: file.name, source: "upload", angle: "side", url, status: "processing" }],
@@ -196,7 +197,8 @@ export function createSessionStore(overrides: Partial<SessionDeps> = {}) {
 
       removeClip: (id) => {
         if (!get().clips.some((c) => c.id === id)) return;
-        set((s) => ({ clips: s.clips.filter((c) => c.id !== id) }));
+        // The session holds at most one clip, so its delegate goes with it.
+        set((s) => ({ clips: s.clips.filter((c) => c.id !== id), engineDelegate: null }));
         retire(id);
         refreshState();
       },

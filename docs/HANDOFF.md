@@ -29,27 +29,30 @@ Updated 2026-11-03. Start here in Claude Code or Codex; no prior chat is require
 - Local folder: `D:\Programming\summer 2026 projects\GymBro AI`.
 - Origin: `https://github.com/tanishhh2077/GymBro-AI.git`. Tasks 1–2 live on
   `feat/gymbro-video-landmarks` (they predate the one-branch-per-task rule).
-  `master` is on GitHub but still at the scaffold commit; it is fast-forwarded to
-  the feature branch when Task 2's review is resolved. GitHub's default branch is
-  still the feature branch until the user switches it to `master` in Settings.
-- Task 3 will be the first task on its own branch, created from `master` after that
-  fast-forward. Check `git log` and `git status` for the latest commits first.
+  `master` holds Tasks 1–2: it is fast-forwarded to the feature branch once the
+  Task 2 review fixes are committed, and pushed. GitHub's default branch is still
+  the feature branch until the user switches it to `master` in Settings.
+- Task 3 is the first task on its own branch, created from `master`. Check
+  `git log`, `git status`, and `git branch -vv` for the latest state first.
 - Layout, file responsibilities, and the engine lifecycle are in
   [ARCHITECTURE.md](ARCHITECTURE.md#repository-layout). `public/` deliberately holds
   no Markdown; its rules are in [root AGENTS.md](../AGENTS.md#static-files-in-public).
-- A development server was observed earlier on `http://127.0.0.1:5176/`; verify it
-  is still serving this project before using it. Do not kill unrelated servers.
+- A development server from an earlier session listens on `http://127.0.0.1:5176/`
+  (seen 2026-11-03, started 2026-11-02); it was not started by this session, so
+  leave it alone. Start your own on another port with `--strictPort`, and when you
+  stop it, confirm the port is free: stopping the `npm run dev` wrapper on Windows
+  can leave the `vite.js` node process running.
 
-## Latest checks (2026-11-03, after Task 2 Step 7)
+## Latest checks (2026-11-03, after the Task 2 review fixes)
 
 | Command / suite | Observed result |
 | --- | --- |
-| Whole `npm test` | **156 passed / 156**, exit 0 |
+| Whole `npm test` | **158 passed / 158**, exit 0 |
 | `src/core/video.test.ts` | 58 passed |
 | `src/core/PoseEngine.test.ts` | 55 passed |
 | `src/core/clipPolicy.test.ts` | 22 passed (16 failed first against a placeholder) |
 | `src/store/useSessionStore.test.ts` | 12 passed (all 12 failed first: API missing) |
-| `src/components/ClipDropzone.test.tsx` | 9 passed (all 9 failed first against the old component) |
+| `src/components/ClipDropzone.test.tsx` | 11 passed (the first 9 failed first against the old component) |
 | `npm run lint` | exit 0 |
 | `npm run build` | exit 0; 399 modules; stale Browserslist warning; 0 Markdown files in `dist/` |
 | Real browser (Step 7) | Chromium `Chrome/156`; inputs, removal, reselection, and a synthetic no-pose clip on GPU behaved as designed |
@@ -80,16 +83,24 @@ including the review disposition, are in [STATUS.md](STATUS.md).
   multi-file drops, shows a named alert, and is disabled while a clip is loaded or
   being released; the camera selector is gone. The page shows Bench Press / Side
   view, recording guidance, and honest scope copy; no-pose clips stay replayable
-  with a notice; failures show kind-specific titles. The rewired app has **not
-  yet been checked in a browser**.
+  with a notice; failures show kind-specific titles.
 - **Task 2 Step 7 is done.** In a real Chromium browser, rejected inputs, an
   undecodable `.mp4`, removal with URL revocation, reselection, and a synthetic
   decodable clip (real GPU model start, real detection, no-pose result, playback)
   all behaved as designed; no request sent the video anywhere. Details in STATUS.
   No bench-press video has been processed yet.
-- **Next task: plan Task 2 Step 8, the fresh critical review of all of Task 2**,
-  then fixes, the disposition record, and the first fast-forward of `master`.
-  Details in STATUS under "One next task".
+- **Task 2 Step 8 is done, so Task 2 is complete.** A fresh-context review found
+  no significant findings; its four Low code findings and three Low documentation
+  findings were fixed (focus after removal, a "releasing" message, page-wide drop
+  claiming, clearing `engineDelegate`). `master` is fast-forwarded to this work
+  and pushed. Details in STATUS under "Task 2 review and fixes".
+- **Next task: plan Task 3, honest overlay and playback**, on a new branch
+  `feat/task3-overlay-playback` created from `master`. Its teaching checkpoint has
+  **not** been given: explain Task 3 and wait for the user's confirmation first.
+  Review items already queued for Task 3 are listed in STATUS ("Task 2 review and
+  fixes").
+- User action pending: switch GitHub's default branch to `master` (Settings >
+  General > Default branch).
 - Task 4 prerequisite: no permitted side-view H.264 MP4 exists. Inspected Commons
   candidates are not side views; the user must choose an option (STATUS, "Fixture
   candidate research").

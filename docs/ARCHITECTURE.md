@@ -1,6 +1,6 @@
 # System architecture
 
-Status: observed prototype plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 after the Task 1 engine review.
+Status: observed prototype plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 after the Task 2 review.
 
 ## Existing implementation
 
@@ -47,8 +47,8 @@ TypeScript configuration: `npm run build` runs `tsc -b` against the root `tsconf
 
 | Area | Responsibility |
 | --- | --- |
-| `src/App.tsx` | Page composition: fixed Bench Press / Side view labels, recording guidance, honest scope copy, the dropzone (disabled while a clip is loaded or `processingState` is not `idle`), and the clip list with a remove/cancel button |
-| `src/components/ClipDropzone.tsx` | `onSelect`/`disabled` props; runs `validateSelection` on chosen or dropped files (so multiple-file drops are rejected), hands one file to `onSelect`, and shows a rejection in a named `role="alert"`; a "Choose video" button is the keyboard path; drops are always claimed so the browser never opens the file |
+| `src/App.tsx` | Page composition: fixed Bench Press / Side view labels, recording guidance, honest scope copy, the dropzone (disabled while a clip is loaded or `processingState` is not `idle`, reading "Releasing the previous clip…" while a removed clip is still being released), and the clip list with a remove/cancel button that moves keyboard focus to the "Add your bench press video" heading |
+| `src/components/ClipDropzone.tsx` | `onSelect`/`disabled`/`disabledMessage` props; runs `validateSelection` on chosen or dropped files (so multiple-file drops are rejected), hands one file to `onSelect`, and shows a rejection in a named `role="alert"`; a "Choose video" button is the keyboard path. While mounted it claims file drags anywhere on the page, so the browser never opens a dropped file and unloads the app |
 | `src/components/ExercisePicker.tsx` | Legacy multi-exercise/view choice; no longer rendered, file retained |
 | `src/store/useSessionStore.ts` | `createSessionStore` factory and the app's `useSessionStore`: at most one clip, admission via `validateSelection`, one owned job per clip, `processingState` (`idle`/`processing`/`cancelling`), and leased object URLs (see "Session ownership" below) |
 | `src/core/PoseEngine.ts` | One processing job at a time: metadata validation before model work, bounded initialization, per-job detector, sampling, observation validation and copying, progress, coverage, and cleanup |
@@ -80,7 +80,8 @@ TypeScript configuration: `npm run build` runs `tsc -b` against the root `tsconf
 - `startClip(file)` returns a `SelectionIssue` immediately or `null`. It rejects with `busy` while a clip is loaded (in any status) or while `processingState` is not `idle`, then applies `validateSelection` before creating any URL, video, or engine. To choose another clip, the user removes the current one first.
 - Each admitted clip gets a fresh `PoseEngine`, `AbortController`, and job object; the job object is the ownership token. Every progress, result, error, and `engineDelegate` update checks that its job still owns the session, so late callbacks from a removed job change nothing.
 - Outcomes: `ready` (at least one sampled frame had a pose), `no-pose` (completed, no pose detected; `pose` is kept, `error` is empty), or `error` with `errorKind` from the engine's failure kind.
-- Removing a clip (or `reset()`) clears it from the screen at once and aborts its job. `processingState` stays `cancelling`, blocking admission, until the job has settled (engine closed, hidden video detached) and every lease on the URL is released; then the URL is revoked exactly once.
+- Removing a clip (or `reset()`) removes it from the store at once, clears `engineDelegate`, and aborts its job. `processingState` stays `cancelling`, blocking admission, until the job has settled (engine closed, hidden video detached) and every lease on the URL is released; then the URL is revoked exactly once.
+- On screen, `App.tsx`'s `AnimatePresence` keeps the removed clip's `VideoStage` mounted, and so holding its lease, until the fade-out animation ends (about 0.3 s observed). Admission therefore reopens only after that animation; changing or removing the animation changes admission timing. In a hidden tab the animation pauses, so `cancelling` lasts until the tab is visible again.
 - Leases: the hidden decoder holds one from admission until its job ends; each mounted `VideoStage` holds one through `retainClipMedia`, whose release function is idempotent. A lease on a live clip does not revoke its URL when released, so StrictMode's mount-unmount-mount cycle is safe.
 
 ## Data and time contracts

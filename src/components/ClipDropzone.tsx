@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { validateSelection, type SelectionIssue } from "@/core/clipPolicy";
 import { M1_LIMITS } from "@/core/processingLimits";
 import { AlertIcon, UploadIcon } from "./icons";
@@ -8,16 +8,36 @@ interface ClipDropzoneProps {
   onSelect: (file: File) => SelectionIssue | null;
   /** True while a clip is loaded or being released; blocks every input path. */
   disabled?: boolean;
+  /** Why admission is blocked, shown while `disabled`. */
+  disabledMessage?: string;
 }
 
 const ACCEPT = ".mp4,video/mp4";
 const MAX_MIB = M1_LIMITS.maxFileBytes / 1_048_576;
 
-export function ClipDropzone({ onSelect, disabled = false }: ClipDropzoneProps) {
+export function ClipDropzone({
+  onSelect,
+  disabled = false,
+  disabledMessage = "Remove the current clip to choose another",
+}: ClipDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [issue, setIssue] = useState<SelectionIssue | null>(null);
   const alertTitleId = useId();
+
+  // A file dropped anywhere else on the page would be opened by the browser,
+  // unloading the app and its in-memory result.
+  useEffect(() => {
+    const claimFileDrag = (e: DragEvent) => {
+      if (Array.from(e.dataTransfer?.types ?? []).includes("Files")) e.preventDefault();
+    };
+    window.addEventListener("dragover", claimFileDrag);
+    window.addEventListener("drop", claimFileDrag);
+    return () => {
+      window.removeEventListener("dragover", claimFileDrag);
+      window.removeEventListener("drop", claimFileDrag);
+    };
+  }, []);
 
   // The same gate the store applies; it also sees multiple-file drops, which
   // the store never receives because it is handed a single file.
@@ -56,9 +76,7 @@ export function ClipDropzone({ onSelect, disabled = false }: ClipDropzoneProps) 
         </span>
         <div>
           <div className="text-sm font-semibold text-white">
-            {disabled
-              ? "Remove the current clip to choose another"
-              : "Drop an MP4 video here"}
+            {disabled ? disabledMessage : "Drop an MP4 video here"}
           </div>
           <div className="mt-1 text-xs text-slate-400">
             One .mp4 file, up to {MAX_MIB} MiB and {M1_LIMITS.maxDurationSeconds} seconds ·

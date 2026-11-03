@@ -240,7 +240,7 @@ function ProcessingLayer({ clip, accent }: { clip: Clip; accent: string }) {
             <div className="mt-0.5 text-xs text-slate-400">
               {clip.progress
                 ? `${clip.progress.processedFrames} frames · ${clip.progress.currentTime.toFixed(1)}s`
-                : "Loading model…"}
+                : "Preparing…"}
             </div>
           </div>
         </motion.div>

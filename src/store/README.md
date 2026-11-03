@@ -11,7 +11,9 @@
   job settles and every URL lease is released, then the URL is revoked once.
 - `retainClipMedia(id)` gives a visible player a lease with an idempotent release.
 
-`useSessionStore.test.ts` (12 cases) drives the real engine with a mocked SDK.
+`useSessionStore.test.ts` (12 cases) drives the real engine with a mocked SDK,
+except one case that uses a fake engine to deliver callbacks after removal.
+`removeClip` also clears `engineDelegate`.
 Design details: [ARCHITECTURE.md](../../docs/ARCHITECTURE.md#session-ownership).
 
 Follow [local rules](AGENTS.md) and [current handoff](../../docs/HANDOFF.md).

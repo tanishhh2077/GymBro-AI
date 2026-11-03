@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSessionStore } from "@/store/useSessionStore";
 import { ANGLES, EXERCISES } from "@/core/exercises";
@@ -17,6 +18,15 @@ export default function App() {
   // that are not implemented.
   const { name: exerciseName, accent } = EXERCISES[exercise];
   const admissionBlocked = clips.length > 0 || processingState !== "idle";
+  const releasing = clips.length === 0 && processingState === "cancelling";
+  const addHeadingRef = useRef<HTMLHeadingElement>(null);
+
+  // The removed clip's section unmounts after its exit animation, taking the
+  // focused remove button with it; move keyboard focus somewhere that remains.
+  const handleRemove = (id: string) => {
+    removeClip(id);
+    addHeadingRef.current?.focus();
+  };
 
   return (
     <div className="relative min-h-full">
@@ -30,6 +40,7 @@ export default function App() {
           step={1}
           title="Add your bench press video"
           subtitle="Film one set from the side, then choose the MP4 file."
+          headingRef={addHeadingRef}
         >
           <div className="mb-3 flex flex-wrap gap-2">
             <span
@@ -46,7 +57,11 @@ export default function App() {
             </span>
           </div>
           <RecordingGuide />
-          <ClipDropzone onSelect={startClip} disabled={admissionBlocked} />
+          <ClipDropzone
+            onSelect={startClip}
+            disabled={admissionBlocked}
+            disabledMessage={releasing ? "Releasing the previous clip…" : undefined}
+          />
         </Section>
 
         <AnimatePresence>
@@ -59,7 +74,7 @@ export default function App() {
               <Section
                 step={2}
                 title="Pose overlay"
-                subtitle="Estimated landmarks drawn over your video, synced to playback. Remove the clip to cancel or start over."
+                subtitle="Estimated landmarks drawn over your video during playback. Remove the clip to cancel or start over."
               >
                 <div className="space-y-6">
                   {clips.map((clip) => (
@@ -86,7 +101,7 @@ export default function App() {
                         </div>
                         <button
                           type="button"
-                          onClick={() => removeClip(clip.id)}
+                          onClick={() => handleRemove(clip.id)}
                           className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-slate-400 transition-colors hover:bg-danger/15 hover:text-danger"
                           aria-label={
                             clip.status === "processing"
@@ -183,7 +198,7 @@ function RecordingGuide() {
     <div className="mb-4 rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 text-sm text-slate-300">
       <div className="mb-1.5 font-semibold text-white">For the clearest overlay</div>
       <ul className="list-disc space-y-1 pl-5 text-slate-400">
-        <li>Film from the side with the camera steady, at about bench height.</li>
+        <li>Film from the side with the camera steady.</li>
         <li>Keep your shoulders, elbows, and wrists in frame for the whole set.</li>
         <li>
           Keep the bar&apos;s path in frame so you can review it yourself; GymBro AI
@@ -207,11 +222,14 @@ function Section({
   step,
   title,
   subtitle,
+  headingRef,
   children,
 }: {
   step: number;
   title: string;
   subtitle: string;
+  /** Lets the page move keyboard focus to this heading. */
+  headingRef?: React.Ref<HTMLHeadingElement>;
   children: React.ReactNode;
 }) {
   return (
@@ -221,7 +239,13 @@ function Section({
           {step}
         </span>
         <div>
-          <h2 className="text-lg font-bold text-white">{title}</h2>
+          <h2
+            ref={headingRef}
+            tabIndex={headingRef ? -1 : undefined}
+            className="text-lg font-bold text-white focus:outline-none"
+          >
+            {title}
+          </h2>
           <p className="text-sm text-slate-400">{subtitle}</p>
         </div>
       </div>

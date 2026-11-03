@@ -10,7 +10,7 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Task 1 is complete, including its fresh critical review (no significant findings; five Low findings resolved). Task 2 Steps 1–6 (selection check, store job ownership, bench-only interface) are complete. Whole `npm test` is **156 passed / 156 total**, exit **0** (58 media-helper, 55 engine, 22 selection, 12 store, 9 dropzone). Lint and build pass. Task 2 Step 7 (verification, including a real-browser check) is complete; Step 8 (fresh review of all of Task 2) is next. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted in the specification. Execution follows the user's explanation-and-understanding checkpoint before each meaningful step.
+The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Task 1 is complete, including its fresh critical review (no significant findings; five Low findings resolved). Task 2 is complete, including its real-browser check and fresh critical review (no significant findings; four Low code and three Low documentation findings resolved). Whole `npm test` is **158 passed / 158 total**, exit **0** (58 media-helper, 55 engine, 22 selection, 12 store, 11 dropzone). Lint and build pass. `master` holds Tasks 1–2. Task 3 (honest overlay and playback) is next, on its own branch, after its teaching checkpoint. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted in the specification. Execution follows the user's explanation-and-understanding checkpoint before each meaningful step.
 
 The working folder is now `D:\Programming\summer 2026 projects\GymBro AI`; older folder paths in historical records are not the current working directory.
 
@@ -119,7 +119,7 @@ The reviewer classified the redundant `result` initialization as a **low-severit
 
 ## One next task
 
-Plan Task 2 Step 8: a fresh critical review of all of Task 2 (commits `c5bcda8..HEAD` on the feature branch, Task 2 paths) against M1-02/M1-03/M1-08/M1-09/M1-10, focusing on teardown ordering and rejected/deferred callbacks, run in a session without the implementer's conversation. Evaluate and fix supported findings, rerun checks, record the disposition, then fast-forward `master` and push it (D-018). Task 3 (honest overlay and playback) follows with its own teaching checkpoint. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
+Plan Task 3 (honest overlay and playback), on a new branch `feat/task3-overlay-playback` created from `master` (D-019). Its teaching checkpoint has not been given: explain the task and wait for the user's confirmation before editing. Include the items queued for Task 3 under "Task 2 review and fixes" below. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
 
 The user has no personal fixture available, and no openly licensed candidate inspected so far is a standardized side view; see "Fixture candidate research" below. Before Task 4 acceptance, the user must choose how to obtain a permitted side-view H.264 MP4. Do not claim a candidate or a mock is a validated result.
 
@@ -493,7 +493,9 @@ candidates.
   lint exit **0**; build exit **0**, 399 modules.
 - Real browser: a Chromium-based browser reporting `Chrome/156` on Windows, driven
   through the Playwright MCP plugin, against `npm run dev -- --host 127.0.0.1
-  --port 5177 --strictPort` (started for this check and stopped afterwards).
+  --port 5177 --strictPort`. Correction found during Step 8: stopping the
+  background task ended only the `npm` wrapper; the `vite.js` process kept
+  listening on 5177 until it was identified and stopped after the review fixes.
   Observed:
   - The page shows the tagline, Bench Press / Side view, the recording guide, the
     labelled drop area, and a "Choose video" button; no exercise or angle choices.
@@ -532,6 +534,70 @@ candidates.
   clean retry and an idle test showed this was the tool, not the app.
 - Not verified: any bench-press footage, overlay alignment, landmark quality, the
   CPU delegate, portrait video, phone browsers, or a 60 s clip's timing (U1).
+
+## Task 2 review and fixes (Step 8)
+
+- Reviewer: a fresh-context Claude Code subagent (Opus 5.5), launched from the
+  implementing session on 2026-11-03 with no access to its conversation; a
+  same-provider review under D-016. Read-only. It ran `npm test` (156/156), lint
+  (exit 0), and build (exit 0), and drove eight jobs in a real Chromium browser on
+  its own dev server (port 5178, stopped afterwards) with synthetic no-person
+  H.264 clips: removal after completion (`cancelling` 321 ms, then `idle`, URL
+  revoked), during detection (15 ms), and 22 ms after admission (about 790 ms; the
+  orphaned MediaPipe graph closed and destroyed its WebGL context, then the
+  replacement completed). Network: only `GET`s; no request carried the video.
+  A process commit (`2ca2dac`, documents only) landed during the review.
+- Verdict: **no significant findings** (nothing Critical, High, or Medium).
+  Findings, all evaluated by the implementer (Claude Code, Opus 5.5) and fixed
+  after the user confirmed the explanation:
+  - L1: keyboard focus fell to `<body>` when the removed clip's section unmounted.
+    Fixed: the remove button moves focus to the "Add your bench press video"
+    heading (`tabIndex={-1}`).
+  - L2: during release the dropzone said "Remove the current clip" with no clip
+    left. Fixed: optional `disabledMessage` prop; App passes "Releasing the
+    previous clip…" while `cancelling` with no clips. Tested.
+  - L3: file drops outside the drop area were not claimed, so the browser could
+    open the file and unload the app. Fixed: while mounted, the dropzone claims
+    `dragover`/`drop` events carrying files anywhere on the window; other drags
+    are untouched; the listeners are removed on unmount. Tested.
+  - L4: `engineDelegate` stayed set after removal and its comment claimed a UI
+    consumer. Fixed: `removeClip` clears it; comment corrected. Tested.
+  - D1–D3: ARCHITECTURE said removal clears the screen "at once" (the exit
+    animation keeps the player and its lease for about 0.3 s, which delays
+    admission) and that drops were "always" claimed; HANDOFF still said the app was
+    never checked in a browser. All corrected, plus the ARCHITECTURE date line and
+    the store README's test description.
+- Also changed on the reviewer's observations: removed the unsourced "at about
+  bench height" advice; overlay subtitle says "during playback" instead of "synced
+  to playback" (unverified until Tasks 3–4); the processing overlay says
+  "Preparing…" instead of "Loading model…" while metadata is still read; the store
+  creates the engine before the URL and creates the hidden video inside the `try`,
+  so an unexpected throw cannot strand a URL or leave the job `processing`.
+- Tests added: two dropzone cases (disabled message; page-wide file-drag claim,
+  ignoring non-file drags and released on unmount) and store assertions (delegate
+  cleared on removal; one `createFromOptions` call per admitted clip). Mutation
+  check: removing the page-level `drop` listener fails 1 dropzone test; keeping the
+  delegate on removal fails 1 store test; both files were restored byte-for-byte.
+- Checks after the fixes: `npm test` **158/158**, exit **0**; lint exit **0**;
+  build exit **0**, 399 modules. Real browser (Chromium `Chrome/156`, dev server on
+  5177): after "Remove clip" focus moved to the heading, the dropzone read
+  "Releasing the previous clip…" 60 ms later and "Drop an MP4 video here" with
+  "Choose video" enabled 1.5 s later. That server turned out to be the Step 7
+  `vite.js` process still running (see the correction in the Step 7 section); it
+  served the current files, and it was stopped afterwards with port 5177 confirmed
+  free. A server on 5176 from an earlier session was left running.
+- Queued for Task 3 (VideoStage controls, now reachable for no-pose clips): the
+  scrubber has no accessible name; speed buttons show the selection by color only
+  (no `aria-pressed`); coverage badges say `fps` and color-grade the rate;
+  `NoPoseNotice` is inserted already filled, which some screen readers do not
+  announce.
+- Unverified, carried to Task 4 or the phone prototype: an orphaned model start
+  can overlap the replacement's start on slower devices (two WebGL contexts);
+  screen-reader announcements; real drops onto the page (synthetic events cannot
+  trigger the browser's default action); `cancelling` lasting while a tab is
+  hidden. The reviewer once saw two file-chooser dialogs open after an Enter
+  press; it did not reproduce under instrumentation and is attributed to the tool
+  unless it reproduces manually.
 
 ## Planning handoff
 

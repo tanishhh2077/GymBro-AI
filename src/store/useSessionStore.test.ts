@@ -291,6 +291,8 @@ describe("session store: one clip, owned job, leased media", () => {
     await settle();
     expect(store.getState().clips[0]).toMatchObject({ name: "next.mp4", status: "ready" });
     expect(store.getState().clips[0].error).toBeUndefined();
+    // Each admitted clip creates its own detector rather than reusing one.
+    expect(sdk.create).toHaveBeenCalledTimes(2);
   });
 
   it("keeps removed media until the last view lease is released", async () => {
@@ -299,8 +301,10 @@ describe("session store: one clip, owned job, leased media", () => {
     await settle();
     const { id } = store.getState().clips[0];
     const release = store.getState().retainClipMedia(id);
+    expect(store.getState().engineDelegate).toBe("GPU");
 
     store.getState().removeClip(id);
+    expect(store.getState().engineDelegate).toBeNull();
     expect(revokeObjectURL).not.toHaveBeenCalled();
     expect(store.getState().processingState).toBe("cancelling");
     expect(store.getState().startClip(mp4("next.mp4"))).toMatchObject({ code: "busy" });

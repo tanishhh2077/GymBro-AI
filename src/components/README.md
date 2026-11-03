@@ -2,8 +2,9 @@
 
 - `ClipDropzone.tsx`: local file selection and drop area. It applies
   `validateSelection`, hands one file to `onSelect`, shows rejections in a named
-  alert, and blocks every input path while `disabled`. Tested in
-  `ClipDropzone.test.tsx` (9 cases, React `createRoot`/`act` in jsdom).
+  alert, blocks every input path while `disabled` (showing `disabledMessage`), and
+  claims file drags anywhere on the page while mounted. Tested in
+  `ClipDropzone.test.tsx` (11 cases, React `createRoot`/`act` in jsdom).
 - `ExercisePicker.tsx`: legacy exercise/view controls, no longer rendered.
 - `VideoStage.tsx`: player and playback controls. It leases the clip's URL from
   the store while mounted (`retainMedia` prop), sets the video source in an effect,

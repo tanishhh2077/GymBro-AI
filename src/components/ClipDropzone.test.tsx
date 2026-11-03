@@ -21,8 +21,14 @@ afterEach(() => {
   container.remove();
 });
 
-function render(onSelect: (file: File) => SelectionIssue | null, disabled = false) {
-  act(() => root.render(<ClipDropzone onSelect={onSelect} disabled={disabled} />));
+function render(
+  onSelect: (file: File) => SelectionIssue | null,
+  disabled = false,
+  disabledMessage?: string,
+) {
+  act(() => root.render(
+    <ClipDropzone onSelect={onSelect} disabled={disabled} disabledMessage={disabledMessage} />,
+  ));
 }
 
 function mp4(name = "bench.mp4", size = 1_000) {
@@ -159,5 +165,32 @@ describe("ClipDropzone", () => {
     render(() => null);
     expect(container.querySelectorAll("[aria-pressed]")).toHaveLength(0);
     expect(container.textContent).not.toMatch(/camera angle/i);
+  });
+
+  it("explains why admission is blocked while disabled", () => {
+    render(() => null, true, "Releasing the previous clip…");
+    expect(dropArea().textContent).toContain("Releasing the previous clip…");
+    expect(dropArea().textContent).not.toContain("Remove the current clip");
+  });
+
+  it("claims file drags anywhere on the page so the browser never opens the file", () => {
+    const onSelect = vi.fn<(file: File) => SelectionIssue | null>(() => null);
+    render(onSelect);
+    const pageEvent = (type: string, types: string[]) => {
+      const event = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "dataTransfer", { value: { types, files: [mp4()] } });
+      act(() => { document.body.dispatchEvent(event); });
+      return event;
+    };
+
+    expect(pageEvent("dragover", ["Files"]).defaultPrevented).toBe(true);
+    expect(pageEvent("drop", ["Files"]).defaultPrevented).toBe(true);
+    // Dragging page text is not a file drop and keeps the browser's behavior.
+    expect(pageEvent("drop", ["text/plain"]).defaultPrevented).toBe(false);
+    expect(onSelect).not.toHaveBeenCalled();
+
+    // The page-wide claim ends when the dropzone unmounts.
+    act(() => root.render(<></>));
+    expect(pageEvent("drop", ["Files"]).defaultPrevented).toBe(false);
   });
 });
