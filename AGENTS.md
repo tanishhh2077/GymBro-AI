@@ -2,7 +2,7 @@
 
 ## Start here
 
-- Read this file, relevant ancestor/local `AGENTS.md` files, and the documents below before changing code. Explicitly read the local guidance for each directory you will edit; do not assume every nested file was automatically loaded.
+- Start with this file and the compact [current handoff](docs/HANDOFF.md). Read applicable ancestor/local `AGENTS.md`, local README, and relevant sections of the sources below before code changes. Load detailed historical evidence only when needed; do not repeatedly ingest every document. Do not assume nested guidance was automatically loaded.
 - [Original product brief](docs/PRODUCT_BRIEF.md) preserves the user's supplied requirements unchanged.
 - [Accepted decisions](docs/DECISIONS.md) records later clarifications and identifies proposals separately.
 - [Current status and next task](docs/STATUS.md) describes observed implementation and verification limits.
@@ -18,6 +18,7 @@
 - An understanding checkpoint is not a request to choose build options. Ask separate clarification questions only when a material requirement is missing.
 - Get a working development environment running before feature code. Treat an existing `node_modules` folder or an old build result as insufficient evidence of a reproducible setup.
 - Preserve unrelated and preexisting uncommitted work. Report failures, skipped checks, and mistaken assumptions plainly.
+- Commit and push regularly ([D-018](docs/DECISIONS.md#d-018-regular-commits-and-reviewed-merges-to-master)). After each work chunk whose relevant tests, lint, and build pass and whose documents are updated, stage only that chunk's paths, check the staged diff for secrets, private media, and personal paths, commit on `feat/gymbro-video-landmarks`, and push it. When a plan task is complete and its fresh review is resolved, fast-forward `master` to the feature branch and push `master`. Never commit a failing state, force-push, or rewrite published history; if a push fails, report it rather than changing credentials.
 - Never add `Co-Authored-By` lines or attribution trailers of any kind to commits.
 
 ## Product boundaries
@@ -40,10 +41,27 @@
 
 ## Context and delegation
 
+- `AGENTS.md` is the shared instruction source for Codex and Claude Code. Adjacent `CLAUDE.md` files import it with `@AGENTS.md`; edit shared rules here rather than maintaining a second copy. Check actual instruction loading in a fresh tool session.
+- Use native tools available in the active assistant. Codex-specific skill paths, scratch scripts, or agent tools are not dependencies Claude must install. Preserve the approved contract when using an equivalent command or workflow.
+- Any task, implementation or review, may run in Claude Code or Codex. The user picks whichever has more remaining usage at the time; no provider owns a role ([D-016](docs/DECISIONS.md#d-016-provider-neutral-documentation-first-continuity)). A review is independent because it runs in a fresh session that never saw the implementer's conversation, not because of which provider runs it.
+- The Markdown files are the only handoff between sessions. A new agent must be able to learn the project's structure, current state, and next task from them alone. Before reporting a work chunk done, update every document whose facts changed.
+- Respect the user's subscription constraints. Do not introduce API-key services to bypass a usage limit, and do not spend a provider the user did not choose. Record which tool and model actually implemented or reviewed a change.
+- Use one writer at a time in a shared working tree. A reviewer reads only; parallel implementation needs separate ownership and isolation.
 - Elephant has the broad context and maintains the approved brief, decisions, status, and bounded task specification. Goldfish starts without the Elephant conversation and reviews the specification against the approved source material and repository.
 - Give workers explicit goals, allowed paths, interfaces, acceptance criteria, and verification expectations. Delegate only work within the approved step; workers return material blockers to the coordinator.
 - Keep durable facts in the documents, rather than relying on chat memory. Update the status/handoff after a milestone; avoid copying the entire brief into every directory.
-- Add concise local `AGENTS.md` guidance when creating an authored project directory. Exclude `.git`, dependencies, build output, and generated caches. Local guidance adds responsibilities; it must not silently weaken product or privacy requirements.
+- Keep `docs/HANDOFF.md` concise and current after each approved work chunk; keep detailed command evidence/history in `docs/STATUS.md`. A handoff must identify the next task and whether its teaching checkpoint was approved.
+- Add concise local `AGENTS.md` guidance when creating an authored project directory. Exclude `.git`, dependencies, build output, generated caches, and `public/` (see the next section). Local guidance adds responsibilities; it must not silently weaken product or privacy requirements.
+
+## Static files in `public/`
+
+Vite copies every file in `public/` into the built site unchanged, where anyone can request it. For that reason `public/` holds no Markdown or instruction files; these rules replace its former local guidance ([D-017](docs/DECISIONS.md#d-017-repository-structure-fixes)).
+
+- Keep only files the running app serves: `public/models/pose_landmarker_full.task` (the local pose model), `public/wasm/` (the MediaPipe JavaScript loaders and WebAssembly runtime), and static SVG files. Images imported by source code belong in `src/assets/`.
+- Never place workout footage, personal data, credentials, or secrets here.
+- Treat the model and runtime as vendor files and never hand-edit them. `@mediapipe/tasks-vision` is pinned to an exact version in `package.json`, and `public/wasm/` must be a byte-identical copy of that package's `wasm/` folder. Upgrade the package, the runtime copy, and the model compatibility check together in one reviewed change, recording source, version, license, and checksum.
+- Keep runtime loading local. A remote model or runtime URL changes network and privacy behavior and needs an accepted decision.
+- A filename or a successful file request does not show that model initialization, inference, or phone support works. Validate a replacement with real footage, including missing poses.
 
 ## Verification and code review
 
@@ -58,4 +76,4 @@
 - Development: `npm run dev`.
 - Build/type check: `npm run build` (`tsc -b` then Vite).
 - Lint: `npm run lint` passes after the declared-tooling repair and unused-initializer cleanup; see [STATUS.md](docs/STATUS.md) for verification and remaining prototype limitations.
-- There is currently no test script. Do not report `npm test` as available until one exists.
+- Tests: `npm test` runs Vitest once over `src/**/*.test.{ts,tsx}` in jsdom, sharing the app's Vite settings. All 156 tests (58 media-helper, 55 pose-engine, 22 selection-check, 12 session-store, 9 dropzone) pass; see STATUS for the latest run. Do not treat simulated browser events or SDK responses as proof of real decoding or pose accuracy.

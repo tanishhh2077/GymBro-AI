@@ -1,0 +1,23 @@
+# Media and pose processing
+
+- `PoseEngine.ts`: MediaPipe coordinator. Runs one bounded job at a time:
+  validates metadata before model work, owns a per-job detector, keeps only
+  forward media times, copies and validates landmarks, and cleans up on every path.
+- `video.ts`: bounded metadata reading, duration recovery, and frame-ready seeking.
+- `processingLimits.ts`: `M1_LIMITS`, the spec's input bounds and time budgets.
+- `processingErrors.ts`: shared typed error, also re-exported by the engine.
+- `clipPolicy.ts`: `validateSelection`, the one-`.mp4`, 100 MiB admission check run
+  before any URL or model work. Called by the store's `startClip`.
+- `video.test.ts` (58 cases), `PoseEngine.test.ts` (55), and `clipPolicy.test.ts`
+  (22): all pass as of 2026-11-03, using simulated media and a mocked MediaPipe SDK.
+- `landmarks.ts`, `math.ts`, `exercises.ts`: topology, provisional math, and
+  legacy multi-exercise metadata.
+
+The engine's lifecycle and time contracts are described in
+[ARCHITECTURE.md](../../docs/ARCHITECTURE.md#pose-engine-lifecycle). Passing tests
+show coordination behavior only; they do not establish real decoding or pose
+accuracy. Preserve raw timestamps, missingness, and uncertainty.
+
+Read [local rules](AGENTS.md), [handoff](../../docs/HANDOFF.md), and the active
+[plan](../../docs/superpowers/plans/2026-11-02-video-landmarks.md).
+From the repository root: `npm test -- src/core/video.test.ts src/core/PoseEngine.test.ts`.

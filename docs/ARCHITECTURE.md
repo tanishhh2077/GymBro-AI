@@ -1,6 +1,6 @@
 # System architecture
 
-Status: observed prototype plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-02.
+Status: observed prototype plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 after the Task 1 engine review.
 
 ## Existing implementation
 
@@ -10,44 +10,102 @@ Current data flow:
 
 ```text
 Local file selection
-  -> browser object URL and in-memory session store
-  -> hidden HTML video element for decoding and seeking
-  -> MediaPipe Pose Landmarker (GPU attempted, CPU fallback)
-  -> timestamped normalized landmarks and inferred world landmarks
+  -> store admission: validateSelection (one .mp4, at most 100 MiB) and the one-clip/busy gate
+  -> browser object URL, leased by the hidden decoder and each visible player
+  -> hidden HTML video element owned by one store job (fresh engine, AbortController, job token)
+  -> PoseEngine job: bounded metadata read, then duration/dimension validation before any model work
+  -> per-job MediaPipe Pose Landmarker (GPU attempted, CPU fallback, one shared initialization budget)
+  -> bounded seek to each sample time; detection only when the reported media time moves forward
+  -> validated, copied normalized landmarks and inferred world landmarks at actual media time
   -> visible HTML video plus canvas skeleton overlay
 ```
 
 "Upload" currently means choosing a local file. The inspected processing path does not send that file to a server. This is a source observation, not a completed runtime network/privacy audit. The page requests external Google Fonts; local inference does not mean the entire page makes no network requests.
 
+## Repository layout
+
+```text
+AGENTS.md, CLAUDE.md   Shared agent rules; every CLAUDE.md contains only "@AGENTS.md"
+README.md              Setup, commands, stack, privacy summary
+spec.md                Current milestone contract and acceptance criteria
+docs/                  Brief, decisions, handoff, status, architecture, workflow, reviews
+docs/superpowers/plans/  Active implementation plan and its progress checkboxes
+src/                   Application source (ownership table below)
+public/                Files served unchanged: pose model, MediaPipe runtime, SVGs; no Markdown
+.vscode/               Shared editor guidance only; other editor files are ignored
+index.html, *.config.*, tsconfig*.json   Vite, Vitest, ESLint, Tailwind/PostCSS, TypeScript settings
+tests/                 Planned in Task 4 for real-browser tests and fixtures; does not exist yet
+```
+
+Generated or local-only, and ignored by Git: `node_modules/`, `dist/` (build output), `.vitest/`, `*.tsbuildinfo`, and `.superpowers/` (scratch snapshots and logs from earlier sessions; history, not a source of truth).
+
+Every authored directory except `public/` has an `AGENTS.md` (rules), a `CLAUDE.md` (imports those rules for Claude Code), and a `README.md` (what the directory holds). `public/` is the exception because Vite publishes every file in it; its rules are in the root [AGENTS.md](../AGENTS.md#static-files-in-public).
+
+TypeScript configuration: `npm run build` runs `tsc -b` against the root `tsconfig.json`, which checks `src/` only. `tsconfig.app.json` and `tsconfig.node.json` are not referenced by it, so their settings do not apply and `vite.config.ts`/`vitest.config.ts` are not type-checked. Wiring them in is separate deferred work ([D-017](DECISIONS.md#d-017-repository-structure-fixes)).
+
 ## Current ownership
 
 | Area | Responsibility |
 | --- | --- |
-| `src/App.tsx` | Page composition, exercise selection, and starting processing after file selection |
-| `src/components/ClipDropzone.tsx` | File selection and camera-angle UI |
-| `src/store/useSessionStore.ts` | In-memory clips, object URLs, processing state, and engine invocation |
-| `src/core/PoseEngine.ts` | Runtime/model initialization, video sampling, pose estimation, progress, coverage |
-| `src/components/VideoStage.tsx` | Playback, seeking, speed controls, progress/errors, and video layout |
+| `src/App.tsx` | Page composition: fixed Bench Press / Side view labels, recording guidance, honest scope copy, the dropzone (disabled while a clip is loaded or `processingState` is not `idle`), and the clip list with a remove/cancel button |
+| `src/components/ClipDropzone.tsx` | `onSelect`/`disabled` props; runs `validateSelection` on chosen or dropped files (so multiple-file drops are rejected), hands one file to `onSelect`, and shows a rejection in a named `role="alert"`; a "Choose video" button is the keyboard path; drops are always claimed so the browser never opens the file |
+| `src/components/ExercisePicker.tsx` | Legacy multi-exercise/view choice; no longer rendered, file retained |
+| `src/store/useSessionStore.ts` | `createSessionStore` factory and the app's `useSessionStore`: at most one clip, admission via `validateSelection`, one owned job per clip, `processingState` (`idle`/`processing`/`cancelling`), and leased object URLs (see "Session ownership" below) |
+| `src/core/PoseEngine.ts` | One processing job at a time: metadata validation before model work, bounded initialization, per-job detector, sampling, observation validation and copying, progress, coverage, and cleanup |
+| `src/core/video.ts` | Bounded metadata reading, one-attempt unknown-duration recovery, and frame-ready seeking on a video element the caller owns |
+| `src/core/processingLimits.ts` | `M1_LIMITS`: the spec's input bounds, sampling rate, and time budgets in one frozen object |
+| `src/core/processingErrors.ts` | Shared `PoseEngineError` carrying a failure `kind` and processing `stage` |
+| `src/core/clipPolicy.ts` | `validateSelection`: the admission check (exactly one non-empty `.mp4`, at most 100 MiB) run before any URL, decoding, or model work; called by the store's `startClip` |
+| `src/core/*.test.ts` | Vitest contract tests using simulated media and a mocked MediaPipe SDK |
+| `src/components/VideoStage.tsx` | Playback, seeking, speed controls, progress, and video layout; leases the clip URL while mounted and sets the video source in an effect. A failure covers the video with a kind-specific title (`role="alert"`); a no-pose result shows a non-covering notice (`role="status"`) and keeps playback controls enabled |
 | `src/components/SkeletonOverlay.tsx` | Landmark lookup/interpolation at video time and canvas rendering |
-| `src/core/landmarks.ts` | Landmark indices and skeleton topology |
+| `src/core/landmarks.ts` | Landmark indices, the 33-landmark count, and skeleton topology |
 | `src/core/math.ts` | Geometry/signal helpers; no implemented exercise analyzer consumes them yet |
-| `src/types/index.ts` | Shared data shapes; includes provisional future-analysis types |
-| `public/models/`, `public/wasm/` | Bundled model and MediaPipe runtime assets |
+| `src/core/exercises.ts` | Legacy multi-exercise and camera-angle metadata; the UI shows only the bench and side-view names and accent, because the taglines/descriptions claim unimplemented measurements |
+| `src/types/index.ts` | Shared data shapes, failure kinds/stages; includes provisional future-analysis types |
+| `public/models/`, `public/wasm/` | Bundled pose model and the MediaPipe runtime, byte-identical to the pinned `@mediapipe/tasks-vision` 0.10.35 package |
+
+## Pose engine lifecycle
+
+- Before any work or timer starts, every limit must be a positive finite number and every timeout must fit a browser timer (at most 2,147,483,647 ms); otherwise the call fails with kind `validation`. An invalid value would otherwise disable a bound silently (`duration > NaN` is always false) or fire a timer at once.
+- A `processVideo` call is one job. A second call while a job runs (or while `init()` runs) is rejected with kind `busy` and the message "The pose engine is busy with another operation". The job owns an internal `AbortController`; the caller's `signal`, `close()`, and the total deadline all stop it through that controller.
+- Order: validate the sampling rate; read metadata (10 s budget) and reject duration over 60 s, long edge over 1920 px, or more than 2,073,600 px with kind `validation`, stage `metadata`; then initialize the model. No runtime or model is loaded for a rejected video.
+- Initialization loads the runtime and tries GPU, then CPU, all within one 60 s deadline. The SDK calls cannot be cancelled, so a detector that arrives after cancellation or timeout is closed, and a late rejection is consumed without starting the CPU fallback.
+- Each seek has a 10 s budget; the whole call has 300 s, counted from the call's start. Cancellation and deadlines cannot interrupt the synchronous `detectForVideo` call; they take effect when it returns.
+- Each job creates its own detector and closes it on success, failure, timeout, and cancellation, so the old detector is closed before the next job creates a new one. Every job therefore pays model-loading time. `init()` optionally prepares one detector ahead of time that only the next job adopts; it is tested but has no current caller. Overlapping `init()` calls are rejected as `busy` rather than shared.
+- `close()` is idempotent: it cancels a running job (whose cleanup closes its detector) and closes an unused prepared detector.
+
+## Session ownership
+
+- `startClip(file)` returns a `SelectionIssue` immediately or `null`. It rejects with `busy` while a clip is loaded (in any status) or while `processingState` is not `idle`, then applies `validateSelection` before creating any URL, video, or engine. To choose another clip, the user removes the current one first.
+- Each admitted clip gets a fresh `PoseEngine`, `AbortController`, and job object; the job object is the ownership token. Every progress, result, error, and `engineDelegate` update checks that its job still owns the session, so late callbacks from a removed job change nothing.
+- Outcomes: `ready` (at least one sampled frame had a pose), `no-pose` (completed, no pose detected; `pose` is kept, `error` is empty), or `error` with `errorKind` from the engine's failure kind.
+- Removing a clip (or `reset()`) clears it from the screen at once and aborts its job. `processingState` stays `cancelling`, blocking admission, until the job has settled (engine closed, hidden video detached) and every lease on the URL is released; then the URL is revoked exactly once.
+- Leases: the hidden decoder holds one from admission until its job ends; each mounted `VideoStage` holds one through `retainClipMedia`, whose release function is idempotent. A lease on a live clip does not revoke its URL when released, so StrictMode's mount-unmount-mount cycle is safe.
 
 ## Data and time contracts
 
-- `PoseFrame.time` is video playback position in seconds. `index` is sample order, not a guaranteed source-frame number.
-- `PoseResult.fps` currently records the target sampling rate, not the video's original frame rate.
+- `PoseFrame.time` is the `currentTime` read back from the browser after each seek, in seconds, rather than a computed value. It is usually the seek target; it is not a decoded frame's presentation timestamp. `index` is the order of retained samples, not a source-frame number.
+- Sample requests are at `step / targetFps`. A sample is kept only when the reported position is later than the last kept one; repeated or backward positions are skipped without detection. A non-finite, negative, or beyond-duration position is a `video-load` error.
+- The detector clock is separate from media time: integer milliseconds, strictly increasing, bumped by 1 ms when distinct media times round to the same millisecond. It restarts with each job's new detector.
+- `PoseResult.fps` records the target sampling rate, not the video's original frame rate.
+- Landmarks are copied out of the SDK result. Each pose must have exactly 33 landmarks with finite `x`, `y`, `z`; otherwise the job fails with kind `detect`. Finite off-image coordinates are kept unchanged. If a result omits visibility, the engine leaves it absent; however, the pinned MediaPipe 0.10.35 library itself replaces absent coordinates and visibility with 0 before returning results. A visibility of 0 can therefore mean "no value" as well as a real 0, so display code must not treat 0 as reliably known (Task 3).
 - Normalized image coordinates are used for overlays. Inferred world landmarks are model estimates with different units and semantics; do not mix them silently.
-- Detector timestamps must satisfy the runtime's sequencing contract without changing the original video-relative times used for display.
 - A missing pose is represented by `null`. Missing observations must not be silently converted into successful detections, zero angles, or scientifically supported interpolated evidence.
-- Coverage summarizes pose detections over sampled observations. It is not a calibrated confidence estimate or a technique score.
+- Coverage summarizes pose detections over retained samples. It is not a calibrated confidence estimate or a technique score.
 
 ## Observed gaps and risks
 
-Source inspection found unbounded seek waits, a metadata timeout path that can remain pending, unwired cancellation, and a shared engine with no per-clip concurrency guard. Overlay sampling can substitute a neighboring pose when one is missing. These are inspection findings to reproduce and address, not claims that every failure has been demonstrated at runtime.
+The engine-level gaps found by earlier inspection (unbounded seek and initialization waits, no concurrency guard, shared detector timestamps, missing duration and dimension bounds) are addressed and covered by mocked contract tests. The 100 MiB file-size bound is enforced by `validateSelection` in the store's `startClip`. The earlier store gaps (an unbounded legacy metadata wait, no cancellation on removal, and a shared engine across clips) are replaced by the session ownership above and covered by mocked store tests. Real decoding and inference behavior remain unverified.
 
-The UI currently exposes exercises/views outside the accepted first milestone. Copy and future types also imply analyzers, view-invariant biomechanics, and numeric scores that are not supported by the implementation. [STATUS.md](STATUS.md) tracks the gaps. Local source files are intentionally unchanged by the documentation step.
+Still open, owned by later tasks:
+
+- Coverage badges still show `{n} frames · {fps}fps` (the sampling rate, which reads like source FPS) and color the coverage rate green/amber/red, which can read as a quality grade (Task 3).
+- The rewired interface has not yet been checked in a real browser (Task 2 Step 7).
+- Overlay sampling can substitute a neighboring pose when one is missing (Task 3).
+- The UI no longer offers other exercises or views, and its copy describes pose visualization only. Legacy code remains but is not rendered: `ExercisePicker.tsx`, the squat/deadlift and front/45° metadata, and future analysis types that imply analyzers, view-invariant biomechanics, and numeric scores. Unreferenced Vite template assets remain in `src/assets/` and `public/`.
+
+[STATUS.md](STATUS.md) tracks verification evidence for these items.
 
 ## Intended boundaries for the first milestone
 

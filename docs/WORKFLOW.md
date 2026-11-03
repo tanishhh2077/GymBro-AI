@@ -57,7 +57,41 @@ The implementer evaluates every finding. Fix supported defects or document an ev
 
 ## Context handoff
 
+Start a fresh session with [HANDOFF.md](HANDOFF.md), root instructions, and
+the relevant local README/rules. Codex reads `AGENTS.md` directly; Claude Code
+reads the adjacent `CLAUDE.md`, whose only line imports `AGENTS.md`. Do not
+duplicate the full policy. Provider-specific skills and agent tools are not
+prerequisites for the other provider.
+
+Either provider may implement or review any task; the user chooses whichever has
+more remaining usage ([D-016](DECISIONS.md#d-016-provider-neutral-documentation-first-continuity)).
+Independence comes from a fresh session that sees only the documents and the
+repository, never the implementer's conversation. Record the real tool, model, and
+review limits; do not substitute a paid API or claim more independence than the
+session had.
+
+The documents are the only handoff, so write them for a reader with no chat
+history. Before reporting a chunk done, check that a new agent could answer from
+the Markdown alone: what the project is, how the repository is laid out, what is
+implemented and verified, what changed last, and what the next task is.
+
+Keep one writer in the shared checkout and reviewers read-only. Preserve modified
+and untracked work, including tests written before implementation. A new clone or
+worktree based only on HEAD may not include the current prototype changes.
+
+The first response in a new session must preserve the teaching checkpoint:
+explain the next meaningful step and wait for understanding before coding, unless
+the handoff records explicit task-specific approval to proceed through that step.
+README files describe each directory; they are not substitutes for the approved
+brief/specification or shared agent rules.
+
 Update `STATUS.md` with the outcome, changed paths, commands actually run and results, checks not run, limitations, unresolved review findings, prerequisites, and the next concrete action. Update architecture/decisions when their facts change. Keep one clear next task; the full vision belongs in the brief.
+
+Also refresh the concise `HANDOFF.md` and actual plan progress after each work
+chunk. Then commit and push that chunk on the feature branch, and fast-forward
+`master` after each reviewed plan task ([D-018](DECISIONS.md#d-018-regular-commits-and-reviewed-merges-to-master)),
+so the pushed history and the documents describe the same state. Keep old detailed command evidence in STATUS so repeated startup does not
+require loading the entire development history.
 
 Do not equate "implemented," "compiled," "mock-tested," "tested with real video," "benchmarked on a phone," and "ready to ship." Record exactly which claim the evidence supports.
 

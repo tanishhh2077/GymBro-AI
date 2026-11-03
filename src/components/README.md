@@ -1,0 +1,17 @@
+# Interface components
+
+- `ClipDropzone.tsx`: local file selection and drop area. It applies
+  `validateSelection`, hands one file to `onSelect`, shows rejections in a named
+  alert, and blocks every input path while `disabled`. Tested in
+  `ClipDropzone.test.tsx` (9 cases, React `createRoot`/`act` in jsdom).
+- `ExercisePicker.tsx`: legacy exercise/view controls, no longer rendered.
+- `VideoStage.tsx`: player and playback controls. It leases the clip's URL from
+  the store while mounted (`retainMedia` prop), sets the video source in an effect,
+  shows kind-specific failures, and keeps no-pose clips replayable with a notice.
+- `SkeletonOverlay.tsx`: canvas overlay.
+- `icons.tsx`: shared interface icons.
+
+Honest overlay sampling, projection, and coverage labels are Task 3; do not assume
+existing rendering is verified. VideoStage and SkeletonOverlay have no tests yet.
+Follow [local rules](AGENTS.md) and [current scope](../../docs/HANDOFF.md).
+Processing belongs in [core](../core/README.md).

@@ -110,6 +110,75 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
 - The user has no fixture available. An openly licensed clip may be used with recorded provenance/attribution and appropriate adaptation rights; inspect framing and decoding before treating a candidate as an acceptance fixture.
 - The earlier Goldfish review covered the squat specification. Record a fresh bench-revision review separately rather than rewriting that completed review.
 
+### D-015: Portable Claude Code and Codex workflow
+
+- The user wants to use both subscriptions and, after reporting Codex usage limits,
+  explicitly requested a repository handoff to continue in Claude Code.
+- Maintain shared root/scoped `AGENTS.md` instructions, short adjacent `CLAUDE.md`
+  imports, and a purpose-specific README in each maintained project directory.
+  Dependencies, Git internals, build output, and generated scratch are excluded.
+- Keep a compact current handoff separate from detailed verification history.
+  Preserve teaching checkpoints, independent judgment, fresh critical review,
+  working-tree changes, and the user's manual commit/push workflow across tools.
+- Record the actual assistant used. Cross-tool review is useful when available;
+  fresh same-provider review is acceptable when honestly identified. Do not add
+  API-key services or spend another provider's allowance implicitly.
+- This documentation handoff does not begin the pending engine implementation.
+- D-016 supersedes this decision's provider-specific review and role guidance.
+
+### D-016: Provider-neutral, documentation-first continuity
+
+- On 2026-11-02 the user stated that implementation and review will run in
+  whichever assistant, Claude Code or Codex, has more unused allowance at the
+  time. The relevant question is never which provider suits a task; it is whether
+  the Markdown documents let any new agent understand the project unaided.
+- Neither provider owns a role. A review is independent because it starts in a
+  fresh session with no access to the implementer's conversation. Record the
+  actual tool and model that implemented or reviewed each change.
+- The Markdown files are the only handoff. After each work chunk, update every
+  document whose facts changed (handoff, status, architecture, plan progress,
+  affected READMEs and rules) before reporting the chunk done. A new session must
+  not need chat history to learn the structure, current state, or next task.
+- Teaching checkpoints, the manual Git workflow, and the ban on API-key services
+  that bypass usage limits are unchanged.
+
+### D-017: Repository structure fixes
+
+- On 2026-11-02 the user approved three structure fixes after an audit of the
+  repository layout:
+  1. Vite copies everything in `public/` into the built site, so the guidance
+     files there were being published. Their rules moved into a "Static files in
+     `public/`" section of root `AGENTS.md`, and `public/` now holds no Markdown.
+     This is an exception to the per-directory guidance rule in D-015.
+  2. Ignore generated `*.tsbuildinfo` files. The root `tsconfig.json` is the
+     configuration `tsc -b` actually builds, and it writes its cache beside itself.
+  3. Pin `@mediapipe/tasks-vision` to the exact installed version (0.10.35), so a
+     fresh install cannot resolve a JavaScript library that differs from the
+     vendored `public/wasm/` runtime.
+- Deferred, not approved here: wiring the unused `tsconfig.app.json` and
+  `tsconfig.node.json` into the build (a separate configuration task), removing
+  unreferenced template assets (with Task 2's scope cleanup), and splitting
+  `src/core/` into subfolders (when measurement work begins).
+
+### D-018: Regular commits and reviewed merges to master
+
+- On 2026-11-03 the user asked agents to keep committing and pushing, to practise
+  good development, and chose the feature-branch model and grouped first commits.
+  This supersedes the earlier rule that only the user commits and pushes.
+- After each work chunk whose relevant tests, lint, and build pass and whose
+  documents are updated: stage only that chunk's paths, check the staged diff for
+  secrets, private media, and personal paths, commit on
+  `feat/gymbro-video-landmarks`, and push it. Do not commit a failing state.
+- When a plan task is complete and its fresh review is resolved, fast-forward
+  `master` to the feature branch and push `master`. `master` therefore holds only
+  finished, reviewed tasks whose documents match the code.
+- Never force-push or rewrite published history. Never add `Co-Authored-By` or any
+  attribution trailer. If a push fails (authentication, network), report it; do
+  not change credentials or remote settings.
+- The repository's first branch is named `master`; no `main` branch exists. The
+  GitHub CLI is not installed, so merges are local fast-forwards rather than pull
+  requests unless that changes.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

@@ -5,12 +5,15 @@ dist-ssr
 .DS_Store
 .vite
 .vitest/
+*.tsbuildinfo
 .superpowers/
 
 # Editor
 .vscode/*
 !.vscode/extensions.json
 !.vscode/AGENTS.md
+!.vscode/CLAUDE.md
+!.vscode/README.md
 .idea
 *.suo
 *.ntvs*

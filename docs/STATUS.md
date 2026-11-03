@@ -1,10 +1,18 @@
 # Current project status
 
-Updated: 2026-11-02 (America/Chicago).
+Updated: 2026-11-03 (America/Chicago).
+
+For a new session in either Claude Code or Codex, start with [HANDOFF.md](HANDOFF.md).
+This file retains detailed evidence/history; the compact handoff avoids loading
+the full record on every task. Work runs in whichever provider has more remaining
+usage, and these documents are the only handoff; see D-016 in
+[accepted decisions](DECISIONS.md).
 
 ## Current stage
 
-The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Task 1 is starting on a feature branch with an authored-file snapshot. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted. Test dependencies are installed; the test command/configuration and application tests do not exist yet. Execution now follows the user's explanation-and-understanding checkpoint before each meaningful step.
+The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Task 1 is complete, including its fresh critical review (no significant findings; five Low findings resolved). Task 2 Steps 1–6 (selection check, store job ownership, bench-only interface) are complete. Whole `npm test` is **156 passed / 156 total**, exit **0** (58 media-helper, 55 engine, 22 selection, 12 store, 9 dropzone). Lint and build pass. Task 2 Step 7 (verification including a manual browser check) and Step 8 (fresh review) are next; the user asked to confirm before each part. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted in the specification. Execution follows the user's explanation-and-understanding checkpoint before each meaningful step.
+
+The working folder is now `D:\Programming\summer 2026 projects\GymBro AI`; older folder paths in historical records are not the current working directory.
 
 ## Observed implementation
 
@@ -12,6 +20,9 @@ The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [impl
 - Local video selection, browser decoding, MediaPipe pose estimation, timestamped observations, progress/errors, and GPU-to-CPU initialization fallback.
 - Playback, scrubbing, slow motion, and a canvas landmark overlay.
 - Locally bundled pose model and vision WASM runtime.
+- Standalone metadata, seek, and duration-recovery helpers with bounded event-driven waiting, invalid-value rejection, drawable-frame checks, cancellation, typed errors, and cleanup; 58 simulated-browser tests pass. The engine uses them, and the store relies on the engine for decoding and metadata.
+- A one-clip session store: admission through `validateSelection`, a fresh engine and job token per clip, cancellation on removal/reset, a `cancelling` state that blocks admission until cleanup, and leased object URLs revoked once; 12 store tests pass with the real engine and a mocked SDK.
+- A bounded pose engine: metadata limits before model work, one shared initialization budget, per-job detector ownership, busy rejection, seek/total deadlines, cancellation, forward-only sample times, and copied, validated landmarks; 55 mocked-SDK contract tests pass. See [ARCHITECTURE.md](ARCHITECTURE.md#pose-engine-lifecycle).
 - Geometry and smoothing helpers plus provisional analysis types.
 
 These are source-inspection observations. They do not establish that real-video pose alignment, accuracy, mobile performance, or every failure path has been tested successfully.
@@ -20,22 +31,21 @@ These are source-inspection observations. They do not establish that real-video 
 
 - Verified first-milestone result on a real, permitted side-view bench-press clip.
 - Bench-press/side-view-only product scope and accurate capability copy in the application.
-- Robust bounded validation, cancellation, sequential processing, and missing-data presentation.
+- Store/UI-level bounded admission, cancellation wiring, one-clip ownership, and honest missing-data presentation (the engine-level parts exist).
 - Rep detection/counting, descent/bottom/ascent segmentation, angle/depth/tempo measurements, evidence-backed findings, or validated quality/abstention behavior.
 - Saved sessions, comparisons, authentication, backend services, or a database.
 - Installed mobile project, device performance results, or store submission.
-- Automated test suite, fixture manifest, evaluation dataset, or measured accuracy benchmarks.
+- Complete passing automated behavior tests, fixture manifest, evaluation dataset, or measured accuracy benchmarks.
 
 ## Known inspection findings
 
-- `src/core/PoseEngine.ts`: `seekTo` waits for `seeked`/`error` without timeout/abort handling; seeking an already-current position needs care.
-- `src/store/useSessionStore.ts`: metadata's timeout can leave a promise pending; engine abort support is not wired to clip removal/reset.
-- The shared detector can be called by multiple uploads; detector timestamps restart per clip without an explicit lifecycle policy.
-- Input size/duration/dimension bounds are absent. One detected frame can currently mark a whole clip ready.
+- Resolved in the engine on 2026-11-02 (mocked tests only): unbounded `seekTo`, the shared detector across clips, unsequenced detector timestamps, and missing duration/dimension bounds. The file-size bound is checked at admission, which Task 2 adds.
+- Resolved in the store on 2026-11-03 (mocked tests only): the pending legacy metadata wait, no cancellation on removal/reset, the shared engine across clips, and immediate URL revocation while still in use.
+- One detected frame can currently mark a whole clip ready.
 - `SkeletonOverlay.tsx` and `math.ts` contain gap interpolation/filling behaviors that must not be mistaken for measured evidence.
-- UI copy and exercise/angle controls exceed the accepted scope. Future analysis types include arbitrary score fields and lack the required finding-evidence contract.
+- Resolved on 2026-11-03: the UI no longer offers exercise/angle choices and its copy no longer claims coach-grade analysis, measurements, or bar tracking. Future analysis types (not rendered) still include arbitrary score fields and lack the required finding-evidence contract.
 - The build's TypeScript check includes application source, but does not reference `tsconfig.node.json` or type-check `vite.config.ts` through that configuration. `@types/node` is now installed for the planned test setup. Wiring a configuration check remains separate work.
-- No test script or test files were found during inspection.
+- A test script, Vitest configuration, 58 passing media-helper tests, and 55 passing pose-engine contract tests exist. Store, display, and real-browser coverage remain pending.
 
 These findings need targeted reproduction and verification during implementation. Do not silently promote them into measured failure rates.
 
@@ -109,9 +119,9 @@ The reviewer classified the redundant `result` initialization as a **low-severit
 
 ## One next task
 
-Explain and then configure Task 1's test harness: add the `npm test` command and Vitest configuration for source tests in a simulated browser environment. Wait for the user's understanding checkpoint before making those changes. The generated-backup lint exclusion is repaired and independently reviewed. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
+Plan Task 2 Step 7: rerun the three Task 2 test files, all unit tests, lint, and build; then check the running app in a browser against the dev server: the bench/side-view labels and guidance, dropzone rejection alerts (a non-MP4, a multi-file drop), the disabled dropzone while a clip is loaded, and the remove/reselect flow. Without a real fixture, an undecodable file named `.mp4` can exercise admission, the error panel, removal, and reselection; real decoding and the overlay stay unverified until Task 4. Then Step 8: a fresh critical review of all of Task 2 against M1-02/M1-03/M1-08/M1-09/M1-10, focusing on teardown ordering and rejected/deferred callbacks. The user asked to confirm before each part starts. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
 
-The user has no personal fixture available. A licensed public bench-press candidate has been found but has not been downloaded, inspected for framing, converted, or run through inference. Before acceptance, establish a permitted suitable side-view fixture and record provenance/changes; do not claim a candidate or a mock is a validated result.
+The user has no personal fixture available, and no openly licensed candidate inspected so far is a standardized side view; see "Fixture candidate research" below. Before Task 4 acceptance, the user must choose how to obtain a permitted side-view H.264 MP4. Do not claim a candidate or a mock is a validated result.
 
 ## Test-tool verification checkpoint
 
@@ -135,6 +145,346 @@ After the user confirmed this step's explanation, changed only `globalIgnores(['
 - An initial default-API diagnostic reported that an explicitly targeted backup file was not ignored. Investigation confirmed that ESLint 10 discovers the backup's own preserved configuration for that explicit file. Root traversal and an explicitly selected root configuration correctly exclude the backup. This is a configuration-discovery distinction, not a failure of the ordinary project lint command.
 - Fresh read-only review: **no significant findings**. The reviewer independently ran normal lint and verified **21** linted files, no snapshot files, zero errors/warnings. Effective configurations for all **14** application TypeScript files and `vite.config.ts` match the baseline, with **108** rules each; the existing `dist` exclusion remains effective.
 - Build was not repeated for this ESLint-only change; the preceding build verification remains applicable to unchanged application source. No application test suite, real-video inference, or accuracy validation was performed.
+
+## Test-harness setup handoff
+
+- User confirmed the explanation before this bounded setup step. Added `test: "vitest run"` in `package.json` and created `vitest.config.ts`, merging existing Vite settings with `environment: "jsdom"` and `include: ["src/**/*.test.{ts,tsx}"]`. Updated README and root instructions to describe actual behavior and limitations.
+- Dependencies were already installed and committed before this step. Comparison with the pre-test-tools lock snapshot found **zero** changed preexisting non-root locked package records and **65** added records. This setup did not change the lockfile or dependency versions.
+- A temporary source smoke check verified normal test discovery, an `@/core/math` import, an HTML video element, metadata events, and a clock advanced from 9,999 to 10,000 ms. `npm test` with that temporary check: **1 test passed**, exit **0**. The check was removed afterward; it is not a retained application test or a real decoding test.
+- Final `npm test`: exit **1**, `No test files found`, with the intended source glob. No empty-suite success flag was added. This confirms the runner starts and reports the missing suite honestly; it is not a passing application-test result.
+- `npm run lint`: exit **0**. `npm run build`: exit **0**, **396** modules transformed; the existing Browserslist-data warning remains. Scoped whitespace checks passed.
+- Fresh read-only review: **no significant findings**. The reviewer independently verified the empty-suite result, lint, resolved jsdom environment, retained alias/React plugins, source-only discovery, compatible installed engines/peers, and unchanged dependency specifications. It did not repeat the coordinator's build or temporary smoke run.
+- No application source or production Vite configuration changes remain. No permanent behavior tests, bounded media helpers, real-video inference, or accuracy results were added. The build's unrelated configuration-type-check limitation remains.
+- Marked only Task 1 Step 1 complete. Preexisting edits elsewhere in the implementation plan and the generated TypeScript cache were preserved. The plan currently contains preexisting stale bench-review wording and an omitted intended-lifter substep; use the accepted decisions/current specification as authority before the later fixture work rather than silently weakening acceptance.
+
+## Initial metadata tests: partial test-first handoff
+
+- After the user's understanding checkpoint, created `src/core/video.test.ts` with three tests: literal already-ready metadata (12.5 s, 1280x720), timeout at 10,000 ms while still pending at 9,999 ms, and cancellation of a pending wait before its deadline. Each case checks that no helper timeout remains afterward.
+- Tests use real jsdom video elements with controlled read-only media properties where needed, fake time, literal expected outputs, and structured error assertions. Rejection checks are attached before time advances. Cancellation is checked while the clock stays below the timeout, rather than relying on timeout completion.
+- Targeted `npm test -- src/core/video.test.ts` and whole `npm test`: exit **1**, unable to resolve `./video`, **zero assertions executed**. This records the planned missing-helper boundary only. No assertion failure-to-pass result has been established.
+- `npm run build`: exit **1**, TypeScript **TS2307** at the same missing import. The current working tree does not have a passing build. `npm run lint`: exit **0**; `git diff --check` passed.
+- Fresh read-only test-design review: **no significant findings within the three approved cases**. The reviewer independently reproduced the missing import and explicitly did not treat it as behavioral verification. This is a partial review, not completion of the media helpers or Task 1.
+- No production helper, shared error implementation, engine change, dependency change, or real-video check was introduced. Updated root/README command notes to reflect the current failure rather than retaining a green-build claim. Plan Step 2 is still incomplete: additional metadata/event/error/cleanup and seek cases remain. Next action is the helper implementation after the user's explanation checkpoint.
+
+## Initial metadata-helper implementation handoff
+
+- After the user's checkpoint, implemented `readVideoMetadata` and its `VideoMetadata`/`MediaWaitOptions` interfaces in `src/core/video.ts`. It returns already-available valid details, or subscribes to metadata/duration/error events with one deadline and abort handling. All terminal paths share timer/listener cleanup. It does not decode a frame or enforce the later clip size/duration/dimension bounds.
+- Created `src/core/processingErrors.ts` and shared processing stage/failure-kind types. `PoseEngine.ts` now imports and directly re-exports the shared error class, preserving the store's import and `instanceof` behavior. No engine processing logic changed; the app still uses its existing metadata path.
+- Added event-driven completion/listener-release, pre-cancelled signal, and media-error tests to the original three cases. A temporary API-only implementation made the tests collect and exposed genuine failures. That first run also exposed unhandled promise/async-assertion rejections in the tests; changed test-only observation to attach both handlers immediately and assert the captured result. The clean run showed **six failing tests** before implementation; no stub remains.
+- Targeted and whole `npm test` after implementation: exit **0**, **six tests passed**, no unhandled-rejection warnings. First lint reported one `prefer-const` error; reordered early rejection/resource setup and then reran the whole suite, lint, and build. Final `npm run lint`: exit **0**. Final `npm run build`: exit **0**, **397** modules transformed; the existing Browserslist warning remains.
+- Development server was restarted from the renamed folder at `http://127.0.0.1:5176/` before implementation; HTTP **200** and GymBro AI title verified. It remains running. This does not establish rendered video playback or inference.
+- Fresh read-only review: **no significant findings in the delivered scope**; reviewer independently ran the six tests, inspected cleanup/deadline behavior, and confirmed error-class compatibility and the absence of engine logic changes. It did not rerun lint/build or validate real decoding/inference.
+- Remaining direct test gaps include invalid metadata, duration-change recovery, a deadline under repeated events, invalid timeout inputs, and listener cleanup on failure. Unusable metadata currently waits for usable values or the deadline; more specific invalid-data handling and unknown-duration probing are unfinished. Seeking, clip bounds, model lifecycle, engine/store integration, and real-video acceptance remain pending. Plan Steps 2/3 and overall Task 1 are not complete.
+
+## Metadata edge-case handoff
+
+- User confirmed this step's explanation before edits. Expanded `src/core/video.test.ts` from **6 to 28** cases covering incomplete duration recovery, invalid loaded dimensions/duration, an existing browser error, repeated events under one deadline, invalid timeout inputs, and video/signal listener cleanup after every implemented failure kind. Event spies delegate to real jsdom EventTarget methods.
+- Before changing the helper, the final test-first run had **10 failures and 18 passes**: invalid loaded metadata remained pending instead of failing immediately, including its cleanup cases. Changed only `src/core/video.ts` production behavior: reject invalid loaded dimensions as `validation` and nonpositive/invalid duration as `no-duration`. NaN/positive Infinity remain temporarily unknown and can recover through `durationchange` without extending the original deadline.
+- Final whole `npm test`: exit **0**, **28 tests passed**. `npm run lint`: exit **0**. `npm run build`: exit **0**, **397** modules transformed; existing Browserslist-data warning remains. `git diff --check` passed. Existing development server on `127.0.0.1:5176` returned HTTP **200** before changes.
+- Fresh read-only review: **no significant findings in this bounded step**. Reviewer compared exact prior source/test snapshots and independently ran **28/28** targeted tests. It did not repeat lint/build or the recorded RED run. No packages, engine/store integration, or other production modules changed in this step.
+- Tests use controlled browser properties/events; some deliberately malformed numeric values are synthetic validation inputs. They do not establish real video decoding or actual metadata timing across browsers. Explicit unknown-duration probing, seeking/frame readiness, full processing lifecycle, and real-video acceptance remain pending. Plan Steps 2/3 and Task 1 remain incomplete.
+
+## Safe-seek helper handoff
+
+- User confirmed the seeking explanation before edits. Added `seekToFrame(video, time, options): Promise<void>` in `src/core/video.ts`. The caller owns the video while waiting. New/in-progress seeks require completion, `seeking === false`, current-frame data, and positive finite dimensions. Same-position ready frames resolve immediately without assigning time; same-position frames awaiting data do not depend on another `seeked` event.
+- Added **20** seek cases: zero/current position, delayed data, new and in-progress seeks, both completion/data orderings, zero-dimension timeout, pre-cancellation, abort/media-error/timeout/setter-throw cleanup, successful cleanup, existing media error, invalid target/timeout inputs, and preservation of the browser-reported resulting time. Listener spies use real EventTarget methods. A temporary API-only implementation produced **20 failures / 28 existing passes**; no stub remains.
+- Final whole `npm test`: exit **0**, **48 tests passed**. `npm run lint`: exit **0**. `npm run build`: exit **0**, **397** modules transformed; existing Browserslist-data warning remains. Development HTTP `127.0.0.1:5176` returned **200** before edits.
+- Fresh read-only review: **no significant findings in the scoped change**. Reviewer compared exact prior source/test snapshots and inspected the event ordering, validation, cleanup, and test contract. It did not rerun tests/lint/build or perform browser decoding. Metadata behavior and its 28 cases are unchanged by this step.
+- No packages, engine/store code, UI, or other production modules changed in this step. These are simulated media-state tests, not real frame decoding/pose inference. Unknown-duration probing, processing bounds, detector lifecycle, integration, and permitted real-video acceptance remain unfinished; Task 1 is not complete.
+
+## Bounded duration-recovery handoff
+
+- User confirmed the duration-recovery explanation before edits. Unknown duration now triggers one far-end seek request after metadata is available. The helper snapshots the original position before mutation, reads only actual finite duration, and requests restoration before reporting success. It waits for restoration to finish but does not require decoded frame data at the metadata stage. Known-duration videos are not moved.
+- Probe and restoration share the original metadata timer; no budget is restarted. On abort/error/timeout, listeners/timer are removed and restoration is requested best-effort without another wait. A failed restoration cannot replace the primary cancellation/timeout/error. The caller remains responsible for video teardown; failed/cancelled operations do not guarantee completed restoration or stop all browser decoding.
+- Added **10** cases, including restoration from a nonzero position, one attempt despite repeated events, delayed metadata/probe/restore under the same deadline, both cancellation phases, setter/media failures, and synchronous notification handling. Test-first run: **9 failures / 49 passes** before implementation. Final whole `npm test`: exit **0**, **58 tests passed**. `npm run lint`: exit **0**. `npm run build`: exit **0**, **397** modules; existing Browserslist warning remains. Whitespace check passed. Development HTTP on `127.0.0.1:5176` returned **200** before edits.
+- Fresh read-only review: **no significant findings** in this bounded change. Reviewer compared exact prior snapshots and independently ran **58/58** targeted tests. It did not repeat the RED run or lint/build. Safe-seek implementation is unchanged; no dependencies or other production modules changed in this step.
+- Marked plan Steps 2/3 complete based on tested media helper behavior; overall Task 1 remains incomplete. Engine limits/init/processing tests and implementation, store integration, and permitted real-video acceptance remain. Controlled jsdom events do not demonstrate recovery/decoding across actual browsers or model accuracy.
+
+## Pose-engine contract tests: RED handoff
+
+- User confirmed the test-only step before edits. Created `src/core/PoseEngine.test.ts` with controlled public SDK initialization/detection and complete result-shaped synthetic observations. The media fixture dispatches real jsdom events; its delayed decoder timers are tracked separately from engine timers. Test teardown closes tracked engines only after assertions.
+- Added **36** cases covering metadata bounds before runtime/model loading; accepted boundaries; zero-position readiness; one 60,000 ms budget including runtime load and GPU/CPU fallback; init failure, abort/explicit close and late model disposal/rejection; concurrent processing rejection; seek/total deadlines; cancellation; actual ordered unique media samples; detector clock sequencing; copied mutable SDK output; genuine no-pose and unknown visibility; off-image coordinates; malformed output; and detector/timer cleanup.
+- Final whole command used the normal `npm test` script with JSON reporting: **94 total**, **65 passed**, **29 failed**, exit **1**. Breakdown: **58/58 media-helper cases pass**; engine **7/36 pass**, **29 fail**. Failures are assertions against missing engine behavior, not missing imports. The stored report/console log are generated scratch artifacts under `.superpowers/sdd/2026-11-02-video-landmarks/engine-contract-red.*`.
+- `npm run lint`: exit **0**. `npm run build`: exit **0**, **397** modules transformed; existing Browserslist warning remains. The build includes static Tailwind scanning of source test files, so generated stylesheet contents can change without an application-source edit. Engine SHA-256 matches the exact pre-test snapshot: **no engine implementation change in this step**. No dependencies or other production modules changed.
+- Fresh read-only test-design review found **no significant defects** in the initial 34-case suite. It identified nonblocking timer-leak/mixed-runtime-budget/explicit-close coverage gaps. Added those targeted checks and reran the whole suite, lint, and build. Resource assertions occur before cleanup; the slow-decoder case releases only fixture-owned events before checking engine timers. Reviewer inspected the original saved RED report/source but did not rerun commands or review these final two added cases separately.
+- Marked plan Step 4 complete; Step 5 implementation and Step 6 observation behavior still need passing verification. Mocked responses verify coordination only, not actual model initialization, decoding, inference, or landmark accuracy. Some assertions after an earlier failing assertion have not yet executed; the green implementation run must exercise the complete contract before acceptance.
+
+## Claude Code continuation handoff
+
+- User requested portable documentation and continuation in Claude Code after
+  reporting Codex usage limits; accepted as D-015. Prepared `HANDOFF.md` with the
+  current 94-test baseline, scope, working-tree state, approval boundary, and exact
+  next task. Prior checks are labeled historical; no runtime tests were repeated
+  for documentation-only work.
+- All **14 maintained project directories** now contain `AGENTS.md`, `README.md`,
+  and `CLAUDE.md`. The short Claude files import adjacent shared rules with
+  `@AGENTS.md`; rules are not copied into a separate policy. Existing local rules
+  were preserved. Added Git ignore exceptions for the two new editor documents.
+- Root guidance loads the compact handoff first, then relevant scope/context,
+  rather than requiring the full historical record on every startup. Added folder
+  explanations, a paste-ready Claude startup prompt, actual-provider review rules,
+  and one-writer ownership guidance. Existing plan edits were preserved.
+- Self-audit: directory/import coverage and **160 local link paths** passed;
+  **44 source/config/runtime/test/original-brief files** retained SHA-256 hashes;
+  whitespace checks passed. No application code, dependency, asset, engine test,
+  or original brief changed. No commits, pushes, or account settings changed.
+- Claude CLI was not on this PowerShell session's PATH. Actual Claude instruction
+  loading, login/subscription routing, and execution were not verified; confirm
+  loaded instructions with `/context` in the user's Claude Code interface. No
+  Claude or additional Codex reviewer was launched for this documentation pass;
+  the audit is a self-check, not cross-provider verification.
+
+## Pose-engine contract implementation handoff (Task 1 Steps 5–7)
+
+- Implemented by Claude Code (model Opus 5.5) on 2026-11-02, after the user
+  approved the explained step ("lets just start with the development"). The user
+  asked not to rerun anything first, so the RED baseline was **not re-observed in
+  this session**; it rests on the earlier recorded run (94 total, 65 passed, 29
+  failed, saved under `.superpowers/sdd/2026-11-02-video-landmarks/engine-contract-red.*`).
+- Changed paths: new `src/core/processingLimits.ts`; rewritten `src/core/PoseEngine.ts`.
+  Steps 5 and 6 were done together because both rewrite the same sampling loop.
+  The old engine-local `seekTo`/`resolveDuration` were removed in favour of the
+  `video.ts` helpers. No test, store, UI, type, or dependency file changed.
+- Behavior and design are recorded in [ARCHITECTURE.md](ARCHITECTURE.md#pose-engine-lifecycle).
+  Implementer choices that the reviewer should check:
+  - `init(options)` prepares a detector that the next job adopts unused. No test
+    covers it and nothing calls it; this is one reading of the plan's interface.
+  - A pose must have exactly 33 landmarks; present-but-non-finite visibility is
+    treated as malformed (`detect`); world landmarks absent while normalized
+    landmarks are present become `null`.
+  - An invalid reported media position is `video-load`/`seek`. External
+    cancellation and `close()` report `aborted` without a stage; the total
+    deadline reports `timeout`/`processing`.
+  - Progress `processedFrames` counts visited sample positions, including skipped
+    repeats, so it stays comparable with `estimatedTotalFrames`.
+  - `coverage.meanVisibility` still reports 0 when no visibility is known
+    (unchanged preexisting behavior).
+- Interim app effect: each job loads the model again, and a clip added while one
+  is processing fails with `busy`. Task 2 owns the store-side lifecycle.
+- Checks run after implementation: `npm test -- src/core/PoseEngine.test.ts`
+  **36/36 passed**; whole `npm test` **94/94 passed**, exit **0**; `npm run lint`
+  exit **0**; `npm run build` exit **0**, **399** modules, existing Browserslist
+  warning. Mocked SDK responses and simulated media verify coordination only;
+  no real decoding, model initialization, inference, or accuracy was tested.
+- Review: **not yet performed** (plan Step 8 is next). No fix has been made in
+  response to a review.
+
+## Repository structure fixes handoff
+
+- After an audit of the layout requested by the user, Claude Code (Opus 5.5)
+  applied the three fixes approved as [D-017](DECISIONS.md#d-017-repository-structure-fixes)
+  on 2026-11-02. The audit found files where the plan places them, tests next to
+  their code, and guidance in every authored directory; it found the problems below.
+- `public/` guidance was being published: `vite build` had copied `AGENTS.md`,
+  `CLAUDE.md`, and `README.md` into `dist/`, `dist/models/`, and `dist/wasm/`.
+  Deleted those nine files from `public/` (three were tracked, six untracked) and
+  moved their rules into the root `AGENTS.md` section "Static files in `public/`".
+  Updated the two `src/assets` references. A fresh build now contains **0**
+  Markdown files.
+- Added `*.tsbuildinfo` to `.gitignore`; `git status --ignored` now reports
+  `tsconfig.tsbuildinfo` as ignored. The file itself was left in place.
+- Pinned `@mediapipe/tasks-vision` from `^0.10.21` to `0.10.35` in `package.json`
+  and the lockfile's root entry; the installed and locked version was already
+  0.10.35, so no package changed. `npm ls @mediapipe/tasks-vision` exit **0**.
+  All six `public/wasm/` files are byte-identical to the package's `wasm/` folder.
+- Documentation made provider-neutral and current per [D-016](DECISIONS.md#d-016-provider-neutral-documentation-first-continuity):
+  root `AGENTS.md`, `README.md`, `WORKFLOW.md`, `ARCHITECTURE.md` (new repository
+  layout and engine lifecycle sections), `DECISIONS.md`, this file, `HANDOFF.md`,
+  the plan's progress checkboxes and README, and the `src/core` and `src/store` READMEs.
+- Checks after these changes: `npm test` **94/94**, lint exit **0**, build exit
+  **0** (399 modules). A scripted check found **43** Markdown files with **159**
+  local links/anchors and **0** broken; **11** authored directories each have
+  `AGENTS.md`, a plain-import `CLAUDE.md`, and `README.md`; `public/` has no
+  Markdown. `git diff --check` passed. Deferred, not done: wiring `tsconfig.app.json`/`tsconfig.node.json`
+  into the build, removing unreferenced template assets (`src/assets/react.svg`,
+  `vite.svg`, `hero.png`; `public/favicon.svg`, `icons.svg`), and splitting `src/core/`.
+
+## Engine review and fixes (Task 1 Step 8)
+
+- Reviewer: a fresh-context Claude Code subagent (Opus 5.5), launched from the
+  implementing session on 2026-11-03 with no access to that conversation; a
+  same-provider review under D-016. Read-only; it ran `npm test` (94/94), lint
+  (exit 0), build (exit 0, 399 modules) and 19 throwaway probe tests outside the
+  repository (17 passed; the 2 failures were the reviewer's own wrong expectations).
+- Verdict: **no significant findings** (nothing Critical, High, or Medium). Five
+  Low findings, all evaluated by the implementer (Claude Code, Opus 5.5) and fixed
+  after the user confirmed the explanation:
+  - L1: custom limits and the `init()` timeout were unvalidated; a `NaN` duration
+    limit accepted any length, and `NaN`/`Infinity` budgets fired at once. Fixed:
+    `validateLimits` and an `init()` timeout check reject them with `validation`
+    before any work or timer starts.
+  - L2: `init()` was untested, and its `busy` message ("Another video is already
+    being processed.") was wrong while only warm-up ran. Fixed: message now "The
+    pose engine is busy with another operation; wait for it to finish."; `init()`
+    tests added. Overlapping `init()` calls stay rejected, now documented.
+  - L3: docs said `PoseFrame.time` is "never the requested time"; after an exact
+    seek it usually equals the target. Reworded in ARCHITECTURE and the code comment.
+  - L4: the 100 MiB bound was described as enforced; nothing reads `maxFileBytes`
+    yet. Reworded in ARCHITECTURE and `processingLimits.ts`; Task 2 adds the check.
+  - L5: MediaPipe 0.10.35 replaces absent coordinates/visibility with 0 (verified
+    in `vision_bundle.mjs`), so "missing visibility stays missing" cannot occur with
+    the real library and visibility 0 is ambiguous. Documented in ARCHITECTURE; the
+    affected tests were already labelled fault-tolerance cases.
+- The reviewer also named an undocumented combined case: removing a processing
+  clip and choosing another gets `busy` for up to the old job's remaining budget.
+  Now in ARCHITECTURE and HANDOFF; Task 2 owns the fix.
+- Added 19 regression tests to `PoseEngine.test.ts` (36 -> 55): invalid limits (7),
+  back-to-back jobs with a fresh detector and restarted clock, `init()` (5),
+  metadata timeout/media-error/invalid-duration without model work (3), a rejected
+  runtime load, `close()` during a seek, and the total deadline during a long model
+  start. The behavior already existed except L1, so these are not test-first
+  results. Mutation check: with `validateLimits` disabled, 4 of the 7 limit cases
+  fail; the other 3 are also caught by later checks (metadata bounds, sampling
+  rate, `video.ts` timeout validation). The file was restored byte-for-byte.
+- Checks after the fixes: `npm test` **113/113**, exit **0**; lint exit **0**;
+  build exit **0**, 399 modules, 0 Markdown files in `dist/`.
+- Unverified concerns carried into Task 4's real-browser checks (none is shown by mocks):
+  - U1: a 60 s clip at 30 samples/s is 1,800 seek+detect cycles; with up to 70 s
+    of metadata and model start inside the 300 s total, about 130–166 ms remain per
+    cycle. Exact H.264 seeks on the CPU delegate may exceed that, failing the whole
+    job. Time a ~60 s 1080p clip on GPU and on forced CPU; revise a budget only
+    with that evidence (D-013).
+  - U2: right after `seeked` with `readyState >= 2`, some browser/decoder
+    combinations expose the previous frame, so landmarks could belong to an earlier
+    image. Compare with `requestVideoFrameCallback` or a frame-counter clip.
+  - U3: each detector re-runs the MediaPipe loader (new `<script>`, new
+    WebAssembly module); `close()` only closes the graph. Run 10+ jobs in Edge and
+    watch memory, WebGL-context warnings, and start-up time.
+  - U4: repeated reported positions are skipped without trace; a mostly
+    unsampled clip still succeeds. Whether to report it is undecided.
+  - U5: a duration that shrinks mid-job fails as `validation`/`seek`, which Task 2
+    might present as an input-rule message.
+  - U6: the first sample does not seek; a browser that stays at metadata-only
+    readiness would time out after 10 s. Relevant to the phone prototype.
+- Instruction loading: the reviewer observed that its session carried the root
+  `AGENTS.md` text from the start of the implementing session, not the later
+  on-disk version. Instructions load when a session starts; a new session reads
+  the current file.
+
+## Fixture candidate research
+
+Done on 2026-11-03 by Claude Code (Opus 5.5) from Wikimedia Commons pages, its
+API, and cover images only. No video was downloaded, converted, or processed.
+`ffmpeg` is not installed, so no frames beyond each cover image were inspected;
+Commons ignored requests for frames at other times.
+
+| Commons file | License | Facts | Cover-image observation |
+| --- | --- | --- | --- |
+| `Bench_press_-_exercise_demonstration_video.webm` (FitnessScape; from YouTube "Half Rack Workout") | CC BY 3.0 | 7.1 s, 1280x720, VP9 WebM, no audio, 389,315 bytes, Commons SHA-1 `619a8ca8c5ad851bb6b7d1775f8babefd478e623` | Oblique view from near the foot end, not a side view; large "BENCH PRESS" title overlay. Upper body and bar visible. |
+| `Goldenberg_bench_press_world_record_156kg_2020.webm` | CC BY-SA 4.0 | 78.2 s, 1280x720 (over the 60 s limit) | Low oblique view from near the head end; loaders/spotters in frame. |
+| `2025_Skelton_Gym_Powerlifting_Competition_(977548).webm` | Public domain | 60.06 s, 1920x1080 (just over the limit) | Interview frame; bench content unknown. |
+| `Half_rack_resistance_exercise_workout.webm` (FitnessScape full video) | CC BY 3.0 | 173.5 s, 1280x720 | Title card; content unknown. |
+
+Commons' MP4-family derivative is MPEG-4 Part 2 in QuickTime (`360p.mpeg4.mov`),
+not H.264 MP4, so it does not meet the fixture format. Options for the user:
+record a short consenting side-view clip kept outside Git through
+`GYMBRO_E2E_VIDEO` (recommended; on iPhone choose "Most Compatible" for H.264),
+use a stock clip whose license permits this use (kept outside Git unless
+redistribution is allowed), and/or install `ffmpeg` to inspect, trim, and convert
+candidates.
+
+## Task 2 part 1: selection check (Steps 1–2)
+
+- Implemented by Claude Code (Opus 5.5) on 2026-11-03 after the user approved the
+  Task 2 explanation and confirmed starting this part.
+- Changed paths: new `src/core/clipPolicy.ts` and `src/core/clipPolicy.test.ts`.
+  No store, component, engine, or dependency file changed.
+- `validateSelection(files, limits = M1_LIMITS)` returns `null` for exactly one
+  non-empty file whose name ends in `.mp4` (any letter case) and whose size is at
+  most `maxFileBytes`; otherwise a `SelectionIssue` with code `file-count`,
+  `empty`, `format`, or `size`, checked in that order. The MIME type is never a
+  reason to accept or reject. An invalid `maxFileBytes` (`NaN`, 0, negative,
+  `Infinity`) throws `RangeError`, because `size > NaN` would accept any size; this
+  case was added beyond the plan's list after review finding L1. `busy` is reserved
+  for the store.
+- Test-first: 22 cases ran against a temporary accept-everything placeholder;
+  **16 failed** on their assertions and the 6 acceptance cases passed. After the
+  implementation: `npm test -- src/core/clipPolicy.test.ts` **22/22**; whole
+  `npm test` **135/135**, exit **0**; lint exit **0**; build exit **0**, 399
+  modules; `git diff --check` passed.
+- Not yet true: neither `ClipDropzone` nor the store calls `validateSelection`, so
+  the running app still accepts any `video/*` file of any size. Plan Step 2's "both
+  the component and store use this gate" is completed by Steps 4 and 6. Review of
+  this code happens with the rest of Task 2 at Step 8.
+
+## Task 2 part 2: store job ownership (Steps 3–5)
+
+- Implemented by Claude Code (Opus 5.5) on 2026-11-03 after the user confirmed
+  starting this part.
+- Changed paths: rewritten `src/store/useSessionStore.ts`; new
+  `src/store/useSessionStore.test.ts`; `src/types/index.ts` (`ClipStatus` gains
+  `no-pose`, `Clip` gains optional `errorKind`); `src/core/PoseEngine.ts`
+  (`getPoseEngine` singleton removed after confirming no other consumer);
+  `src/App.tsx` and `src/components/VideoStage.tsx` (wiring only, below).
+- Store design is recorded in [ARCHITECTURE.md](ARCHITECTURE.md#session-ownership).
+  Implementer choices for the Step 8 reviewer:
+  - A loaded clip in any status blocks admission (`busy`, "Remove the current clip
+    before choosing another."); the user removes it to choose again. This follows
+    the plan's one-clip rule and Task 4's "admission disabled while loaded".
+  - The job object itself is the operation token (identity comparison).
+  - `createSessionStore(deps)` is exported so tests get fresh ownership state and
+    can supply the video element, URL functions, and (in one test) a fake engine.
+    `useSessionStore` is the app's single instance with browser defaults.
+  - The hidden decoder keeps the old store's `preload`, `muted`, `playsInline`,
+    and `crossOrigin` settings; the legacy `waitForMetadata` is gone.
+- Wiring outside the store, kept minimal and marked interim where Step 6 will
+  change it: App always uses bench press (the "Choose your lift" step is no longer
+  rendered because `setExercise` no longer exists), calls `startClip`, and shows a
+  rejected selection's message in a `role="alert"` paragraph. `VideoStage` takes a
+  required `retainMedia` prop, leases the URL in an effect, sets the video source
+  there instead of through the `src` prop (so a StrictMode remount re-attaches it),
+  pauses and detaches on cleanup, and shows a short no-pose message.
+- Test-first: the 12 store tests first failed with `createSessionStore is not a
+  function` (a missing-API failure, not assertion-level evidence of the old store's
+  defects). After implementation: `npm test -- src/store/useSessionStore.test.ts`
+  **12/12**; whole `npm test` **147/147**, exit **0**, with no jsdom
+  "not implemented" or unhandled-rejection messages; `npm run lint` exit **0**
+  after replacing two unused mock parameter names; `npm run build` exit **0**,
+  399 modules; `git diff --check` passed.
+- Not done: no manual browser check of the rewired app yet (plan Step 7, after
+  part 3). `VideoStage`'s lease/source effect has no component test (its tests
+  are Task 3). The dropzone still offers an angle selector and accepts any
+  `video/*`; the copy still overclaims (part 3).
+
+## Task 2 part 3: bench-only interface (Step 6)
+
+- Implemented by Claude Code (Opus 5.5) on 2026-11-03 after the user confirmed
+  starting this part.
+- Changed paths: new `src/components/ClipDropzone.test.tsx`; rewritten
+  `src/components/ClipDropzone.tsx`; `src/App.tsx`; `src/components/VideoStage.tsx`.
+- `ClipDropzone` now takes `onSelect(file): SelectionIssue | null` and `disabled`.
+  It runs `validateSelection` on the chosen or dropped files (so a multi-file drop
+  is rejected instead of silently using one), hands exactly one file to
+  `onSelect`, and shows any rejection, including the store's `busy`, in a
+  `role="alert"` named "Video not accepted" through `aria-labelledby`. The camera
+  selector is gone; `accept` is `.mp4,video/mp4`. A visible "Choose video" button
+  replaces the old click-anywhere label, because the old hidden input could not
+  be reached by keyboard. Drops are always `preventDefault`ed so the browser never
+  opens a dropped file, even while disabled. The limits text is derived from
+  `M1_LIMITS`. framer-motion was dropped from this component.
+- App: header subtitle is now the tagline "Your second set of eyes."; the header
+  chip says "On-device processing" (narrowed from "100% on-device", since the page
+  loads web fonts); the hero describes pose-landmark estimation in sampled frames
+  and states that the app does not count reps, track the bar, or judge technique;
+  Bench Press and Side view labels; a recording guide (side-on steady camera,
+  shoulders/elbows/wrists in frame, bar path in frame for the user's own review,
+  one lifter, adequate light, landmarks are estimates and not a form judgment).
+  The dropzone is disabled while a clip is loaded or `processingState` is not
+  `idle`. The remove button's accessible name says it cancels while processing.
+  The legacy `EXERCISES`/`ANGLES` taglines and descriptions are not shown.
+- VideoStage: a failure covers the video with a kind-specific title
+  (`role="alert"`) and "Remove the clip to try another."; a no-pose result shows a
+  non-covering notice (`role="status"`) with recording advice and "not a
+  judgment of your form", and playback controls stay enabled so the clip can be
+  replayed. The overlay still renders only for `ready`.
+- Test-first: the 9 dropzone tests first failed against the old component for
+  behavioral reasons (it called the absent `onAdd`, had no labelled drop area,
+  rendered three `aria-pressed` angle buttons, and had no picker button). After
+  the change: **9/9**; whole `npm test` **156/156**, exit **0**, with no `act`
+  warnings or unhandled errors; lint exit **0**; build exit **0**, 399 modules.
+- Not done: the App copy and VideoStage changes have no automated tests (component
+  tests for VideoStage are Task 3); nothing has been checked in a real browser
+  yet (Step 7). Coverage badges still say `fps` and color-grade the rate (Task 3).
 
 ## Planning handoff
 

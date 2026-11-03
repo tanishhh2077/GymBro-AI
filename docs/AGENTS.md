@@ -4,7 +4,8 @@ Read [root instructions](../AGENTS.md) first.
 
 - Preserve [PRODUCT_BRIEF.md](PRODUCT_BRIEF.md) unchanged as the user's original source. Record approved amendments in [DECISIONS.md](DECISIONS.md), with provenance and supersession where needed.
 - [ARCHITECTURE.md](ARCHITECTURE.md) owns the current system map and intended boundaries. Label proposals explicitly.
-- [STATUS.md](STATUS.md) owns current implementation facts, verification evidence/limits, blockers, and one next task. Keep historical chatter out.
+- [HANDOFF.md](HANDOFF.md) owns the compact current state, exact latest test baseline, next task, and whether its teaching checkpoint is approved. Keep it usable by a fresh Claude Code or Codex session without chat history.
+- [STATUS.md](STATUS.md) owns detailed verification evidence/limits and historical handoffs. Keep current facts consistent with HANDOFF without copying all history into it.
 - [WORKFLOW.md](WORKFLOW.md) owns reusable independent-judgment, specification-review, implementation-review, and handoff procedures.
 - Root [spec.md](../spec.md) owns the bounded current milestone's proposed behavior and acceptance criteria. Its review status and implementation approval are separate.
 - `superpowers/plans/` owns reviewable implementation sequences and interface/test decisions. Keep future commands and proposed dependency/default choices clearly distinct from executed work.

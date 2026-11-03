@@ -4,7 +4,7 @@ Inherit [source guidance](../AGENTS.md). Follow the
 [product brief](../../docs/PRODUCT_BRIEF.md) and [decisions](../../docs/DECISIONS.md).
 
 - Store visual assets imported by application source here; public runtime files
-  belong under `public` with that directory's guidance.
+  belong under `public`, governed by the root guidance's public-file section.
 - Record the origin, license or permission, and meaningful edits for new assets.
   Do not assume an image is reusable because it appears in a search result.
 - Keep branding consistent with the agreed `GymBro AI` identity and tagline in the
