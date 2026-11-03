@@ -1,12 +1,14 @@
 import { useEffect, useRef } from "react";
 import type { NormalizedLandmark, PoseFrame } from "@/types";
 import { KEY_JOINTS, POSE_CONNECTIONS } from "@/core/landmarks";
+import { isDrawableLandmark, samplePose, videoContentRect, type Rect } from "./poseDisplay";
 
 interface SkeletonOverlayProps {
   /** The video this overlay tracks. */
   videoRef: React.RefObject<HTMLVideoElement | null>;
   /** Per-frame landmarks (normalized) to draw. */
   frames: PoseFrame[];
+  targetFps: number;
   /** Minimum landmark visibility to draw a point/edge. */
   minVisibility?: number;
   /** Accent color for the skeleton (CSS color). */
@@ -26,115 +28,95 @@ const VISIBILITY_FLOOR = 0.3;
 export function SkeletonOverlay({
   videoRef,
   frames,
+  targetFps,
   minVisibility = VISIBILITY_FLOOR,
   color = "#4ade80",
   className,
 }: SkeletonOverlayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number>(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const video = videoRef.current;
+    const parent = canvas?.parentElement;
+    if (!canvas || !video || !parent) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const times = frames.map((f) => f.time);
-
     const draw = () => {
-      rafRef.current = requestAnimationFrame(draw);
-      const v = videoRef.current;
-      if (!v) return;
-
-      // Keep the canvas backing store matched to its display size * dpr.
+      const box = video.getBoundingClientRect();
+      const parentBox = parent.getBoundingClientRect();
+      canvas.style.left = `${box.left - parentBox.left - parent.clientLeft + parent.scrollLeft}px`;
+      canvas.style.top = `${box.top - parentBox.top - parent.clientTop + parent.scrollTop}px`;
+      canvas.style.width = `${box.width}px`;
+      canvas.style.height = `${box.height}px`;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const cw = canvas.clientWidth;
-      const ch = canvas.clientHeight;
-      if (cw === 0 || ch === 0) return;
-      const pxW = Math.round(cw * dpr);
-      const pxH = Math.round(ch * dpr);
+      const pxW = Math.round(box.width * dpr);
+      const pxH = Math.round(box.height * dpr);
       if (canvas.width !== pxW || canvas.height !== pxH) {
         canvas.width = pxW;
         canvas.height = pxH;
       }
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, cw, ch);
-
-      if (frames.length === 0) return;
-
-      const t = v.currentTime;
-      const interp = sampleAt(frames, times, t);
-      if (!interp) return;
-
-      drawSkeleton(ctx, interp, cw, ch, color, minVisibility);
+      ctx.clearRect(0, 0, box.width, box.height);
+      if (video.seeking || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
+      const content = videoContentRect(video.videoWidth, video.videoHeight, box.width, box.height);
+      const pose = samplePose(frames, video.currentTime, targetFps);
+      if (!content || !pose) return;
+      drawSkeleton(ctx, pose.landmarks, content, color, minVisibility);
     };
 
-    rafRef.current = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [frames, videoRef, color, minVisibility]);
+    let raf: number | undefined;
+    const playing = () => !video.paused && !video.ended;
+    const tick = () => {
+      raf = undefined;
+      draw();
+      if (playing()) raf = requestAnimationFrame(tick);
+    };
+    const refresh = () => {
+      draw();
+      if (playing() && raf === undefined) raf = requestAnimationFrame(tick);
+      else if (!playing() && raf !== undefined) {
+        cancelAnimationFrame(raf);
+        raf = undefined;
+      }
+    };
+    const events = ["loadedmetadata", "loadeddata", "timeupdate", "seeking", "seeked", "play", "pause", "ended", "ratechange", "emptied"];
+    for (const event of events) video.addEventListener(event, refresh);
+    window.addEventListener("resize", refresh);
+    window.addEventListener("orientationchange", refresh);
+    const observer = new ResizeObserver(refresh);
+    observer.observe(video);
+    refresh();
+    return () => {
+      if (raf !== undefined) cancelAnimationFrame(raf);
+      observer.disconnect();
+      for (const event of events) video.removeEventListener(event, refresh);
+      window.removeEventListener("resize", refresh);
+      window.removeEventListener("orientationchange", refresh);
+    };
+  }, [frames, targetFps, videoRef, color, minVisibility]);
 
   return (
     <canvas
       ref={canvasRef}
       className={className}
       aria-hidden
-      style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+      style={{ position: "absolute", pointerEvents: "none" }}
     />
   );
-}
-
-/** Binary-search the nearest two frames and linearly interpolate landmarks. */
-function sampleAt(
-  frames: PoseFrame[],
-  times: number[],
-  t: number,
-): NormalizedLandmark[] | null {
-  if (frames.length === 0) return null;
-  if (t <= times[0]) return frames[0].landmarks;
-  if (t >= times[times.length - 1]) return frames[frames.length - 1].landmarks;
-
-  let lo = 0;
-  let hi = times.length - 1;
-  while (hi - lo > 1) {
-    const mid = (lo + hi) >> 1;
-    if (times[mid] <= t) lo = mid;
-    else hi = mid;
-  }
-
-  const a = frames[lo].landmarks;
-  const b = frames[hi].landmarks;
-  // If either neighbor is missing a pose, prefer the present one (no ghosting).
-  if (!a || !b) return a ?? b;
-
-  const span = times[hi] - times[lo];
-  const f = span > 1e-6 ? (t - times[lo]) / span : 0;
-
-  const out: NormalizedLandmark[] = new Array(a.length);
-  for (let i = 0; i < a.length; i++) {
-    const la = a[i];
-    const lb = b[i];
-    out[i] = {
-      x: la.x + (lb.x - la.x) * f,
-      y: la.y + (lb.y - la.y) * f,
-      z: la.z + (lb.z - la.z) * f,
-      visibility: Math.min(la.visibility ?? 1, lb.visibility ?? 1),
-    };
-  }
-  return out;
 }
 
 function drawSkeleton(
   ctx: CanvasRenderingContext2D,
   landmarks: NormalizedLandmark[],
-  w: number,
-  h: number,
+  content: Rect,
   color: string,
   minVisibility: number,
 ): void {
-  const visible = (i: number) =>
-    (landmarks[i]?.visibility ?? 1) >= minVisibility;
+  const visible = (i: number) => isDrawableLandmark(landmarks[i], minVisibility);
 
   // Bones
   ctx.lineCap = "round";
@@ -142,10 +124,10 @@ function drawSkeleton(
   for (const [a, b] of POSE_CONNECTIONS) {
     if (!landmarks[a] || !landmarks[b]) continue;
     if (!visible(a) || !visible(b)) continue;
-    const ax = landmarks[a].x * w;
-    const ay = landmarks[a].y * h;
-    const bx = landmarks[b].x * w;
-    const by = landmarks[b].y * h;
+    const ax = content.x + landmarks[a].x * content.width;
+    const ay = content.y + landmarks[a].y * content.height;
+    const bx = content.x + landmarks[b].x * content.width;
+    const by = content.y + landmarks[b].y * content.height;
 
     // Soft outer glow for that athletic-tech look.
     ctx.strokeStyle = hexWithAlpha(color, 0.18);
@@ -166,8 +148,8 @@ function drawSkeleton(
   // Joints
   for (const i of KEY_JOINTS) {
     if (!landmarks[i] || !visible(i)) continue;
-    const x = landmarks[i].x * w;
-    const y = landmarks[i].y * h;
+    const x = content.x + landmarks[i].x * content.width;
+    const y = content.y + landmarks[i].y * content.height;
 
     ctx.fillStyle = hexWithAlpha("#ffffff", 0.9);
     ctx.beginPath();

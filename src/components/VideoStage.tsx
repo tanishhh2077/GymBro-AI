@@ -20,7 +20,11 @@ interface VideoStageProps {
 
 const SPEEDS = [0.25, 0.5, 1] as const;
 
-export function VideoStage({
+export function VideoStage(props: VideoStageProps) {
+  return <VideoStagePlayer key={`${props.clip.id}:${props.clip.url}`} {...props} />;
+}
+
+function VideoStagePlayer({
   clip,
   accent = EXERCISES.bench.accent,
   retainMedia,
@@ -30,6 +34,11 @@ export function VideoStage({
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1);
+  const [playbackError, setPlaybackError] = useState<string | null>(null);
+  const attached = useRef(false);
+  const playAttempt = useRef(0);
+  const fallbackDuration = finiteDuration(clip.pose?.duration ?? 0);
+  const displayDuration = duration || fallbackDuration;
 
   // The overlay needs detected poses; playback only needs a completed clip, so a
   // no-pose clip can still be replayed without implying anything about its quality.
@@ -43,8 +52,11 @@ export function VideoStage({
     const v = videoRef.current;
     if (!v) return;
     const release = retainMedia(clip.id);
+    attached.current = true;
+    playAttempt.current++;
     v.src = clip.url;
     return () => {
+      attached.current = false;
       v.pause();
       v.removeAttribute("src");
       v.load();
@@ -56,18 +68,22 @@ export function VideoStage({
     const v = videoRef.current;
     if (!v) return;
     const onTime = () => setTime(v.currentTime);
-    const onMeta = () => setDuration(v.duration || 0);
-    const onPlay = () => setPlaying(true);
+    const onMeta = () => setDuration(finiteDuration(v.duration));
+    const onPlay = () => { setPlaying(true); setPlaybackError(null); };
     const onPause = () => setPlaying(false);
     const onEnd = () => setPlaying(false);
     v.addEventListener("timeupdate", onTime);
+    v.addEventListener("seeked", onTime);
     v.addEventListener("loadedmetadata", onMeta);
+    v.addEventListener("durationchange", onMeta);
     v.addEventListener("play", onPlay);
     v.addEventListener("pause", onPause);
     v.addEventListener("ended", onEnd);
     return () => {
       v.removeEventListener("timeupdate", onTime);
+      v.removeEventListener("seeked", onTime);
       v.removeEventListener("loadedmetadata", onMeta);
+      v.removeEventListener("durationchange", onMeta);
       v.removeEventListener("play", onPlay);
       v.removeEventListener("pause", onPause);
       v.removeEventListener("ended", onEnd);
@@ -79,18 +95,33 @@ export function VideoStage({
     if (v) v.playbackRate = speed;
   }, [speed]);
 
+  const startPlayback = async (fromStart = false) => {
+    const v = videoRef.current;
+    if (!v) return;
+    const attempt = ++playAttempt.current;
+    setPlaybackError(null);
+    try {
+      if (fromStart) {
+        v.currentTime = 0;
+        setTime(v.currentTime);
+      }
+      await v.play();
+    } catch {
+      if (attached.current && attempt === playAttempt.current) {
+        setPlaying(!v.paused && !v.ended);
+        setPlaybackError("Playback could not start. Try Play again, or remove this clip and choose another.");
+      }
+    }
+  };
+
   const togglePlay = () => {
     const v = videoRef.current;
     if (!v) return;
-    if (v.paused) void v.play();
-    else v.pause();
-  };
-
-  const restart = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.currentTime = 0;
-    void v.play();
+    if (v.paused) void startPlayback();
+    else {
+      playAttempt.current++;
+      v.pause();
+    }
   };
 
   const scrub = (value: number) => {
@@ -103,20 +134,20 @@ export function VideoStage({
   return (
     <div className="overflow-hidden rounded-2xl border border-white/5 bg-black">
       <div className="flex w-full justify-center bg-black">
-        {/* Wrapper hugs the video's true rendered box so the overlay canvas
-            (inset-0) aligns pixel-for-pixel with the frame — no letterboxing. */}
         <div className="relative min-h-[220px]">
           <video
             ref={videoRef}
             playsInline
             muted
             preload="auto"
+            style={{ objectFit: "contain" }}
             className="block max-h-[70vh] max-w-full"
           />
           {ready && (
             <SkeletonOverlay
               videoRef={videoRef}
               frames={frames}
+              targetFps={clip.pose!.fps}
               color={accent}
             />
           )}
@@ -126,7 +157,8 @@ export function VideoStage({
         </div>
       </div>
 
-      {clip.status === "no-pose" && <NoPoseNotice />}
+      <NoPoseNotice visible={clip.status === "no-pose"} />
+      {playbackError && <div role="alert" className="px-4 pt-3 text-sm text-warn">{playbackError}</div>}
 
       {/* Controls */}
       <div className="flex flex-col gap-3 px-4 py-3">
@@ -142,7 +174,7 @@ export function VideoStage({
           </button>
           <button
             type="button"
-            onClick={restart}
+            onClick={() => void startPlayback(true)}
             disabled={!playable}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-slate-300 transition-colors hover:bg-white/10 disabled:opacity-40"
             aria-label="Restart"
@@ -152,9 +184,10 @@ export function VideoStage({
 
           <input
             type="range"
+            aria-label="Video position"
             className="scrubber min-w-0 flex-1"
             min={0}
-            max={duration || 0}
+            max={displayDuration}
             step={0.01}
             value={time}
             disabled={!playable}
@@ -162,7 +195,7 @@ export function VideoStage({
           />
 
           <span className="shrink-0 font-mono text-xs tabular-nums text-slate-400">
-            {fmt(time)} / {fmt(duration)}
+            {fmt(time)} / {fmt(displayDuration)}
           </span>
         </div>
 
@@ -176,6 +209,7 @@ export function VideoStage({
                 key={s}
                 type="button"
                 onClick={() => setSpeed(s)}
+                aria-pressed={speed === s}
                 disabled={!playable}
                 className={`rounded-md px-2 py-1 text-xs font-medium transition-colors disabled:opacity-40 ${
                   speed === s
@@ -284,12 +318,15 @@ function ErrorLayer({ clip }: { clip: Clip }) {
  * A completed result with no detected pose. It does not cover the video, which
  * can still be replayed, and it says nothing about the lifter's technique.
  */
-function NoPoseNotice() {
+function NoPoseNotice({ visible }: { visible: boolean }) {
   return (
     <div
       role="status"
-      className="flex items-start gap-2 border-t border-warn/20 bg-warn/10 px-4 py-3 text-sm"
+      aria-live="polite"
+      aria-atomic="true"
+      className={visible ? "flex items-start gap-2 border-t border-warn/20 bg-warn/10 px-4 py-3 text-sm" : undefined}
     >
+      {visible && <>
       <AlertIcon width={18} className="mt-0.5 shrink-0 text-warn" aria-hidden="true" />
       <div>
         <div className="font-semibold text-white">No pose detected in the sampled frames</div>
@@ -299,6 +336,7 @@ function NoPoseNotice() {
           clip. You can still replay this video.
         </div>
       </div>
+      </>}
     </div>
   );
 }
@@ -306,21 +344,23 @@ function NoPoseNotice() {
 function CoverageBadges({ clip }: { clip: Clip }) {
   const pose = clip.pose!;
   const rate = Math.round(pose.coverage.detectionRate * 100);
-  const rateColor =
-    rate >= 85 ? "text-accent" : rate >= 60 ? "text-warn" : "text-danger";
   return (
     <div className="flex flex-wrap items-center gap-2 text-[11px]">
       <span className="chip bg-white/5 text-slate-300">
         <CpuIcon width={13} /> {pose.delegate}
       </span>
       <span className="chip bg-white/5 text-slate-300">
-        {pose.frames.length} frames · {pose.fps}fps
+        Sampling target: {pose.fps} samples/s
       </span>
-      <span className={`chip bg-white/5 ${rateColor}`}>
-        {rate}% pose coverage
+      <span className="chip bg-white/5 text-slate-300">
+        {rate}% of sampled positions with a pose
       </span>
     </div>
   );
+}
+
+function finiteDuration(value: number): number {
+  return Number.isFinite(value) && value > 0 ? value : 0;
 }
 
 function fmt(s: number): string {

@@ -1,6 +1,6 @@
 # System architecture
 
-Status: observed prototype plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 after Task 3 calculation helpers (Steps 1–2).
+Status: observed prototype plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 after Task 3 component wiring (Steps 3–4).
 
 ## Existing implementation
 
@@ -57,9 +57,9 @@ TypeScript configuration: `npm run build` runs `tsc -b` against the root `tsconf
 | `src/core/processingErrors.ts` | Shared `PoseEngineError` carrying a failure `kind` and processing `stage` |
 | `src/core/clipPolicy.ts` | `validateSelection`: the admission check (exactly one non-empty `.mp4`, at most 100 MiB) run before any URL, decoding, or model work; called by the store's `startClip` |
 | `src/core/*.test.ts` | Vitest contract tests using simulated media and a mocked MediaPipe SDK |
-| `src/components/VideoStage.tsx` | Playback, seeking, speed controls, progress, and video layout; leases the clip URL while mounted and sets the video source in an effect. A failure covers the video with a kind-specific title (`role="alert"`); a no-pose result shows a non-covering notice (`role="status"`) and keeps playback controls enabled |
-| `src/components/SkeletonOverlay.tsx` | Landmark lookup/interpolation at video time and canvas rendering |
-| `src/components/poseDisplay.ts` | Standalone pure display calculations: exact observations, bounded interpolation/endpoint holds, drawing eligibility, and centered CSS-pixel video content. Tested but not yet wired into the canvas/player |
+| `src/components/VideoStage.tsx` | Leased, contain-fit player keyed by clip/source identity; event-synchronized seeking, restart, speed state, guarded play failures, accessible controls, persistent no-pose live region, and neutral sampled-detection labels |
+| `src/components/SkeletonOverlay.tsx` | Uses `poseDisplay` at video time; follows the actual video box, projects into contain content, applies DPR once, clears unavailable data, redraws on paused media/layout events, and owns RAF only during playback |
+| `src/components/poseDisplay.ts` | Pure display calculations: exact observations, bounded interpolation/endpoint holds, drawing eligibility, and centered CSS-pixel video content; used by the overlay without modifying raw observations |
 | `src/core/landmarks.ts` | Landmark indices, the 33-landmark count, and skeleton topology |
 | `src/core/math.ts` | Geometry/signal helpers; no implemented exercise analyzer consumes them yet |
 | `src/core/exercises.ts` | Legacy multi-exercise and camera-angle metadata; the UI shows only the bench and side-view names and accent, because the taglines/descriptions claim unimplemented measurements |
@@ -102,9 +102,9 @@ The engine-level gaps found by earlier inspection (unbounded seek and initializa
 
 Still open, owned by later tasks:
 
-- Coverage badges still show `{n} frames · {fps}fps` (the sampling rate, which reads like source FPS) and color the coverage rate green/amber/red, which can read as a quality grade (Task 3).
+- Coverage badges now explicitly say sampling target and percentage of sampled positions with a pose, using neutral styling. They do not describe source FPS or technique quality.
 - The interface was checked in a real Chromium browser on 2026-11-03 (Task 2 Step 7, recorded in STATUS) with rejected inputs, an undecodable file, and a synthetic decodable clip without a person. No bench-press video has been processed, so overlay alignment and landmark quality remain unverified (Task 4).
-- The current overlay still substitutes a neighboring pose when one is missing. Its replacement calculations are tested in `poseDisplay.ts`; wiring them into the renderer is the next Task 3 step.
+- The overlay now preserves missing observations and bounded display gaps through `poseDisplay.ts`. Simulated component tests verify canvas calls and cleanup; real-media timing, anatomical alignment, and actual screen-reader announcements remain unverified (Task 4).
 - The UI no longer offers other exercises or views, and its copy describes pose visualization only. Legacy code remains but is not rendered: `ExercisePicker.tsx`, the squat/deadlift and front/45° metadata, and future analysis types that imply analyzers, view-invariant biomechanics, and numeric scores. Unreferenced Vite template assets remain in `src/assets/` and `public/`.
 
 [STATUS.md](STATUS.md) tracks verification evidence for these items.

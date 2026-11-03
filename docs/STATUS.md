@@ -10,7 +10,7 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Tasks 1–2 are complete and reviewed. Task 3 Steps 1–2 (pure display calculations) are implemented and reviewed; component tests/wiring are next after their teaching checkpoint. Whole `npm test` is **214 passed / 214 total**, exit **0** (58 media-helper, 55 engine, 22 selection, 12 store, 11 dropzone, 56 display calculations). Lint and build pass. `master` still holds only Tasks 1–2; Task 3 is on `feat/task3-overlay-playback`. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted in the specification. Execution follows the user's explanation-and-understanding checkpoint before each meaningful step.
+The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Tasks 1–2 are complete and reviewed. Task 3 Steps 1–4 (display calculations and component wiring) are implemented; final verification/review is in progress. Whole `npm test` is **236 passed / 236 total**, exit **0** (58 media-helper, 55 engine, 22 selection, 12 store, 11 dropzone, 56 display calculations, 10 overlay, 12 player). Lint and build pass. `master` still holds only Tasks 1–2; Task 3 is on `feat/task3-overlay-playback`. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted in the specification. Execution follows the user's explanation-and-understanding checkpoint before each meaningful step.
 
 The working folder is now `D:\Programming\summer 2026 projects\GymBro AI`; older folder paths in historical records are not the current working directory.
 
@@ -30,22 +30,20 @@ These are source-inspection observations. They do not establish that real-video 
 ## Not implemented or not demonstrated
 
 - Verified first-milestone result on a real, permitted side-view bench-press clip.
-- Bench-press/side-view-only product scope and accurate capability copy in the application.
-- Store/UI-level bounded admission, cancellation wiring, one-clip ownership, and honest missing-data presentation (the engine-level parts exist).
 - Rep detection/counting, descent/bottom/ascent segmentation, angle/depth/tempo measurements, evidence-backed findings, or validated quality/abstention behavior.
 - Saved sessions, comparisons, authentication, backend services, or a database.
 - Installed mobile project, device performance results, or store submission.
-- Complete passing automated behavior tests, fixture manifest, evaluation dataset, or measured accuracy benchmarks.
+- Complete real-browser acceptance tests, fixture manifest, evaluation dataset, or measured accuracy benchmarks. The passing unit/component checks are described below.
 
 ## Known inspection findings
 
 - Resolved in the engine on 2026-11-02 (mocked tests only): unbounded `seekTo`, the shared detector across clips, unsequenced detector timestamps, and missing duration/dimension bounds. The file-size bound is checked at admission, which Task 2 adds.
 - Resolved in the store on 2026-11-03 (mocked tests only): the pending legacy metadata wait, no cancellation on removal/reset, the shared engine across clips, and immediate URL revocation while still in use.
 - One detected frame can currently mark a whole clip ready.
-- `SkeletonOverlay.tsx` and `math.ts` contain gap interpolation/filling behaviors that must not be mistaken for measured evidence.
+- `SkeletonOverlay.tsx` uses bounded display interpolation without modifying raw observations. Legacy `math.ts` gap filling has no current analyzer consumer and must not be mistaken for measured evidence.
 - Resolved on 2026-11-03: the UI no longer offers exercise/angle choices and its copy no longer claims coach-grade analysis, measurements, or bar tracking. Future analysis types (not rendered) still include arbitrary score fields and lack the required finding-evidence contract.
 - The build's TypeScript check includes application source, but does not reference `tsconfig.node.json` or type-check `vite.config.ts` through that configuration. `@types/node` is now installed for the planned test setup. Wiring a configuration check remains separate work.
-- A test script, Vitest configuration, 58 passing media-helper tests, and 55 passing pose-engine contract tests exist. Store, display, and real-browser coverage remain pending.
+- Unit/component checks cover media helpers, engine, selection, store, dropzone, display helpers, overlay, and player. Full real-browser bench-press acceptance remains pending.
 
 These findings need targeted reproduction and verification during implementation. Do not silently promote them into measured failure rates.
 
@@ -119,7 +117,7 @@ The reviewer classified the redundant `result` initialization as a **low-severit
 
 ## One next task
 
-Continue Task 3 with Steps 3–4: write component tests and wire the tested display calculations into SkeletonOverlay/VideoStage. Explain this next step and wait for understanding before editing. Cover canvas geometry/DPR and missing-data clearing, paused seeks/restarts/speed changes, actionable rejected-play feedback, and the accessibility/coverage items queued under "Task 2 review and fixes". Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
+Finish Task 3 Steps 5–6: record final verification, resolve the fresh whole-task review, update handoff, and fast-forward/push `master` once reviewed. The component-wiring teaching checkpoint was approved; ordinary checks and review do not need another checkpoint. Task 4 needs a new explanation before work. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
 
 The user has no personal fixture available, and no openly licensed candidate inspected so far is a standardized side view; see "Fixture candidate research" below. Before Task 4 acceptance, the user must choose how to obtain a permitted side-view H.264 MP4. Do not claim a candidate or a mock is a validated result.
 
@@ -635,6 +633,51 @@ candidates.
   Steps 3–4. No real-media alignment, bench-press accuracy, or mobile claim follows
   from these pure tests. Commit Steps 1–2 together under D-019; do not merge the
   unfinished feature to `master`.
+
+## Task 3 component tests and wiring (Steps 3–4)
+
+- Implemented by Codex on 2026-11-03 after the user answered the teaching
+  checkpoint. Exact served model identifier is unavailable. Source scope is
+  `SkeletonOverlay.tsx`, `VideoStage.tsx`, and their two new component test files;
+  no dependencies, engine/store behavior, or production debug controls changed.
+- Test-first run: **22 tests, 20 failed / 2 passed** against the old components.
+  Failures exposed parent-box projection, missing-data carry-forward, continuous
+  paused RAF, stale seek/restart/source state, missing control semantics, rejected
+  play promises, no-pose live-region replacement, and ambiguous badges. The RED
+  run also exposed the old unhandled play rejections; GREEN has none.
+- Overlay now calls the tested pure helpers at actual media time. It positions
+  its canvas over the video element, projects centered contain content in CSS
+  pixels, and applies DPR once to the backing store/transform. Unknown or invalid
+  visibility and off-image points are hidden, without changing raw observations.
+  Missing samples, large gaps, seeking and not-ready media clear existing marks.
+  Media/layout events redraw paused frames; only playback owns a recurring RAF.
+  Unmount/effect replacement releases RAF, ResizeObserver, and listeners.
+- Player listens to seek completion and real playback events, resets state for a
+  replacement source, uses finite browser/processing duration, exposes the seek
+  control's name and selected speed, and catches rejected play/restart attempts.
+  Request identity and attachment guards prevent late errors from older media.
+  Restart updates its time immediately even if play fails. StrictMode tests show
+  the source detached and media paused before releasing the store URL lease.
+- Task 2's queued controls/badges/live-region issues are addressed: sampling is
+  explicitly a target, sampled detection uses neutral text/styling, and an empty
+  status region exists before a no-pose result populates it. Actual screen-reader
+  announcements remain unverified; no claim is made for initially completed clips.
+- Plan adaptation: removal belongs to App, not VideoStage. Component checks cover
+  player unmount/lease cleanup instead of adding a fake removal control. Existing
+  App removal/focus checks remain historical Task 2 evidence; Task 4 checks them
+  again through actual browser controls.
+- Verification: focused **22/22**, whole **236/236**, lint exit **0** with no
+  warnings, build exit **0**, 400 modules (existing stale Browserslist warning).
+  The first full build caught missing `this` annotations in test doubles; those
+  were corrected. An effect-cleanup lint warning was resolved by invalidating old
+  playback requests on setup and guarding attachment on cleanup.
+- Own dev server `127.0.0.1:5179` returned HTTP **200** before feature edits.
+  After checks, verified its Vite command/process identity, stopped it, and
+  confirmed the port free. Earlier `5176` server left alone. No real browser
+  rendering, bench footage, new inference, or phone check was run in this step.
+- Fresh whole-Task-3 read-only Codex review returned **no significant findings**.
+  Steps 3–4 form one green commit under D-019; record final verification and
+  review handoff in their own step commits before merging Task 3.
 
 ## Planning handoff
 
