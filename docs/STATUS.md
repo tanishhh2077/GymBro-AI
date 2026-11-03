@@ -117,9 +117,9 @@ The reviewer classified the redundant `result` initialization as a **low-severit
 
 ## One next task
 
-Task 4 Step 1: establish a permitted side-view bench-press recording for actual browser acceptance. Its teaching checkpoint is now approved; the user answered "yes" after the real-media versus simulated-test explanation. Seven additional public-stock previews were inspected without a suitable candidate. A question is pending about arranging a consenting recording or continuing public-footage research. Step 1 and real-video acceptance remain blocked on the missing fixture. No browser-test implementation checkpoint has been approved. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
+Task 4 Step 1: establish a permitted side-view bench-press recording for actual browser acceptance. Its teaching checkpoint is approved. The user cannot arrange a recording and explicitly requested continued licensed-footage research. Nine downloaded videos were inspected through sampled frames/contact sheets, plus additional stock previews; no suitable fixture was accepted. See [the search record](FIXTURE_SEARCH.md) for evidence and remaining leads. Step 1 and real-video acceptance remain blocked on footage. No browser-test implementation checkpoint has been approved. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
 
-The user has no personal fixture available, and no openly licensed candidate inspected so far is a standardized side view; see "Fixture candidate research" below. Before Task 4 acceptance, the user must choose how to obtain a permitted side-view H.264 MP4. Do not claim a candidate or a mock is a validated result.
+The chosen sourcing route is further licensed-footage research; do not ask the user to arrange a recording again. No suitable permitted side-view H.264 MP4 has been established. Do not claim a candidate or a mock is a validated result.
 
 ## Test-tool verification checkpoint
 
@@ -415,7 +415,8 @@ candidates.
   search snippet. `ffmpeg`/`ffprobe` remain unavailable on PATH; no tool was installed.
 - The user previously had no personal footage. Asked whether they can arrange a
   consenting 10–20-second side-view barbell recording; if already available,
-  requested its local path and whether it must stay private. Response pending.
+  requested its local path and whether it must stay private. The response was
+  pending at this point; the continued-search section below records the answer.
 - Step 1 and real-video acceptance remain **blocked by missing suitable footage**.
   No manifest/hash/reference timestamps are fabricated, no plan checkbox is
   completed, and no browser-test dependencies or application code were changed.
@@ -425,6 +426,30 @@ candidates.
   lint exit **0** with no warnings, and build exit **0**, 400 modules with the
   existing Browserslist warning. Whitespace check passes. No new development
   server, browser run, inference, or code review was needed for research-only docs.
+
+## Task 4 continued licensed-footage search (Step 1 still incomplete)
+
+- User reply: **"I cannot get a recording; keep searching licensed footage."**
+  Continued sourcing is authorized; no personal-recording question remains open.
+- Codex continued the search on 2026-11-03, with no subagent; served model ID is
+  unavailable. [FIXTURE_SEARCH.md](FIXTURE_SEARCH.md) records the sources,
+  permission evidence, inspected frames, rejected candidates, and remaining leads.
+- Downloaded nine public candidate videos to ignored `.superpowers/` scratch and
+  inspected sampled stills/contact sheets. No candidate met the approved framing
+  requirement. No real bench clip was processed by the application or MediaPipe.
+- Installed `imageio-ffmpeg==0.6.0` with `--no-deps --target` into ignored
+  `.superpowers/fixture-tools`, providing a portable FFmpeg 7.1 executable.
+  No package/lockfile, global Python environment, PATH, or app dependency changed.
+  `ffprobe` remains unavailable on PATH. Earlier entries saying no decoder or
+  downloaded media describe the earlier research step, not the current state.
+- Changes are documentation only: this section, compact handoff, search record,
+  and planning progress. No manifest, accepted binary, test dependency, or feature
+  was created. All Task 4 checkboxes remain unchecked. Browser acceptance,
+  useful intended-lifter observations, and anatomical alignment remain unverified.
+- Fresh required checks: `npm test` **236/236** in eight files, exit **0**;
+  `npm run lint` exit **0**, no warnings; `npm run build` exit **0**, 400 modules,
+  existing stale Browserslist warning. No application source changed. No browser
+  acceptance or code review was run for this documentation-only research chunk.
 
 ## Task 2 part 1: selection check (Steps 1–2)
 

@@ -122,23 +122,25 @@ including the review disposition, are in [STATUS.md](STATUS.md).
   deferred code findings remain. The same-provider review's model identifier was
   unavailable; actual browser rendering and bench-press alignment are unverified.
 - **Task 4 Step 1's teaching checkpoint is approved.** The user answered "yes"
-  after the explanation of real media versus simulated tests. Codex inspected
-  seven additional public-stock previews; none meets the side-view exercise/
-  framing requirement (details in STATUS). No full video was downloaded or tested.
-- **Next: resolve the missing fixture.** A question is pending about whether the
-  user can arrange a consenting 10–20-second side-view barbell bench-press recording
-  or wants further public-footage research. If already available, request its
-  local path and privacy/retention permission. Step 1 and real-video acceptance
-  remain blocked on footage. Do not repeat the already-approved Step 1 checkpoint,
-  relax the view requirement, or invent a manifest, checksum, or reference times.
+  after the explanation of real media versus simulated tests, then clarified:
+  **"I cannot get a recording; keep searching licensed footage."** Do not ask
+  them to arrange footage again. Continued research is authorized.
+- **Next: obtain a suitable licensed fixture.** Codex downloaded nine candidate
+  videos into ignored scratch storage and inspected sampled frames/contact sheets;
+  none was accepted. More stock previews, source terms, and two research
+  repositories were checked. [Search evidence](FIXTURE_SEARCH.md) records sources,
+  rejection reasons, access failures, and leads so another session need not repeat
+  the search. A portable decoder now exists in ignored scratch; it is not an app
+  dependency. No actual bench-lifter inference was run.
+  Step 1 and real-video acceptance remain blocked on footage. Do not repeat the
+  approved checkpoint, relax the view requirement, or invent manifest values.
   Step 2 browser-test implementation needs its own teaching checkpoint.
 - The server started for this step on `127.0.0.1:5179` was stopped and its port
   verified free. The earlier `5176` listener was left untouched.
 - GitHub's default branch may still need switching to `master` in Settings; this
   is the last recorded state, not a fresh remote-setting check.
-- Task 4 prerequisite: no permitted side-view H.264 MP4 exists. Inspected Commons
-  candidates are not side views; the user must choose an option (STATUS, "Fixture
-  candidate research").
+- Task 4 prerequisite: no suitable permitted side-view H.264 MP4 has been
+  established. The user's chosen route is further licensed-footage research.
 
 ## Read context progressively
 
@@ -160,7 +162,8 @@ work based on old unchecked scratch briefs under ignored `.superpowers/`.
 
 Confirm which instructions loaded, summarize the latest checks above, explain the
 next task with its reason and alternative, ask **"Is this clear?"**, and wait. The
-display task is complete and reviewed. Task 4 Step 1 was approved; resolve its
-pending footage question. Later browser-test implementation has not been approved.
+display task is complete and reviewed. Task 4 Step 1 and continued licensed-footage
+research were approved; do not reopen the answered footage question. Later
+browser-test implementation has not been approved.
 After an approved work chunk,
 update this handoff, STATUS, ARCHITECTURE where facts changed, and plan progress.
