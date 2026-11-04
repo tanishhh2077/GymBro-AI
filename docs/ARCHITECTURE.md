@@ -5,8 +5,10 @@ Status: observed implementation plus accepted direction; not a claim of complete
 ## Existing implementation
 
 The shared application is React/TypeScript/Vite. Capacitor 8.6.0 now wraps its
-build in iOS/Android project sources under D-022. These wrappers are generated,
-not yet compiled or verified on devices. There is no Python service, database,
+build in iOS/Android projects under D-022. Both native wrappers now compile in
+cloud CI; the iOS process launched but its first screenshot was blank, so native
+interface acceptance is unresolved. Neither is verified on physical devices.
+There is no Python service, database,
 account system or persistence layer.
 
 Current data flow:

@@ -130,27 +130,68 @@ jobs:
           ditto -c -k --sequesterRsrc --keepParent \
             build/ios/Build/Products/Debug-iphonesimulator/App.app \
             build/artifacts/GymBroAI-ios-simulator.zip
-      - name: Launch empty app shell in an iPhone simulator
+      - name: Build visual startup guard and reject the splash screen
+        run: |
+          swiftc scripts/check-simulator-screen.swift -o build/check-simulator-screen
+          set +e
+          build/check-simulator-screen 'ios/App/App/Assets.xcassets/Splash.imageset/Default@1x~universal~anyany.png'
+          probe_status=$?
+          set -e
+          if [[ "$probe_status" -ne 1 ]]; then
+            echo '::error::Startup guard must reject a splash screen without the app interface.'
+            exit 1
+          fi
+      - name: Launch and verify visible app shell in an iPhone simulator
+        timeout-minutes: 12
         run: |
           xcrun simctl list devices available --json > "$RUNNER_TEMP/gymbro-devices.json"
           node --input-type=module - "$RUNNER_TEMP/gymbro-devices.json" "$RUNNER_TEMP/gymbro-device.txt" <<'JS'
           import { readFileSync, writeFileSync } from 'node:fs';
           const devices = JSON.parse(readFileSync(process.argv[2], 'utf8')).devices;
-          const phone = Object.values(devices).flat().find(device => device.name.startsWith('iPhone'));
+          const phones = Object.entries(devices).flatMap(([runtime, list]) => list.map(device => ({ ...device, runtime })));
+          const phone = phones.find(device => device.name.startsWith('iPhone'));
           if (!phone) throw new Error('No available iPhone simulator.');
           writeFileSync(process.argv[3], `${phone.udid} ${phone.state}\n`);
-          console.log(`Using ${phone.name}: ${phone.udid} (${phone.state})`);
+          console.log(`Using ${phone.name}: ${phone.udid} (${phone.state}), ${phone.runtime}`);
           JS
           read -r GYMBRO_DEVICE GYMBRO_STATE < "$RUNNER_TEMP/gymbro-device.txt"
+          collect_diagnostics() {
+            xcrun simctl spawn "$GYMBRO_DEVICE" log show --last 2m --style compact --predicate 'process == "App"' || true
+            xcrun simctl terminate "$GYMBRO_DEVICE" com.gymbroai.app || true
+            if [[ -n "${GYMBRO_LOG_PID:-}" ]]; then
+              for drain_attempt in {1..5}; do
+                if ! kill -0 "$GYMBRO_LOG_PID" 2>/dev/null; then break; fi
+                sleep 1
+              done
+              kill -KILL "$GYMBRO_LOG_PID" 2>/dev/null || true
+              wait "$GYMBRO_LOG_PID" 2>/dev/null || true
+            fi
+            if [[ -f "$RUNNER_TEMP/gymbro-ios-console.log" ]]; then
+              cat "$RUNNER_TEMP/gymbro-ios-console.log"
+            fi
+            xcrun simctl shutdown "$GYMBRO_DEVICE" || true
+          }
+          trap collect_diagnostics EXIT
           if [[ "$GYMBRO_STATE" != Booted ]]; then
             xcrun simctl boot "$GYMBRO_DEVICE"
           fi
           xcrun simctl bootstatus "$GYMBRO_DEVICE" -b
           xcrun simctl install "$GYMBRO_DEVICE" build/ios/Build/Products/Debug-iphonesimulator/App.app
-          xcrun simctl launch "$GYMBRO_DEVICE" com.gymbroai.app
-          sleep 5
-          xcrun simctl io "$GYMBRO_DEVICE" screenshot build/artifacts/ios-simulator-startup.png
-          xcrun simctl shutdown "$GYMBRO_DEVICE"
+          xcrun simctl launch --console-pty --terminate-running-process "$GYMBRO_DEVICE" com.gymbroai.app > "$RUNNER_TEMP/gymbro-ios-console.log" 2>&1 &
+          GYMBRO_LOG_PID=$!
+          rendered=0
+          for attempt in {1..12}; do
+            sleep 5
+            xcrun simctl io "$GYMBRO_DEVICE" screenshot build/artifacts/ios-simulator-startup.png
+            if build/check-simulator-screen build/artifacts/ios-simulator-startup.png; then
+              rendered=1
+              break
+            fi
+          done
+          if [[ "$rendered" -ne 1 ]]; then
+            echo '::error::The compiled iOS app did not show its GymBro AI bench-press interface.'
+            exit 1
+          fi
       - name: Save simulator app and empty-shell evidence
         if: ${{ always() && steps.package.outcome == 'success' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

@@ -64,7 +64,8 @@ are rejected. See STATUS for red/green and actual command evidence.
 Native background events now pause videos and reset only unfinished processing
 through the existing store; late listener handles are released. Completed clips
 stay in memory and never auto-resume. Google Fonts were removed; system-font
-fallbacks and safe-area CSS are active. Android's edge-to-edge code is uncompiled.
+fallbacks and safe-area CSS are active. Android's edge-to-edge code now compiles
+in the cloud; device behavior is still unverified.
 
 Edge 156.0.4314.58 production startup passed at 390x844, 844x390 and 1280x900:
 injected inset padding correct, no horizontal overflow, external requests or
@@ -76,18 +77,31 @@ plus mobile verification. Whole-feature review remains Step 5.
 
 Own dev server 5193 remains available. Preview 5194 was stopped and its port
 verified free. Leave earlier server 5176 alone. Browser checks use
-an isolated profile; never save private-video screenshots or traces. No native
-compilation, simulator run or physical-device test has occurred.
+an isolated profile; never save private-video screenshots or traces. No physical
+device or native real-video test has occurred.
 
 Step 4: `.github/workflows/mobile-builds.yml` is authored and passed actionlint
 1.7.12 (official release checksum verified). Fresh read-only Codex workflow
 review found no material issues and independently passed package verification;
-all 320 local tests/lint/build/guarded sync pass. First cloud run is pending.
+all 320 local tests/lint/build/guarded sync pass. Workflow commit `b126748` is
+pushed; [run 1](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41774153219)
+completed with green jobs. Shared checks, Android debug build, Xcode simulator
+compilation/package verification and process launch passed. **The downloaded iOS
+screenshot is blank**, so rendered-interface acceptance failed despite green CI.
+Android artifact `13296546282` is downloaded in ignored `build/artifacts/run-1/`;
+ZIP digest matches GitHub metadata; all 13 APK assets independently match local
+dist. iOS artifact `13296457592` is also downloaded/hash-verified in that directory
+with the simulator ZIP/blank startup PNG. No iOS rendered-UI claim yet.
 Shared checks gate Ubuntu24.04
 Android/Java21 and macOS26/Xcode simulator builds; native packages must contain
 all shared assets. Only explicit prototype/screenshot artifacts, one-day retention,
 read-only contents permission, no persisted Git credentials or npm caches.
-No native compiler result yet. Workflow README covers triggers and artifacts;
+Both native compilers succeeded; iOS UI startup is unresolved. A diagnostic fix
+adds local macOS Vision text recognition (must reject the first-party splash),
+bounded actual-screen retries, App console/system logs and selected runtime
+reporting. Actionlint passes; Swift helper and readiness changes await macOS CI.
+No speculative app-code change. Do not advance Step 5 with unresolved blank UI.
+Workflow README covers triggers and artifacts;
 manual dispatch UI needs the workflow on the still-old default branch.
 
 ## Next product work

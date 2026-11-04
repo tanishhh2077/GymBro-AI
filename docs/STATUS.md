@@ -22,7 +22,10 @@ Read the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md
 and [plan](superpowers/plans/2026-11-03-mobile-prototype.md). Capacitor 8.6.0,
 App plugin 8.1.2 and assets tool 4.0.0 are pinned. iOS/SPM and Android native
 projects are generated with `com.gymbroai.app` / GymBro AI identity and version
-0.1.0. No native compilation, signing or device tests have occurred.
+0.1.0. Android and iOS simulator native compilation pass in run 1, but the iOS
+startup screenshot is blank despite green launch status. Rendered UI acceptance
+is unresolved; a diagnostic/readiness fix is in progress. No Apple signing
+credentials or physical-device tests have been used.
 
 Task 6 verification on 2026-11-03: process-local Node 22.23.2 / npm 10.9.8;
 working-tree tests **287/287** in ten files, lint and production build exit **0**,
@@ -136,6 +139,52 @@ validation follows from these checks.
   the workflow on the repository default branch, still `feat/gymbro-video-landmarks`.
   No repository setting was changed. GitHub connector fetch supports push-run
   metadata, while its dedicated commit-workflow helper filters to PR runs.
+
+- Initial workflow commit `b126748` pushed successfully. GitHub connector reports
+  [run 1](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41774153219),
+  `41774153219`, at that exact head. Shared job passed on Ubuntu24.04.5 with
+  Node22.23.2/npm10.9.8: clean install, **320 tests/13 files**, lint and guarded
+  sync all succeeded. Android job `126390685905` passed: Gradle reports
+  **BUILD SUCCESSFUL in 1m30s**, and final APK contains all 13 shared web files
+  byte-for-byte. iOS job `126390685793` passed Xcode **26.6 / 17F113** compilation
+  (`BUILD SUCCEEDED`) and package verification on `macos-26-arm64`; simulator
+  iPhone17Pro boot/install/launch and screenshot steps exited 0. Startup took
+  6m17s. No rendered-UI or physical-device/inference claim follows. In-progress iOS logs were unavailable
+  through the connector (404 pending finalized log blob); wait for the job result.
+- Android artifact `13296546282` (`GymBroAI-android-debug-1`) is 24,697,556 bytes
+  and expires after one day. Downloaded through GitHub connector to ignored
+  `build/artifacts/run-1/`; ZIP SHA-256 matches GitHub metadata:
+  `c1ba4f4e13663bec784324f185425ee8601ce412c6e4b063a48c531e8b667f0e`.
+  Extracted only the expected `app-debug.apk` to `GymBroAI-android-debug.apk`
+  (24,697,416 bytes), SHA-256
+  `9d82a4922d6d6b387144c337d9f46bf1b82c0b6560040f1e12e69894e9e85c66`.
+  No artifact/build output is staged or committed. An APK is not an Android
+  device test; simulator app delivery is not a signed iPhone installation.
+- Run1 completed **success**, but visual inspection found a **blank dark iOS
+  screen with status bar only**, not GymBro AI's interface. This is an acceptance
+  failure; a green process-launch check is insufficient. iOS artifact
+  `13296457592` (19,967,925 bytes) downloaded through connector; ZIP hash matched
+  `dd9ef95de2e743e5a35214a36337148fe2dd631fb6cce58b5dc87daf44e23646`.
+  Extracted only simulator ZIP (19,894,745 bytes) and empty startup PNG (72,872
+  bytes) into ignored `build/artifacts/run-1/`. No human footage. Local APK
+  independently matched all 13 web files against dist after download.
+- Diagnostic/readiness change: new macOS-only local Vision text-recognition CLI
+  must reject the first-party splash, then require visible GymBroAI/bench-press
+  labels in bounded simulator screenshot retries. Capture native App console and
+  recent system logs in CI output, and record selected runtime. No paid service,
+  no workout images, no speculative app-code changes. Actionlint passes; actual
+  Swift compilation/negative check/positive UI remain pending on macOS CI.
+- Diagnostic follow-up review found one supported P2: file-backed stdout can
+  buffer Capacitor's `Swift.print` startup errors, and reading before termination
+  can miss them. Verified local CAPLog implementation and Apple's terminal/
+  buffering documentation. Changed launch to `--console-pty`, terminate App,
+  allow a bounded five-second logger drain, stop/reap that owned logger, then
+  print captured output. System-log collection is supplemental. No other material
+  review findings; Swift/console behavior must still be exercised in CI.
+- After diagnostic changes, local **320 tests**, lint, build/config check and
+  guarded sync pass; actionlint and diff checks pass. This does not validate the
+  macOS-only Swift helper on Windows. The next CI run will compile it, check the
+  splash rejection and require the real empty-shell interface to become visible.
 
 ### Earlier milestone context
 

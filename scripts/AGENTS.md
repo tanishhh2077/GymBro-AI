@@ -11,3 +11,6 @@ Inherit [root guidance](../AGENTS.md) and the mobile design/plan.
 - Tests use small synthetic files in isolated ignored scratch directories. Check
   the resolved cleanup path before recursively deleting a fixture directory.
 - Passing packaging checks is not native compilation or inference validation.
+- `check-simulator-screen.swift` runs only on macOS CI using Apple's local Vision
+  text recognition. Feed it the empty app/splash screen only, never human workout
+  images. Recognizing startup text proves no video-analysis capability.

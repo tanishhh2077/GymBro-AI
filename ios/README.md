@@ -14,8 +14,9 @@ npm run mobile:sync
 
 These commands also work on Windows and prepare the local web bundle; they do
 not compile iOS. Native sources/branding and the shared lifecycle/layout work
-are implemented; native compilation/device behavior remain unverified. Cloud
-native builds are planned in Task 6 Step 4 and have not run.
+are implemented. Cloud run 1 compiled on Xcode26.6 and launched an iPhone17Pro
+simulator, but the downloaded screenshot is blank. Visible startup is unresolved;
+see STATUS for diagnostic changes/results. Physical-device behavior is unverified.
 
 On macOS with Xcode 26+, the planned unsigned simulator build command is:
 

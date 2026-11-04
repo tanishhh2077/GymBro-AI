@@ -21,8 +21,10 @@ Set-Location android
 
 On Linux/macOS, use `./gradlew assembleDebug` inside `android/`. Expected output:
 `app/build/outputs/apk/debug/app-debug.apk`. These native build commands have not
-run in this checkout: this Windows environment lacks an Android SDK/emulator. Task 6
-Step 4 plans cloud builds. Debug compilation does not prove file selection,
+run locally: this Windows environment lacks an Android SDK/emulator. Cloud run 1
+successfully compiled the debug APK and verified all 13 packaged web files.
+The downloaded APK is retained in ignored `build/artifacts/run-1/` locally.
+Debug compilation does not prove file selection,
 inference, background cleanup or performance on an actual phone.
 
 Run `npm run mobile:assets` at the root after editing `resources/logo.svg`.

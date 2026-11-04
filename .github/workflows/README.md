@@ -20,9 +20,14 @@ Planned artifacts, retained one day:
 
 Final package checks compare all shared web files against `dist/`. The iOS job
 boots an available iPhone simulator, installs/launches the app and captures only
-its empty shell. Compilation, launch and screenshot inspection have separate
-results; an artifact alone does not establish usable UI, inference or performance.
-See [STATUS](../../docs/STATUS.md) for actual runs; the workflow has not run yet.
+its empty shell. A local macOS Vision text check must reject the first-party
+splash and recognize the GymBroAI/bench-press interface in bounded captures.
+App console/system diagnostics are captured for startup failures. No workout
+image is inspected and no paid OCR service is called. Compilation, launch and
+screen inspection have separate results; none establishes inference/performance.
+Run1 compiled both platforms but its startup PNG was blank despite green jobs;
+the visual guard/diagnostics are being added to prevent that false pass. See
+[STATUS](../../docs/STATUS.md) for actual runs and unresolved checks.
 
 Download artifacts from the selected run's summary under the repository's Actions
 tab. GitHub may require sign-in. Apple provisioning/signing, real phones, file

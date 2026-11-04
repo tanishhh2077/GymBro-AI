@@ -20,8 +20,9 @@ remains in the source but is not rendered.
 Processing currently happens on-device using WebAssembly/WebGL. Choosing a local
 video does not upload it to a server. An installed mobile app is the intended
 release direction. Task 6 now adds Capacitor iOS/Android project sources and
-branding, with iPhone first. Native compilation and device video handling are
-not verified yet; no backend exists. See [iOS](ios/README.md),
+branding, with iPhone first. Android and iOS simulator compilation pass in cloud
+CI, but the first iOS screenshot is blank and startup is being investigated.
+Physical-device video handling is unverified; no backend exists. See [iOS](ios/README.md),
 [Android](android/README.md) and the [mobile plan](docs/superpowers/plans/2026-11-03-mobile-prototype.md).
 
 ## Project context and development
