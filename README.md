@@ -24,7 +24,7 @@ Processing currently happens on-device using WebAssembly/WebGL. Choosing a local
 video does not upload it to a server. An installed mobile app is the intended
 release direction. Task 6 now adds Capacitor iOS/Android project sources and
 branding, with iPhone first. Android and iOS simulator compilation pass in cloud
-CI; [run 3](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41778715047)
+CI; [run 5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
 also verifies the visible iPhone-simulator interface. Physical-device video
 handling is unverified; no backend exists. See [iOS](ios/README.md),
 [Android](android/README.md) and the [mobile plan](docs/superpowers/plans/2026-11-03-mobile-prototype.md).
@@ -122,8 +122,8 @@ development-server URL.
 
 Java 21/Android SDK and macOS/Xcode respectively are needed for native builds.
 Cloud builds are verified in the [workflow](.github/workflows/README.md);
-download test artifacts from run 3 (one-day GitHub retention). Local copies are
-retained in ignored `build/artifacts/run-3/`. iOS simulator output cannot run on a
+download test artifacts from run5 (one-day GitHub retention). Local copies are
+retained in ignored `build/artifacts/run-5/`. iOS simulator output cannot run on a
 physical iPhone; Apple signing/provisioning remains separate. Native app-state
 events now pause attached videos and cancel unfinished processing; completed clips
 stay in memory. The layout uses device safe areas, and fonts use local system

@@ -1,6 +1,6 @@
 # Feature designs
 
-[Clip elbow summary](2026-11-04-elbow-summary-design.md) defines active Task9's
+[Clip elbow summary](2026-11-04-elbow-summary-design.md) defines completed Task9's
 observed counts/extrema and evidence jumps. It extends Task5 without rep detection
 or a validated range-of-motion claim; D-025 records the PC-development scope.
 

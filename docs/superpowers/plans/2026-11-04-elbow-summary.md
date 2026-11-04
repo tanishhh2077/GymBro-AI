@@ -68,10 +68,10 @@ component calls the current seek callback. No media/store ownership changes.
   label it synthetic and verify actual jump/paused media-time state where feasible.
 - [x] Fresh read-only whole-feature review against spec; fix supported issues
   with appropriate failing tests/checks. Do not invent a finding quota.
-- [ ] Full required precommit checks, guarded sync and current docs; commit/push
+- [x] Full required precommit checks, guarded sync and current docs; commit/push
   green review fixes/handoff. Fast-forward/push master under D-019 once resolved.
   Inspect native CI if source change triggers it; record its actual result.
-- [ ] Preserve Task8's branch and phone deferral. Explain exactly how it resumes
+- [x] Preserve Task8's branch and phone deferral. Explain exactly how it resumes
   against the new reviewed source; never mark its phone/native/bench cases passed.
 
 ## Self-review

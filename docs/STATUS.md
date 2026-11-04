@@ -12,8 +12,10 @@ usage, and these documents are the only handoff; see D-016 in
 
 Task9 PC development is active on `feat/task9-elbow-summary` from reviewed
 master26a831f. The user requested PC work while phone testing waits; D-025
-records the builder-selected observed-elbow summary. Step1 is committed/pushed
-as7b3a524; Step2 implementation/checks pass and fresh final review is next.
+records the builder-selected observed-elbow summary. **Task9 is complete**:
+reviewed source is integrated in master9e34ec4, local366 tests/lint/build/sync
+and all three native run5 jobs pass. Final documentation follows that source;
+check Git for current tips. Phone/Safari/native-video/bench gates remain open.
 D-024 guidance was carried from Task8's accepted
 user instruction; Task8 itself stays open at7198ec1 and is not merged here.
 
@@ -99,7 +101,42 @@ user instruction; Task8 itself stays open at7198ec1 and is not merged here.
   narrow/wide layout and removal. No external app-origin requests/page errors.
   This is browser accessibility-tree evidence, not a physical screen-reader test.
   Phone/LAN/native/bench gates remain unverified. Review is resolved; integration
-  and new native CI evidence remain to be recorded.
+  and new native CI evidence follow below.
+- Review fix9e34ec4 was committed/pushed after green366 tests/lint/build/sync.
+  Fast-forwarded master26a831f..9e34ec4; reran the whole366 tests/15 files,
+  lint and guarded sync/build on the merged tree, all exit0. Working tree stayed
+  clean and own dev5193 returnedHTTP200. Pushed master and retained feature branch.
+- New native [master run5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
+  at9e34ec4 finalized **success** in all three jobs: shared126826538964,
+  Android126826848597 and iOS126826848662. Shared checks pass366 tests; Android
+  build succeeds and matches13 compiled web files. iOS Xcode26.6/17F113 build and
+  13-file comparison pass, negative splash is rejected, and foreground launch
+  PID14141 eventually shows actual GymBro/bench UI at20:08:06UTC after an initially
+  incomplete capture. iPhone17Pro/iOS26.4; WebView loaded. Matching fresh App
+  crash reports0 is not general stability evidence. No Apple team/signing secrets.
+- Downloaded both artifacts and verified outer SHA-256 against GitHub metadata:
+  Android `13a2919e4cf0b7ff9aa01801eefd1bb86984479d8383fc5170861bb6b5029ddd`;
+  iOS `dd0b2bb07c4b73738c491607a09ebcddab5724c3f725ac25de3aae45955f6609`.
+  Root independently compared all13 dist files inside each downloaded package
+  byte-for-byte. Manual image inspection confirms the real empty app interface.
+  The new summary is bundled but not exercised by this startup-only image.
+  Ignored `build/artifacts/run-5/` retains APK24,698,528 bytes,
+  SHA-256 `91a0a19de40a5616a90f8776fd9d52dcde925699d63a87982217c55447bed9c9`;
+  iOS App.app ZIP19,895,594 bytes and PNG1,105,405 bytes. Artifact IDs Android
+  13358772029/iOS13359342876; one-day retention. Older run4 retained separately.
+- Implementation was by the current Codex session (model identifier not exposed);
+  review model gpt-6-astra/high was explicitly selected as recorded above. No
+  new human footage, private media, native device install, signing or release.
+- Task8 remains at7198ec1 with the earlier source. When resuming, merge reviewed
+  master into its branch, retain both histories and redo checks/build/sync before
+  phone cases. Preserve its factual preparation/evidence in conflict resolution.
+  No published-history rewrite or Task8 merge into master is implied. Phone steps
+  remain deferred until the user is home; Task4 still lacks permitted bench media.
+- Final documentation verification:75 Markdown files,204 relative links/anchors
+  and all19 CLAUDE imports resolve; diff formatting passes. Fresh precommit
+  **366 tests/15 files**, lint and build/config check exit0,411 modules. Source
+  bundle hashes match the verified run5 packages. All Task9 steps are complete;
+  no acceptance-blocking review finding remains. Feature branch is retained.
 
 ### Earlier Task7 planning record
 

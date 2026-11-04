@@ -1,8 +1,10 @@
 # Implementation plans
 
-Active: [Task9 elbow summary](2026-11-04-elbow-summary.md), PC-side observed
-sample counts and extrema navigation under D-025; phone work stays deferred on
-Task8's branch. No rep/ROM/technique validity claim is added.
+Latest completed feature: [Task9 elbow summary](2026-11-04-elbow-summary.md),
+observed counts/extrema navigation under D-025. All3 steps,366 tests, fresh review
+and native run5 pass; source is merged/pushed to master. Task8 phone work stays
+deferred on its preserved branch and must incorporate this reviewed master before
+resuming. No rep/ROM/technique validity claim is added.
 
 The reviewed [phone/video acceptance plan](2026-11-04-phone-video-acceptance.md)
 completes Task 7's planning deliverable, authorized on 2026-11-04. Available device:
