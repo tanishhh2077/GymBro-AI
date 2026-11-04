@@ -116,7 +116,8 @@ development-server URL.
 - `npm run mobile:open:android`: open an installed Android Studio.
 
 Java 21/Android SDK and macOS/Xcode respectively are needed for native builds.
-Cloud build setup is a later plan step. iOS simulator output cannot run on a
+Cloud build configuration is in progress in the [workflow](.github/workflows/README.md);
+consult STATUS for actual run evidence. iOS simulator output cannot run on a
 physical iPhone; Apple signing/provisioning remains separate. Native app-state
 events now pause attached videos and cancel unfinished processing; completed clips
 stay in memory. The layout uses device safe areas, and fonts use local system

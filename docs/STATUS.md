@@ -10,13 +10,14 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 6 native lifecycle/offline packaging work is active on
+Task 6 native cloud-build setup is active on
 `feat/task6-mobile-app`, based on reviewed master `f0e9118`. D-022 authorizes
 both native prototypes, prioritizing iPhone, from Windows without a MacBook.
 The user confirmed the mobile packaging explanation, then replied "ok cool" to
 Step 2's dependency/native-generation understanding checkpoint. The user then
 answered "clear" directly to Step 3's background/layout/offline explanation.
-Step 4 retains its understanding checkpoint before cloud native builds.
+The user then answered "clear" to Step 4's cloud-build explanation; Step 4 is
+active. Step 5 retains its next understanding checkpoint.
 Read the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md)
 and [plan](superpowers/plans/2026-11-03-mobile-prototype.md). Capacitor 8.6.0,
 App plugin 8.1.2 and assets tool 4.0.0 are pinned. iOS/SPM and Android native
@@ -109,6 +110,32 @@ validation follows from these checks.
   port confirmed free. Own dev 5193 and earlier 5176 were left alone.
   Step 3 is complete; Step 4 awaits its teaching checkpoint. No native compilation,
   simulator launch, signing or physical-device test yet.
+
+### Task 6 Step 4 preparation
+
+- Added `.github/workflows/mobile-builds.yml` and scoped shared guidance/READMEs.
+  Shared checks gate Android debug APK compilation on Ubuntu 24.04/Java21 and
+  iOS simulator compilation on macOS26/Xcode, with final package asset comparisons.
+  iOS plans an available iPhone simulator boot/install/launch and empty-shell
+  screenshot; no human media is imported. Native results are still pending.
+- Repo public confirmed through GitHub metadata. Standard public runners are
+  free for compute per official GitHub billing documentation; larger runners are
+  excluded. Artifacts have one-day retention, explicit prototype/screenshot paths;
+  repository token is read-only contents, checkout credentials are not persisted,
+  npm automatic caches disabled. No signing credentials, release or paid service.
+- Official action release commits verified through GitHub Git refs: checkout
+  v7.0.1, setup-node v7.1.0, setup-java v6.1.0, upload-artifact v7.0.2. Actionlint
+  **1.7.12** downloaded to ignored scratch, SHA-256 matched official checksums;
+  workflow validation exit **0**. Local whole **320 tests**, lint and guarded
+  sync/build/config check exit **0**. Fresh read-only Codex workflow review
+  (`mobile_ci_review`, model not exposed) found no material findings and
+  independently passed `mobile:verify` and diff checks. No files changed by the
+  reviewer; no native compile/startup result before the first workflow push.
+- Relevant code/config pushes trigger on the mobile feature branch and master;
+  Markdown-only changes do not. Manual dispatch is defined but its UI requires
+  the workflow on the repository default branch, still `feat/gymbro-video-landmarks`.
+  No repository setting was changed. GitHub connector fetch supports push-run
+  metadata, while its dedicated commit-workflow helper filters to PR runs.
 
 ### Earlier milestone context
 

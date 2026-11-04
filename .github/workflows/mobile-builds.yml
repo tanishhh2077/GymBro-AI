@@ -1,0 +1,164 @@
+name: Mobile prototypes
+
+on:
+  push:
+    branches: [feat/task6-mobile-app, master]
+    paths:
+      - .github/workflows/mobile-builds.yml
+      - src/**
+      - public/**
+      - ios/**
+      - android/**
+      - resources/**
+      - scripts/**
+      - package*.json
+      - '*config*'
+      - index.html
+      - .nvmrc
+      - .gitattributes
+      - '!**/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  shared:
+    name: Shared application checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: npm ci --no-audit --no-fund
+      - run: npm test
+      - run: npm run lint
+      - run: npm run mobile:sync
+
+  android:
+    name: Android debug APK
+    needs: shared
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npm ci --no-audit --no-fund
+      - run: npm run mobile:sync
+      - name: Compile debug APK
+        working-directory: android
+        run: ./gradlew --no-daemon assembleDebug
+      - name: Verify compiled APK contains the web bundle
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          files = [path for path in Path('dist').rglob('*') if path.is_file()]
+          with ZipFile('android/app/build/outputs/apk/debug/app-debug.apk') as apk:
+              for path in files:
+                  name = 'assets/public/' + path.relative_to('dist').as_posix()
+                  if apk.read(name) != path.read_bytes():
+                      raise SystemExit(f'Compiled APK asset mismatch: {name}')
+          print(f'Compiled APK contains all {len(files)} shared web files byte-for-byte.')
+          PY
+      - name: Save Android test package
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: GymBroAI-android-debug-${{ github.run_number }}
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+
+  ios:
+    name: iOS simulator build and startup
+    needs: shared
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: npm ci --no-audit --no-fund
+      - run: npm run mobile:sync
+      - name: Compile simulator app without Apple signing credentials
+        run: |
+          xcodebuild -version
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO build
+      - name: Verify and package simulator app
+        id: package
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          app = Path('build/ios/Build/Products/Debug-iphonesimulator/App.app/public')
+          files = [path for path in Path('dist').rglob('*') if path.is_file()]
+          for path in files:
+              packaged = app / path.relative_to('dist')
+              if packaged.read_bytes() != path.read_bytes():
+                  raise SystemExit(f'Compiled simulator asset mismatch: {path}')
+          print(f'Compiled simulator app contains all {len(files)} shared web files byte-for-byte.')
+          PY
+          mkdir -p build/artifacts
+          ditto -c -k --sequesterRsrc --keepParent \
+            build/ios/Build/Products/Debug-iphonesimulator/App.app \
+            build/artifacts/GymBroAI-ios-simulator.zip
+      - name: Launch empty app shell in an iPhone simulator
+        run: |
+          xcrun simctl list devices available --json > "$RUNNER_TEMP/gymbro-devices.json"
+          node --input-type=module - "$RUNNER_TEMP/gymbro-devices.json" "$RUNNER_TEMP/gymbro-device.txt" <<'JS'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const devices = JSON.parse(readFileSync(process.argv[2], 'utf8')).devices;
+          const phone = Object.values(devices).flat().find(device => device.name.startsWith('iPhone'));
+          if (!phone) throw new Error('No available iPhone simulator.');
+          writeFileSync(process.argv[3], `${phone.udid} ${phone.state}\n`);
+          console.log(`Using ${phone.name}: ${phone.udid} (${phone.state})`);
+          JS
+          read -r GYMBRO_DEVICE GYMBRO_STATE < "$RUNNER_TEMP/gymbro-device.txt"
+          if [[ "$GYMBRO_STATE" != Booted ]]; then
+            xcrun simctl boot "$GYMBRO_DEVICE"
+          fi
+          xcrun simctl bootstatus "$GYMBRO_DEVICE" -b
+          xcrun simctl install "$GYMBRO_DEVICE" build/ios/Build/Products/Debug-iphonesimulator/App.app
+          xcrun simctl launch "$GYMBRO_DEVICE" com.gymbroai.app
+          sleep 5
+          xcrun simctl io "$GYMBRO_DEVICE" screenshot build/artifacts/ios-simulator-startup.png
+          xcrun simctl shutdown "$GYMBRO_DEVICE"
+      - name: Save simulator app and empty-shell evidence
+        if: ${{ always() && steps.package.outcome == 'success' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: GymBroAI-ios-simulator-${{ github.run_number }}
+          path: |
+            build/artifacts/GymBroAI-ios-simulator.zip
+            build/artifacts/ios-simulator-startup.png
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error

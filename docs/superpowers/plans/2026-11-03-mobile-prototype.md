@@ -51,8 +51,10 @@ Real Edge empty-shell checks pass in portrait/landscape/desktop with injected
 insets, no overflow/external requests/errors; screenshots inspected. Fresh Codex
 review found no significant issues and independently passed 100 focused cases
 plus package verification. Preview 5194 stopped/port free. Native compilation,
-actual device lifecycle/insets/offline inference remain unrun; Step 4 awaits
-its teaching checkpoint.
+actual device lifecycle/insets/offline inference remain unrun. Step 4's cloud-build
+checkpoint was then approved with "clear"; its workflow is authored/reviewed,
+with actionlint 1.7.12 validation and all local checks passed. Native results
+remain pending before the initial push-triggered run.
 
 `capacitor.config.ts`, `.nvmrc`, package/lock and mobile TS configuration;
 generated/configured `ios/`, `android/`, `resources/` with scoped guidance;

@@ -11,9 +11,10 @@ first, developed from Windows without a MacBook. Read root AGENTS.md, the
 
 The user approved Step 2 with "ok cool", then answered "clear" directly to Step
 3's background/layout/offline explanation. Step 3 is implemented and reviewed.
-Step 4 (cloud native builds) still needs its teaching checkpoint: explain what,
-why and the alternative, ask "Is this clear?", then wait. Do not let earlier
-larger-batch permission override the user's latest checkpoint workflow.
+The user then answered "clear" to Step 4's explanation of GitHub cloud builds:
+Android debug APK and an iOS simulator app on a cloud Mac. Step 4 is active.
+Preserve the next teaching checkpoint for Step 5's whole-feature review/handoff;
+do not treat this as permission for signing or store deployment.
 
 Current branch: `feat/task6-mobile-app`, based on reviewed master `f0e9118`.
 Capacitor 8.6.0, App 8.1.2 and assets 4.0.0 are pinned; Node 22+ is required.
@@ -77,6 +78,17 @@ Own dev server 5193 remains available. Preview 5194 was stopped and its port
 verified free. Leave earlier server 5176 alone. Browser checks use
 an isolated profile; never save private-video screenshots or traces. No native
 compilation, simulator run or physical-device test has occurred.
+
+Step 4: `.github/workflows/mobile-builds.yml` is authored and passed actionlint
+1.7.12 (official release checksum verified). Fresh read-only Codex workflow
+review found no material issues and independently passed package verification;
+all 320 local tests/lint/build/guarded sync pass. First cloud run is pending.
+Shared checks gate Ubuntu24.04
+Android/Java21 and macOS26/Xcode simulator builds; native packages must contain
+all shared assets. Only explicit prototype/screenshot artifacts, one-day retention,
+read-only contents permission, no persisted Git credentials or npm caches.
+No native compiler result yet. Workflow README covers triggers and artifacts;
+manual dispatch UI needs the workflow on the still-old default branch.
 
 ## Next product work
 
