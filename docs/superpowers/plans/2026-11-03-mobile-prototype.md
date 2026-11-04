@@ -17,7 +17,7 @@ Swift Package Manager/Xcode on macOS CI, Java 21/Android Gradle on Linux CI.
 - [x] Step 2: Pin Capacitor dependencies, Node engine and build scripts. Configure
   local dist/ identity, generate iOS/Android shells and branded assets, scoped
   guidance and ignores. Verify build/sync and type-check config; commit/push.
-- [ ] Step 3: Test-first native background/listener ownership and packaging guard;
+- [x] Step 3: Test-first native background/listener ownership and packaging guard;
   implement cleanup integration and readable safe-area/offline shell. Run whole
   tests/lint/build, native asset checks, document actual results; commit/push.
 - [ ] Step 4: Add reviewed cloud builds for Android APK and unsigned iOS simulator
@@ -40,7 +40,19 @@ Step 2 evidence: dependencies/config/native sources and branded assets generated
 model/runtime files match each native copy by SHA-256; local configs/indexes and
 ignores checked. Existing locked package entries unchanged. Fresh read-only Codex
 setup review found no significant issues and independently checked asset hashes.
-No native compilation or device test performed. Step 3 awaits its checkpoint.
+No native compilation or device test performed. Step 3's checkpoint was then
+approved with "clear".
+
+Step 3 evidence: 320 tests/13 files, lint, build/config check (409 modules), both
+native syncs and package guard pass. Lifecycle (10), App integration (2) and
+packaging cases (21) were observed failing before implementation/fixes. Exact
+empty CLI compatibility stubs are permitted; no other extra files are exempted.
+Real Edge empty-shell checks pass in portrait/landscape/desktop with injected
+insets, no overflow/external requests/errors; screenshots inspected. Fresh Codex
+review found no significant issues and independently passed 100 focused cases
+plus package verification. Preview 5194 stopped/port free. Native compilation,
+actual device lifecycle/insets/offline inference remain unrun; Step 4 awaits
+its teaching checkpoint.
 
 `capacitor.config.ts`, `.nvmrc`, package/lock and mobile TS configuration;
 generated/configured `ios/`, `android/`, `resources/` with scoped guidance;

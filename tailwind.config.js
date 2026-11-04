@@ -32,14 +32,13 @@ export default {
       },
       fontFamily: {
         sans: [
-          "Inter",
           "ui-sans-serif",
           "system-ui",
           "-apple-system",
           "Segoe UI",
           "sans-serif",
         ],
-        mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"],
+        mono: ["ui-monospace", "SFMono-Regular", "monospace"],
       },
       boxShadow: {
         glow: "0 0 0 1px rgba(74,222,128,0.15), 0 8px 40px -12px rgba(74,222,128,0.35)",

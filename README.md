@@ -104,9 +104,11 @@ checks do not establish successful real-video inference or native compilation. S
 npm run mobile:sync
 ```
 
-This builds the shared app and copies it and the local model/WASM into both
-native projects; it does not compile an APK or iOS app. `npm run build` also
-type-checks `capacitor.config.ts`. The config has no development-server URL.
+This builds the shared app, copies it and the local model/WASM into both native
+projects, and verifies bundle identity/integrity; it does not compile an APK or
+iOS app. `npm run mobile:verify` checks existing copies without modifying them.
+`npm run build` also type-checks `capacitor.config.ts`. The config has no
+development-server URL.
 
 - `npm run mobile:assets`: regenerate platform icons/splash from the first-party
   [vector source](resources/README.md).
@@ -115,9 +117,11 @@ type-checks `capacitor.config.ts`. The config has no development-server URL.
 
 Java 21/Android SDK and macOS/Xcode respectively are needed for native builds.
 Cloud build setup is a later plan step. iOS simulator output cannot run on a
-physical iPhone; Apple signing/provisioning remains separate. Background handling,
-safe-area layout and removal of the existing remote font requests are Step 3,
-not claims of this source-generation step.
+physical iPhone; Apple signing/provisioning remains separate. Native app-state
+events now pause attached videos and cancel unfinished processing; completed clips
+stay in memory. The layout uses device safe areas, and fonts use local system
+fallbacks. Browser tests verify layout/startup; native device behavior and offline
+inference still need platform checks.
 
 ### Automated tests
 
@@ -127,7 +131,9 @@ npm test
 
 Vitest runs `src/**/*.test.{ts,tsx}` once using jsdom's simulated browser
 objects and the app's existing Vite settings, including the `@` source alias.
-All 287 tests pass: 40 elbow-measurement cases, 9 timeline component cases,
+It also runs `scripts/**/*.test.mjs` in Node for synthetic packaging fixtures.
+All 320 tests pass: 10 native lifecycle, 2 App integration and 21 package guard
+cases plus the preceding 287 cases: 40 elbow-measurement, 9 timeline component,
 58 media-helper cases, 55 pose-engine contract cases, 22
 selection-check cases, 12 session-store cases, 11 dropzone component cases, and
 56 pure display-calculation cases, 10 overlay cases, and 14 player cases.

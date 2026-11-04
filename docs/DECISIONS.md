@@ -250,6 +250,8 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
 - The user subsequently confirmed the packaging explanation was clear. Preserve
   their latest explicit understanding checkpoint between meaningful steps;
   environment/plan verification does not automatically approve Step 2 execution.
+- The user approved Step 2 with "ok cool" and answered "clear" to the explicit
+  Step 3 explanation. Step 4 retains its next understanding checkpoint.
 
 ## Specification-author defaults and later acceptance
 

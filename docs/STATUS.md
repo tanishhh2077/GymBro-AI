@@ -10,12 +10,13 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 6 native project setup is active on
+Task 6 native lifecycle/offline packaging work is active on
 `feat/task6-mobile-app`, based on reviewed master `f0e9118`. D-022 authorizes
 both native prototypes, prioritizing iPhone, from Windows without a MacBook.
 The user confirmed the mobile packaging explanation, then replied "ok cool" to
-Step 2's dependency/native-generation understanding checkpoint. Step 3 retains
-its explicit understanding checkpoint before background/layout behavior changes.
+Step 2's dependency/native-generation understanding checkpoint. The user then
+answered "clear" directly to Step 3's background/layout/offline explanation.
+Step 4 retains its understanding checkpoint before cloud native builds.
 Read the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md)
 and [plan](superpowers/plans/2026-11-03-mobile-prototype.md). Capacitor 8.6.0,
 App plugin 8.1.2 and assets tool 4.0.0 are pinned. iOS/SPM and Android native
@@ -61,6 +62,53 @@ validation follows from these checks.
   against both native copies. It changed no files and compiled no native binary.
   Preserve executable mode on `android/gradlew`. No phone/inference/offline
   startup claim is made: existing remote fonts are removed in Step 3.
+
+### Task 6 Step 3 implementation and evidence
+
+- Added native-only App listener ownership and App composition integration.
+  Background events pause attached videos, reset only processing/cancelling
+  sessions, and reuse existing abort/lease cleanup. Completed clips stay in
+  memory; foreground events never auto-resume. Cleanup handles late registration,
+  queued events, idempotent disposal and rejected/synchronous bridge operations.
+  Failures emit fixed diagnostics without private error/video details.
+- Red/green: lifecycle stub failed eight of ten cases, then ten passed; App wiring
+  initially failed its StrictMode/native integration case, then both cases passed.
+  The bridge and media APIs are faked; cancellation uses the real session store.
+  These checks do not prove native background delivery or interrupt synchronous
+  MediaPipe inference before it returns.
+- Packaging stub initially failed 19 of 20 cases; implementation passed 20. The
+  real verifier then caught existing Google Fonts requests. Removed remote font
+  links and use system-font fallbacks. Safe-area CSS consumes native variables
+  or environment values; Android MainActivity enables edge-to-edge rendering.
+  Android source compilation remains unrun until Step 4.
+- First guarded full sync exposed two extra zero-byte files written by the pinned
+  Capacitor CLI (`cordova.js` and `cordova_plugins.js`, confirmed in its source).
+  A realistic fixture failed before the fix. The verifier permits only their
+  exact empty contents; a new case rejects nonempty stubs. No other extra file
+  is exempted. Real Cordova plugins would need a separately reviewed change.
+- Whole suite now **320/320** in 13 files: 287 preceding, ten lifecycle, two App
+  integration and 21 packaging cases. Lint and build pass (409 modules). Guard
+  checks 13 shared web files per platform plus permitted stubs, both runtime
+  configs/native bundle IDs, local entry resources and the model/six runtime
+  copies. Public WASM must match the installed package; stale/missing/extra files,
+  remote entry/CSS resources and obvious served media/signing/Markdown fail.
+  It is not a general secret scanner or arbitrary-JavaScript network audit.
+- Real Edge **156.0.4314.58**, production preview 5194: 390x844 portrait with
+  injected top47/bottom34, 844x390 landscape left/right47 and bottom21, and
+  1280x900 desktop zeros. Computed top/side padding matched; bottom padding was
+  130/117/96 px. No horizontal overflow, external startup requests, or page/console
+  errors. Portrait/landscape screenshots inspected; empty app only, no footage.
+  This tests CSS/browser startup, not native notch/background handling, iPhone
+  file selection, offline inference, performance or real bench accuracy.
+- Final whole **320 tests**, lint and guarded `npm run mobile:sync` exit **0**,
+  including source/config type-check, 409-module build, both copies and verifier.
+  Fresh read-only Codex review (`mobile_behavior_review`, model not exposed) found
+  no significant issues; independently passed 100 focused lifecycle/App/guard/
+  store/engine tests and `mobile:verify`. It changed no files and compiled no
+  native binary. Preview 5194 was stopped after verifying its process identity;
+  port confirmed free. Own dev 5193 and earlier 5176 were left alone.
+  Step 3 is complete; Step 4 awaits its teaching checkpoint. No native compilation,
+  simulator launch, signing or physical-device test yet.
 
 ### Earlier milestone context
 

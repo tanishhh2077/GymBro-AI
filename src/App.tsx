@@ -1,12 +1,20 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { Capacitor } from "@capacitor/core";
+import { App as NativeApp } from "@capacitor/app";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSessionStore } from "@/store/useSessionStore";
 import { ANGLES, EXERCISES } from "@/core/exercises";
 import { ClipDropzone } from "@/components/ClipDropzone";
 import { VideoStage } from "@/components/VideoStage";
 import { ShieldIcon, TrashIcon } from "@/components/icons";
+import { connectNativeLifecycle } from "@/mobile/nativeLifecycle";
 
 export default function App() {
+  useEffect(() => connectNativeLifecycle({
+    isNative: Capacitor.isNativePlatform(), app: NativeApp,
+    session: useSessionStore, document,
+  }), []);
+
   const exercise = useSessionStore((s) => s.exercise);
   const clips = useSessionStore((s) => s.clips);
   const processingState = useSessionStore((s) => s.processingState);
@@ -29,11 +37,11 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-full">
+    <div className="app-safe-sides relative min-h-full">
       <BackdropFX accent={accent} />
       <Header />
 
-      <main className="mx-auto w-full max-w-5xl px-4 pb-24 pt-6 sm:px-6">
+      <main className="app-safe-bottom mx-auto w-full max-w-5xl px-4 pt-6 sm:px-6">
         <Hero />
 
         <Section
@@ -131,7 +139,7 @@ export default function App() {
 
 function Header() {
   return (
-    <header className="sticky top-0 z-30 border-b border-white/5 bg-ink-950/70 backdrop-blur-xl">
+    <header className="app-safe-top sticky top-0 z-30 border-b border-white/5 bg-ink-950/70 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
         <div className="flex items-center gap-2.5">
           <Logo />
@@ -144,7 +152,6 @@ function Header() {
             </div>
           </div>
         </div>
-        {/* Narrow claim: the video is processed locally; the page still loads web fonts. */}
         <span className="chip border border-white/5 bg-white/5 text-[11px] text-slate-300">
           <ShieldIcon width={13} className="text-accent" />
           <span className="hidden sm:inline">On-device processing</span>

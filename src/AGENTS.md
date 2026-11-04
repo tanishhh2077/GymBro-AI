@@ -11,7 +11,7 @@ with the approved amendments in [decisions](../docs/DECISIONS.md).
   quantities calculated from observations; findings interpret those measurements.
 - The existing pipeline runs on the device. Selecting an uploaded file currently
   creates local access to it; it does not transfer the video to a server.
-- Reuse the existing pipeline before adding infrastructure. Backend services,
+- Reuse the existing pipeline before adding infrastructure. Backend services
   and persistence remain deferred. D-022 now authorizes bounded mobile prototypes;
   consult the mobile design/plan before native integration work.
 - Keep uncertainty and missing observations visible through every layer. A

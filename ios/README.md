@@ -13,8 +13,9 @@ npm run mobile:sync
 ```
 
 These commands also work on Windows and prepare the local web bundle; they do
-not compile iOS. This step has generated sources and branding only. Cloud native
-builds are planned in Task 6 Step 4 and have not run.
+not compile iOS. Native sources/branding and the shared lifecycle/layout work
+are implemented; native compilation/device behavior remain unverified. Cloud
+native builds are planned in Task 6 Step 4 and have not run.
 
 On macOS with Xcode 26+, the planned unsigned simulator build command is:
 

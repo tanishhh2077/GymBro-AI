@@ -5,6 +5,11 @@
 @layer base {
   :root {
     color-scheme: dark;
+    /* Capacitor supplies Android values; iOS/browser use the CSS environment. */
+    --app-safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+    --app-safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+    --app-safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
+    --app-safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
   }
 
   html,
@@ -54,6 +59,17 @@
     background: #4ade80;
     box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.18);
   }
+}
+
+.app-safe-top {
+  padding-top: var(--app-safe-top);
+}
+.app-safe-sides {
+  padding-left: var(--app-safe-left);
+  padding-right: var(--app-safe-right);
+}
+.app-safe-bottom {
+  padding-bottom: calc(6rem + var(--app-safe-bottom));
 }
 
 @layer components {

@@ -1,6 +1,6 @@
 # System architecture
 
-Status: observed implementation plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 for Task 6 native project generation.
+Status: observed implementation plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 for Task 6 native lifecycle and packaging checks.
 
 ## Existing implementation
 
@@ -23,7 +23,11 @@ Local file selection
   -> visible HTML video plus canvas skeleton overlay
 ```
 
-"Upload" currently means choosing a local file. The inspected processing path does not send that file to a server. This is a source observation, not a completed runtime network/privacy audit. The page requests external Google Fonts; local inference does not mean the entire page makes no network requests.
+"Upload" currently means choosing a local file. The inspected processing path
+does not send that file to a server. External Google Fonts were removed in Task 6;
+system fonts and the local model/runtime make startup self-contained. Browser
+startup checks observed no external requests; this is not a general runtime
+network/privacy audit or proof of offline inference on a phone.
 
 ## Repository layout
 
@@ -38,6 +42,7 @@ public/                Files served unchanged: pose model, MediaPipe runtime, SV
 ios/, android/         Native Capacitor wrappers; scoped root guidance covers generated subdirectories
 resources/             First-party vector branding source for native icons/splash screens
 capacitor.config.ts    Native identity, local dist webDir and system-bar configuration
+scripts/               Native bundle/model/runtime integrity guard and synthetic filesystem tests
 .vscode/               Shared editor guidance only; other editor files are ignored
 index.html, *.config.*, tsconfig*.json   Vite, Vitest, ESLint, Tailwind/PostCSS, TypeScript settings
 tests/                 Planned in Task 4 for real-browser tests and fixtures; does not exist yet
@@ -54,8 +59,21 @@ The build additionally checks `capacitor.config.ts` through
 copy/update both native projects and installed plugin references. Copied web
 assets, runtime config, builds, caches, local SDK paths and signing files are
 ignored. There is no remote development-server URL in the native configuration.
-Safe-area CSS, background lifecycle handling and remote-font removal remain
-Task 6 Step 3; native cloud compilation remains Step 4.
+`mobile:sync` now verifies the native copies against `dist/`, local model and
+installed MediaPipe runtime, allowing only Capacitor's two exact empty Cordova
+compatibility stubs. It checks native bundle IDs/configs, local entrypoints and
+obvious forbidden served files; it is not a general secret/network scanner.
+Native cloud compilation remains Step 4.
+
+`src/mobile/nativeLifecycle.ts` owns one native app-state listener per App mount,
+including handles delivered after cleanup. Native background events pause attached
+videos and call the existing store reset only while processing/cancelling. The
+store still owns abort, decoder cleanup and delayed URL revocation. Completed
+clips remain in memory; foreground events do not resume media or work. Browser
+sessions register no native listener. Registration/removal failures are caught
+and emit fixed diagnostics without video information; native behavior still needs
+device verification. CSS consumes Capacitor's Android safe-area variables or iOS
+environment values; MainActivity enables edge-to-edge rendering.
 
 ## Current ownership
 

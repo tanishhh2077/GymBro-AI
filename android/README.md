@@ -21,7 +21,7 @@ Set-Location android
 
 On Linux/macOS, use `./gradlew assembleDebug` inside `android/`. Expected output:
 `app/build/outputs/apk/debug/app-debug.apk`. These native build commands have not
-run in this step: this Windows environment lacks an Android SDK/emulator. Task 6
+run in this checkout: this Windows environment lacks an Android SDK/emulator. Task 6
 Step 4 plans cloud builds. Debug compilation does not prove file selection,
 inference, background cleanup or performance on an actual phone.
 
