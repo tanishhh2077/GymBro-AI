@@ -10,6 +10,58 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task 8 (the phone plan's free Safari slice) is in progress on
+`feat/task8-safari-phone-test`: preparation is done and the phone transfer/test
+waits on the user's network choice and iOS version. See "Task 8 Step 1
+preparation" below. Task 7's planning record follows it.
+
+### Task 8 Step 1 preparation
+
+- Done by Claude Code (Opus 5.5) on 2026-11-04 after the user approved the
+  explanation; the user then waived routine "Is this clear?" stops (D-024).
+  Branch `feat/task8-safari-phone-test` created from master `26a831f`, which
+  matched `origin/master` after a fetch.
+- Node: `C:\nvm4w\nodejs` (global, v20.20.2) was left unchanged. Each command
+  prepended the nvm folder for v22.23.2 to `PATH`; `node --version` reported
+  v22.23.2 and npm 10.9.8. `nvm use` was not run, because it switches the global
+  link.
+- Baseline under Node 22.23.2: `npm test` **320 passed / 13 files**, exit 0;
+  `npm run lint` exit 0; `npm run build` exit 0, 409 modules. Working tree clean.
+- Fixture export from `34538e417a724ebceb0971bd2b632a376a7e739e:tests/fixtures/`
+  with `git cat-file blob` (raw stored bytes, no line-ending or text filters;
+  equivalent to the plan's binary-safe archive/extraction) into ignored
+  `build/fixtures/`, which did not exist beforehand:
+
+  | File | Bytes | SHA-256 vs plan | Git object ID matches tree |
+  | --- | --- | --- | --- |
+  | no-person.mp4 | 4,890 | OK | `ee7fdd4` OK |
+  | no-person-portrait.mp4 | 3,216 | OK | `b59102c` OK |
+  | over-duration.mp4 | 52,626 | OK | `83baafa` OK |
+  | over-long-edge.mp4 | 2,391 | OK | `5b823db` OK |
+  | over-pixels.mp4 | 2,374 | OK | `4c917f3` OK |
+  | README.md (provenance) | 2,631 | not in plan; SHA-256 `aac2cdac1d5cc213208d869c3678abb4dad3267ba7accae511e86bea357e7d00` | `5ef78be` OK |
+
+  The directory holds exactly these six files. The README's relative links point
+  to files beside its original Task 4 location and do not resolve in the copy.
+- Environment observed (read-only) for the LAN step: Python 3.12.10 available;
+  ports 5195 and 5196 free; this session's earlier servers are gone, an older
+  dev server still listens on 127.0.0.1:5176 and another on 127.0.0.1:5193
+  (both left alone). The PC's only connected network is Ethernet "UWNet",
+  Windows category **Public**; NordVPN adapters (NordLynx, OpenVPN) are present;
+  Wi-Fi is disconnected. Enabled inbound firewall rules already allow
+  `node.exe`/`python.exe` on the Public profile (rule program paths were not
+  inspected). A campus network is not the plan's trusted private network and may
+  block device-to-device traffic, so the recommended route is the iPhone's
+  Personal Hotspot with both servers bound only to the hotspot address.
+- Neither the app nor the MediaPipe bundle uses secure-context-only browser
+  features (`crypto.subtle`, `SharedArrayBuffer`, service workers, camera access),
+  so serving over plain HTTP on a LAN address is not expected to change behavior.
+- Not done yet: binding the preview/fixture servers, phone transfer, opening the
+  page in Safari, and the iOS version. No server has been started, no file has
+  been sent to the phone, and no Step 2 case has run.
+
+### Task 7 record
+
 Task 7's [phone/video acceptance plan](superpowers/plans/2026-11-04-phone-video-acceptance.md)
 is complete as a planning-only deliverable, developed on
 `feat/task7-phone-test-plan` from clean reviewed master `e38cc4b`. The user

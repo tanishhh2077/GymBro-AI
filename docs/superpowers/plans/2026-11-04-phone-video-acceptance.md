@@ -87,7 +87,7 @@ prove this phone's unknown OS has been tested.
 at US$99/year and TestFlight benefits; no purchase is approved or required for
 the proposed Safari slice. Recheck requirements before a later signing action.
 
-## Step 1: Prepare the free Safari slice — not approved/executed
+## Step 1: Prepare the free Safari slice — approved, in progress as Task 8
 
 **Paths:** Existing app only; later local outputs under ignored `build/fixtures/`
 and `build/`. Text findings go in `docs/STATUS.md`; no new product module.
@@ -96,9 +96,9 @@ and `build/`. Text findings go in `docs/STATUS.md`; no new product module.
 
 - [ ] Explain this step and obtain "Is this clear?" confirmation. Confirm the
   iOS version in Settings > General > About and phone/PC LAN reachability.
-- [ ] Select installed Node 22.23.2 only in the task process. Verify the existing
+- [x] Select installed Node 22.23.2 only in the task process. Verify the existing
   dev/build baseline before any later feature code. Preserve servers5193/5176.
-- [ ] Export only the following files plus their provenance README from immutable
+- [x] Export only the following files plus their provenance README from immutable
   commit `34538e417a724ebceb0971bd2b632a376a7e739e`, paths `tests/fixtures/`.
   Use binary-safe Git archive/extraction into ignored `build/fixtures/`; never
   PowerShell text redirection for MP4 bytes. Verify each SHA-256 before transfer.

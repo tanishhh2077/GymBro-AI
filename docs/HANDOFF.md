@@ -2,24 +2,37 @@
 
 Updated 2026-11-04 (America/Chicago). Start here in Claude Code or Codex.
 
-## Current task and next checkpoint
+## Current task and next action
 
-Task 7's **planning-only deliverable is complete**, authorized by the user's
-latest "clear" on 2026-11-04. It was developed on `feat/task7-phone-test-plan`
-from reviewed master
-`e38cc4b`. The user has an **iPhone 12 Pro Max**, no Android phone access and no
-Apple Developer Program membership. iOS version/temporary Mac access remain
-unconfirmed. See D-023 and the [phone test plan](superpowers/plans/2026-11-04-phone-video-acceptance.md).
-Fresh independent review found no significant issues; all 320 tests, lint/build
-and documentation checks pass. Check Git for the final integrated document commit.
+**Task 8: the phone plan's free Safari slice** (Step 1 of the
+[phone test plan](superpowers/plans/2026-11-04-phone-video-acceptance.md)), on
+branch `feat/task8-safari-phone-test` from master `26a831f`. Approved by the
+user on 2026-11-04; routine "Is this clear?" stops are waived
+([D-024](DECISIONS.md#d-024-explain-and-proceed-without-routine-is-this-clear-checkpoints)),
+but every phone action is coordinated with the user. Do not merge Task 4.
 
-Proposed next execution step: prepare a free private-LAN Safari test from Windows,
-with verified first-party non-human fixtures exported from Task4's exact commit.
-This can test real phone decoding/model/player behavior without paid membership;
-it cannot verify the installed native app. The user approved it on 2026-11-04 and
-then waived routine "Is this clear?" stops ([D-024](DECISIONS.md#d-024-explain-and-proceed-without-routine-is-this-clear-checkpoints)):
-explain briefly and proceed, but coordinate every phone action with the user.
-No product code, fixture export, LAN server or phone test has run in Task 7.
+Done so far (details in STATUS, "Task 8 Step 1 preparation"):
+- Process-local Node 22.23.2 / npm 10.9.8 (nvm folder prepended to PATH per
+  command; global Node 20 untouched). Baseline: **320 tests / 13 files**, lint and
+  build pass, 409 modules.
+- The five non-human fixtures and their README were exported byte-for-byte
+  (`git cat-file blob`) from `34538e4` into ignored `build/fixtures/`; every
+  SHA-256 matches the plan's table and every byte count and Git object ID matches
+  the source tree. The directory holds only those six files.
+- The production build in ignored `dist/` is from app code identical to `26a831f`.
+
+**Next action, waiting on the user's phone:** the PC is on UWNet (Ethernet,
+Windows category Public, NordVPN adapters present; Wi-Fi disconnected), which is
+not the trusted private network the plan requires. Recommended: the user turns on
+iPhone Personal Hotspot and joins the PC to it; then bind `npm run preview` (port
+5195) and `python -m http.server` (port 5196, `build/fixtures/` only) to the
+hotspot address only. Also still needed: the iOS version (Settings > General >
+About). Do not change firewall/VPN/router settings; if Windows shows an
+"Allow access" prompt, the user decides. No server has been started yet.
+
+Task 7's planning-only deliverable is complete (D-023): the user has an
+**iPhone 12 Pro Max**, no Android phone access and no Apple Developer Program
+membership; temporary Mac access remains unconfirmed.
 
 Task 6's bounded mobile prototype is complete, iPhone first, from Windows without
 a MacBook (D-022). The reviewed feature was fast-forwarded/pushed to `master` at
