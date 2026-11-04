@@ -52,7 +52,8 @@ browser-only global used by mistake would pass the check and fail when Vite star
 
 - [x] Confirm clean branch from master `aec3cb2`; record D-027 and this plan;
   update the plans index, ARCHITECTURE and HANDOFF/STATUS.
-- [x] Whole tests/lint/build under Node 22.23.2. Commit/push as Task 11 Step 1.
+- [x] Whole tests/lint/build (they ran under global Node 20 by mistake; Step 2
+  reran them under Node 22.23.2, see the STATUS correction). Commit/push as Task 11 Step 1.
 
 ## Step 2 — wiring and test
 
@@ -70,7 +71,7 @@ new `scripts/build-config.test.mjs`; **delete** `tsconfig.app.json`.
 
 ## Step 3 — fresh review and integration
 
-- [ ] Fresh read-only review of D-027, this plan and the diff; fix supported findings
+- [x] Fresh read-only review of D-027, this plan and the diff; fix supported findings
   in their own commit.
 - [ ] Record the review, fast-forward master, push, and merge master into Task 8
   with a merge commit so the phone branch keeps current configuration.

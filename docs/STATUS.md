@@ -24,7 +24,8 @@ installed-native and real-bench acceptance remain unverified.
 - Claude Code (Opus 5.5), 2026-11-04. Branch created from `master` at `aec3cb2`,
   matching `origin/master` after a fetch. Package files unchanged; no reinstall
   (servers on `[::1]:5173` and `127.0.0.1:5193` still hold `node_modules` files).
-- Measured before any change, under process-local Node 22.23.2:
+- Measured before any change (the first two commands under Node 22.23.2, the
+  `tsconfig.app.json` check under Node 20; see the correction below):
   `tsc -p tsconfig.node.json --noEmit` exit 0 (it lists only `vite.config.ts` and
   nothing runs it); a hand check of `vite.config.ts` and `vitest.config.ts` with
   strict ES2022/bundler/Node types exit 0; `tsc -p tsconfig.app.json --noEmit`
@@ -63,6 +64,32 @@ installed-native and real-bench acceptance remain unverified.
 - Whole **383 tests / 16 files**, lint exit 0, `npm run mobile:sync` exit 0
   (411 modules, unchanged; iOS and Android 13 files each verified). No application
   source, dependency or Vite/Vitest behavior changed.
+
+### Task 11 Step 3 fresh review
+
+- Fresh read-only review (Claude Code subagent, Opus 5.5, no builder conversation)
+  of D-027, the plan and `aec3cb2..fa4fc19`, under Node 22.23.2: 383 tests, lint
+  and build (411 modules) exit 0; it did not run `mobile:sync` (writes native
+  copies). It repeated the three mutations, added `window`/`HTMLElement` in
+  `vitest.config.ts` (TS2304, exit 2) and `environment: 123` (TS2769, so the
+  `test` key stays typed through the `vitest/config` import), and showed the new
+  test fails when `"types": ["node"]` or `vitest.config.ts` is removed (the build
+  alone still passes without the types line). No reference to `tsconfig.app.json`
+  outside documents, including `.github/`. CI runs `npm test` on Ubuntu only;
+  path handling is portable there.
+- No Blocker/High/Medium. Four Low documentation findings, all fixed: the plan's
+  Step 1 box and STATUS's Step 1 measurement line now say which Node ran;
+  HANDOFF describes the old behavior in the past tense; the older known-finding
+  about the unchecked config is marked resolved; README mentions the new check.
+- Speculative concerns: (1) the Windows drive-letter case could differ between
+  the compiler and the file URL; adopted cheaply by comparing lower-cased paths.
+  (2) `capacitor.config.ts` also runs in Node but `tsconfig.mobile.json` checks it
+  with the root DOM settings; pre-existing, recorded as a follow-up, not changed.
+  (3) ESLint applies browser globals to the config files; pre-existing, the
+  compiler now rejects DOM use. (4) The reviewer could not reproduce the
+  `tsconfig.app.json` TS2307 failure from a scratch copy (the copy lost the
+  package context); the builder's in-repository run showed TS2307 on `@/`
+  imports, and the file is unreferenced either way.
 
 ### Task 10 Step 1 baseline and design
 
@@ -719,7 +746,7 @@ These are source-inspection observations. They do not establish that real-video 
 - One detected frame can currently mark a whole clip ready.
 - `SkeletonOverlay.tsx` uses bounded display interpolation without modifying raw observations. Legacy `math.ts` gap filling has no current analyzer consumer and must not be mistaken for measured evidence.
 - Resolved on 2026-11-03: the UI no longer offers exercise/angle choices and its copy no longer claims coach-grade analysis, measurements, or bar tracking. Future analysis types (not rendered) still include arbitrary score fields and lack the required finding-evidence contract.
-- The build's TypeScript check includes application source, but does not reference `tsconfig.node.json` or type-check `vite.config.ts` through that configuration. `@types/node` is now installed for the planned test setup. Wiring a configuration check remains separate work.
+- The build's TypeScript check includes application source, but does not reference `tsconfig.node.json` or type-check `vite.config.ts` through that configuration. `@types/node` is now installed for the planned test setup. Wiring a configuration check remains separate work. Resolved on 2026-11-04 by Task 11 (D-027): the build checks both Vite config files through `tsconfig.node.json`.
 - Unit/component checks cover media helpers, engine, selection, store, dropzone, display helpers, overlay, and player. Full real-browser bench-press acceptance remains pending.
 
 These findings need targeted reproduction and verification during implementation. Do not silently promote them into measured failure rates.

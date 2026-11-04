@@ -22,8 +22,10 @@ describe("build configuration type-check", () => {
     const files = execFileSync(process.execPath, [tsc, "--project", "tsconfig.node.json", "--listFilesOnly"], {
       cwd: root, encoding: "utf8",
     }).split(/\r?\n/).map((file) => file.replaceAll("\\", "/"));
-    const rootPath = root.replaceAll("\\", "/");
-    for (const name of ["vite.config.ts", "vitest.config.ts"]) expect(files).toContain(`${rootPath}${name}`);
+    // Windows drive-letter case can differ between the compiler and the file URL.
+    const listed = files.map((file) => file.toLowerCase());
+    const rootPath = root.replaceAll("\\", "/").toLowerCase();
+    for (const name of ["vite.config.ts", "vitest.config.ts"]) expect(listed).toContain(`${rootPath}${name}`);
     expect(files.some((file) => file.includes("/@types/node/"))).toBe(true);
     expect(files.some((file) => file.includes("/@types/react/"))).toBe(false);
     expect(files.some((file) => file.endsWith("/lib.dom.d.ts"))).toBe(false);

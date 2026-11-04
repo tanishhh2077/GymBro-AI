@@ -9,12 +9,13 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 `feat/task11-config-typecheck` from reviewed master `aec3cb2`. The user, still
 away, asked the builder to keep working without frequent questions; D-027 records
 this builder choice of the configuration task D-017 deferred. `npm run build`
-does not check `vite.config.ts`/`vitest.config.ts` today (both pass by hand); Task 11
+did not check `vite.config.ts`/`vitest.config.ts` before Task 11 (both passed by hand); Task 11
 points `tsconfig.node.json` at both, runs it in the build, and deletes the
 unreferenced template `tsconfig.app.json`, whose settings fail on the real source.
 No application source or dependency changes. Step 1 (D-027, plan) and Step 2
 (wiring, `scripts/build-config.test.mjs`, **383 tests / 16 files**, lint,
-guarded sync, three build mutations) are done; next is Step 3's fresh review.
+guarded sync, three build mutations) and the fresh review (four Low documentation
+findings, fixed) are done; next is fast-forwarding master and merging it into Task 8.
 Read the
 [plan](superpowers/plans/2026-11-04-config-typecheck.md); its checkboxes and Git
 show the latest step. D-024 applies. One writer; reviewers read only.
