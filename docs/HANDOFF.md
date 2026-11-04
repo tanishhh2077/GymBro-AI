@@ -100,6 +100,13 @@ Both native compilers succeeded; iOS UI startup is unresolved. A diagnostic fix
 adds local macOS Vision text recognition (must reject the first-party splash),
 bounded actual-screen retries, App console/system logs and selected runtime
 reporting. Actionlint passes; Swift helper and readiness changes await macOS CI.
+Diagnostic commit `99c7f21` is pushed; [run 2](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41776005380)
+passed shared checks/both native compilers and compiled the Swift guard, but
+failed the real UI gate: captures showed the simulator home screen, not the app.
+Console capture contained only the launched PID, no Capacitor startup messages.
+Cause remains unconfirmed. Revised diagnostics now wait for foreground launch,
+read unbuffered stdout/stderr from simulator data/tmp, and inspect only fresh
+matching App crash reports. Local syntax/checks and review precede another run.
 No speculative app-code change. Do not advance Step 5 with unresolved blank UI.
 Workflow README covers triggers and artifacts;
 manual dispatch UI needs the workflow on the still-old default branch.

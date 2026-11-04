@@ -130,6 +130,8 @@ jobs:
           ditto -c -k --sequesterRsrc --keepParent \
             build/ios/Build/Products/Debug-iphonesimulator/App.app \
             build/artifacts/GymBroAI-ios-simulator.zip
+          codesign -dv --verbose=4 build/ios/Build/Products/Debug-iphonesimulator/App.app 2>&1 || true
+          otool -L build/ios/Build/Products/Debug-iphonesimulator/App.app/App
       - name: Build visual startup guard and reject the splash screen
         run: |
           swiftc scripts/check-simulator-screen.swift -o build/check-simulator-screen
@@ -142,33 +144,56 @@ jobs:
             exit 1
           fi
       - name: Launch and verify visible app shell in an iPhone simulator
-        timeout-minutes: 12
+        timeout-minutes: 15
         run: |
           xcrun simctl list devices available --json > "$RUNNER_TEMP/gymbro-devices.json"
-          node --input-type=module - "$RUNNER_TEMP/gymbro-devices.json" "$RUNNER_TEMP/gymbro-device.txt" <<'JS'
+          node --input-type=module - "$RUNNER_TEMP/gymbro-devices.json" "$RUNNER_TEMP/gymbro-device.txt" "$RUNNER_TEMP/gymbro-device.json" <<'JS'
           import { readFileSync, writeFileSync } from 'node:fs';
           const devices = JSON.parse(readFileSync(process.argv[2], 'utf8')).devices;
           const phones = Object.entries(devices).flatMap(([runtime, list]) => list.map(device => ({ ...device, runtime })));
           const phone = phones.find(device => device.name.startsWith('iPhone'));
           if (!phone) throw new Error('No available iPhone simulator.');
           writeFileSync(process.argv[3], `${phone.udid} ${phone.state}\n`);
+          writeFileSync(process.argv[4], JSON.stringify(phone));
           console.log(`Using ${phone.name}: ${phone.udid} (${phone.state}), ${phone.runtime}`);
           JS
           read -r GYMBRO_DEVICE GYMBRO_STATE < "$RUNNER_TEMP/gymbro-device.txt"
           collect_diagnostics() {
             xcrun simctl spawn "$GYMBRO_DEVICE" log show --last 2m --style compact --predicate 'process == "App"' || true
             xcrun simctl terminate "$GYMBRO_DEVICE" com.gymbroai.app || true
-            if [[ -n "${GYMBRO_LOG_PID:-}" ]]; then
-              for drain_attempt in {1..5}; do
-                if ! kill -0 "$GYMBRO_LOG_PID" 2>/dev/null; then break; fi
-                sleep 1
-              done
-              kill -KILL "$GYMBRO_LOG_PID" 2>/dev/null || true
-              wait "$GYMBRO_LOG_PID" 2>/dev/null || true
-            fi
-            if [[ -f "$RUNNER_TEMP/gymbro-ios-console.log" ]]; then
-              cat "$RUNNER_TEMP/gymbro-ios-console.log"
-            fi
+            python3 - "$RUNNER_TEMP/gymbro-device.json" <<'PY'
+          import json, sys, time
+          from pathlib import Path
+          phone = json.loads(Path(sys.argv[1]).read_text())
+          data = Path(phone.get('dataPath') or Path.home() / 'Library/Developer/CoreSimulator/Devices' / phone['udid'] / 'data')
+          for name in ('gymbro-stdout.log', 'gymbro-stderr.log'):
+              path = data / 'tmp' / name
+              if path.is_file():
+                  print(f'Simulator App {name}:')
+                  with path.open(errors='replace') as stream:
+                      print(stream.read(50000))
+              else:
+                  print(f'No simulator App {name} was produced.')
+          directories = [Path.home() / 'Library/Logs/DiagnosticReports',
+                         data / 'Library/Logs/CrashReporter', data / 'Library/Logs/DiagnosticReports']
+          reports = []
+          for directory in directories:
+              for pattern in ('App*.ips', 'App*.crash'):
+                  for path in directory.glob(pattern):
+                      if time.time() - path.stat().st_mtime < 900:
+                          reports.append(path)
+          matched = 0
+          for path in sorted(set(reports), key=lambda item: item.stat().st_mtime, reverse=True):
+              with path.open(errors='replace') as stream:
+                  text = stream.read(50000)
+              if 'com.gymbroai.app' in text or '/App.app/App' in text:
+                  print(f'Fresh GymBro AI crash report: {path.name}')
+                  print(text)
+                  matched += 1
+                  if matched == 3:
+                      break
+          print(f'Matching fresh App crash reports: {matched}; absence does not establish no crash.')
+          PY
             xcrun simctl shutdown "$GYMBRO_DEVICE" || true
           }
           trap collect_diagnostics EXIT
@@ -177,8 +202,10 @@ jobs:
           fi
           xcrun simctl bootstatus "$GYMBRO_DEVICE" -b
           xcrun simctl install "$GYMBRO_DEVICE" build/ios/Build/Products/Debug-iphonesimulator/App.app
-          xcrun simctl launch --console-pty --terminate-running-process "$GYMBRO_DEVICE" com.gymbroai.app > "$RUNNER_TEMP/gymbro-ios-console.log" 2>&1 &
-          GYMBRO_LOG_PID=$!
+          xcrun simctl help launch
+          SIMCTL_CHILD_NSUnbufferedIO=YES xcrun simctl launch --terminate-running-process \
+            --stdout=/tmp/gymbro-stdout.log --stderr=/tmp/gymbro-stderr.log \
+            "$GYMBRO_DEVICE" com.gymbroai.app
           rendered=0
           for attempt in {1..12}; do
             sleep 5

@@ -20,7 +20,8 @@ do {
     let text = words.joined(separator: " ")
     print("Empty-shell screen text: \(text)")
     let normalized = text.lowercased().filter { $0.isLetter || $0.isNumber }
-    guard normalized.contains("gymbroai"), normalized.contains("benchpress") else {
+    // OCR can confuse the final I with l; both independent visible labels matter.
+    guard normalized.contains("gymbro"), normalized.contains("benchpress") else {
         fputs("GymBro AI bench-press interface is not visible yet.\n", stderr)
         exit(1)
     }

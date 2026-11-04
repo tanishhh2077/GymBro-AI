@@ -185,6 +185,35 @@ validation follows from these checks.
   guarded sync pass; actionlint and diff checks pass. This does not validate the
   macOS-only Swift helper on Windows. The next CI run will compile it, check the
   splash rejection and require the real empty-shell interface to become visible.
+- Diagnostic commit `99c7f21` pushed; [run 2](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41776005380)
+  (`41776005380`) passed shared checks and both native compilers. The new macOS
+  Swift guard compiled, and the first-party splash was correctly rejected with
+  expected exit1. Bounded real simulator startup is in progress; visible UI and
+  native diagnostics remain pending. No product startup fix is claimed.
+
+- Run2 finished with **iOS UI gate failure**, while shared/Android/native iOS
+  compilation and the splash negative check passed. All 12 actual screen reads
+  showed the simulator home screen (including app icon label OCR "GymBro Al")
+  without bench-press UI. The captured console contained only the launched PID;
+  no Capacitor/JavaScript error or App unified-log entry established a cause.
+  The asynchronous console-attached launch may race capture, or the app may
+  fail early; neither is proven. No speculative product code change.
+- Revised diagnostic flow uses foreground `simctl launch` before UI retries,
+  explicit child unbuffered I/O and SDK stdout/stderr destinations under guest
+  `/tmp`, collected through the selected device data directory. Qt Creator's
+  primary launcher implementation documents simctl's path rewriting; reading a
+  guessed host temp path is unreliable. Capture at most three fresh matching App
+  crash reports, bounded 50k characters each, without treating .ips as a single
+  JSON object. The startup step is bounded at 15 minutes including slow boot,
+  foreground launch, retries and diagnostic collection. No human media or new service.
+- OCR now requires the unambiguous `gymbro` fragment **and** `benchpress`, avoiding
+  the observed I/l confusion while still rejecting the labeled home screen.
+  Reviewer inspected the actual replacement: no material issues; actionlint and
+  diff checks independently pass. Local consumer checks validate all five Bash
+  blocks and embedded Python/JavaScript syntax. Full local checks are being
+  passed (**320 tests**, lint, build/config check, guarded sync) before another
+  push. Signing metadata/dylib dependencies will also be printed read-only;
+  no actual startup repair is claimed.
 
 ### Earlier milestone context
 

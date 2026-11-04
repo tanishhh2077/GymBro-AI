@@ -22,11 +22,14 @@ Final package checks compare all shared web files against `dist/`. The iOS job
 boots an available iPhone simulator, installs/launches the app and captures only
 its empty shell. A local macOS Vision text check must reject the first-party
 splash and recognize the GymBroAI/bench-press interface in bounded captures.
-App console/system diagnostics are captured for startup failures. No workout
+Foreground launch completes before UI retries. Unbuffered App stdout/stderr are
+collected from simulator data/tmp; supplemental system logs and only fresh crash
+reports matching this app are printed for startup failures. No workout
 image is inspected and no paid OCR service is called. Compilation, launch and
 screen inspection have separate results; none establishes inference/performance.
 Run1 compiled both platforms but its startup PNG was blank despite green jobs;
-the visual guard/diagnostics are being added to prevent that false pass. See
+run2's visual guard correctly failed on home-screen captures. Launch/log/crash
+diagnostics are being tightened to determine the cause. See
 [STATUS](../../docs/STATUS.md) for actual runs and unresolved checks.
 
 Download artifacts from the selected run's summary under the repository's Actions
