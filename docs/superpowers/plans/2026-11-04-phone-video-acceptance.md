@@ -124,8 +124,8 @@ and `build/`. Text findings go in `docs/STATUS.md`; no new product module.
 Source README grants project redistribution of these internally generated black,
 silent H.264 patterns; no human/third-party content. They are not bench fixtures.
 
-- [x] Amendment, 2026-11-04 (builder-proposed under Task 8; review recorded in
-  STATUS): S07 and S08 need a zero-byte MP4, a file over 100 MiB and a nonempty
+- [x] Amendment, 2026-11-04 (builder-proposed under Task 8; its fresh read-only
+  review and fixes are recorded in STATUS): S07 and S08 need a zero-byte MP4, a file over 100 MiB and a nonempty
   corrupt MP4, which none of the exported fixtures is. Generate these three
   non-media inputs into the same ignored `build/fixtures/`. They are defined by
   their exact bytes, so any session can regenerate identical files; nothing is
@@ -133,15 +133,20 @@ silent H.264 patterns; no human/third-party content. They are not bench fixtures
 
 | Input | Bytes | Exact content | SHA-256 |
 | --- | --- | --- | --- |
-| empty.mp4 | 0 | nothing | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| zero-byte.mp4 | 0 | nothing | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | corrupt.mp4 | 68 | ASCII `GymBro AI S08 test input: these bytes are deliberately not a video.` plus one LF | `447aba0195e407858bc7816fdd332b3a27d4e707e108f53ca426b4a6ccc691aa` |
 | over-size.mp4 | 104,857,601 | that many 0x00 bytes (100 MiB + 1) | `7f12a2ac8cc123711b92c20e22583eaa49582c52a8c1f3050f81dd1aa6591007` |
 
 These are not videos and contain no human or third-party content. Expected app
-behavior: `empty.mp4` and `over-size.mp4` are rejected before processing;
-`corrupt.mp4` passes the selection check and must end in an actionable decoding
-failure, not a no-pose success. Transfer `over-size.mp4` only if the user agrees
-to store about 100 MiB on the phone temporarily, and delete it after S07.
+behavior: `zero-byte.mp4` and `over-size.mp4` are rejected before processing;
+`corrupt.mp4` passes the selection check and must end in an actionable terminal
+failure (a read failure or a timeout message, either with removal guidance), not
+a no-pose success. Being plain text, `corrupt.mp4` exercises only the earliest
+failure point, the first metadata read; it does not represent a damaged real
+recording that fails later during seeking or decoding. Verify each SHA-256 before
+transfer. Transfer `over-size.mp4` only if the user agrees to store about 100 MiB
+on the phone temporarily, and delete it after S07. "Known empty clip" in S06/S08
+means `no-person.mp4`, the empty-scene video, never `zero-byte.mp4`.
 
 - [x] Build with `npm run build`; desktop runtime preflight is recorded separately
   in STATUS and does not pass the physical-phone cases below.
@@ -154,8 +159,11 @@ to store about 100 MiB on the phone temporarily, and delete it after S07.
 - [ ] Check port5196 is free. For fixture transfer only, later run
   `python -m http.server 5196 --bind $phoneTestHost --directory build/fixtures`.
   That directory must contain only the five verified non-human fixtures, their
-  provenance README and the three generated S07/S08 inputs above. Download them in phone Safari and confirm they are
-  stored locally in Files. This temporary LAN server avoids a cloud upload or
+  provenance README and the three generated S07/S08 inputs above. Download them
+  in phone Safari by long-pressing each link and choosing "Download Linked File"
+  (a plain tap may open Safari's player instead), then confirm they are stored
+  locally in Files. Record any file Safari will not download, such as the
+  zero-byte input, as observed. This temporary LAN server avoids a cloud upload or
   fixture files in served app assets; it is separate from the product. Stop
   this newly owned server after transfer. If Python/LAN access is unavailable,
   mark transfer blocked rather than installing tools/changing firewall silently.
@@ -177,7 +185,7 @@ rows. Each outcome is **passed / failed / blocked / not run**; all start not run
 | S05 | Remove during visible work, then choose distinct/same file; repeat after completion/error | Clip disappears; temporary cleanup state may block selection; admission resumes; old progress/name/error/delegate/overlay never returns. If the short clip finishes first, cancellation case is not run |
 | S06 | Play/pause, seek both directions while paused, restart, use .25x/.5x/1x | Playback and time controls respond; empty clip shows no fabricated landmarks/measurements; repeat with portrait-source pattern |
 | S07 | Try .MOV/non-MP4, zero-byte MP4, >100 MiB selection where possible | Rejection before processing; selection remains available. Distinguish picker filtering from app rejection; single-file picker cannot establish multi-file-drop handling |
-| S08 | Use three over-limit fixtures and a nonempty corrupt .mp4 | Bound fixtures show supported-limit error; corrupt clip reaches actionable terminal failure, not no-pose success. Remove, then process known empty clip successfully |
+| S08 | Use three over-limit fixtures and a nonempty corrupt .mp4 | Bound fixtures show supported-limit error; corrupt clip reaches actionable terminal failure, not no-pose success. Remove, then process known empty clip (`no-person.mp4`) successfully |
 | S09 | Leave/return to Safari; separately record any suspension/reload | Observe shared browser behavior only. Do not demand or claim Capacitor's reset behavior; Safari has no registered native listener |
 
 Do not rename MOV to MP4 as a conversion. A camera's Most Compatible setting

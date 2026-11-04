@@ -25,9 +25,9 @@ every SHA-256 still matches the plan. Seven desktop Edge preflight cases and a
 forwarded insecure-origin GPU check passed earlier (pause/seek actions exercised,
 final seek state not asserted). These are PC evidence, not Safari/LAN/native or
 bench passes. The plan was amended to add three generated non-media inputs
-for S07/S08 (`empty.mp4`, `corrupt.mp4`, `over-size.mp4`, exact bytes and
+for S07/S08 (`zero-byte.mp4`, `corrupt.mp4`, `over-size.mp4`, exact bytes and
 hashes in the plan); desktop Chromium confirmed their intended rejection and
-decoding-failure paths.
+read-failure paths, and a fresh review's three Low findings are fixed.
 
 The user reported the iPhone 12 Pro Max runs **iOS 26.5.2** (Settings, 2026-11-04).
 

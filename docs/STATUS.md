@@ -25,7 +25,8 @@ unverified.
 - Claude Code (Opus 5.5), 2026-11-04. The plan's S07 needs a zero-byte MP4 and a
   file over 100 MiB, and S08 a nonempty corrupt MP4; the five exported fixtures
   and Task 4's `tests/fixtures/` (checked at `34538e4`) contain none of them.
-  Builder-proposed plan amendment: generate `empty.mp4` (0 bytes),
+  Builder-proposed plan amendment: generate `zero-byte.mp4` (0 bytes; first
+  generated as `empty.mp4` and renamed after review, same bytes and hash),
   `corrupt.mp4` (68 ASCII bytes) and `over-size.mp4` (104,857,601 zero bytes)
   into ignored `build/fixtures/`. A Python script wrote raw bytes, refusing to
   overwrite; the printed SHA-256 values are in the plan table. `git check-ignore`
@@ -33,20 +34,45 @@ unverified.
 - PC behavior check, desktop only: a temporary production preview bound to
   `127.0.0.1:5194` served the Task 8 tip's build (source identical to master
   `3209025`) to the Playwright MCP Chromium browser. Inputs were set on the real
-  file input. `empty.mp4` showed alert "Video not accepted — This file is empty.
+  file input. The zero-byte input (then named `empty.mp4`) showed alert "Video not accepted — This file is empty.
   Choose a recorded video."; `over-size.mp4` showed "This video is larger than
   100 MiB…". Neither created a video element; Choose video stayed enabled.
   `corrupt.mp4` was admitted and ended in alert "The video could not be read —
   The browser could not load this video. Remove the clip to try another.", not a
   no-pose result; Choose video was disabled and Remove present. After removal,
   `no-person.mp4` processed to the no-pose result in about 4 s, with the old
-  filename gone. Only `blob:` requests left the preview origin. Console: one
+  filename gone. No request went anywhere except the preview origin and
+  in-memory `blob:` URLs for the selected files. Console: one
   `favicon.ico` 404 (the app ships no favicon; cosmetic) and MediaPipe's OpenGL
   notice. Preview process 50072 was stopped and port 5194 confirmed free; upload
   copies in ignored `.playwright-mcp/` were deleted.
 - This shows the inputs reach the intended code paths in desktop Chromium. It is
   not a Safari, iPhone Files-provider or native result; the phone may filter,
   rename or refuse to download a zero-byte file, which S07 records as observed.
+
+- Fresh read-only review (Claude Code subagent, Opus 5.5, no inherited builder
+  conversation; read only Git objects and `build/fixtures/`) of `fedc7e2..e10cc93`
+  found no Critical/High/Medium issue. It recomputed all three inputs' bytes and
+  SHA-256 from the files and from the plan text alone, confirmed `build/` is
+  ignored with nothing tracked, matched every quoted alert to `clipPolicy.ts`,
+  `video.ts` and `VideoStage.tsx`, and found the iOS record consistent. It ran no
+  tests/builds/servers and could not see the Chromium run or phone behavior.
+- Three Low findings, all fixed in the following commit: (1) the name
+  `empty.mp4` could be confused with the plan's "known empty clip"
+  (`no-person.mp4`), so the input is now `zero-byte.mp4` and S08 names
+  `no-person.mp4`; (2) the plan claimed a review "recorded in STATUS" before
+  one existed, now this record; (3) "Only `blob:` requests left the preview
+  origin" was reworded, because `blob:` URLs never leave the page.
+- Two unverified concerns, addressed in the plan: the text-file `corrupt.mp4`
+  exercises only the earliest (metadata) failure, now stated, and a timeout
+  message with removal guidance also counts as S08's actionable failure;
+  phone Safari may play rather than download an `.mp4` link, so the transfer
+  step now says to long-press and choose "Download Linked File". The reviewer's
+  minor note is also adopted: the amendment repeats "verify each SHA-256".
+- Commit hygiene note: commit `e10cc93`'s subject begins with an invisible UTF-8
+  byte-order mark, written by Windows PowerShell 5.1 into the message file. The
+  commit's content is correct; the published history is left unchanged. Later
+  message files are written fresh without one.
 
 ### Task 8 iOS version
 
