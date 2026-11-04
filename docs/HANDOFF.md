@@ -21,8 +21,10 @@ automatic reps, medical claims, backend/storage or mobile scaffold in this batch
 
 - Current branch: `feat/task5-elbow-measurements`, based on reviewed local/remote
   `master` at `680201d`. Design review returned "nothing important left". Core
-  measurement functions are implemented: 40 tests failed first against API stubs,
-  then passed. Next: panel/player tests first, then integration and fresh review.
+  measurement functions and player timeline are implemented. Forty core tests
+  failed first against stubs; nine panel and two player additions failed first
+  before wiring. All 287 tests, lint and build pass. Final review/browser evidence
+  is being recorded for the Step 4 handoff before merge.
 - Tasks 1-3 are implemented/reviewed on master: bounded media engine, one local
   clip, lifecycle/selection errors, timestamped poses, player and overlay.
 - Task 4 tooling is separately committed/pushed at `34538e4` on
@@ -41,10 +43,16 @@ automatic reps, medical claims, backend/storage or mobile scaffold in this batch
 
 Baseline after branch creation: `npm install --no-audit --no-fund` succeeded and
 removed the three Task 4-only tooling packages. Original baseline: 236 cases.
-Task 5 core adds 40 cases (276 total); see STATUS for the latest verification.
-Lint and build exited 0; build transformed 400 modules with the existing stale
+Task 5 adds 40 core and 11 panel/player cases: **287 total**, ten files.
+Lint and build exited 0; build transformed 403 modules with the existing stale
 Browserslist warning. Own strict-port dev server 5191 returned HTTP 200 before
 feature code. No new dependency is planned.
+
+The panel appears below the existing playback controls for completed results.
+It shows independent image-space estimates, missing reasons, raw sample identity,
+gap-separated traces, and previous/next measured-sample jumps. It owns no extra
+media resources/timers. Geometry/component data are synthetic; anatomical/bench
+accuracy is not established.
 
 Own Task 5 server uses `127.0.0.1:5191` with `--strictPort`. Earlier server 5176
 belongs to an old session; leave it alone. Stop only the server you started and

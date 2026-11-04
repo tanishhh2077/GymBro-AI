@@ -1,6 +1,6 @@
 # System architecture
 
-Status: observed prototype plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 after Task 3 component wiring (Steps 3–4).
+Status: observed implementation plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 after Task 5 measurement/timeline wiring.
 
 ## Existing implementation
 
@@ -73,7 +73,11 @@ layer: versioned image-pixel angle estimates, per-side abstention, real media
 times/observation indices, gap-separated lines and measured-sample navigation.
 It does not use inferred model z/world coordinates or legacy score/flag types.
 Its 40 geometry tests are synthetic; real bench/anatomical validity is unverified.
-The timeline/player integration is the next step on `feat/task5-elbow-measurements`.
+`src/components/ElbowTimeline.tsx` now consumes this series for completed clips,
+following the player's media-time events and delegating raw-sample jumps to its
+existing seek handler. Measurement failures leave video replay/removal usable.
+The panel owns no media resources or timers. Its gap-separated SVG traces and
+per-side unavailability do not certify a target person or anatomical accuracy.
 
 - Before any work or timer starts, every limit must be a positive finite number and every timeout must fit a browser timer (at most 2,147,483,647 ms); otherwise the call fails with kind `validation`. An invalid value would otherwise disable a bound silently (`duration > NaN` is always false) or fire a timer at once.
 - A `processVideo` call is one job. A second call while a job runs (or while `init()` runs) is rejected with kind `busy` and the message "The pose engine is busy with another operation". The job owns an internal `AbortController`; the caller's `signal`, `close()`, and the total deadline all stop it through that controller.

@@ -198,4 +198,37 @@ describe("VideoStage", () => {
     emit("ended");
     expect(play()).toBeTruthy();
   });
+
+  it("synchronizes angle evidence with paused seeks and delegates sample navigation", async () => {
+    const c = clip();
+    c.pose!.width = 200; c.pose!.height = 100;
+    c.pose!.frames = [0, .5, 1].map((time, index) => {
+      const landmarks = Array.from({ length: 33 }, () => ({ x: .5, y: .5, z: 0, visibility: 1 }));
+      landmarks[11] = { x: .2, y: .4, z: 0, visibility: 1 };
+      landmarks[13] = { x: .2, y: .6, z: 0, visibility: 1 };
+      landmarks[15] = { x: .4, y: index === 1 ? .2 : .6, z: 0, visibility: 1 };
+      return { index, time, landmarks, worldLandmarks: null };
+    });
+    render(c);
+    expect(container.querySelector('[aria-label="Left elbow angle"]')?.textContent).toBe('90°');
+    video().currentTime = .5; emit("seeked");
+    expect(container.querySelector('[aria-label="Left elbow angle"]')?.textContent).toBe('45°');
+    const next = find<HTMLButtonElement>('button[aria-label="Next angle sample"]');
+    await click(next);
+    expect(video().currentTime).toBe(1);
+    emit("seeked");
+    expect(container.querySelector('[aria-label="Left elbow angle"]')?.textContent).toBe('90°');
+    video().currentTime = 0; emit("seeked");
+    expect(container.textContent).toContain('Observation 0');
+  });
+
+  it("clears the angle panel on a new processing source and retains no-pose replay", () => {
+    render();
+    expect(container.querySelector('[aria-label="Estimated 2D elbow angles"]')).toBeTruthy();
+    render(clip("processing", "b"));
+    expect(container.querySelector('[aria-label="Estimated 2D elbow angles"]')).toBeNull();
+    render(clip("no-pose", "b"));
+    expect(container.querySelector('[aria-label="Left elbow angle"]')?.textContent).toBe('Unavailable');
+    expect(play().disabled).toBe(false);
+  });
 });

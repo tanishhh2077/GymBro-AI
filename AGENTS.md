@@ -93,4 +93,4 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
 - Development: `npm run dev`.
 - Build/type check: `npm run build` (`tsc -b` then Vite).
 - Lint: `npm run lint` passes after the declared-tooling repair and unused-initializer cleanup; see [STATUS.md](docs/STATUS.md) for verification and remaining prototype limitations.
-- Tests: `npm test` runs Vitest once over source tests in jsdom with the app's Vite settings. The current branch has 276 tests: 236 reviewed application cases plus 40 Task 5 geometry/measurement cases. Consult STATUS for the latest run; simulated observations do not prove real bench accuracy. Task 4's separate branch owns its browser/fixture tooling.
+- Tests: `npm test` runs Vitest once over source tests in jsdom with the app's Vite settings. The current branch has 287 tests: 236 baseline cases plus 40 Task 5 geometry and 11 timeline/player cases. Consult STATUS for the latest run; simulated observations do not prove real bench accuracy. Task 4's separate branch owns its browser/fixture tooling.

@@ -35,7 +35,7 @@ and `{frameIndex, time, left, right}` samples with `{degrees, reason}` results.
 - [x] Step 2: Write core tests, observe intended failure against API stubs,
   implement the four pure functions. Test every measurement/temporal constraint
   above, preserve raw input, and run whole tests/lint/build before commit/push.
-- [ ] Step 3: Write component and player integration tests first; implement the
+- [x] Step 3: Write component and player integration tests first; implement the
   accessible panel, discontinuous SVG plot, missing reasons and sample navigation.
   Reuse player `scrub` and time events. Test paused seeks, no-pose and source reset.
   Verify whole tests/lint/build, update docs, commit/push.

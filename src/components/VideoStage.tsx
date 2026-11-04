@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { Clip, ProcessingFailureKind } from "@/types";
 import { EXERCISES } from "@/core/exercises";
 import { SkeletonOverlay } from "./SkeletonOverlay";
+import { ElbowTimeline } from "./ElbowTimeline";
 import {
   AlertIcon,
   CpuIcon,
@@ -225,6 +226,7 @@ function VideoStagePlayer({
           {clip.pose && <CoverageBadges clip={clip} />}
         </div>
       </div>
+      {playable && clip.pose && <ElbowTimeline pose={clip.pose} time={time} onSeek={scrub} />}
     </div>
   );
 }

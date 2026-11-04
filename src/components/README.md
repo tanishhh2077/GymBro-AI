@@ -10,8 +10,14 @@
   the store while mounted (`retainMedia` prop), sets the video source in an effect,
   shows kind-specific failures, and keeps no-pose clips replayable with a persistent
   live region. Seek events synchronize controls; rejected play/restart requests
-  show retry guidance. Source identity resets player state. Its 12 tests cover
+  show retry guidance. Source identity resets player state. Its 14 tests cover
   these behaviors, selected speed, finite duration, and StrictMode lease cleanup.
+- `ElbowTimeline.tsx`: versioned raw-observation angle series from `core/elbowAngles`,
+  independent left/right estimates, unavailable reasons, gap-separated SVG lines,
+  and previous/next measured-sample navigation through the player's existing seek
+  handler. Nine component tests plus two added player integration cases cover
+  synthetic geometry, paused seeks, no-pose output, malformed input, and source
+  reset. No new media resources, timers, persistence, or technique verdicts.
 - `SkeletonOverlay.tsx`: canvas overlay using `poseDisplay` at actual media time.
   It follows the video box and centered contain content, applies DPR once, clears
   missing/not-ready/seeking data, and animates only while playing. Its 10 tests

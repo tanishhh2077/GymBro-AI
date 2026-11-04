@@ -8,8 +8,11 @@ bench-press video**.
 
 The existing browser prototype contains local video selection, MediaPipe pose
 estimation, and a skeleton overlay with playback controls. Repetition detection,
-joint-angle/depth/tempo findings, saved sessions, and comparisons are not yet
+depth/tempo findings, saved sessions, and comparisons are not yet
 implemented. Real-video acceptance and mobile performance remain to be verified.
+The player now includes estimated left/right 2D elbow-angle traces, explicit
+unavailable reasons, observation timestamps, and sample navigation. These are
+image-space measurements, not validated bench biomechanics or technique findings.
 The UI offers only the supported workflow: one side-view bench-press MP4, with
 recording guidance and no exercise or camera-angle choices. Legacy multi-lift code
 remains in the source but is not rendered.
@@ -98,9 +101,10 @@ npm test
 
 Vitest runs `src/**/*.test.{ts,tsx}` once using jsdom's simulated browser
 objects and the app's existing Vite settings, including the `@` source alias.
-All 236 tests pass: 58 media-helper cases, 55 pose-engine contract cases, 22
+All 287 tests pass: 40 elbow-measurement cases, 9 timeline component cases,
+58 media-helper cases, 55 pose-engine contract cases, 22
 selection-check cases, 12 session-store cases, 11 dropzone component cases, and
-56 pure display-calculation cases, 10 overlay cases, and 12 player cases.
+56 pure display-calculation cases, 10 overlay cases, and 14 player cases.
 See [current status](docs/STATUS.md) for exact results. The canvas uses bounded
 display sampling and video-content geometry. Player tests cover seeks, playback
 failures, source replacement, leases, and accessible control state. These simulated

@@ -30,7 +30,7 @@ These are source-inspection observations. They do not establish that real-video 
 ## Not implemented or not demonstrated
 
 - Verified first-milestone result on a real, permitted side-view bench-press clip.
-- Rep detection/counting, descent/bottom/ascent segmentation, angle/depth/tempo measurements, evidence-backed findings, or validated quality/abstention behavior.
+- Rep detection/counting, descent/bottom/ascent segmentation, validated anatomical-angle/depth/tempo measurements, or technique findings. Task 5 separately implements limited image-space elbow estimates and explicit missingness; it does not establish those biomechanical capabilities.
 - Saved sessions, comparisons, authentication, backend services, or a database.
 - Installed mobile project, device performance results, or store submission.
 - Complete real-browser acceptance tests, fixture manifest, evaluation dataset, or measured accuracy benchmarks. The passing unit/component checks are described below.
@@ -145,12 +145,26 @@ The 40 new synthetic-geometry cases all failed first against API stubs, then
 passed. Source-pixel axis scaling, bilateral availability, zero/180 degrees,
 unknown visibility, invalid/out-of-image/degenerate points, immutable raw input,
 observation indices and actual times, bounded nearest sampling, independent gap
-segments, and valid-neighbor navigation are covered. The UI is not yet wired.
+segments, and valid-neighbor navigation are covered. The UI is now wired as below.
 Whole tests: **276/276** across nine files; lint exit **0**; build exit **0**,
 400 modules and existing stale Browserslist warning. Real bench landmark/angle
 accuracy remains unverified.
 
-Continue the [Task 5 plan](superpowers/plans/2026-11-03-elbow-timeline.md) under D-021: panel/player tests, timeline integration, then fresh code review and verification. The user delegated proceeding past the fixture blocker; do not reopen this batch's understanding checkpoint. No reps, technique findings, backend, persistence or mobile scaffold is included.
+Continue the [Task 5 plan](superpowers/plans/2026-11-03-elbow-timeline.md) under D-021: record final review/browser evidence and the feature handoff. The user delegated proceeding past the fixture blocker; do not reopen this batch's understanding checkpoint. No reps, technique findings, backend, persistence or mobile scaffold is included.
+
+Task 5 Step 3: `ElbowTimeline.tsx` now uses the real measurement helpers below
+the existing video controls. It displays per-side values or unavailable reasons,
+the selected raw observation/time, discontinuous SVG lines/singleton points,
+and accessible previous/next measured-sample navigation through `VideoStage`'s
+existing seek handler. No added listeners, animation loops, video/URL leases,
+store state, or persistence. Invalid measurement metadata leaves replay usable.
+HTML axis labels remain legible when the plot resizes to a narrow viewport.
+
+Test-first UI run: **11 failed / 12 passed**, 23 cases across the panel/player;
+new panel and integration cases all failed before implementation. Green: **23/23**
+focused, whole **287/287** in ten files, lint exit **0**, build exit **0**,
+403 modules and existing stale Browserslist warning. Supplied positive-pose
+geometry is explicitly synthetic, not a MediaPipe or human bench result.
 
 Task 4 acceptance remains open on its separate branch. The user cannot arrange footage and requested continued licensed-footage search; do not ask them to record again. Real bench identity, anatomy and positive synchronization remain unverified. Do not claim that geometry/component fixtures validate real bench measurements.
 
