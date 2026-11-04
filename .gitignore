@@ -8,6 +8,8 @@ dist-ssr
 *.tsbuildinfo
 .superpowers/
 .playwright-mcp/
+test-results/
+playwright-report/
 
 # Editor
 .vscode/*

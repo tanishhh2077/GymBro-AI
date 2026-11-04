@@ -205,6 +205,20 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   changes it under Settings > General > Default branch once `master` holds the
   reviewed work, because no GitHub CLI or token is available to agents.
 
+### D-020: Continue independent development past a blocked prerequisite
+
+- On 2026-11-03 the user instructed: "just keep building all the other tasks as
+  well if you reach a deadend on anything" and emphasized continuing development.
+- Execute remaining work in the approved milestone plan where its prerequisites
+  permit it. Explain the next steps as work proceeds; this is approval for the
+  remaining planned batch under the larger-step exception in root guidance.
+- A missing bench fixture blocks bench acceptance, not browser setup, bad-input,
+  cancellation, no-person, tooling, or clean-install verification. Keep full bench
+  acceptance failing with clear setup guidance; do not skip it or fake data.
+- This instruction does not establish useful bench observations or approve new
+  product scope such as rep counting, medical/form verdicts, backend, or mobile.
+  Keep the ordinary teaching checkpoint for later work outside this batch.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

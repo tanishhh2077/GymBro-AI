@@ -117,7 +117,7 @@ The reviewer classified the redundant `result` initialization as a **low-severit
 
 ## One next task
 
-Task 4 Step 1: establish a permitted side-view bench-press recording for actual browser acceptance. Its teaching checkpoint is approved. The user cannot arrange a recording and explicitly requested continued licensed-footage research. Nine downloaded videos were inspected through sampled frames/contact sheets, plus additional stock previews; no suitable fixture was accepted. See [the search record](FIXTURE_SEARCH.md) for evidence and remaining leads. Step 1 and real-video acceptance remain blocked on footage. No browser-test implementation checkpoint has been approved. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
+Task 4 continues under [D-020](DECISIONS.md#d-020-continue-independent-development-past-a-blocked-prerequisite): the user authorized independent planned development when a prerequisite is blocked. Step 2 tooling and ten footage-independent browser checks are implemented, reviewed, and verified in a clean copy. Next establish footage, then extend/run the prepared structural bench test and write positive-overlay synchronization checks. Step 1 and real bench acceptance remain blocked on footage. The user cannot arrange a recording; do not ask again. See [the search record](FIXTURE_SEARCH.md) before further sourcing. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
 
 The chosen sourcing route is further licensed-footage research; do not ask the user to arrange a recording again. No suitable permitted side-view H.264 MP4 has been established. Do not claim a candidate or a mock is a validated result.
 
@@ -450,6 +450,99 @@ candidates.
   `npm run lint` exit **0**, no warnings; `npm run build` exit **0**, 400 modules,
   existing stale Browserslist warning. No application source changed. No browser
   acceptance or code review was run for this documentation-only research chunk.
+
+## Task 4 browser setup and independent checks (Step 2)
+
+- User explicitly authorized continuing other planned development when blocked
+  (D-020). Implemented inline by Codex, served model identifier unavailable.
+  Existing Task 4 feature branch/checkout retained; no implementer subagent.
+- Added pinned `@playwright/test` 1.64.1 (Node >=20; verified npm metadata),
+  strict dedicated Vite server/Edge configuration, separate test type-check,
+  commands, scoped AGENTS/CLAUDE/README in `tests/`, `tests/e2e/`, and
+  `tests/fixtures/`. No production source/debug hook/model asset changed.
+- Setup failure reported: root `npm ci` could not unlink esbuild held by the
+  older 5176 server. `npm install` restored dependencies; ignored locked-backup
+  cleanup warnings remain. Older server untouched. Own server on 5190 returned
+  HTTP 200 before test code. The later clean-copy installation succeeded.
+- Browser tests verify empty/wrong-extension/multiple input, real renamed-MP4
+  decode failure, real decoded duration/long-edge/pixel rejection before model
+  loading, disabled admission, keyboard remove/focus, and repeated admission.
+  Five internally generated black H.264 MP4 patterns (no people, no third-party
+  material) are documented with sizes, metadata, encoder command, and hashes in
+  `tests/fixtures/README.md`; they are not a human bench fixture.
+- Real SDK/model path: no-person observations stay null, honest no-pose feedback
+  allows play/pause/seek/speed/restart, remove releases the blob URL, and another
+  job succeeds. A second test cancels an actual processing job and starts another
+  after cleanup. Native portrait source dimensions survive landscape/phone-sized
+  viewports; this is not rotated-source or physical-phone coverage. No unexpected
+  origin/write request or page error was observed in the repeated no-person path;
+  fonts were blocked. This is one workflow, not a complete privacy audit.
+- Browser: installed Edge **156.0.4314.58**; SDK **0.10.35**, real **GPU** delegate;
+  black landscape clip produced **120** sampled positions at target **30/s**.
+  Ten browser cases pass (**29.1 s** latest run); this is suite elapsed time,
+  not a bench processing/accuracy benchmark. CPU fallback/60 s worst-case budget,
+  anatomical alignment, and actual bench observations remain unverified.
+- Fixture setup gate checks nonempty source/permission, metadata bounds,
+  orientation, three distinct reference times, external path, regular-file size,
+  and SHA-256. All **18** tests failed first against the stub and now pass.
+  Arbitrary bytes in those unit tests are explicitly not accepted video media.
+  A guarded real-bench data-shape test is prepared; no manifest is fabricated.
+- Failed checks and corrections: initial browser selector named a nonexistent
+  heading (test fixed); the portrait test incorrectly required element-box and
+  source aspect ratios to match despite `object-fit: contain` (test corrected to
+  verify contain, native dimensions, and viewport fit); test type-check caught
+  missing video-element casts. Lint initially mistook Playwright's `use` callback
+  for a React hook (renamed the callback). Concurrent lint/browser cleanup exposed
+  a generated-output scan race; ESLint now ignores runner output directories.
+- Privacy: screenshots/video/traces off, per-test output never retained. Source
+  inspection of pinned Playwright found automatic ARIA snapshots despite trace
+  off; `PLAYWRIGHT_NO_COPY_PROMPT=1` suppresses those snapshots. A failed test may
+  temporarily write error text before output cleanup; do not claim no files are
+  ever created. Recheck the internal switch on runner upgrades.
+- Latest observed checks: whole **254/254** tests in nine files; lint exit **0**;
+  build exit **0**, 400 modules; test type-check exit **0**; browser **10/10**.
+  Build retains stale Browserslist warning; dev mode also reports the vendor's
+  missing source map. Fresh review and clean-copy results follow below.
+
+## Task 4 independent verification and fresh review (Steps 5–7 portions)
+
+- Fresh-context read-only Codex reviewer inspected the working tree and new files
+  against `360da53`, scoped instructions/spec/plan and surrounding engine code.
+  It ran **18/18** fixture tests and test type-check, checked five binary hashes/
+  lengths against the README, whitespace, and the pinned snapshot-suppression
+  implementation. No browser, files changed, inherited conversation, or further
+  agents. Exact served model identifier unavailable.
+- Verdict: **no significant findings**, one Low assertion-contract mismatch.
+  The prepared bench test required inferred world landmarks whenever normalized
+  landmarks existed, while the engine/spec allow missing world output. Confirmed
+  against `PoseEngine.ts`, corrected the assertion to validate world output only
+  when present before the first implementation commit. Type-check and required
+  whole checks pass after correction; real normalized-only bench output remains
+  untested. No unresolved code-review finding remains for this tooling batch.
+- Clean source copy in ignored `.superpowers/clean-task4-20261103`, with no prior
+  dependencies: `npm ci --no-audit --no-fund` exit **0** (341 packages), **254/254**
+  tests, lint exit **0**, build exit **0** (400 modules), test type-check exit **0**,
+  and browser UI/no-person **10/10**, **27.5 s**, same Edge/GPU. The copy was made
+  from current source plus new authored files; reviewed world-optional correction
+  was copied before browser verification. No scratch encoder is needed to run it.
+- Full root `npm run test:e2e`: **10 passed / 1 setup failure**, **26.5 s**.
+  The bench case fails with `Bench fixture setup: set GYMBRO_E2E_VIDEO ... See
+  tests/fixtures/README.md.` This is the required honest missing-prerequisite
+  outcome, not green full acceptance. No human manifest or video was created.
+- An earlier full run stalled during the no-person case while clean-copy setup
+  was running and was interrupted with Ctrl-C. A separate scratch-HTML watcher
+  probe did **not** reproduce a navigation; the cause remains unconfirmed. No
+  application change was made to explain it away. Sequential full-root and
+  clean-copy browser runs passed their ten independent cases. Treat recurring
+  stalls as a diagnostic task rather than adding retries or increasing budgets.
+- Own manual dev server on **5190** was stopped after verifying its process
+  identity, and that port was verified free. Automated runners owned **4179**;
+  the older **5176** server remains untouched. No app feature source changed.
+- Step 2 is complete. Steps 3/4/5/6/7 are not whole-task acceptance: structural
+  bench checks are prepared; positive-overlay/reference-frame alignment, real
+  bench identity/privacy, 60 s worst-case timing, rotated-source, physical-phone,
+  and whole-milestone review/acceptance remain open. Keep Task 4 on its feature
+  branch rather than merging it to `master` as a completed milestone.
 
 ## Task 2 part 1: selection check (Steps 1–2)
 

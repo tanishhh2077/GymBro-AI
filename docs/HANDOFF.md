@@ -36,8 +36,8 @@ Updated 2026-11-03. Start here in Claude Code or Codex; no prior chat is require
   Retain that branch. Check `git log`, `git status`, and `git branch -vv` for
   current local/remote pointers rather than assuming an older handoff hash.
 - Task 4 fixture investigation is on `feat/task4-browser-acceptance`, created
-  from verified local/remote `master` at `680201d`. No Task 4 application code,
-  browser-test dependency, or accepted fixture exists yet.
+  from verified local/remote `master` at `680201d`. Playwright tooling and test
+  code now exist; no application source was changed and no human fixture exists.
 - Layout, file responsibilities, and the engine lifecycle are in
   [ARCHITECTURE.md](ARCHITECTURE.md#repository-layout). `public/` deliberately holds
   no Markdown; its rules are in [root AGENTS.md](../AGENTS.md#static-files-in-public).
@@ -47,11 +47,16 @@ Updated 2026-11-03. Start here in Claude Code or Codex; no prior chat is require
   stop it, confirm the port is free: stopping the `npm run dev` wrapper on Windows
   can leave the `vite.js` node process running.
 
-## Latest checks (2026-11-03, repeated during Task 4 fixture investigation)
+## Latest checks (2026-11-03, Task 4 browser tooling)
 
 | Command / suite | Observed result |
 | --- | --- |
-| Whole `npm test` | **236 passed / 236**, exit 0 |
+| Whole `npm test` | **254 passed / 254**, nine files, exit 0 |
+| Fixture gate, Node | 18 passed; all 18 failed first against the loader stub |
+| `npm run test:e2e:ui` | **10/10 passed** in Edge 156.0.4314.58; real GPU no-person inference |
+| `npm run test:e2e:typecheck` | exit 0 |
+| Full `npm run test:e2e` | 10 passed; 1 expected setup failure: no permitted bench path/manifest |
+| Clean-copy install/checks | `npm ci`, 254 tests, lint, build, type-check, 10 browser cases passed |
 | `src/core/video.test.ts` | 58 passed |
 | `src/core/PoseEngine.test.ts` | 55 passed |
 | `src/core/clipPolicy.test.ts` | 22 passed (16 failed first against a placeholder) |
@@ -125,16 +130,41 @@ including the review disposition, are in [STATUS.md](STATUS.md).
   after the explanation of real media versus simulated tests, then clarified:
   **"I cannot get a recording; keep searching licensed footage."** Do not ask
   them to arrange footage again. Continued research is authorized.
-- **Next: obtain a suitable licensed fixture.** Codex downloaded nine candidate
+- **Fixture sourcing remains open.** Codex downloaded nine candidate
   videos into ignored scratch storage and inspected sampled frames/contact sheets;
   none was accepted. More stock previews, source terms, and two research
   repositories were checked. [Search evidence](FIXTURE_SEARCH.md) records sources,
   rejection reasons, access failures, and leads so another session need not repeat
   the search. A portable decoder now exists in ignored scratch; it is not an app
   dependency. No actual bench-lifter inference was run.
-  Step 1 and real-video acceptance remain blocked on footage. Do not repeat the
-  approved checkpoint, relax the view requirement, or invent manifest values.
-  Step 2 browser-test implementation needs its own teaching checkpoint.
+  Step 1 and bench acceptance remain blocked on footage. Do not relax the view
+  requirement or invent manifest values.
+- **The user approved continuing independent planned development** when blocked
+  ([D-020](DECISIONS.md#d-020-continue-independent-development-past-a-blocked-prerequisite)).
+  Task 4 Step 2 tooling and footage-independent checks are implemented. Ten Edge
+  checks cover input/decoded limits, keyboard removal, blocked replacement,
+  cancellation, real no-person inference/playback, repeated jobs, URL revocation,
+  local requests, and native portrait decoding/layout. Five tiny generated black
+  patterns are committed test assets; they contain no people or external footage.
+  The existing 236 app cases plus 18 new fixture-gate cases pass. A guarded bench
+  data-shape test exists, but cannot establish bench success until footage and
+  its inspected manifest exist. Full bench acceptance must fail clearly meanwhile.
+- **The test/tooling batch has a fresh review and clean-copy verification.** One
+  Low assertion mismatch was corrected: inferred world landmarks are optional.
+  No significant findings remain. The reviewer independently passed 18 fixture
+  tests and type-check, checked generated hashes and snapshot-suppression source,
+  and did not run browsers. Exact served model identifier unavailable.
+- **Next: continue remaining Task 4 work under D-020.** Establish permitted
+  footage, then extend/run the prepared structural bench test and implement
+  positive-overlay seek/resize checks with inspected reference times. Step 3 is
+  prepared but unverified on real bench footage; Step 4 positive overlay checks
+  are not yet written. Step 5 has independent no-person/cleanup/privacy evidence;
+  Step 6 has clean-copy checks, but full acceptance remains incomplete. Do not
+  reopen the batch's checkpoint or claim the milestone done. The unresolved
+  60 s processing-budget concern, rotated source, physical phone, intended-lifter
+  observations, and anatomical alignment remain unverified. One concurrent
+  browser run stalled and was interrupted; sequential root and clean-copy runs
+  passed. Cause unconfirmed; details in STATUS.
 - The server started for this step on `127.0.0.1:5179` was stopped and its port
   verified free. The earlier `5176` listener was left untouched.
 - GitHub's default branch may still need switching to `master` in Settings; this
@@ -162,8 +192,8 @@ work based on old unchecked scratch briefs under ignored `.superpowers/`.
 
 Confirm which instructions loaded, summarize the latest checks above, explain the
 next task with its reason and alternative, ask **"Is this clear?"**, and wait. The
-display task is complete and reviewed. Task 4 Step 1 and continued licensed-footage
-research were approved; do not reopen the answered footage question. Later
-browser-test implementation has not been approved.
+display task is complete and reviewed. D-020 authorizes the remaining planned
+development batch despite blocked footage; continue approved independent work
+with explanations instead of reopening its checkpoint or footage question.
 After an approved work chunk,
 update this handoff, STATUS, ARCHITECTURE where facts changed, and plan progress.

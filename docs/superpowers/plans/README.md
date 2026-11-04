@@ -7,7 +7,10 @@ pointers. Task 4 Step 1's teaching checkpoint is approved; fixture investigation
 has not found a suitable permitted side-view clip. The user cannot arrange a
 recording and explicitly chose continued licensed-footage research. Consult
 [the search record](../../FIXTURE_SEARCH.md) before repeating candidate checks.
-Later browser-test implementation requires its own teaching checkpoint.
+The user subsequently authorized continuing independent planned development
+despite blockers (D-020). Step 2 tooling and ten footage-independent Edge checks
+are implemented, reviewed, and verified in a clean copy; full Task 4
+bench acceptance remains incomplete and must not be represented as passing.
 
 Follow [local rules](AGENTS.md). Check the [current handoff](../../HANDOFF.md)
 before executing: accepted decisions and the current specification take precedence

@@ -96,9 +96,10 @@ These checks do not establish successful real-video inference. See
 npm test
 ```
 
-Vitest runs `src/**/*.test.{ts,tsx}` once using jsdom's simulated browser
+Vitest runs `src/**/*.test.{ts,tsx}` using jsdom's simulated browser
 objects and the app's existing Vite settings, including the `@` source alias.
-All 236 tests pass: 58 media-helper cases, 55 pose-engine contract cases, 22
+It also runs fixture-gate tests under `tests/` in Node. All 254 tests pass:
+18 fixture-gate cases plus 58 media-helper cases, 55 pose-engine contract cases, 22
 selection-check cases, 12 session-store cases, 11 dropzone component cases, and
 56 pure display-calculation cases, 10 overlay cases, and 12 player cases.
 See [current status](docs/STATUS.md) for exact results. The canvas uses bounded
@@ -124,7 +125,23 @@ blocked admission until cleanup, ignored late callbacks, no-pose versus typed
 failure, and URL leases revoked exactly once.
 An empty suite exits 1 rather than appearing to pass.
 jsdom does not decode real videos or establish MediaPipe inference accuracy;
-real-browser checks remain part of the later milestone acceptance.
+real-browser bench checks remain part of milestone acceptance.
+
+```bash
+npm run test:e2e:typecheck
+npm run test:e2e:ui
+```
+
+Playwright 1.64.1 opens installed Microsoft Edge in an isolated test profile.
+Ten footage-independent checks exercise actual decoding, input limits, removal,
+cancellation, repeated jobs, no-person inference/playback, and native portrait
+media. The committed media are generated black patterns containing no people.
+These checks do not establish bench-lifter landmark quality or alignment.
+
+Full `npm run test:e2e` additionally requires the permitted external bench video
+and a verified manifest; it fails clearly while those are unavailable. Setup and
+privacy controls are in [tests/e2e/README.md](tests/e2e/README.md) and
+[tests/fixtures/README.md](tests/fixtures/README.md).
 
 ### Model & WASM assets
 

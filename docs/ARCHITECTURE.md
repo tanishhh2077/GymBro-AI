@@ -1,6 +1,6 @@
 # System architecture
 
-Status: observed prototype plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 after Task 3 component wiring (Steps 3–4).
+Status: observed prototype plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 after Task 4 browser tooling and independent checks.
 
 ## Existing implementation
 
@@ -34,7 +34,8 @@ src/                   Application source (ownership table below)
 public/                Files served unchanged: pose model, MediaPipe runtime, SVGs; no Markdown
 .vscode/               Shared editor guidance only; other editor files are ignored
 index.html, *.config.*, tsconfig*.json   Vite, Vitest, ESLint, Tailwind/PostCSS, TypeScript settings
-tests/                 Planned in Task 4 for real-browser tests and fixtures; does not exist yet
+tests/e2e/             Playwright UI/no-person checks and a guarded real-bench acceptance test
+tests/fixtures/        External bench fixture gate/unit tests and generated no-person/limit patterns
 ```
 
 Generated or local-only, and ignored by Git: `node_modules/`, `dist/` (build output), `.vitest/`, `*.tsbuildinfo`, and `.superpowers/` (scratch snapshots and logs from earlier sessions; history, not a source of truth).
@@ -42,6 +43,16 @@ Generated or local-only, and ignored by Git: `node_modules/`, `dist/` (build out
 Every authored directory except `public/` has an `AGENTS.md` (rules), a `CLAUDE.md` (imports those rules for Claude Code), and a `README.md` (what the directory holds). `public/` is the exception because Vite publishes every file in it; its rules are in the root [AGENTS.md](../AGENTS.md#static-files-in-public).
 
 TypeScript configuration: `npm run build` runs `tsc -b` against the root `tsconfig.json`, which checks `src/` only. `tsconfig.app.json` and `tsconfig.node.json` are not referenced by it, so their settings do not apply and `vite.config.ts`/`vitest.config.ts` are not type-checked. Wiring them in is separate deferred work ([D-017](DECISIONS.md#d-017-repository-structure-fixes)).
+
+`npm run test:e2e:typecheck` separately checks `playwright.config.ts` and all test
+TypeScript through `tsconfig.e2e.json`. Vitest includes the Node fixture-gate suite
+alongside application tests. Playwright owns a strict server on port 4179, uses
+installed Edge with a separate profile and one worker, blocks fonts, and disables
+video/screenshots/traces. Pinned-runner `PLAYWRIGHT_NO_COPY_PROMPT=1` suppresses
+automatic ARIA error snapshots; `preserveOutput: never` removes per-test outputs.
+Recheck that internal switch on a runner upgrade before private media is used.
+No debug global or test hook was added to production source; tests dynamically
+read the existing development store module.
 
 ## Current ownership
 
