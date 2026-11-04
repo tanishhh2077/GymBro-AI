@@ -11,9 +11,10 @@ usage, and these documents are the only handoff; see D-016 in
 ## Current stage
 
 Task 8 (the phone plan's free Safari slice) is in progress on
-`feat/task8-safari-phone-test`: preparation is done and the phone transfer/test
-waits on the user's network choice and iOS version. See "Task 8 Step 1
-preparation" below. Task 7's planning record follows it.
+`feat/task8-safari-phone-test`: fixtures/baseline and desktop runtime preflight
+are verified. The user postponed phone actions until returning home (roughly six
+hours from their 2026-11-04 message). Phone testing still needs a trusted private
+connection and iOS version. No LAN listener/phone transfer or Safari case has run.
 
 ### Task 8 Step 1 preparation
 
@@ -53,12 +54,78 @@ preparation" below. Task 7's planning record follows it.
   inspected). A campus network is not the plan's trusted private network and may
   block device-to-device traffic, so the recommended route is the iPhone's
   Personal Hotspot with both servers bound only to the hotspot address.
-- Neither the app nor the MediaPipe bundle uses secure-context-only browser
-  features (`crypto.subtle`, `SharedArrayBuffer`, service workers, camera access),
-  so serving over plain HTTP on a LAN address is not expected to change behavior.
-- Not done yet: binding the preview/fixture servers, phone transfer, opening the
+- Claude's inspection did not identify secure-context-only features in the
+  selected processing path. This was an expectation about plain HTTP, not a
+  Safari result; model startup on an actual phone LAN origin remains unverified.
+- Not done by Claude: binding the preview/fixture servers, phone transfer, opening the
   page in Safari, and the iOS version. No server has been started, no file has
   been sent to the phone, and no Step 2 case has run.
+
+### Task 8 Codex continuation: PC runtime preflight
+
+- On 2026-11-04 the user asked Codex to inspect Claude's work and resume. Git was
+  clean at `10524e9`, matching its remote; fetch left master at `26a831f`. The
+  two Claude commits (`49538b2`, `10524e9`) change documentation only, including
+  the user's D-024 waiver. App/native/package/tooling source is unchanged.
+- Fresh read-only Codex review (`claude_task8_review`, no inherited conversation;
+  model identifier not exposed) found no acceptance-blocking issue. All six
+  ignored fixture files, sizes, SHA-256 and Git blob IDs match immutable
+  `34538e417a724ebceb0971bd2b632a376a7e739e`, with no hidden extras/directories.
+  Their README documents internally generated black/silent H.264 and permitted
+  redistribution. The reviewer ran no tests/builds/servers/device actions.
+- One supported low-severity finding was corrected: WORKFLOW's new-session
+  paragraph and the phone plan's combined Step1 checkbox still mandated routine
+  understanding stops, contradicting D-024. Current instructions now distinguish
+  explain-and-proceed from actual user phone/settings coordination. Task7's
+  approval language below is historical; Task8 now authorizes preparation.
+- The user then postponed only the phone portion until returning home, about
+  six hours later. No phone/network-setting action was attempted. Read-only
+  network inspection still found Ethernet UWNet on the Public profile. Unlike
+  the earlier Claude snapshot, ports5176/5193 had no listener at Codex's check;
+  no existing server was stopped. No campus-bound or all-interface listener ran.
+- Fresh Node22.23.2 verification: **320 tests/13 files**, lint and build/config
+  type-check exit **0**, 409 modules; existing Browserslist warning remains.
+  No dependencies installed or native build/sync needed for unchanged sources.
+- A temporary Vite production preview bound only to **127.0.0.1:5194** was used
+  with an isolated headless desktop **Edge156.0.4314.58** context. Existing
+  Playwright1.64.1 was reused from the ignored clean-Task4 cache; no Task4 app or
+  unfinished test tooling was merged. The real production UI/decoder/local model
+  ran with no inference mocks or seeded poses. Seven scratch preflight cases passed:
+  startup; landscape and portrait empty-clip GPU processing with no-pose/0%
+  coverage/unavailable elbow values, actual playback progression, pause/seek
+  control actions and narrow layout;
+  all three over-limit metadata rejections; active cancellation and successful
+  replacement without the previous filename returning. The narrow viewport is
+  desktop Edge layout evidence, not iPhone/WebKit emulation or acceptance.
+- No external app-origin requests, page errors or console errors were observed
+  in that context. A non-human full-page result image was manually inspected.
+  Scratch script/results/image remain ignored at `build/task8-pc-preflight.mjs`,
+  `build/task8-pc-preflight-results.json`, `build/task8-pc-no-person.png`. These
+  are local manual evidence, not seven new npm tests or committed CI tooling.
+  They do not establish bench accuracy, native behavior or a general privacy audit.
+  Pause and slider actions were exercised but the scratch harness did not assert
+  the resulting paused/seek state; do not promote these actions to verified seeking.
+- A separate scratch HTTP-origin check passed on the same desktop Edge:
+  `http://gymbro.test` reported **isSecureContext=false**, completed real GPU
+  processing of the empty fixture, and displayed no-pose/0%/unavailable angles.
+  Browser request interception forwarded exact production responses from the
+  loopback preview, with no inference replacement. No external requests/page
+  errors were observed. Script/results are ignored at
+  `build/task8-http-preflight.mjs` and `build/task8-http-preflight-results.json`.
+  This narrows the secure-context concern for Edge only; interception is not an
+  actual LAN connection and cannot verify iPhone Safari or hotspot routing.
+- Temporary loopback previews were stopped after checks. One immediate stop
+  probe still reported a listener; a subsequent independent query found neither
+  port5194's listener nor its preview process. No older process was stopped.
+  Global Node20.20.2 was rechecked and preserved; no LAN listeners were started.
+- Targeted follow-up by the same read-only reviewer confirmed the D-024 fix,
+  phone deferral and PC/forwarded-HTTP evidence boundaries. It identified the
+  pause/seek assertion limitation above; claims were narrowed accordingly.
+  No remaining acceptance-blocking finding; Task8 remains incomplete for the phone.
+- All Safari/physical-phone cases remain unrun. Resume when the user returns:
+  obtain iOS version, coordinate a trusted private connection, bind narrowly to
+  its actual address and check phone reachability before transferring fixtures.
+  Keep Task8 open/unmerged until its acceptance/review is resolved.
 
 ### Task 7 record
 

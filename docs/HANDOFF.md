@@ -20,15 +20,28 @@ Done so far (details in STATUS, "Task 8 Step 1 preparation"):
   SHA-256 matches the plan's table and every byte count and Git object ID matches
   the source tree. The directory holds only those six files.
 - The production build in ignored `dist/` is from app code identical to `26a831f`.
+- Codex reviewed Claude's work and verified every fixture against the immutable
+  source. Fresh 320 tests/lint/build pass. Seven real desktop Edge preflight
+  cases pass: GPU no-pose processing on both empty clips, playback progression,
+  pause/seek control actions and narrow layout,
+  three metadata-limit rejections and active cancellation/replacement. These
+  are PC results, not Safari/phone acceptance. Evidence is in ignored `build/`.
+  Resulting paused/seek state was not independently asserted in that scratch run.
+- A separate Edge check also completed real GPU inference with
+  `isSecureContext=false` at a test HTTP origin; requests were forwarded to the
+  loopback production preview. This tests Edge's HTTP feature gating, not actual
+  LAN transport or Safari compatibility.
 
-**Next action, waiting on the user's phone:** the PC is on UWNet (Ethernet,
-Windows category Public, NordVPN adapters present; Wi-Fi disconnected), which is
-not the trusted private network the plan requires. Recommended: the user turns on
-iPhone Personal Hotspot and joins the PC to it; then bind `npm run preview` (port
-5195) and `python -m http.server` (port 5196, `build/fixtures/` only) to the
-hotspot address only. Also still needed: the iOS version (Settings > General >
-About). Do not change firewall/VPN/router settings; if Windows shows an
-"Allow access" prompt, the user decides. No server has been started yet.
+**Next action, when the user returns home:** on 2026-11-04 the user postponed the
+phone portion for roughly six hours while busy. Wait for their return; do not
+start phone/LAN actions or change network settings in the meantime. The PC was
+rechecked on UWNet (Ethernet, Windows category Public), not the required trusted
+private connection. Coordinate home Wi-Fi or Personal Hotspot, confirm the iOS
+version (Settings > General > About), then re-detect the actual private address.
+Bind the production preview5195 and fixture server5196 only to that address;
+verify reachability with the user before file transfer. Firewall/VPN/router
+prompts/settings remain their decision. No LAN listener or phone transfer has run.
+The PC-only preflight used a temporary loopback preview, not the campus address.
 
 Task 7's planning-only deliverable is complete (D-023): the user has an
 **iPhone 12 Pro Max**, no Android phone access and no Apple Developer Program
@@ -44,8 +57,8 @@ reviewed-integration explanation. Do not reopen its checkpoint.
 Fresh whole-feature code review found no significant issues and independently
 passed 33 focused tests/package checks. Documentation audit found two stale
 current claims and a plan-index label; these are corrected. All five steps are
-complete: local merged-tree checks and master cloud run4 pass. Task 7's planning
-checkpoint is now approved; executing its proposed checks remains separate.
+complete: local merged-tree checks and master cloud run4 pass. Task 7 supplied
+the reviewed protocol; Task 8 now owns its approved Safari preparation.
 
 Read root AGENTS.md, the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md),
 [plan](superpowers/plans/2026-11-03-mobile-prototype.md), and scoped guidance
@@ -135,8 +148,9 @@ Master's Task 5 measurements are limited image-space estimates, not completion
 of milestone-one bench acceptance. Preserve both branches and PRODUCT_BRIEF.
 
 Use process-local Node 22.23.2 / npm 10.9.8; preserve global Node 20.
-Java 21 exists locally; Android SDK/emulator and Xcode do not. Own dev server
-5193 remains available, preview 5194 was stopped/port free; leave older 5176 alone.
+Java 21 exists locally; Android SDK/emulator and Xcode do not. At the Codex
+recheck, ports5176/5193 had no listener. No older server was stopped. Temporary
+preflight preview5194 is owned by this run and stopped after verification.
 Browser checks use an isolated profile and only empty/non-human screenshots.
 
 One writer. Before every commit run whole tests/lint/build and inspect staging.

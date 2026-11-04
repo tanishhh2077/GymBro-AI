@@ -79,9 +79,10 @@ Keep one writer in the shared checkout and reviewers read-only. Preserve modifie
 and untracked work, including tests written before implementation. A new clone or
 worktree based only on HEAD may not include the current prototype changes.
 
-The first response in a new session must preserve the teaching checkpoint:
-explain the next meaningful step and wait for understanding before coding, unless
-the handoff records explicit task-specific approval to proceed through that step.
+The first response in a new session explains the next meaningful step and
+continues within the approved scope under D-024. Do not restore routine
+"Is this clear?" stops. Coordinate actual user device/account actions and stop
+for the decisions, spending, publishing and settings changes listed in D-024.
 README files describe each directory; they are not substitutes for the approved
 brief/specification or shared agent rules.
 

@@ -5,8 +5,10 @@ completes Task 7's planning deliverable, authorized on 2026-11-04. Available dev
 iPhone12ProMax, no Android phone or paid Apple membership. It proposes free
 Safari checks first and keeps installed-native/bench gates separate. Its Step 1
 is in progress as Task 8 on `feat/task8-safari-phone-test`: baseline and verified
-fixture export are done; the phone transfer waits on the user. No phone cases
-have run.
+fixture export and seven desktop runtime preflight cases pass. The user deferred
+phone work until returning home; iOS/private-network setup still needs their
+coordination. No Safari/physical-phone cases have run. D-024 waives routine
+understanding stops, not actual device/settings actions.
 
 The latest completed plan is [2026-11-03-mobile-prototype.md](2026-11-03-mobile-prototype.md),
 authorized by D-022 for both platforms with iPhone first. All five steps are
