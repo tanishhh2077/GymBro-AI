@@ -357,6 +357,11 @@ function CoverageBadges({ clip }: { clip: Clip }) {
       <span className="chip bg-white/5 text-slate-300">
         {rate}% of sampled positions with a pose
       </span>
+      {clip.processingMs !== undefined && (
+        <span className="chip bg-white/5 text-slate-300">
+          Processing took {(clip.processingMs / 1000).toFixed(1)} seconds on this device
+        </span>
+      )}
     </div>
   );
 }

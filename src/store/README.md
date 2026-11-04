@@ -10,9 +10,16 @@
 - `removeClip`/`reset` abort the job; `processingState` stays `cancelling` until the
   job settles and every URL lease is released, then the URL is revoked once.
 - `retainClipMedia(id)` gives a visible player a lease with an idempotent release.
+- Task 10 (D-026): an injected monotonic clock (`deps.now`, default
+  `performance.now()`) is read at admission and when the result completes. The
+  difference is set as `processingMs` in the same update as a `ready`/`no-pose`
+  result; failed or removed jobs and invalid, backwards or throwing readings
+  leave it absent, never zero. It is one run's observation, not a benchmark.
 
-`useSessionStore.test.ts` (12 cases) drives the real engine with a mocked SDK,
-except one case that uses a fake engine to deliver callbacks after removal.
+`useSessionStore.test.ts` (21 cases) drives the real engine with a mocked SDK,
+except cases that use a fake engine to deliver callbacks after removal. Nine
+cases cover the timing rules with a fake clock; mutation checks confirmed each
+guard is tested.
 `removeClip` also clears `engineDelegate`.
 Design details: [ARCHITECTURE.md](../../docs/ARCHITECTURE.md#session-ownership).
 

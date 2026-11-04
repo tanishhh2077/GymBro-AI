@@ -45,6 +45,35 @@ details. Safari, installed-native and real-bench acceptance remain unverified.
   count as invalid, `toFixed(1)` rounding with "seconds" written in full, and a
   narrow-width browser check. The reviewer ran no tests/builds/browsers.
 
+### Task 10 Step 2 measurement and badge
+
+- Changed: `src/types/index.ts` (optional `Clip.processingMs`),
+  `src/store/useSessionStore.ts` (`SessionDeps.now`, default `performance.now()`;
+  one guarded `readClock`; start read before engine/URL creation and kept on the
+  job; `processingMs` set in the same patch as a `ready`/`no-pose` result when
+  both readings are valid and the difference is not negative),
+  `src/components/VideoStage.tsx` (one chip in `CoverageBadges`), their tests,
+  and the store/components READMEs, AGENTS/README counts and ARCHITECTURE rows.
+  No engine, limit, dependency, storage or native change.
+- RED: the first store test (ready 1000→5123.4 ms and no-pose 20→20 ms) failed
+  because the result had no `processingMs`; the other 12 store tests passed. The
+  minimal implementation was written together with its clock guards, so the
+  guard cases could not show a natural RED first. Instead, after the 9 store
+  timing cases passed, a scratch script applied five mutations one at a time and
+  restored the file (hash unchanged): no finite check, no throw guard, no
+  backwards check, time in a later patch, and start read after URL creation.
+  Each mutation failed at least one test (1, 2, 1, 1 and 1 failures). The three
+  badge-text cases failed against the old player (no badge text), then passed;
+  the absence case passed before and after, as expected for current behavior.
+- Merged test changes: 9 store cases (ready/no-pose times, same-update
+  subscription, failed job, late result after removal plus a later clip's own
+  50 ms interval, non-finite start/end, backwards and throwing end readings, a
+  throwing start reading that still admits, creates one URL and revokes it) and
+  4 player cases (4123.4/0/123456 ms → 4.1/0.0/123.5 seconds; no badge when absent).
+- Whole **379 tests / 15 files** pass, lint exit 0, `npm run mobile:sync` exit 0
+  (build and config type-check, 411 modules, iOS and Android 13 files each
+  verified). No tracked file changed by sync. Node 22.23.2 process-local.
+
 ### Task 9 record: observed elbow summary, completed on master
 
 Task9 PC development ran on `feat/task9-elbow-summary` from reviewed

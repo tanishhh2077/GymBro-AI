@@ -45,14 +45,16 @@ completion and stores the difference on the clip; the existing badge row shows i
 (`SessionDeps.now`), its tests, `src/components/VideoStage.tsx`, its tests, and
 the relevant source READMEs.
 
-- [ ] Write failing store tests (fake clock) for ready and no-pose times; observe
+- [x] Write failing store tests (fake clock) for ready and no-pose times; observe
   failure because no time is recorded.
-- [ ] Implement the minimal guarded clock reads and patch. Add RED→GREEN cases
-  for failure, late result after removal, a later clip's own interval,
-  non-finite/backwards/throwing readings, and the same-update subscription.
-- [ ] Write failing VideoStage tests for badge text/rounding (including 0 ms) and
+- [x] Implement the minimal guarded clock reads and patch. Add cases for
+  failure, late result after removal, a later clip's own interval,
+  non-finite/backwards/throwing readings, and the same-update subscription
+  (guards were written with the minimal change; mutation checks stand in for
+  their RED, see STATUS).
+- [x] Write failing VideoStage tests for badge text/rounding (including 0 ms) and
   absence; implement the badge in the existing style.
-- [ ] Run full tests/lint/build and `npm run mobile:sync`. Record actual RED/GREEN
+- [x] Run full tests/lint/build and `npm run mobile:sync`. Record actual RED/GREEN
   evidence. Update docs, inspect staging, commit/push.
 
 ## Step 3 — browser evidence, fresh review and integration

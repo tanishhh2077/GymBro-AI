@@ -14,7 +14,10 @@ result. It is a single-run observation, not a benchmark. Read the
 [plan](superpowers/plans/2026-11-04-processing-time.md). D-024 applies: explain
 and proceed; stop only for phone/account/settings/spending/publication actions.
 
-Progress: Step 1 (baseline and design) is in progress. Check the plan's
+Progress: Step 1 (design, fresh design review adopted) and Step 2 (store clock,
+`Clip.processingMs`, badge; **379 tests / 15 files**, lint, guarded sync pass)
+are done. Next: Step 3, real no-person browser check at wide and narrow widths,
+fresh whole-feature code review, then fast-forward master. Check the plan's
 checkboxes and Git for the latest step. One writer; reviewers read only.
 
 ## Task 8 phone test (separate branch, waiting for the user)

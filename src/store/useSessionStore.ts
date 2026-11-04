@@ -21,6 +21,8 @@ export interface SessionDeps {
   createVideo: () => HTMLVideoElement;
   createObjectURL: (media: Blob) => string;
   revokeObjectURL: (url: string) => void;
+  /** Monotonic milliseconds, so a system clock change cannot distort a duration. */
+  now: () => number;
 }
 
 interface SessionState {
@@ -54,6 +56,8 @@ interface Job {
   clipId: string;
   controller: AbortController;
   engine: SessionEngine;
+  /** Clock reading at admission, or null when it was invalid. */
+  startedAt: number | null;
 }
 
 const defaultDeps: SessionDeps = {
@@ -61,6 +65,7 @@ const defaultDeps: SessionDeps = {
   createVideo: () => document.createElement("video"),
   createObjectURL: (media) => URL.createObjectURL(media),
   revokeObjectURL: (url) => URL.revokeObjectURL(url),
+  now: () => performance.now(),
 };
 
 /**
@@ -78,6 +83,17 @@ export function createSessionStore(overrides: Partial<SessionDeps> = {}) {
   // Ownership bookkeeping is never rendered, so it stays outside reactive state.
   const media = new Map<string, MediaEntry>();
   let job: Job | null = null;
+
+  // A timing observation must never break processing, so a throwing or
+  // non-finite clock reading simply means "no reading".
+  const readClock = (): number | null => {
+    try {
+      const value = deps.now();
+      return Number.isFinite(value) ? value : null;
+    } catch {
+      return null;
+    }
+  };
 
   return create<SessionState>((set, get) => {
     const refreshState = () => {
@@ -110,7 +126,7 @@ export function createSessionStore(overrides: Partial<SessionDeps> = {}) {
     };
 
     const runJob = async (current: Job, url: string) => {
-      const { clipId, controller, engine } = current;
+      const { clipId, controller, engine, startedAt } = current;
       const owns = () => job === current && !controller.signal.aborted;
       const patch = (update: Partial<Clip>) => {
         if (!owns()) return;
@@ -133,11 +149,15 @@ export function createSessionStore(overrides: Partial<SessionDeps> = {}) {
           onProgress: (progress) => patch({ progress }),
         });
         if (!owns()) return;
+        const finishedAt = readClock();
+        const elapsed = startedAt !== null && finishedAt !== null ? finishedAt - startedAt : null;
         set({ engineDelegate: pose.delegate });
         patch({
           status: pose.coverage.framesWithPose === 0 ? "no-pose" : "ready",
           pose,
           progress: undefined,
+          // A backwards reading is not a duration; leave the value absent.
+          ...(elapsed !== null && elapsed >= 0 ? { processingMs: elapsed } : {}),
         });
       } catch (err) {
         patch({
@@ -179,12 +199,14 @@ export function createSessionStore(overrides: Partial<SessionDeps> = {}) {
         const issue = validateSelection([file]);
         if (issue) return issue;
 
+        // Read the clock before creating anything; the guard keeps it from throwing.
+        const startedAt = readClock();
         // Create the engine before the URL, so a failure here cannot strand a URL.
         const engine = deps.createEngine();
         const id = nextId("clip");
         const url = deps.createObjectURL(file);
         media.set(id, { url, leases: 1, retired: false });
-        const current: Job = { clipId: id, controller: new AbortController(), engine };
+        const current: Job = { clipId: id, controller: new AbortController(), engine, startedAt };
         job = current;
         set({
           clips: [{ id, name: file.name, source: "upload", angle: "side", url, status: "processing" }],
