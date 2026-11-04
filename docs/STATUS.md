@@ -10,15 +10,18 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 6 whole-feature review and integration is active on
-`feat/task6-mobile-app`, based on reviewed master `f0e9118`. D-022 authorizes
-both native prototypes, prioritizing iPhone, from Windows without a MacBook.
+Task 6's bounded mobile prototype is complete. The reviewed feature was integrated
+into local/remote `master` at `ed5f1b3`; later commits finalize documentation.
+`feat/task6-mobile-app` is retained. It was based on reviewed master `f0e9118`.
+D-022 authorizes both native prototypes, prioritizing iPhone, from Windows
+without a MacBook.
 The user confirmed the mobile packaging explanation, then replied "ok cool" to
 Step 2's dependency/native-generation understanding checkpoint. The user then
 answered "clear" directly to Step 3's background/layout/offline explanation.
 The user then answered "clear" to Step 4's cloud-build explanation, and on
 2026-11-04 answered "clear" to Step 5's whole-feature review/integration
-explanation. Step 5 is authorized and active; a new task retains its checkpoint.
+explanation. All five steps are complete; the next physical-device/video planning
+task retains its understanding checkpoint and is not approved yet.
 Read the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md)
 and [plan](superpowers/plans/2026-11-03-mobile-prototype.md). Capacitor 8.6.0,
 App plugin 8.1.2 and assets tool 4.0.0 are pinned. iOS/SPM and Android native
@@ -26,11 +29,14 @@ projects are generated with `com.gymbroai.app` / GymBro AI identity and version
 0.1.0. **Run3 passes both native builds and visible iOS startup**, after earlier
 blank/home-screen failures exposed insufficient launch verification. The final
 screenshot was downloaded/hash-verified and manually inspected. Step 4 is
-complete; Step 5's fresh review found no significant implementation issues and
-final integration/handoff are in progress.
+complete; Step 5's fresh review found no significant implementation issues.
+Merged-tree local checks and all three jobs in master run4 pass. Both run4
+downloads were hash-verified and matched against dist, and its actual-interface
+screenshot was manually inspected. This completes the prototype, not M1 bench
+acceptance or production readiness.
 No Apple signing credentials or physical-device tests have been used.
 
-Task 6 verification on 2026-11-03: process-local Node 22.23.2 / npm 10.9.8;
+Task 6 Step 1 verification on 2026-11-03: process-local Node 22.23.2 / npm 10.9.8;
 working-tree tests **287/287** in ten files, lint and production build exit **0**,
 403 modules. Existing stale Browserslist warning remains. Own Node-22 dev server
 5193 returns HTTP 200. Separate ignored clean install completed with 338 packages
@@ -285,7 +291,47 @@ validation follows from these checks.
   config check exit **0** (409 modules). Dev server5193 returned HTTP200. Existing
   Browserslist warning remains. Source behavior and native project inputs are
   unchanged by these documentation corrections; run3's native evidence remains
-  applicable. Review is resolved; integration verification is pending.
+  applicable. Review is resolved.
+- Review/documentation correction commit `ed5f1b3` passed whole tests/lint/build,
+  actionlint 1.7.12 and staged diff checks before commit/push. Follow-up audit
+  found no material issues and verified all 188 relative links/anchors.
+- Fast-forwarded local master `f0e9118..ed5f1b3`, then independently reran
+  **320 tests/13 files**, lint and guarded sync/build on that merged tree: all
+  exit **0**. Working tree stayed clean. Pushed master successfully and retained
+  the feature branch; all four local/remote pointers matched `ed5f1b3`.
+- Master [run4](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41794275180)
+  at `ed5f1b3` finalized **success** in all three jobs: shared `126454557698`,
+  Android `126454766976`, iOS `126454766779`. Android logs report successful
+  native compilation and all 13 compiled APK files matching dist. iOS logs show
+  Xcode26.6/17F113, iPhone17Pro/iOS26.4, all 13 simulator files matching, negative
+  splash rejection and foreground launch PID22487. Actual GymBro/bench text was
+  recognized at 07:55:12 UTC; native stdout reports WebView loaded. No matching
+  fresh App crash report was found; this is not a general stability result.
+- Root fetched the completed-success run result, downloaded both run4 artifacts
+  and verified outer SHA-256 against GitHub metadata:
+  Android `a9bda97c4567acb247e932db3b1419186d7f51326101e224020cf9a8a36355a1`,
+  iOS `251676d7f2368a25d8d55e5b76ad89984b61dd8d93fd417534274a81b82bfbc8`.
+  Root independently matched all 13 dist files in each downloaded package and
+  manually inspected the 1206x2622 screenshot: the real GymBro bench interface
+  is visible, with no human footage. Latest payloads are retained in ignored
+  `build/artifacts/run-4/`; old run3 evidence is retained separately.
+  APK: 24,697,416 bytes, SHA-256
+  `a8bdc00bd80188bbdeb8bd3a1b66ea108a8be6fec69d01b943abba38535a2918`.
+  iOS App.app ZIP: 19,894,745 bytes; screenshot: 1,094,538 bytes.
+  Artifact IDs Android `13305216402`, iOS `13305681152`; one-day retention,
+  expiring 2026-11-05 07:46/07:55 UTC respectively. No signed phone IPA or device
+  inference result is implied. No artifacts, logs or screenshots are committed.
+- Final documentation-only changes also pass **320 tests/13 files**, lint and
+  build/config type-check (409 modules). Global Node remains20.20.2; process-local
+  verification uses22.23.2. Own dev5193 still returnsHTTP200. All five prototype
+  steps are complete. Next: explain and obtain understanding for the physical-
+  device/video acceptance planning task; no paid/signing/store action is approved.
+- Implementation rulings retained from the plan's scratch ledger: use the
+  existing task-specific branch/shared checkout with one writer, matching the
+  established workflow (if separate isolation becomes necessary, native changes
+  must be transferred); permit only Capacitor's two exact zero-byte compatibility
+  stubs, which the pinned CLI writes even without Cordova plugins (adding real
+  plugins requires an explicit verifier change). No deferred review findings.
 
 ### Earlier milestone context
 

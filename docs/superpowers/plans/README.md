@@ -1,9 +1,10 @@
 # Implementation plans
 
-The active plan is [2026-11-03-mobile-prototype.md](2026-11-03-mobile-prototype.md),
-authorized by D-022 for both platforms with iPhone first. Steps1–4 are implemented:
-320 tests, native cloud builds and visible iPhone-simulator startup pass. Step5's
-whole-feature review/handoff/integration was approved on 2026-11-04 and is active.
+The latest completed plan is [2026-11-03-mobile-prototype.md](2026-11-03-mobile-prototype.md),
+authorized by D-022 for both platforms with iPhone first. All five steps are
+complete: 320 tests, native cloud builds, visible iPhone-simulator startup and
+fresh whole-feature review pass. Reviewed code is merged/pushed to master, whose
+run4 also passes. Physical-device/video planning needs its next user checkpoint.
 
 The preceding plan is [2026-11-03-elbow-timeline.md](2026-11-03-elbow-timeline.md),
 authorized as bounded follow-on work by D-021 despite missing bench footage.
