@@ -10,15 +10,28 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 11 (D-027, build configuration type-check) is **complete**: built on
-`feat/task11-config-typecheck` from reviewed master `aec3cb2`, freshly reviewed
-and fast-forwarded to master; chosen by the
-builder after the user, still away, asked for continued work without frequent
-questions. Task 10 (D-026, observed processing time) is complete on master and
-verified by native run6. Task 8's phone test waits for the user on its own branch
-(`9c06492`: master `aec3cb2` merged, iOS 26.5.2 reported, S07/S08 inputs
-generated and reviewed); its branch records hold the details. Safari,
-installed-native and real-bench acceptance remain unverified.
+Task 12 (D-028, legacy code and template asset cleanup) is **in progress** on
+`feat/task12-legacy-cleanup` from reviewed master `eaf87e1`, chosen by the builder
+under the user's request for continued work toward completion. Task 11 (D-027,
+build configuration type-check) is complete on master. Task 8's phone test waits
+for the user on its own branch (`398b5c0`: master `eaf87e1` merged, iOS 26.5.2
+reported, S07/S08 inputs generated and reviewed); its branch records hold the
+details. Safari, installed-native and real-bench acceptance remain unverified.
+
+### Task 12 Step 1 decision and plan
+
+- Claude Code (Opus 5.5), 2026-11-04. Branch created from `master` at `eaf87e1`,
+  matching `origin/master`. Package files unchanged; no reinstall.
+- Measured with `git grep` before any change: no importer of
+  `ExercisePicker.tsx`; `EXERCISE_LIST`/`ANGLE_LIST` used only by it; no reference
+  to `App.css`, `src/assets/{hero.png,react.svg,vite.svg}`, `public/favicon.svg`
+  (a Vite logo) or `public/icons.svg` (social-media icons) from source, HTML, CSS
+  or scripts; the analysis types after `ClipStatus` have no user outside
+  `src/types/index.ts`. The store fixes bench/side/upload.
+- Recorded D-028 and the [plan](superpowers/plans/2026-11-04-legacy-cleanup.md)
+  (design section inside); updated HANDOFF and the docs/plans indexes.
+
+### Task 11 record: build configuration type-check, completed on master
 
 ### Task 11 Step 1 decision and plan
 

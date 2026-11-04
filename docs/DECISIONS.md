@@ -361,6 +361,31 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   assets, `src/core/` subfolders) stay deferred.
 - See the [plan](superpowers/plans/2026-11-04-config-typecheck.md).
 
+### D-028: Remove unrendered legacy code and template assets
+
+- On 2026-11-04, under the same request as D-027 ("just do the stuff that you
+  can to achieve completion of the project"), the builder selected Task 12: the
+  scope cleanup D-001, D-002 and D-017 left for an approved task.
+- Delete files nothing imports or links: `src/components/ExercisePicker.tsx`,
+  `src/App.css`, the Vite template images in `src/assets/` (`hero.png`,
+  `react.svg`, `vite.svg`) and the template SVGs in `public/` (`favicon.svg`, a
+  Vite logo, and `icons.svg`, social-media icons). Vite copied the two public
+  SVGs into every build and both native copies although no page used them.
+- Remove the unused analysis types (`Rep`, `FormFlag`, `ClipAnalysis`,
+  `SessionReport`, `ExerciseAnalyzer` and their helpers), which carry the
+  arbitrary `score`/`overallScore` fields and view-invariant comments D-002
+  supersedes. Narrow `Exercise` to `"bench"`, `CameraAngle` to `"side"` and
+  `ClipSource` to `"upload"`, the only values the app produces, and keep only the
+  bench/side names and accent in `src/core/exercises.ts`; the squat/deadlift and
+  front/45° entries and every tagline/focus/description claim measurements the
+  app does not make. Future analysis contracts get their own design.
+- The rendered interface, store behavior, model/runtime, dependencies and native
+  configuration do not change; existing tests that render the names and accent
+  must keep passing. Git history keeps every deleted file. The app still has no
+  favicon (the browser's `favicon.ico` request returns 404); adding a GymBro icon
+  is a separate visible change.
+- See the [plan](superpowers/plans/2026-11-04-legacy-cleanup.md).
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

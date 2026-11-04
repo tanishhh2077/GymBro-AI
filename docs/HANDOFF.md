@@ -4,34 +4,31 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 
 ## Current task and next action
 
-**Task 11 (complete): type-check the build configuration files**
-([D-027](DECISIONS.md#d-027-type-check-the-build-configuration-files)), on
-`feat/task11-config-typecheck` from reviewed master `aec3cb2`. The user, still
-away, asked the builder to keep working without frequent questions; D-027 records
-this builder choice of the configuration task D-017 deferred. `npm run build`
-did not check `vite.config.ts`/`vitest.config.ts` before Task 11 (both passed by hand); Task 11
-points `tsconfig.node.json` at both, runs it in the build, and deletes the
-unreferenced template `tsconfig.app.json`, whose settings fail on the real source.
-No application source or dependency changes. Step 1 (D-027, plan) and Step 2
-(wiring, `scripts/build-config.test.mjs`, **383 tests / 16 files**, lint,
-guarded sync, three build mutations) and the fresh review (four Low documentation
-findings, fixed) are done, and master is fast-forwarded to the reviewed result.
-**Task 11 is complete.** Next: merge master into Task 8 (merge commit), then a
-builder-selected PC task while the phone session waits. Follow-up recorded in
-STATUS: `capacitor.config.ts` is still checked with the root DOM settings.
-Read the
-[plan](superpowers/plans/2026-11-04-config-typecheck.md); its checkboxes and Git
-show the latest step. D-024 applies. One writer; reviewers read only.
+**Task 12 (in progress): remove unrendered legacy code and template assets**
+([D-028](DECISIONS.md#d-028-remove-unrendered-legacy-code-and-template-assets)), on
+`feat/task12-legacy-cleanup` from reviewed master `eaf87e1`. The user, still away,
+asked the builder to keep working toward completion without frequent questions;
+D-028 records this builder choice. It deletes `ExercisePicker.tsx`, `App.css`,
+Vite template images/SVGs and the unused score-bearing analysis types, and
+narrows the lift/view/source types and metadata to bench/side/upload. Nothing
+visible changes. Read the [plan](superpowers/plans/2026-11-04-legacy-cleanup.md);
+its checkboxes and Git show the latest step. D-024 applies. One writer;
+reviewers read only.
+
+Task 11 (D-027, the build's Vite/Vitest config type-check) is complete on master
+`eaf87e1`; native run7 (41936252985) for that commit was in progress when Task 12
+began. Follow-up: `capacitor.config.ts` is still checked with the root DOM settings.
 
 ## Task 8 phone test (separate branch, waiting for the user)
 
-`feat/task8-safari-phone-test` at `9c06492` has merged reviewed master twice
-(`3209025`, then `aec3cb2` with Task 10's badge), each with a merge commit keeping
-both histories, and repeated 381 tests/lint/guarded sync. The user reported
-**iOS 26.5.2**. Ignored `build/fixtures/` holds the five exported non-human
-fixtures, their README and three generated S07/S08 inputs (`zero-byte.mp4`,
-`corrupt.mp4`, `over-size.mp4`), all hash-checked against the phone plan. Task 8's
-own HANDOFF/STATUS hold the details. Task 11 must never delay the phone session.
+`feat/task8-safari-phone-test` at `398b5c0` has merged reviewed master three times
+(Task 9, Task 10's badge, Task 11's config check), each with a merge commit
+keeping both histories, and repeated 383 tests/lint/guarded sync. The user
+reported **iOS 26.5.2**. Ignored `build/fixtures/` holds the five exported
+non-human fixtures, their README and three generated S07/S08 inputs
+(`zero-byte.mp4`, `corrupt.mp4`, `over-size.mp4`), all hash-checked against the
+phone plan. Task 8's own HANDOFF/STATUS hold the details. Task 12 must never delay
+the phone session.
 
 With the user present: agree a trusted private network (home Wi-Fi or Personal
 Hotspot; the PC is on Public campus Ethernet UWNet), bind preview 5195 and fixture
