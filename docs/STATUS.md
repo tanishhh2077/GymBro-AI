@@ -1,6 +1,6 @@
 # Current project status
 
-Updated: 2026-11-03 (America/Chicago).
+Updated: 2026-11-04 (America/Chicago).
 
 For a new session in either Claude Code or Codex, start with [HANDOFF.md](HANDOFF.md).
 This file retains detailed evidence/history; the compact handoff avoids loading
@@ -10,14 +10,15 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 6 native cloud-build setup is active on
+Task 6 whole-feature review and integration is active on
 `feat/task6-mobile-app`, based on reviewed master `f0e9118`. D-022 authorizes
 both native prototypes, prioritizing iPhone, from Windows without a MacBook.
 The user confirmed the mobile packaging explanation, then replied "ok cool" to
 Step 2's dependency/native-generation understanding checkpoint. The user then
 answered "clear" directly to Step 3's background/layout/offline explanation.
-The user then answered "clear" to Step 4's cloud-build explanation; Step 4 is
-active. Step 5 retains its next understanding checkpoint.
+The user then answered "clear" to Step 4's cloud-build explanation, and on
+2026-11-04 answered "clear" to Step 5's whole-feature review/integration
+explanation. Step 5 is authorized and active; a new task retains its checkpoint.
 Read the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md)
 and [plan](superpowers/plans/2026-11-03-mobile-prototype.md). Capacitor 8.6.0,
 App plugin 8.1.2 and assets tool 4.0.0 are pinned. iOS/SPM and Android native
@@ -25,7 +26,8 @@ projects are generated with `com.gymbroai.app` / GymBro AI identity and version
 0.1.0. **Run3 passes both native builds and visible iOS startup**, after earlier
 blank/home-screen failures exposed insufficient launch verification. The final
 screenshot was downloaded/hash-verified and manually inspected. Step 4 is
-complete; Step 5's whole-feature review/integration awaits its teaching checkpoint.
+complete; Step 5's fresh review found no significant implementation issues and
+final integration/handoff are in progress.
 No Apple signing credentials or physical-device tests have been used.
 
 Task 6 verification on 2026-11-03: process-local Node 22.23.2 / npm 10.9.8;
@@ -254,6 +256,36 @@ validation follows from these checks.
   inference, video processing or bench calibration occurred. Android compilation
   does not establish Android UI/device performance; iOS startup proves no pose
   accuracy. M1/Task4 footage acceptance remains incomplete. No store release.
+
+### Task 6 Step 5 whole-feature review and integration
+
+- Authorized on 2026-11-04 by the user's "clear" response to the complete review
+  and reviewed merge explanation. Started on clean `feat/task6-mobile-app` at
+  `eabf55e`; fetch confirmed local/remote master both `f0e9118`, the branch's
+  merge base. D-019 already authorizes fast-forward integration and branch retention.
+- Fresh read-only Codex code review (`mobile_whole_feature_review`, no inherited
+  builder conversation, model not exposed) examined `f0e9118..eabf55e` against
+  D-022/design/plan and scoped rules. **No significant implementation findings.**
+  It checked native listener/store ownership, safe-area/vendor behavior, local
+  resources/identities, package guard and failure cases, CI final-package and
+  visible-startup checks. Independently passed **33 focused cases** in three
+  files under Node22.23.2, matched all 13 dist files against each retained native
+  package, verified packaged configs/no server overrides and the APK hash, and
+  inspected the retained visible iOS screenshot. No native build/device/inference
+  test was performed by this reviewer; no files changed.
+- Independent read-only Codex documentation audit (`mobile_handoff_audit`, fresh
+  context, model not exposed) verified 72 tracked Markdown files, 187 relative
+  links/anchors, all 19 CLAUDE imports and authored-directory guidance coverage.
+  It found two stale current claims: README privacy still mentioned external
+  fonts, and architecture still treated native compilation as future work.
+  Both were independently confirmed and corrected. A low-priority index label
+  now distinguishes the original M1 plan from the mobile plan. No readiness
+  overclaim or unresolved link issue was found. No files changed by the auditor.
+- Fresh whole local suite: **320 tests/13 files**, lint and guarded sync/build/
+  config check exit **0** (409 modules). Dev server5193 returned HTTP200. Existing
+  Browserslist warning remains. Source behavior and native project inputs are
+  unchanged by these documentation corrections; run3's native evidence remains
+  applicable. Review is resolved; integration verification is pending.
 
 ### Earlier milestone context
 

@@ -65,7 +65,9 @@ Both outer artifact hashes match GitHub metadata; current downloads are retained
 in ignored `build/artifacts/run-3/`. Xcode26.6's ARM64 linker emits an ad-hoc
 signature despite disabled Xcode signing, with no Apple team/identity. This is
 not physical-iPhone delivery. No device/video inference or store release checked.
-Step 5 awaits its teaching checkpoint; no whole-feature merge/review yet.
+Step 5's checkpoint was approved with "clear" on 2026-11-04. Fresh read-only
+whole-feature review found no significant implementation findings; integration
+and final handoff are being finalized.
 
 `capacitor.config.ts`, `.nvmrc`, package/lock and mobile TS configuration;
 generated/configured `ios/`, `android/`, `resources/` with scoped guidance;

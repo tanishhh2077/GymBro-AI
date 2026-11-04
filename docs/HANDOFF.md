@@ -1,6 +1,6 @@
 # GymBro AI: current handoff
 
-Updated 2026-11-03 (America/Chicago). Start here in Claude Code or Codex.
+Updated 2026-11-04 (America/Chicago). Start here in Claude Code or Codex.
 
 ## Current task and next checkpoint
 
@@ -9,11 +9,12 @@ MacBook (D-022). Steps 1–4 are complete. Branch: `feat/task6-mobile-app`;
 implementation head `76dd71c`, based on reviewed master `f0e9118`. Check Git
 for the final documentation commit. Task 6 has not been merged to master.
 
-The user approved each understanding checkpoint, most recently answering
-"clear" to Step 4's cloud-build explanation. **Step 5 is not approved yet.**
-Explain the whole-feature critical review, supported fixes, final handoff and
-reviewed integration; explain why individual step checks can miss interactions;
-ask **"Is this clear?"** and wait before starting that step.
+On 2026-11-04 the user answered "clear" to Step 5's whole-feature review and
+reviewed-integration explanation. Step 5 is active; do not reopen its checkpoint.
+Fresh whole-feature code review found no significant issues and independently
+passed 33 focused tests/package checks. Documentation audit found two stale
+current claims and a plan-index label; these are corrected. Integration and final
+handoff are being finalized. A new product task still needs its teaching checkpoint.
 
 Read root AGENTS.md, the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md),
 [plan](superpowers/plans/2026-11-03-mobile-prototype.md), and scoped guidance
@@ -71,15 +72,27 @@ Both outer ZIP digests matched GitHub metadata. APK SHA-256:
 GitHub artifact IDs: Android `13297429135`, iOS `13298088997`; retention one day.
 Never commit the downloads, screenshots, signing files or copied web assets.
 
-Fresh read-only Codex reviews covered design, native setup, Step 3 and CI;
-models were not exposed. Step 3 review independently passed 100 focused cases.
-The whole-feature fresh review remains Step 5.
+Fresh read-only Codex whole-feature review of `f0e9118..eabf55e` found no
+significant implementation findings. It independently passed 33 focused cases,
+verified both packages' 13 files/configs and APK checksum, and inspected the
+visible iOS image. A separate docs audit verified links/imports/guidance; two
+stale font/compilation claims and a plan-index label are corrected. Models were
+not exposed. No native execution or inference was performed by these reviewers.
+Review is resolved; integration verification is pending. See STATUS for limits.
 
 ## Limits and continuity
 
 Physical iPhone/Android installation, native file selection/background behavior,
 native offline inference, bench accuracy and phone performance remain unverified.
 No paid service, Apple enrollment/credentials or store release is authorized.
+
+The next product task is to design the physical-device/video acceptance plan,
+iPhone first: establish available phone/OS and Apple signing/build prerequisites,
+use the Android test APK where a device is available, and define native MP4
+import/inference/cancellation checks with permitted fixtures. This planning task
+is not approved yet. Explain why startup alone cannot verify processing, ask
+"Is this clear?", and wait before starting it. Keep paid enrollment, signing
+credentials and release actions outside that checkpoint's scope.
 
 Task 4 remains unmerged on `feat/task4-browser-acceptance` at `34538e4`.
 Its permitted bench fixture is still missing; the user cannot record one, so do

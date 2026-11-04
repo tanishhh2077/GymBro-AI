@@ -3,7 +3,7 @@
 The active plan is [2026-11-03-mobile-prototype.md](2026-11-03-mobile-prototype.md),
 authorized by D-022 for both platforms with iPhone first. Steps1–4 are implemented:
 320 tests, native cloud builds and visible iPhone-simulator startup pass. Step5's
-whole-feature review/handoff/integration awaits its understanding checkpoint.
+whole-feature review/handoff/integration was approved on 2026-11-04 and is active.
 
 The preceding plan is [2026-11-03-elbow-timeline.md](2026-11-03-elbow-timeline.md),
 authorized as bounded follow-on work by D-021 despite missing bench footage.

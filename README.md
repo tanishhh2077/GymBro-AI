@@ -190,8 +190,9 @@ Markdown; its rules are in [AGENTS.md](AGENTS.md#static-files-in-public).
 ## Privacy
 
 The inspected processing path keeps selected videos on the device. There is no
-backend, analytics service, or account system. The page loads external fonts;
-local inference does not imply that the page makes no network requests. Any
+backend, analytics service, or account system. Fonts use local system fallbacks;
+browser startup checks observed no external requests. This is not a general
+runtime network audit or proof of native offline inference. Any
 future upload/storage behavior needs an explicit privacy decision.
 
 ## Build status

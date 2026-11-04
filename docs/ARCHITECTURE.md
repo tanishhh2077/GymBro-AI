@@ -172,10 +172,11 @@ Keep analysis logic independent of React. Reuse existing working boundaries inst
 ## Mobile direction and deferred services
 
 The intended release is an installed mobile app. D-022 authorizes the iOS/Android
-Capacitor prototype before full bench acceptance, prioritizing iPhone. Generated
-project sources now exist; native compilation and phone workflow checks remain
-future gates. Packaging does not convert browser inference into a native
-MediaPipe implementation or establish acceptable performance.
+Capacitor prototype before full bench acceptance, prioritizing iPhone. Native
+compilation and visible iPhone-simulator startup passed in run3; physical-phone
+workflow and native video-inference checks remain future gates. Packaging does
+not convert browser inference into a native MediaPipe implementation or establish
+acceptable performance.
 
 Record the tested device, OS, runtime, model, delegate, clip characteristics, processing time, failure/cancellation behavior, and available resource measurements. Do not choose the processing architecture from an App Store target alone. Prototype evidence determines whether local processing remains suitable or another implementation/service is justified.
 
