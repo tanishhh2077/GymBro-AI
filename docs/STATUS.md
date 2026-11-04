@@ -90,6 +90,30 @@ details. Safari, installed-native and real-bench acceptance remain unverified.
 - The server was stopped and port 5194 confirmed free; `[::1]:5173` and
   `127.0.0.1:5193` were left running.
 
+### Task 12 Step 4 fresh review
+
+- Fresh read-only review (Claude Code subagent, Opus 5.5, no builder
+  conversation) of D-028, the plan and `eaf87e1..86a71b0`, under Node 22.23.2:
+  385 tests / 17 files, lint and build (411 modules) exit 0. Whole-repository
+  `git grep` for every deleted path/export/type found only records of the
+  removal; Tailwind scans only `index.html` and `src/**/*.{ts,tsx}`; no tracked
+  native file, CI step, verifier or `resources/logo.svg` input refers to a
+  deleted file. It rebuilt master from `git archive` and compared CSS: only 15
+  picker-only utility rules disappeared, and no remaining class name is built
+  from fragments. No persisted data can carry other lift/view/source values. The
+  new test fails on the old metadata; the `WorldLandmark` comment is accurate.
+- No Blocker/High/Medium. Six Low documentation findings, all fixed: README and
+  ARCHITECTURE's types row no longer describe deleted analysis types;
+  ARCHITECTURE's layout no longer lists SVGs in `public/`; `src/AGENTS.md` and
+  `src/components/AGENTS.md` no longer describe removed declarations/choices;
+  HANDOFF is current; and the `src/core/math.ts` header (outside D-028's literal
+  scope, comment-only) no longer claims analyzer use or view invariance.
+- One review statement was wrong and was caught before commit: it said nothing
+  imports `math.ts`, but `elbowAngles.ts` imports `angleAt` (applied to 2D
+  image-pixel points). The new header says so; only the other helpers lack a
+  consumer. Rechecked under Node 22.23.2: 385 tests / 17 files, lint and
+  `npm run mobile:sync` (411 modules, 11 verified files per platform) pass.
+
 ### Task 11 record: build configuration type-check, completed on master
 
 ### Task 11 Step 1 decision and plan

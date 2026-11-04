@@ -92,6 +92,6 @@ Changes:
 
 - [x] Desktop browser: empty and no-person-loaded screens look the same as
   master's (names, view label, accent, badges); no new console errors.
-- [ ] Fresh read-only review of D-028, this plan and the diff; fix supported
+- [x] Fresh read-only review of D-028, this plan and the diff; fix supported
   findings in their own commit.
 - [ ] Record the review, fast-forward master, push, and merge master into Task 8.

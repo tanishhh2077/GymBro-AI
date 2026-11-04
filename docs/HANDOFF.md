@@ -16,7 +16,8 @@ its checkboxes and Git show the latest step. Step 1 (D-028, plan) and Step 2
 (unreferenced files deleted, plus the picker-only lift icons; 383 tests, lint,
 guarded sync with 11 verified files per platform) and Step 3 (types/metadata
 narrowed, unused analysis types deleted, **385 tests / 17 files**) are done; next
-is Step 4's browser check and fresh review. D-024 applies. One writer;
+is Step 4: the browser check (screens match Task 10's) and fresh review (six Low
+documentation findings, fixed) are done; next is fast-forwarding master. D-024 applies. One writer;
 reviewers read only.
 
 Task 11 (D-027, the build's Vite/Vitest config type-check) is complete on master

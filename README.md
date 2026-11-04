@@ -79,10 +79,10 @@ and time contracts are maintained in one place:
 holds media and pose processing, `src/components/` the React interface,
 `src/store/` session state, and `src/types/` shared data contracts.
 
-The pose engine and geometry helpers are separate from React. Types for future
-analyzers and multi-angle reports exist in `src/types/index.ts`, but the analyzers
-and fusion are not implemented. These provisional types include legacy score
-fields and will need revision before evidence-backed findings are built.
+The pose engine and geometry helpers are separate from React. `src/types/index.ts`
+holds only the contracts the app uses; the legacy analyzer, multi-angle report
+and score types were removed (D-028). Evidence-backed findings will need their
+own designed contract.
 
 ## Getting started
 

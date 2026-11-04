@@ -41,7 +41,7 @@ spec.md                Current milestone contract and acceptance criteria
 docs/                  Brief, decisions, handoff, status, architecture, workflow, reviews
 docs/superpowers/plans/  Active implementation plan and its progress checkboxes
 src/                   Application source (ownership table below)
-public/                Files served unchanged: pose model, MediaPipe runtime, SVGs; no Markdown
+public/                Files served unchanged: pose model and MediaPipe runtime; no Markdown
 ios/, android/         Native Capacitor wrappers; scoped root guidance covers generated subdirectories
 resources/             First-party vector branding source for native icons/splash screens
 capacitor.config.ts    Native identity, local dist webDir and system-bar configuration
@@ -98,9 +98,9 @@ environment values; MainActivity enables edge-to-edge rendering.
 | `src/components/SkeletonOverlay.tsx` | Uses `poseDisplay` at video time; follows the actual video box, projects into contain content, applies DPR once, clears unavailable data, redraws on paused media/layout events, and owns RAF only during playback |
 | `src/components/poseDisplay.ts` | Pure display calculations: exact observations, bounded interpolation/endpoint holds, drawing eligibility, and centered CSS-pixel video content; used by the overlay without modifying raw observations |
 | `src/core/landmarks.ts` | Landmark indices, the 33-landmark count, and skeleton topology |
-| `src/core/math.ts` | Geometry/signal helpers; no implemented exercise analyzer consumes them yet |
+| `src/core/math.ts` | Geometry/signal helpers; `elbowAngles.ts` uses `angleAt` on 2D image-pixel points, and the other helpers have no consumer yet |
 | `src/core/exercises.ts` | Display names and accent for the one supported lift and view (Bench Press, Side); no taglines or measurement claims (D-028) |
-| `src/types/index.ts` | Shared data shapes, failure kinds/stages; includes provisional future-analysis types |
+| `src/types/index.ts` | Shared data shapes, failure kinds/stages; bench/side/upload only, no analysis or score types (D-028) |
 | `public/models/`, `public/wasm/` | Bundled pose model and the MediaPipe runtime, byte-identical to the pinned `@mediapipe/tasks-vision` 0.10.35 package |
 
 ## Pose engine lifecycle
