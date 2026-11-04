@@ -73,5 +73,5 @@ new `scripts/build-config.test.mjs`; **delete** `tsconfig.app.json`.
 
 - [x] Fresh read-only review of D-027, this plan and the diff; fix supported findings
   in their own commit.
-- [ ] Record the review, fast-forward master, push, and merge master into Task 8
+- [x] Record the review, fast-forward master, push, and merge master into Task 8
   with a merge commit so the phone branch keeps current configuration.

@@ -10,8 +10,9 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 11 (D-027, build configuration type-check) is **in progress** on
-`feat/task11-config-typecheck` from reviewed master `aec3cb2`, chosen by the
+Task 11 (D-027, build configuration type-check) is **complete**: built on
+`feat/task11-config-typecheck` from reviewed master `aec3cb2`, freshly reviewed
+and fast-forwarded to master; chosen by the
 builder after the user, still away, asked for continued work without frequent
 questions. Task 10 (D-026, observed processing time) is complete on master and
 verified by native run6. Task 8's phone test waits for the user on its own branch

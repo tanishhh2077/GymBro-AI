@@ -4,7 +4,7 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 
 ## Current task and next action
 
-**Task 11 (in progress): type-check the build configuration files**
+**Task 11 (complete): type-check the build configuration files**
 ([D-027](DECISIONS.md#d-027-type-check-the-build-configuration-files)), on
 `feat/task11-config-typecheck` from reviewed master `aec3cb2`. The user, still
 away, asked the builder to keep working without frequent questions; D-027 records
@@ -15,7 +15,10 @@ unreferenced template `tsconfig.app.json`, whose settings fail on the real sourc
 No application source or dependency changes. Step 1 (D-027, plan) and Step 2
 (wiring, `scripts/build-config.test.mjs`, **383 tests / 16 files**, lint,
 guarded sync, three build mutations) and the fresh review (four Low documentation
-findings, fixed) are done; next is fast-forwarding master and merging it into Task 8.
+findings, fixed) are done, and master is fast-forwarded to the reviewed result.
+**Task 11 is complete.** Next: merge master into Task 8 (merge commit), then a
+builder-selected PC task while the phone session waits. Follow-up recorded in
+STATUS: `capacitor.config.ts` is still checked with the root DOM settings.
 Read the
 [plan](superpowers/plans/2026-11-04-config-typecheck.md); its checkboxes and Git
 show the latest step. D-024 applies. One writer; reviewers read only.
