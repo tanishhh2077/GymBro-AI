@@ -90,7 +90,7 @@ Changes:
 
 ## Step 4 — browser check, fresh review and integration
 
-- [ ] Desktop browser: empty and no-person-loaded screens look the same as
+- [x] Desktop browser: empty and no-person-loaded screens look the same as
   master's (names, view label, accent, badges); no new console errors.
 - [ ] Fresh read-only review of D-028, this plan and the diff; fix supported
   findings in their own commit.

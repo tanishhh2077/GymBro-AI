@@ -73,6 +73,23 @@ details. Safari, installed-native and real-bench acceptance remain unverified.
   contains "Bench Press" and `#f472b6`. Type/core/architecture guides, AGENTS and
   README counts updated; D-002 notes the removal.
 
+### Task 12 Step 4 browser check
+
+- Production preview bound to `127.0.0.1:5194` only (Playwright Chromium; the
+  ignored `build/fixtures/no-person.mp4` copied into ignored `.playwright-mcp/`).
+  Chips read exactly "On-device processing", "Bench Press", "Side view",
+  "Bench Press · Side view", "GPU", "Sampling target: 30 samples/s", "0% of
+  sampled positions with a pose", "Processing took 2.9 seconds on this device".
+  The 1280-px screenshot matches Task 10's `build/task10-wide.png`; no horizontal
+  overflow at 1280 or 390 px (`build/task12-wide.png`, `build/task12-narrow.png`,
+  ignored).
+- Requests: only the page, its JS/CSS, the clip's object URL and the local
+  runtime/model. Console: the pre-existing `favicon.ico` 404 and MediaPipe start-up
+  logs only. The CSS file hash changed because Tailwind no longer generates the
+  deleted picker's classes; the rendered screens are unchanged.
+- The server was stopped and port 5194 confirmed free; `[::1]:5173` and
+  `127.0.0.1:5193` were left running.
+
 ### Task 11 record: build configuration type-check, completed on master
 
 ### Task 11 Step 1 decision and plan
