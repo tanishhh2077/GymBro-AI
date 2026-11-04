@@ -59,10 +59,10 @@ the relevant source READMEs.
 
 ## Step 3 — browser evidence, fresh review and integration
 
-- [ ] Real no-person inference in an isolated loopback PC browser shows the badge
+- [x] Real no-person inference in an isolated loopback PC browser shows the badge
   after the no-pose result at wide and narrow widths, and removal clears it.
-- [ ] Fresh read-only whole-feature review against the spec; fix supported issues
-  with failing tests first.
+- [x] Fresh read-only whole-feature review against the spec; fix supported issues
+  with failing tests first (three Low; new tests verified by mutation, see STATUS).
 - [ ] Full checks and current docs; commit/push. Fast-forward/push master under
   D-019 once the review resolves; inspect native CI triggered by the source change.
 - [ ] If ready before the phone session, merge reviewed master into Task 8 again,

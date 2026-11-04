@@ -7,17 +7,19 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 **Task 10: observed processing time** ([D-026](DECISIONS.md#d-026-show-the-observed-processing-time-for-a-completed-clip)),
 on `feat/task10-processing-time` from reviewed master `3209025`. While the user is
 away, they asked the builder to find PC-side work; D-026 records this builder
-choice. When a clip finishes, the player shows one badge, "Processing took N s on
-this device", measured with a monotonic clock from admission to the completed
+choice. When a clip finishes, the player shows one badge, "Processing took N
+seconds on this device", measured with a monotonic clock from admission to the completed
 result. It is a single-run observation, not a benchmark. Read the
 [design](superpowers/specs/2026-11-04-processing-time-design.md) and
 [plan](superpowers/plans/2026-11-04-processing-time.md). D-024 applies: explain
 and proceed; stop only for phone/account/settings/spending/publication actions.
 
-Progress: Step 1 (design, fresh design review adopted) and Step 2 (store clock,
-`Clip.processingMs`, badge; **379 tests / 15 files**, lint, guarded sync pass)
-are done. Next: Step 3, real no-person browser check at wide and narrow widths,
-fresh whole-feature code review, then fast-forward master. Check the plan's
+Progress: Step 1 (design, fresh design review adopted), Step 2 (store clock,
+`Clip.processingMs`, badge) and Step 3's browser check (real no-person run showed
+"Processing took 3.2 seconds on this device" at wide and narrow widths) and
+fresh code review (three Low findings, fixed) are done: **381 tests / 15 files**,
+lint, guarded sync pass. Next: fast-forward/push master, check the native CI it
+triggers, then merge master into Task 8 again. Check the plan's
 checkboxes and Git for the latest step. One writer; reviewers read only.
 
 ## Task 8 phone test (separate branch, waiting for the user)

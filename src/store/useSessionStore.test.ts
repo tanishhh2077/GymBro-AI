@@ -424,6 +424,31 @@ describe("session store: one clip, owned job, leased media", () => {
     expect(clip).not.toHaveProperty("processingMs");
   });
 
+  it("reads the start time before creating the engine or the URL", async () => {
+    const now = clock(1, 2);
+    const createEngine = vi.fn(() => new PoseEngine());
+    const { store, createObjectURL } = setup({ now, engine: createEngine });
+    store.getState().startClip(mp4());
+    await settle();
+
+    const startOrder = now.mock.invocationCallOrder[0];
+    expect(startOrder).toBeLessThan(createEngine.mock.invocationCallOrder[0]);
+    expect(startOrder).toBeLessThan(createObjectURL.mock.invocationCallOrder[0]);
+  });
+
+  it("uses the monotonic performance clock by default", async () => {
+    const readings = [100, 350];
+    const spy = vi.spyOn(performance, "now").mockImplementation(() => readings.shift() ?? 350);
+    try {
+      const { store } = setup();
+      store.getState().startClip(mp4());
+      await settle();
+      expect(store.getState().clips[0].processingMs).toBe(250);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
   it("admits and releases normally when the start reading throws", async () => {
     const { store, createObjectURL, revokeObjectURL } = setup({ now: clock(new Error("clock unavailable"), 5) });
     expect(store.getState().startClip(mp4())).toBeNull();

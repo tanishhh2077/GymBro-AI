@@ -74,6 +74,39 @@ details. Safari, installed-native and real-bench acceptance remain unverified.
   (build and config type-check, 411 modules, iOS and Android 13 files each
   verified). No tracked file changed by sync. Node 22.23.2 process-local.
 
+### Task 10 Step 3 browser evidence, review and fix
+
+- Browser check: a temporary production preview of the `e1a0e79` build bound to
+  `127.0.0.1:5194`, driven by the Playwright MCP Chromium browser with the real
+  local model (no mocks). `no-person.mp4` processed on the GPU delegate to the
+  no-pose result, and the badge read **"Processing took 3.2 seconds on this
+  device"**; the harness's own timer from file selection to badge measured
+  3,256 ms, consistent with it. No badge before processing; removal cleared it.
+  No horizontal overflow at 1280x900 or 390x844; at 390 px the badge wraps onto
+  its own line in the chip style. Both non-human UI screenshots were inspected
+  and kept in ignored `build/task10-wide.png` and `build/task10-narrow.png`.
+  No request left the preview origin except in-memory `blob:` URLs; console had
+  the known `favicon.ico` 404 and MediaPipe's OpenGL notice. Preview process
+  87140 was stopped and port 5194 confirmed free. This is desktop evidence, not
+  a phone, Safari or benchmark result.
+- Fresh read-only whole-feature review (Claude Code subagent, Opus 5.5, no
+  inherited builder conversation) of `3209025..e1a0e79` ran 39 focused and the
+  full 379 tests (all pass), read every changed file and ran its own mutations
+  on a scratch copy outside the repository. No Critical/High/Medium finding.
+  Three Low findings, all fixed in the review-fix commit:
+  1. The start-before-resources ordering was untested. **Correction to the
+     Step 2 record above:** its "start read after URL creation" mutation also
+     removed the guard, so the failure it reported came from the throw guard,
+     not from ordering; the reviewer's guarded-ordering mutation passed all 21
+     tests. A call-order test now asserts the start reading precedes
+     `createEngine` and `createObjectURL`; the guarded-ordering mutation fails it.
+  2. HANDOFF quoted the badge as "N s"; it now matches the code ("N seconds").
+  3. The default clock was untested; a new test spies on `performance.now()`,
+     and a mutation to `Date.now()` fails it.
+  The reviewer did not run lint/build/sync or any browser check.
+- After the fix: **381 tests / 15 files** (23 store cases), lint and guarded sync
+  pass; see the review-fix commit.
+
 ### Task 9 record: observed elbow summary, completed on master
 
 Task9 PC development ran on `feat/task9-elbow-summary` from reviewed

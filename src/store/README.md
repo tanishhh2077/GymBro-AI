@@ -16,10 +16,11 @@
   result; failed or removed jobs and invalid, backwards or throwing readings
   leave it absent, never zero. It is one run's observation, not a benchmark.
 
-`useSessionStore.test.ts` (21 cases) drives the real engine with a mocked SDK,
-except cases that use a fake engine to deliver callbacks after removal. Nine
-cases cover the timing rules with a fake clock; mutation checks confirmed each
-guard is tested.
+`useSessionStore.test.ts` (23 cases) drives the real engine with a mocked SDK,
+except cases that use a fake engine to deliver callbacks after removal. Eleven
+cases cover the timing rules, including start-before-resources call order and
+the default `performance.now()` clock; mutation checks of each guard, the order
+and the default clock each fail a test (see STATUS).
 `removeClip` also clears `engineDelegate`.
 Design details: [ARCHITECTURE.md](../../docs/ARCHITECTURE.md#session-ownership).
 
