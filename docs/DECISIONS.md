@@ -259,6 +259,29 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   signing; no Apple team/identity/provisioning is used. This does not authorize
   signed physical-iPhone installation, store delivery or unverified device claims.
 
+### D-023: Plan phone/video acceptance with the available iPhone
+
+- On 2026-11-04 the user answered "clear" to planning installation prerequisites
+  and video import/processing/cancellation checks before store-release work.
+  This authorizes the planning document, not execution of its future commands.
+- The user reports an **iPhone 12 Pro Max**, no Android phone access and no Apple
+  Developer Program membership. iOS version was not supplied. Earlier no-MacBook
+  constraint remains; temporary Mac access is unconfirmed.
+- Builder proposal: first verify the shared pipeline in Safari from a Windows
+  private-LAN preview, using already-owned synthetic non-human fixtures. This
+  costs no enrollment and can expose real phone decoding/inference issues, but
+  cannot pass native lifecycle, packaging or fresh offline-launch acceptance.
+  The intended product remains an installed app.
+- The [phone test plan](superpowers/plans/2026-11-04-phone-video-acceptance.md)
+  keeps Safari, installed-native and real-bench gates separate. Its first
+  execution step retains the next teaching checkpoint. No fixture export,
+  server listener, phone install, paid enrollment/service, signing credentials
+  or release action is approved by this planning checkpoint.
+- Known first-party synthetic fixtures can later be exported by exact checksum
+  from Task4's commit without merging its incomplete branch. These assets do
+  not replace the still-missing permitted bench footage; do not ask the user to
+  record again. Physical Android acceptance remains blocked on device access.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
@@ -266,6 +289,7 @@ The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md]
 ## Open prerequisites
 
 - A real side-view bench-press fixture with permission/license and privacy handling is needed before real-video acceptance can be demonstrated.
-- A supported browser/device matrix and first mobile test platform must be established at the relevant milestone.
+- The available first phone is recorded in D-023; its OS and actual Safari/native
+  acceptance remain to be established. A broader supported-device matrix is unverified.
 - Exact measurement definitions, quality thresholds, evaluation references, and dataset methodology belong to later bounded specifications.
 - Backend processing, accounts, video retention, database deployment, custom training, and multi-camera work remain unapproved future work.

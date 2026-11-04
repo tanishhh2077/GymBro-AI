@@ -10,6 +10,65 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task 7's [phone/video acceptance plan](superpowers/plans/2026-11-04-phone-video-acceptance.md)
+is complete as a planning-only deliverable, developed on
+`feat/task7-phone-test-plan` from clean reviewed master `e38cc4b`. The user
+approved **planning only** with "clear" on 2026-11-04 and reports iPhone12ProMax,
+no Android phone and no Apple Developer Program membership. iOS version and
+temporary Mac access remain unreported. D-023 records these facts separately
+from the builder's proposed free Safari-on-Windows-LAN first slice. No phone
+tests, fixture exports, listeners, product changes or signing actions have run.
+Fresh independent plan review found no significant findings; authoring checks
+pass. Execution is not approved. Check Git for the final documentation commit.
+
+### Task 7 planning evidence and review
+
+- Planning only: added the phone/video protocol and D-023; refreshed HANDOFF and
+  documentation/plan indexes. No product/native/workflow/test code changes.
+- Read official Apple/Capacitor documentation on 2026-11-04: free Xcode Personal
+  Team device testing, seven-day provisioning limits, macOS/Xcode26+/iOS15+
+  requirements, Developer Mode and paid distribution prerequisites. Sources are
+  linked beside the plan's claims. No enrollment, credential, signing or store
+  operation was performed. Paid membership is not recommended for the first slice.
+- Root read the immutable Task4 fixture README at
+  `34538e417a724ebceb0971bd2b632a376a7e739e`: five internally generated black,
+  silent H.264 patterns have explicit project redistribution permission. Only
+  exact-blob export to ignored local fixtures is proposed later. No branch merge
+  or export occurred. Empty content cannot pass real-bench acceptance.
+- Read-only Codex source audit (`device_plan_contract_audit`, no inherited
+  conversation; model identifier not exposed) mapped actual file admission,
+  limits, player, cancellation/cleanup, native lifecycle and memory-only session
+  behavior. It ran no builds/tests/device actions and changed no files. Root
+  incorporated its supported distinctions: picker cancel has no exact-message
+  contract, native reset is absent in Safari, and process death loses results.
+- Fresh Goldfish/builder review (`phone_plan_goldfish`, no inherited builder
+  conversation; model identifier not exposed) found **no significant findings or
+  material unanswered questions**. Independently checked all five immutable
+  fixture blobs' sizes/hashes and provenance, actual UI/lifecycle contracts, and
+  the primary Apple/Capacitor requirements. Explicit conditional native/Android/
+  bench prerequisites do not block planning or falsely pass those gates. No edits,
+  tests/builds, exports, listeners, signing or device checks ran in this review.
+- Read-only documentation audit (`mobile_handoff_audit`, model identifier not
+  exposed) found **no material findings**: all **196 relative links/anchors** in
+  73 project Markdown files resolve; all 19 CLAUDE imports remain valid; no new
+  directory needs guidance. Scope/hardware/authorization statements agree and
+  diff formatting passes. This was a continuity audit, not a fresh-context
+  product-code review. No files or runtime state changed by the auditor.
+- All physical-phone cases remain **not run**. Native installation, Android
+  device access and permitted bench footage remain conditional/blocked as
+  specified. Next checkpoint covers only preparing the free Windows-LAN Safari
+  slice with verified synthetic fixtures; no paid/signing action is implied.
+- Required authoring verification under process-local Node22.23.2/npm10.9.8:
+  **320 tests/13 files**, lint and build/config type-check all exit **0**; Vite
+  transforms409 modules with the existing stale Browserslist warning. Own
+  dev5193 returnsHTTP200; global Node remains20.20.2. No dependencies installed,
+  native recompilation/sync or new tests were necessary for Markdown-only work.
+  Self-review covered source/fixture contracts, each proposed case and prerequisite,
+  explicit execution gates and plan scope. Fresh review is resolved; D-019 applies
+  to integration of this documentation task, not execution of its future protocol.
+
+### Completed Task 6 baseline
+
 Task 6's bounded mobile prototype is complete. The reviewed feature was integrated
 into local/remote `master` at `ed5f1b3`; later commits finalize documentation.
 `feat/task6-mobile-app` is retained. It was based on reviewed master `f0e9118`.
@@ -20,8 +79,8 @@ Step 2's dependency/native-generation understanding checkpoint. The user then
 answered "clear" directly to Step 3's background/layout/offline explanation.
 The user then answered "clear" to Step 4's cloud-build explanation, and on
 2026-11-04 answered "clear" to Step 5's whole-feature review/integration
-explanation. All five steps are complete; the next physical-device/video planning
-task retains its understanding checkpoint and is not approved yet.
+explanation. All five steps are complete; the next planning checkpoint was then
+approved as Task 7 above, while test execution retains its own checkpoint.
 Read the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md)
 and [plan](superpowers/plans/2026-11-03-mobile-prototype.md). Capacitor 8.6.0,
 App plugin 8.1.2 and assets tool 4.0.0 are pinned. iOS/SPM and Android native

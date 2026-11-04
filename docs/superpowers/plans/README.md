@@ -1,10 +1,16 @@
 # Implementation plans
 
+The reviewed [phone/video acceptance plan](2026-11-04-phone-video-acceptance.md)
+completes Task 7's planning deliverable, authorized on 2026-11-04. Available device:
+iPhone12ProMax, no Android phone or paid Apple membership. It proposes free
+Safari checks first and keeps installed-native/bench gates separate. Execution
+needs the next teaching checkpoint; no phone cases have run.
+
 The latest completed plan is [2026-11-03-mobile-prototype.md](2026-11-03-mobile-prototype.md),
 authorized by D-022 for both platforms with iPhone first. All five steps are
 complete: 320 tests, native cloud builds, visible iPhone-simulator startup and
 fresh whole-feature review pass. Reviewed code is merged/pushed to master, whose
-run4 also passes. Physical-device/video planning needs its next user checkpoint.
+run4 also passes. The follow-on planning checkpoint is now approved above.
 
 The preceding plan is [2026-11-03-elbow-timeline.md](2026-11-03-elbow-timeline.md),
 authorized as bounded follow-on work by D-021 despite missing bench footage.

@@ -4,6 +4,24 @@ Updated 2026-11-04 (America/Chicago). Start here in Claude Code or Codex.
 
 ## Current task and next checkpoint
 
+Task 7's **planning-only deliverable is complete**, authorized by the user's
+latest "clear" on 2026-11-04. It was developed on `feat/task7-phone-test-plan`
+from reviewed master
+`e38cc4b`. The user has an **iPhone 12 Pro Max**, no Android phone access and no
+Apple Developer Program membership. iOS version/temporary Mac access remain
+unconfirmed. See D-023 and the [phone test plan](superpowers/plans/2026-11-04-phone-video-acceptance.md).
+Fresh independent review found no significant issues; all 320 tests, lint/build
+and documentation checks pass. Check Git for the final integrated document commit.
+
+Proposed next execution step: prepare a free private-LAN Safari test from Windows,
+with verified first-party non-human fixtures exported from Task4's exact commit.
+This can test real phone decoding/model/player behavior without paid membership;
+it cannot verify the installed native app. **Execution is not approved yet.**
+Explain the local preview/fixture transfer, why it helps before native signing,
+and why a paid build service is unnecessary for this first slice; ask
+"Is this clear?" and wait before starting servers/exporting files/phone checks.
+No product code, fixture export, LAN server or phone test has run in Task 7.
+
 Task 6's bounded mobile prototype is complete, iPhone first, from Windows without
 a MacBook (D-022). The reviewed feature was fast-forwarded/pushed to `master` at
 `ed5f1b3` on 2026-11-04; `feat/task6-mobile-app` is retained. Implementation head
@@ -14,8 +32,8 @@ reviewed-integration explanation. Do not reopen its checkpoint.
 Fresh whole-feature code review found no significant issues and independently
 passed 33 focused tests/package checks. Documentation audit found two stale
 current claims and a plan-index label; these are corrected. All five steps are
-complete: local merged-tree checks and master cloud run4 pass. A new product
-task still needs its teaching checkpoint.
+complete: local merged-tree checks and master cloud run4 pass. Task 7's planning
+checkpoint is now approved; executing its proposed checks remains separate.
 
 Read root AGENTS.md, the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md),
 [plan](superpowers/plans/2026-11-03-mobile-prototype.md), and scoped guidance
@@ -92,13 +110,11 @@ Physical iPhone/Android installation, native file selection/background behavior,
 native offline inference, bench accuracy and phone performance remain unverified.
 No paid service, Apple enrollment/credentials or store release is authorized.
 
-The next product task is to design the physical-device/video acceptance plan,
-iPhone first: establish available phone/OS and Apple signing/build prerequisites,
-use the Android test APK where a device is available, and define native MP4
-import/inference/cancellation checks with permitted fixtures. This planning task
-is not approved yet. Explain why startup alone cannot verify processing, ask
-"Is this clear?", and wait before starting it. Keep paid enrollment, signing
-credentials and release actions outside that checkpoint's scope.
+The phone test plan separates free Safari checks, conditional installed-native
+checks and permitted bench evidence. Native installation needs a later available
+Mac/approved signing route; the current simulator ZIP cannot install on the phone.
+Android physical tests have no available device. Bench acceptance still needs
+licensed footage. Keep those gates blocked rather than inferring passes.
 
 Task 4 remains unmerged on `feat/task4-browser-acceptance` at `34538e4`.
 Its permitted bench fixture is still missing; the user cannot record one, so do
