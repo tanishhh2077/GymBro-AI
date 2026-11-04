@@ -20,3 +20,6 @@ Inherit [source guidance](../AGENTS.md). Follow the
 - Keep observation quality separate from form interpretation. Abstain when the
   required evidence is unavailable; do not fabricate scores or LLM form judgments.
 - Verify real-clip extraction and timestamp synchronization before adding metrics.
+  Task 5 is an explicit ordering exception under D-021: the user asked to build
+  later work despite the missing fixture. Implement the bounded image-space
+  measurement design, preserving real-bench validation as an open requirement.

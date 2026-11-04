@@ -205,6 +205,33 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   changes it under Settings > General > Default branch once `master` holds the
   reviewed work, because no GitHub CLI or token is available to agents.
 
+### D-020: Continue independent work when a prerequisite is blocked
+
+- On 2026-11-03 the user requested continuing other tasks when a dead end occurs.
+- Task 4's implementation and detailed verification live on
+  `feat/task4-browser-acceptance` at `34538e4`: ten browser checks and 254 total
+  unit/component/fixture cases pass there; full bench acceptance is still open.
+- That branch is not merged into this Task 5 branch or `master`. Those tools and
+  test counts must not be claimed as present in another checkout automatically.
+
+### D-021: Begin bounded post-pipeline work before bench acceptance
+
+- On 2026-11-03 the user explicitly requested "do some more tasks that would
+  come after the bench press video thing, dont stop at this blocker."
+- This authorizes proceeding with a bounded later-feature batch, explaining
+  choices as work progresses, without treating the missing recording as a stop
+  for all product development. It does not establish milestone-one acceptance.
+- Builder choice: estimated left/right image-space elbow angles and a video-linked
+  evidence timeline, from the brief's measurement/transparency requirements.
+  See the [design](superpowers/specs/2026-11-03-elbow-timeline-design.md) and
+  [Task 5 plan](superpowers/plans/2026-11-03-elbow-timeline.md). The user did not
+  prescribe the algorithm or threshold. Keep these choices explicit and testable.
+- This narrowly supersedes earlier sequencing guidance to validate real bench
+  extraction before any measurement implementation. Preserve the real-media
+  accuracy/identity/synchronization gate before claiming validated bench results.
+  No automatic reps, technique verdicts, storage/backend, or mobile scaffold is
+  included in this batch. Use the ordinary teaching checkpoint for later scope.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

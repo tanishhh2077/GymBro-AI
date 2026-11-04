@@ -115,11 +115,34 @@ The reviewer classified the redundant `result` initialization as a **low-severit
 - Dependency files and unrelated application source remain unchanged by this cleanup. No test framework or new unit test was added for a dead-initializer removal; the lint failure-to-pass check and TypeScript compilation directly verify the reported issue.
 - No real-video inference, browser rendering, phone performance, or scientific validation was performed. Broader lifecycle/validation/measurement gaps remain as listed above.
 
+## Task 5 setup: post-pipeline elbow measurements
+
+- The user's new instruction explicitly requested tasks after the bench-video
+  work, without stopping at that blocker. D-021 authorizes a bounded later-feature
+  batch. Builder choice: estimated image-space elbow angles and an evidence
+  timeline; no claim that the user specified the algorithm or cutoff.
+- Created `feat/task5-elbow-measurements` from verified reviewed local/remote
+  `master` at `680201d`. Task 4's pushed test tooling stays on its separate branch
+  at `34538e4`; do not misreport its 254 tests as this branch's baseline.
+- Drafted the design/implementation plan and scoped specs guidance, and updated
+  instructions to make the ordering exception explicit. Original brief and M1
+  specification are preserved. A fresh read-only Codex builder/Goldfish review
+  found **nothing important left**; wording explicitly identifies stored
+  observation indices rather than decoded source-video frame numbers. Reviewer
+  served model ID unavailable; no code changes, browser or inference by reviewer.
+- `npm install --no-audit --no-fund` succeeded, removing three Task 4-only tooling
+  packages without changing this branch's package/lockfile. Baseline `npm test`:
+  **236/236** in eight files; lint exit **0**; build exit **0**, 400 modules,
+  existing stale Browserslist warning. Own strict-port dev server **5191** returned
+  HTTP **200** before feature code. Earlier 5176 server untouched.
+- Implementer: Codex; served model ID unavailable. No new runtime dependency,
+  new positive-pose inference, human recording, or browser image artifact.
+
 ## One next task
 
-Task 4 Step 1: establish a permitted side-view bench-press recording for actual browser acceptance. Explain why real media is needed instead of relying on simulated event/canvas tests, ask **"Is this clear?"**, and wait. No Task 4 teaching checkpoint has been approved yet. No fixture, browser-test dependency, or inference result is supplied by Task 3. Keep new measurements, rep counting, mobile scaffolding, and backend work outside scope.
+Continue the [Task 5 plan](superpowers/plans/2026-11-03-elbow-timeline.md) under D-021: finish design review, implement tested image-space geometry, then the timeline/player integration and fresh code review. The user delegated proceeding past the fixture blocker; do not reopen this batch's understanding checkpoint. No reps, technique findings, backend, persistence or mobile scaffold is included.
 
-The user has no personal fixture available, and no openly licensed candidate inspected so far is a standardized side view; see "Fixture candidate research" below. Before Task 4 acceptance, the user must choose how to obtain a permitted side-view H.264 MP4. Do not claim a candidate or a mock is a validated result.
+Task 4 acceptance remains open on its separate branch. The user cannot arrange footage and requested continued licensed-footage search; do not ask them to record again. Real bench identity, anatomy and positive synchronization remain unverified. Do not claim that geometry/component fixtures validate real bench measurements.
 
 ## Test-tool verification checkpoint
 

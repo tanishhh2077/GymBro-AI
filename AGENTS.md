@@ -36,6 +36,9 @@
 - Avoid medical, injury-prevention, perfect-form, and unvalidated coach-grade claims. Do not use an LLM to invent movement findings.
 - Do not expand into other exercises, camera views, multi-camera fusion, or generic fitness features during the initial milestone.
 - Start with on-device processing. Mobile is the intended release direction; a Capacitor prototype is a candidate to test, not a verified deployment. No server video transfer, mobile scaffold, or database is approved by these documents alone.
+- D-021 authorizes Task 5's bounded follow-on measurement/timeline work despite
+  unfinished Task 4 acceptance. Read its separate design/plan; do not treat it as
+  a validated bench assessment or declare milestone one complete.
 
 ## Independent judgment
 

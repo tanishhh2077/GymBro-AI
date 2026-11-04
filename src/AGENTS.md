@@ -19,3 +19,5 @@ with the approved amendments in [decisions](../docs/DECISIONS.md).
   not permission to activate features beyond the agreed milestone.
 - Put concise local `AGENTS.md` guidance in each new authored source directory.
   Do not add guidance inside dependencies, build output, or generated caches.
+- Task 5 adds a separate, explicitly limited image-space measurement layer under
+  D-021 while Task 4 acceptance stays incomplete; consult its design/plan.
