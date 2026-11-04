@@ -4,44 +4,33 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 
 ## Current task and next action
 
-**Task 10 (complete): observed processing time** ([D-026](DECISIONS.md#d-026-show-the-observed-processing-time-for-a-completed-clip)),
-on `feat/task10-processing-time` from reviewed master `3209025`. While the user is
-away, they asked the builder to find PC-side work; D-026 records this builder
-choice. When a clip finishes, the player shows one badge, "Processing took N
-seconds on this device", measured with a monotonic clock from admission to the completed
-result. It is a single-run observation, not a benchmark. Read the
-[design](superpowers/specs/2026-11-04-processing-time-design.md) and
-[plan](superpowers/plans/2026-11-04-processing-time.md). D-024 applies: explain
-and proceed; stop only for phone/account/settings/spending/publication actions.
-
-Progress: Step 1 (design, fresh design review adopted), Step 2 (store clock,
-`Clip.processingMs`, badge) and Step 3's browser check (real no-person run showed
-"Processing took 3.2 seconds on this device" at wide and narrow widths) and
-fresh code review (three Low findings, fixed) are done: **381 tests / 15 files**,
-lint, guarded sync pass. Master was fast-forwarded to the reviewed code and
-[native run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41913320712)
-passed all three jobs (artifacts not downloaded: that needs a signed-in account).
-**Task 10 is complete.** Next: merge master into Task 8, then the phone session. Check the plan's
-checkboxes and Git for the latest step. One writer; reviewers read only.
+**Task 11 (in progress): type-check the build configuration files**
+([D-027](DECISIONS.md#d-027-type-check-the-build-configuration-files)), on
+`feat/task11-config-typecheck` from reviewed master `aec3cb2`. The user, still
+away, asked the builder to keep working without frequent questions; D-027 records
+this builder choice of the configuration task D-017 deferred. `npm run build`
+does not check `vite.config.ts`/`vitest.config.ts` today (both pass by hand); Task 11
+points `tsconfig.node.json` at both, runs it in the build, and deletes the
+unreferenced template `tsconfig.app.json`, whose settings fail on the real source.
+No application source or dependency changes. Read the
+[plan](superpowers/plans/2026-11-04-config-typecheck.md); its checkboxes and Git
+show the latest step. D-024 applies. One writer; reviewers read only.
 
 ## Task 8 phone test (separate branch, waiting for the user)
 
-`feat/task8-safari-phone-test` at `3d8230a` has merged master `3209025` (merge
-commit `fedc7e2`, both histories kept) and repeated 366 tests/lint/build/guarded
-sync. The user reported **iOS 26.5.2**. Ignored `build/fixtures/` holds the five
-exported non-human fixtures, their README and three generated S07/S08 inputs
-(`zero-byte.mp4`, `corrupt.mp4`, `over-size.mp4`), all hash-checked against the
-phone plan; a fresh review's Low findings are fixed. Task 8's own HANDOFF/STATUS
-hold the details.
+`feat/task8-safari-phone-test` at `9c06492` has merged reviewed master twice
+(`3209025`, then `aec3cb2` with Task 10's badge), each with a merge commit keeping
+both histories, and repeated 381 tests/lint/guarded sync. The user reported
+**iOS 26.5.2**. Ignored `build/fixtures/` holds the five exported non-human
+fixtures, their README and three generated S07/S08 inputs (`zero-byte.mp4`,
+`corrupt.mp4`, `over-size.mp4`), all hash-checked against the phone plan. Task 8's
+own HANDOFF/STATUS hold the details. Task 11 must never delay the phone session.
 
-If Task 10 is reviewed and on master by then, merge master into Task 8 again
-and repeat its checks; Task 10 must never delay the phone session, which
-otherwise runs on Task 8's current build. Then, with the user present: agree a trusted
-private network (home Wi-Fi or Personal Hotspot; the PC is on Public campus
-Ethernet UWNet), bind preview 5195 and fixture server 5196 only to that address,
-verify reachability, transfer fixtures, and run the Safari cases. No LAN listener,
-phone transfer or Safari case has run. Firewall/VPN/router prompts are the
-user's decision.
+With the user present: agree a trusted private network (home Wi-Fi or Personal
+Hotspot; the PC is on Public campus Ethernet UWNet), bind preview 5195 and fixture
+server 5196 only to that address, verify reachability, transfer fixtures, and run
+the Safari cases. No LAN listener, phone transfer or Safari case has run.
+Firewall/VPN/router prompts are the user's decision.
 
 ## Product boundaries
 

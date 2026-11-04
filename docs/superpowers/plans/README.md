@@ -1,9 +1,14 @@
 # Implementation plans
 
+In progress: [Task 11 config type-check](2026-11-04-config-typecheck.md) under
+D-027, on `feat/task11-config-typecheck` from master `aec3cb2`. It makes the build
+check `vite.config.ts`/`vitest.config.ts` and deletes the unused template
+`tsconfig.app.json`; no application source changes.
+
 Latest completed feature: [Task 10 observed processing time](2026-11-04-processing-time.md)
 under D-026: one completed run's measured time, not a benchmark. All 3 steps,
 381 tests and a fresh review pass; it is fast-forwarded/pushed to master. Task 8's
-branch holds the phone preparation and merges this master before its phone cases.
+branch holds the phone preparation and has merged this master (`aec3cb2`).
 
 Preceding feature: [Task9 elbow summary](2026-11-04-elbow-summary.md),
 observed counts/extrema navigation under D-025. All3 steps,366 tests, fresh review

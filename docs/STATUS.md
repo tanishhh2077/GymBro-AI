@@ -10,13 +10,30 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 10 (D-026, observed processing time) is **complete**: built on
-`feat/task10-processing-time` from reviewed master `3209025`, chosen by the
-builder after the user, away from the PC, asked for PC-side work, freshly
-reviewed, fast-forwarded to master and verified by native run6. Task 8's phone
-test waits for the user on its own branch (`3d8230a`: master merged, iOS 26.5.2
-reported, S07/S08 inputs generated and reviewed); its branch records hold the
-details. Safari, installed-native and real-bench acceptance remain unverified.
+Task 11 (D-027, build configuration type-check) is **in progress** on
+`feat/task11-config-typecheck` from reviewed master `aec3cb2`, chosen by the
+builder after the user, still away, asked for continued work without frequent
+questions. Task 10 (D-026, observed processing time) is complete on master and
+verified by native run6. Task 8's phone test waits for the user on its own branch
+(`9c06492`: master `aec3cb2` merged, iOS 26.5.2 reported, S07/S08 inputs
+generated and reviewed); its branch records hold the details. Safari,
+installed-native and real-bench acceptance remain unverified.
+
+### Task 11 Step 1 decision and plan
+
+- Claude Code (Opus 5.5), 2026-11-04. Branch created from `master` at `aec3cb2`,
+  matching `origin/master` after a fetch. Package files unchanged; no reinstall
+  (servers on `[::1]:5173` and `127.0.0.1:5193` still hold `node_modules` files).
+- Measured before any change, under process-local Node 22.23.2:
+  `tsc -p tsconfig.node.json --noEmit` exit 0 (it lists only `vite.config.ts` and
+  nothing runs it); a hand check of `vite.config.ts` and `vitest.config.ts` with
+  strict ES2022/bundler/Node types exit 0; `tsc -p tsconfig.app.json --noEmit`
+  fails on the real source with TS2307 for every `@/` import, because the template
+  file has no `paths` alias (it also omits strict mode). Nothing references
+  `tsconfig.app.json`.
+- Recorded D-027 and the [plan](superpowers/plans/2026-11-04-config-typecheck.md)
+  (its design section replaces a separate design document for a two-file
+  configuration change); updated HANDOFF and the docs/plans indexes.
 
 ### Task 10 Step 1 baseline and design
 
