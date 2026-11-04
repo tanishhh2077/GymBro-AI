@@ -124,6 +124,25 @@ and `build/`. Text findings go in `docs/STATUS.md`; no new product module.
 Source README grants project redistribution of these internally generated black,
 silent H.264 patterns; no human/third-party content. They are not bench fixtures.
 
+- [x] Amendment, 2026-11-04 (builder-proposed under Task 8; review recorded in
+  STATUS): S07 and S08 need a zero-byte MP4, a file over 100 MiB and a nonempty
+  corrupt MP4, which none of the exported fixtures is. Generate these three
+  non-media inputs into the same ignored `build/fixtures/`. They are defined by
+  their exact bytes, so any session can regenerate identical files; nothing is
+  committed to Git.
+
+| Input | Bytes | Exact content | SHA-256 |
+| --- | --- | --- | --- |
+| empty.mp4 | 0 | nothing | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| corrupt.mp4 | 68 | ASCII `GymBro AI S08 test input: these bytes are deliberately not a video.` plus one LF | `447aba0195e407858bc7816fdd332b3a27d4e707e108f53ca426b4a6ccc691aa` |
+| over-size.mp4 | 104,857,601 | that many 0x00 bytes (100 MiB + 1) | `7f12a2ac8cc123711b92c20e22583eaa49582c52a8c1f3050f81dd1aa6591007` |
+
+These are not videos and contain no human or third-party content. Expected app
+behavior: `empty.mp4` and `over-size.mp4` are rejected before processing;
+`corrupt.mp4` passes the selection check and must end in an actionable decoding
+failure, not a no-pose success. Transfer `over-size.mp4` only if the user agrees
+to store about 100 MiB on the phone temporarily, and delete it after S07.
+
 - [x] Build with `npm run build`; desktop runtime preflight is recorded separately
   in STATUS and does not pass the physical-phone cases below.
 - [ ] When the user returns, check port5195 is free; set a task-local
@@ -134,8 +153,8 @@ silent H.264 patterns; no human/third-party content. They are not bench fixtures
   LAN access is blocked, record the exact prerequisite and continue other work.
 - [ ] Check port5196 is free. For fixture transfer only, later run
   `python -m http.server 5196 --bind $phoneTestHost --directory build/fixtures`.
-  That directory must contain only the five verified non-human fixtures and
-  their provenance README. Download them in phone Safari and confirm they are
+  That directory must contain only the five verified non-human fixtures, their
+  provenance README and the three generated S07/S08 inputs above. Download them in phone Safari and confirm they are
   stored locally in Files. This temporary LAN server avoids a cloud upload or
   fixture files in served app assets; it is separate from the product. Stop
   this newly owned server after transfer. If Python/LAN access is unavailable,

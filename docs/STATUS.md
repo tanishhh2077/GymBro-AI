@@ -20,6 +20,34 @@ connection between the iPhone and the PC. No LAN listener, phone transfer or
 Safari case has run. Safari, installed-native and real-bench acceptance remain
 unverified.
 
+### Task 8 generated S07/S08 inputs
+
+- Claude Code (Opus 5.5), 2026-11-04. The plan's S07 needs a zero-byte MP4 and a
+  file over 100 MiB, and S08 a nonempty corrupt MP4; the five exported fixtures
+  and Task 4's `tests/fixtures/` (checked at `34538e4`) contain none of them.
+  Builder-proposed plan amendment: generate `empty.mp4` (0 bytes),
+  `corrupt.mp4` (68 ASCII bytes) and `over-size.mp4` (104,857,601 zero bytes)
+  into ignored `build/fixtures/`. A Python script wrote raw bytes, refusing to
+  overwrite; the printed SHA-256 values are in the plan table. `git check-ignore`
+  confirms `build/` is ignored. The folder now holds those nine files only.
+- PC behavior check, desktop only: a temporary production preview bound to
+  `127.0.0.1:5194` served the Task 8 tip's build (source identical to master
+  `3209025`) to the Playwright MCP Chromium browser. Inputs were set on the real
+  file input. `empty.mp4` showed alert "Video not accepted — This file is empty.
+  Choose a recorded video."; `over-size.mp4` showed "This video is larger than
+  100 MiB…". Neither created a video element; Choose video stayed enabled.
+  `corrupt.mp4` was admitted and ended in alert "The video could not be read —
+  The browser could not load this video. Remove the clip to try another.", not a
+  no-pose result; Choose video was disabled and Remove present. After removal,
+  `no-person.mp4` processed to the no-pose result in about 4 s, with the old
+  filename gone. Only `blob:` requests left the preview origin. Console: one
+  `favicon.ico` 404 (the app ships no favicon; cosmetic) and MediaPipe's OpenGL
+  notice. Preview process 50072 was stopped and port 5194 confirmed free; upload
+  copies in ignored `.playwright-mcp/` were deleted.
+- This shows the inputs reach the intended code paths in desktop Chromium. It is
+  not a Safari, iPhone Files-provider or native result; the phone may filter,
+  rename or refuse to download a zero-byte file, which S07 records as observed.
+
 ### Task 8 iOS version
 
 - On 2026-11-04, while away from the PC, the user reported the iPhone 12 Pro Max
