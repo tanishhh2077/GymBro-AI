@@ -39,6 +39,9 @@
 - D-021 authorizes Task 5's bounded follow-on measurement/timeline work despite
   unfinished Task 4 acceptance. Read its separate design/plan; do not treat it as
   a validated bench assessment or declare milestone one complete.
+- D-022 explicitly authorizes iOS/Android mobile prototypes, iPhone first, despite
+  the earlier scaffold deferral. Follow the mobile design/plan; no paid service,
+  signing-secret request, store release or claim of device validation is implied.
 
 ## Independent judgment
 

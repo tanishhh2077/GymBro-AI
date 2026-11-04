@@ -4,18 +4,22 @@ Updated 2026-11-03. Start here in Claude Code or Codex; no prior chat is needed.
 
 ## Current work and authorization
 
-The user explicitly requested building later tasks instead of stopping at the
-missing bench recording. D-021 authorizes this bounded batch. The builder chose
-estimated left/right 2D elbow angles with a video-linked timeline, from the
-original brief's measurement and evidence requirements. Explain work as it
-proceeds; do not reopen the already-authorized batch's understanding checkpoint.
-For new scope afterwards, preserve the normal teaching checkpoint.
+Task 6 is the mobile prototype, authorized by D-022: both platforms, iPhone
+first, developed from Windows without a MacBook. Read root AGENTS.md, the
+[mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md) and
+[Task 6 plan](superpowers/plans/2026-11-03-mobile-prototype.md).
 
-Read root AGENTS.md, scoped source rules, the
-[design](superpowers/specs/2026-11-03-elbow-timeline-design.md), and
-[Task 5 plan](superpowers/plans/2026-11-03-elbow-timeline.md). Raw pose observations,
-derived measurements and technique findings must remain separate. No form score,
-automatic reps, medical claims, backend/storage or mobile scaffold in this batch.
+The user confirmed the packaging explanation was clear and requested continuing.
+The current approved teaching step is environment verification and plan review.
+Before Step 2's dependency installation/native generation, explain its purpose
+and alternative, ask "Is this clear?", and wait. Do not interpret the earlier
+larger-batch permission as overriding this latest explicit checkpoint workflow.
+
+Current branch: `feat/task6-mobile-app`, based on reviewed master `f0e9118`.
+Only planning/guidance documents have changed; Capacitor is not installed and no
+native shell has been generated. No paid services, signing/enrollment, store
+release or device-validation claims are authorized. Simulator output cannot be
+installed on a physical iPhone. Real bench accuracy remains unverified.
 
 ## Branches and actual implementation
 
@@ -44,6 +48,17 @@ automatic reps, medical claims, backend/storage or mobile scaffold in this batch
 
 ## Verification and development
 
+Task 6 environment check: process-local Node 22.23.2 / npm 10.9.8; working-tree
+287 tests in ten files, lint and build passed (403 modules). Own existing dev
+server 5193 returned HTTP 200; its process uses Node 22.23.2. A separate ignored
+`.superpowers/mobile-baseline-20261103` clean install succeeded with 338 packages;
+its fresh-source tests (287), lint and build also passed. Fresh read-only Codex
+design review found no significant issues (model not exposed); no native build
+was run by the reviewer. Step 1 is complete; Step 2 awaits its teaching checkpoint.
+Do not change the user's global Node 20 or disturb the older server 5176.
+Java 21 is installed, but Android SDK/emulator and Xcode are unavailable locally.
+No native compilation, simulator run or physical-device test has occurred.
+
 Baseline after branch creation: `npm install --no-audit --no-fund` succeeded and
 removed the three Task 4-only tooling packages. Original baseline: 236 cases.
 Task 5 adds 40 core and 11 panel/player cases: **287 total**, ten files.
@@ -70,10 +85,10 @@ never save private-video screenshots/traces or upload user media.
 
 ## Next product work
 
-The elbow timeline is a completed bounded feature, not completion of M1. The
-next product increment is a separately scoped repetition/phase-timing design
-using this explicit measurement/missing-data layer. Keep development and real
-bench calibration distinct; do not fabricate thresholds or validated rep counts.
+The elbow timeline is a completed bounded feature, not completion of M1. Mobile
+packaging is now the next requested product increment. Repetition/phase timing
+remains future work. Keep development and real bench calibration distinct; do not
+fabricate thresholds or validated rep counts.
 Task 4 remains available on its own branch and will need the updated master
 merged before continuing its browser suite. Do not discard either branch.
 

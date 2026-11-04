@@ -232,6 +232,25 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   No automatic reps, technique verdicts, storage/backend, or mobile scaffold is
   included in this batch. Use the ordinary teaching checkpoint for later scope.
 
+### D-022: Build both mobile prototypes, prioritizing iPhone
+
+- The user requested "ok then build the mobile app" and clarified both platforms,
+  first preference iPhone, with no MacBook available. This authorizes native
+  prototype implementation, superseding earlier mobile deferrals for this batch.
+- Builder choice: reuse the current React app via Capacitor 8.6.0; target
+  `com.gymbroai.app`. Node 22.23.2 is already installed and will be selected only
+  within task processes, keeping the user's global Node selection unchanged.
+- Use local assets/processing and no backend. Native iOS builds require macOS;
+  prepare/use standard GitHub public-repo build runners without signing or store
+  publication. A simulator app is not an installable/signed iPhone app.
+- Apple signing/enrollment and real iPhone/Android media verification remain
+  separate requirements; no paid account/service or automatic release is allowed.
+- [Design](superpowers/specs/2026-11-03-mobile-prototype-design.md) and
+  [plan](superpowers/plans/2026-11-03-mobile-prototype.md) bound this batch.
+- The user subsequently confirmed the packaging explanation was clear. Preserve
+  their latest explicit understanding checkpoint between meaningful steps;
+  environment/plan verification does not automatically approve Step 2 execution.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

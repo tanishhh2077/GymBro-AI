@@ -1,6 +1,10 @@
 # Implementation plans
 
-The active branch's plan is [2026-11-03-elbow-timeline.md](2026-11-03-elbow-timeline.md),
+The active plan is [2026-11-03-mobile-prototype.md](2026-11-03-mobile-prototype.md),
+authorized by D-022 for both platforms with iPhone first. Environment and design
+review precede implementation; preserve the user's teaching checkpoints.
+
+The preceding plan is [2026-11-03-elbow-timeline.md](2026-11-03-elbow-timeline.md),
 authorized as bounded follow-on work by D-021 despite missing bench footage.
 All four Task 5 steps are complete: deterministic measurements, timeline/player
 integration, 287 passing tests, real no-person browser checks, explicitly synthetic

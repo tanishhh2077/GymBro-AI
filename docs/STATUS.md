@@ -10,6 +10,31 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task 6 mobile planning/environment verification is active on
+`feat/task6-mobile-app`, based on reviewed master `f0e9118`. D-022 authorizes
+both native prototypes, prioritizing iPhone, from Windows without a MacBook.
+The user confirmed the mobile packaging explanation; the currently approved
+step verifies the environment and reviews the plan. Step 2 retains the explicit
+understanding checkpoint before installing dependencies or generating projects.
+Read the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md)
+and [plan](superpowers/plans/2026-11-03-mobile-prototype.md). No native code,
+dependencies, builds, signing or device tests have been added yet.
+
+Task 6 verification on 2026-11-03: process-local Node 22.23.2 / npm 10.9.8;
+working-tree tests **287/287** in ten files, lint and production build exit **0**,
+403 modules. Existing stale Browserslist warning remains. Own Node-22 dev server
+5193 returns HTTP 200. Separate ignored clean install completed with 338 packages
+(existing Recharts 2 deprecation warning); clean-source tests **287/287**, lint
+and build also exit **0**, with 403 transformed modules. Fresh read-only Codex
+design review (`mobile_design_review`, model not exposed) found no significant
+issues after inspecting the plan, store/engine ownership, file admission and local
+asset contracts. It ran no builds and changed no files. Step 1 is complete;
+Step 2 awaits its understanding checkpoint. Java 21 exists locally; Android SDK/emulator and Xcode do
+not. Earlier server 5176 is untouched. No physical-device or bench-video
+validation follows from these checks.
+
+### Earlier milestone context
+
 The current product is **GymBro AI** (`gym-bro-ai`). The user approved the [implementation plan](superpowers/plans/2026-11-02-video-landmarks.md), then changed the first exercise to **bench press** before feature edits began; see [D-013/D-014](DECISIONS.md#d-013-execute-the-reviewed-first-milestone-plan). Tasks 1–3 are complete and reviewed. Whole `npm test` is **236 passed / 236 total**, exit **0** (58 media-helper, 55 engine, 22 selection, 12 store, 11 dropzone, 56 display calculations, 10 overlay, 12 player). Lint and build pass. Task 3 was developed on `feat/task3-overlay-playback`; D-019 integrates the reviewed tip into `master` by fast-forward and push. Check Git for current branch pointers. Task 4 is next, after its teaching checkpoint and permitted fixture gate. The [bench-specific Goldfish review](GOLDFISH_BENCH_REVIEW.md) is complete, with its two acceptance clarifications adopted in the specification. Execution follows the user's explanation-and-understanding checkpoint before each meaningful step.
 
 The working folder is now `D:\Programming\summer 2026 projects\GymBro AI`; older folder paths in historical records are not the current working directory.
