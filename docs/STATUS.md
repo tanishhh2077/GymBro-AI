@@ -150,7 +150,7 @@ Whole tests: **276/276** across nine files; lint exit **0**; build exit **0**,
 400 modules and existing stale Browserslist warning. Real bench landmark/angle
 accuracy remains unverified.
 
-Continue the [Task 5 plan](superpowers/plans/2026-11-03-elbow-timeline.md) under D-021: record final review/browser evidence and the feature handoff. The user delegated proceeding past the fixture blocker; do not reopen this batch's understanding checkpoint. No reps, technique findings, backend, persistence or mobile scaffold is included.
+Task 5 is complete within its bounded scope; its final review/verification is recorded below. Next product increment: a separately scoped repetition/phase-timing design using this measurement/missing-data layer. Task 4 real bench acceptance remains open and independent. Do not silently activate legacy scores, invent biomechanical thresholds, or claim validated rep counts from synthetic checks.
 
 Task 5 Step 3: `ElbowTimeline.tsx` now uses the real measurement helpers below
 the existing video controls. It displays per-side values or unavailable reasons,
@@ -167,6 +167,49 @@ focused, whole **287/287** in ten files, lint exit **0**, build exit **0**,
 geometry is explicitly synthetic, not a MediaPipe or human bench result.
 
 Task 4 acceptance remains open on its separate branch. The user cannot arrange footage and requested continued licensed-footage search; do not ask them to record again. Real bench identity, anatomy and positive synchronization remain unverified. Do not claim that geometry/component fixtures validate real bench measurements.
+
+## Task 5 final review, browser verification and handoff (Step 4)
+
+- Fresh read-only Codex reviewer inspected the committed core plus then-working
+  panel/player diff against base `680201d`, scoped instructions, D-021, design,
+  plan and surrounding engine guarantees. It found **no significant findings**
+  and independently passed **63/63** core/panel/player tests. No reviewer edits,
+  browser/server, inherited implementation conversation or further agents.
+  Reviewer and implementer served model identifiers were unavailable.
+- After review, visual QA moved axis labels from scaled SVG text to HTML so
+  labels stay readable at narrow widths. No measurement/navigation behavior
+  changed. Repeated whole tests **287/287** across ten files, lint exit **0**,
+  build exit **0**, 403 modules, existing stale Browserslist warning.
+- Real browser verification: installed Edge **156.0.4314.58**, real **GPU**
+  inference on the internally generated black H.264 clip from Task 4 scratch,
+  **120** sampled positions. The completed no-pose result displayed unavailable
+  angle values and disabled sample navigation, followed playback and a paused
+  seek to raw observation time **2.000 s**, remained within a **390x844** viewport,
+  and disappeared on clip removal. No page error or unexpected external/write
+  request observed; fonts were blocked. SDK remains pinned at **0.10.35**.
+- Separate visual/navigation check: the actual component rendered supplied
+  geometry in a conspicuously labeled **synthetic component preview, not model
+  output**. The app's session state was never seeded. Previous/next callbacks,
+  a missing-data break, **390x844** and **1280x900** layouts passed. Inspected
+  screenshots are ignored scratch and contain no human recording or claimed
+  positive inference. This does not prove bench landmarks/anatomy or overlay
+  accuracy. The first preview harness failed because optimized ReactDOM exposed
+  `createRoot` on its default export; corrected the harness, not product code.
+  An explicit phone viewport was added to the preview-only rerun before claiming
+  mobile-size verification.
+- Programmatic browser QA reused Playwright **1.64.1** from the ignored clean
+  Task 4 copy; no new dependency or private/paid service was introduced. Another
+  provider may use its own equivalent tool; no scratch path is an app prerequisite.
+- Own strict-port dev server **5191** was verified by command/process identity,
+  stopped, and its port verified free. Earlier **5176** server untouched.
+- Step 3 is committed/pushed at `d8f5b9d`. Step 4 records the reviewed feature
+  and final verification, then D-019 fast-forwards/pushes `master` to the Task 5
+  tip, retaining the branch. Task 4 stays unmerged/incomplete at `34538e4`.
+  Check Git refs for the resulting tips rather than assuming an earlier hash.
+- Unverified: real bench target-person identity and anatomical angle accuracy,
+  positive-pose media synchronization, rotated sources, physical-phone behavior,
+  and the 60 s processing budget. No repetition detection, technique findings,
+  storage/backend or mobile packaging was added. The original M1 gate is open.
 
 ## Test-tool verification checkpoint
 

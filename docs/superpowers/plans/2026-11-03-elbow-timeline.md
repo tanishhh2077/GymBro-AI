@@ -39,7 +39,7 @@ and `{frameIndex, time, left, right}` samples with `{degrees, reason}` results.
   accessible panel, discontinuous SVG plot, missing reasons and sample navigation.
   Reuse player `scrub` and time events. Test paused seeks, no-pose and source reset.
   Verify whole tests/lint/build, update docs, commit/push.
-- [ ] Step 4: Obtain fresh whole-feature critical review and fix supported defects.
+- [x] Step 4: Obtain fresh whole-feature critical review and fix supported defects.
   Verify browser behavior using real no-person media and explicitly synthetic
   component samples; do not claim real positive bench validation. Record checks,
   limits and exact next action; commit/push. Merge only this reviewed feature per

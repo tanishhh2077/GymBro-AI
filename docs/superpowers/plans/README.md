@@ -2,6 +2,10 @@
 
 The active branch's plan is [2026-11-03-elbow-timeline.md](2026-11-03-elbow-timeline.md),
 authorized as bounded follow-on work by D-021 despite missing bench footage.
+All four Task 5 steps are complete: deterministic measurements, timeline/player
+integration, 287 passing tests, real no-person browser checks, explicitly synthetic
+visual checks, and fresh review without significant findings. Its completion flow
+advances master to the reviewed feature; it does not complete original M1.
 The earlier [2026-11-02-video-landmarks.md](2026-11-02-video-landmarks.md) remains
 the milestone-one plan; Task 4 browser tooling is on its separate branch at
 `34538e4`, with real bench acceptance still incomplete. Consult HANDOFF for branch
