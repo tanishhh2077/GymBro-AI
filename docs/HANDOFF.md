@@ -4,7 +4,7 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 
 ## Current task and next action
 
-**Task 10: observed processing time** ([D-026](DECISIONS.md#d-026-show-the-observed-processing-time-for-a-completed-clip)),
+**Task 10 (complete): observed processing time** ([D-026](DECISIONS.md#d-026-show-the-observed-processing-time-for-a-completed-clip)),
 on `feat/task10-processing-time` from reviewed master `3209025`. While the user is
 away, they asked the builder to find PC-side work; D-026 records this builder
 choice. When a clip finishes, the player shows one badge, "Processing took N
@@ -18,8 +18,10 @@ Progress: Step 1 (design, fresh design review adopted), Step 2 (store clock,
 `Clip.processingMs`, badge) and Step 3's browser check (real no-person run showed
 "Processing took 3.2 seconds on this device" at wide and narrow widths) and
 fresh code review (three Low findings, fixed) are done: **381 tests / 15 files**,
-lint, guarded sync pass. Next: fast-forward/push master, check the native CI it
-triggers, then merge master into Task 8 again. Check the plan's
+lint, guarded sync pass. Master was fast-forwarded to the reviewed code and
+[native run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41913320712)
+passed all three jobs (artifacts not downloaded: that needs a signed-in account).
+**Task 10 is complete.** Next: merge master into Task 8, then the phone session. Check the plan's
 checkboxes and Git for the latest step. One writer; reviewers read only.
 
 ## Task 8 phone test (separate branch, waiting for the user)
@@ -50,9 +52,11 @@ reps or form verdicts. Summary availability is not accuracy confidence; observed
 extrema can include tracking errors and are not per-rep ROM or 3D anatomy.
 
 Capacitor 8.6.0/App 8.1.2 prototypes use appId `com.gymbroai.app`, version 0.1.0.
-[Master run5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
-compiled both platforms and verified visible iPhone 17 Pro/iOS 26.4 simulator
-startup. Latest ignored packages are in `build/artifacts/run-5/`. The simulator
+[Master run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41913320712)
+(Task 10 source) compiled both platforms and passed its iOS simulator startup
+job; its packages were not downloaded. [Run5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
+verified visible iPhone 17 Pro/iOS 26.4 simulator startup, and its packages are
+in ignored `build/artifacts/run-5/` (Task 9 source, without the badge). The simulator
 ZIP cannot install on an iPhone; physical native workflow and offline inference
 remain unverified. The workflow runs on pushes to `master` and
 `feat/task6-mobile-app` only.

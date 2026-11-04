@@ -10,9 +10,10 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 10 (D-026, observed processing time) is in progress on
+Task 10 (D-026, observed processing time) is **complete**: built on
 `feat/task10-processing-time` from reviewed master `3209025`, chosen by the
-builder after the user, away from the PC, asked for PC-side work. Task 8's phone
+builder after the user, away from the PC, asked for PC-side work, freshly
+reviewed, fast-forwarded to master and verified by native run6. Task 8's phone
 test waits for the user on its own branch (`3d8230a`: master merged, iOS 26.5.2
 reported, S07/S08 inputs generated and reviewed); its branch records hold the
 details. Safari, installed-native and real-bench acceptance remain unverified.
@@ -105,7 +106,24 @@ details. Safari, installed-native and real-bench acceptance remain unverified.
      and a mutation to `Date.now()` fails it.
   The reviewer did not run lint/build/sync or any browser check.
 - After the fix: **381 tests / 15 files** (23 store cases), lint and guarded sync
-  pass; see the review-fix commit.
+  pass; review fix `2fbafce` committed/pushed. The fix adds two tests and docs
+  only, so no repeat whole review was run.
+- Integration: `origin/master` `3209025` was an ancestor; fast-forwarded master
+  `3209025..2fbafce` and pushed. Native
+  [master run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41913320712)
+  at `2fbafce` finished **success** in all three jobs: shared checks
+  126866303879 (21:08:59–21:09:40 UTC), Android debug APK 126866720563
+  (21:09:42–21:11:21) and iOS simulator build and startup 126866720990
+  (21:09:43–21:21:31). Artifacts: Android `GymBroAI-android-debug-6`
+  (13364016806, 24,698,796 bytes, sha256 `d89d0b5d…c5d0`) and iOS
+  `GymBroAI-ios-simulator-6` (13365275347, 20,996,418 bytes, sha256
+  `4c4c70e2…0c95`), as reported by GitHub's public API. Run status was read via
+  the unauthenticated public API (no `gh` CLI here). The artifacts were **not
+  downloaded or compared** with local `dist/`, because GitHub requires a signed-in
+  account to download them and adding credentials is an account action. The
+  simulator startup does not exercise the new badge or native video inference.
+- Task 10 is complete. The feature branch is retained. Task 8 merges this master
+  next, before its phone cases; Task 4 stays unmerged.
 
 ### Task 9 record: observed elbow summary, completed on master
 

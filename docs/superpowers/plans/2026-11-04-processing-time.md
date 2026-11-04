@@ -63,8 +63,9 @@ the relevant source READMEs.
   after the no-pose result at wide and narrow widths, and removal clears it.
 - [x] Fresh read-only whole-feature review against the spec; fix supported issues
   with failing tests first (three Low; new tests verified by mutation, see STATUS).
-- [ ] Full checks and current docs; commit/push. Fast-forward/push master under
-  D-019 once the review resolves; inspect native CI triggered by the source change.
+- [x] Full checks and current docs; commit/push. Fast-forward/push master under
+  D-019 once the review resolves; inspect native CI triggered by the source change
+  (master run6 succeeded in all three jobs; artifacts not downloaded, see STATUS).
 - [ ] If ready before the phone session, merge reviewed master into Task 8 again,
   preserving both histories; otherwise the phone cases run on Task 8's current
   build. Never mark phone/native/bench cases passed.
