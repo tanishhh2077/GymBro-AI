@@ -1,6 +1,12 @@
 # Implementation plans
 
-Latest completed feature: [Task 10 observed processing time](2026-11-04-processing-time.md)
+Latest completed feature: [Task 11 config type-check](2026-11-04-config-typecheck.md)
+under D-027. The build checks `vite.config.ts`/`vitest.config.ts` with Node types
+and the unused template `tsconfig.app.json` is deleted; no application source
+changes. All 3 steps, 383 tests and a fresh review pass; fast-forwarded to master.
+Task 8's branch has merged this master (`eaf87e1`) with a merge commit.
+
+Preceding feature: [Task 10 observed processing time](2026-11-04-processing-time.md)
 under D-026: one completed run's measured time, not a benchmark. All 3 steps,
 381 tests and a fresh review pass; it is fast-forwarded/pushed to master. Task 8's
 branch holds the phone preparation and has merged this master (`aec3cb2`).
@@ -18,7 +24,7 @@ iPhone12ProMax, no Android phone or paid Apple membership. It proposes free
 Safari checks first and keeps installed-native/bench gates separate. Its Step 1
 is in progress as Task 8 on `feat/task8-safari-phone-test`: baseline and verified
 fixture export, seven desktop runtime preflight cases, generated S07/S08 inputs
-and the Task 9 and Task 10 master merges pass. The user reported iOS 26.5.2; private-network setup still needs their
+and the Task 9, 10 and 11 master merges pass. The user reported iOS 26.5.2; private-network setup still needs their
 coordination.
 No Safari/physical-phone cases have run. D-024 waives routine understanding
 stops, not actual device/settings actions.

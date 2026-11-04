@@ -11,14 +11,112 @@ usage, and these documents are the only handoff; see D-016 in
 ## Current stage
 
 Task 8 (the phone plan's free Safari slice) is ready for the phone session on
-`feat/task8-safari-phone-test`. It has merged reviewed master `aec3cb2`, which
-adds Task 10's processing-time badge, on top of its earlier Task 9 merge; both
-merges keep both published histories. The merged source is byte-identical to
-master and the whole tests/lint/guarded sync pass. The user reported **iOS
+`feat/task8-safari-phone-test`. It has merged reviewed master three times, each
+with a merge commit keeping both published histories: Task 9, Task 10 (the
+processing-time badge) and now `eaf87e1` (Task 11, the build configuration
+type-check, which changes no application code). The merged non-Markdown files
+equal master and the whole tests/lint/guarded sync pass. The user reported **iOS
 26.5.2**. Phone testing still needs the user for a trusted private connection
 between the iPhone and the PC. No LAN listener, phone transfer or Safari case has
 run. Safari, installed-native and real-bench acceptance remain unverified.
 
+### Task 8 merge of reviewed master (Task 11)
+
+- Claude Code (Opus 5.5), 2026-11-04, under Node 22.23.2 (confirmed with
+  `node -v`). `origin/master` was `eaf87e1` (Task 11 complete, fresh review
+  resolved) and the Task 8 remote `9c06492`. Merged with `git merge --no-ff
+  master`: no rebase or force push; Task 4 not merged.
+- Git merged every file except `HANDOFF.md` and `STATUS.md`. This file keeps every
+  section from both branches, newest first; HANDOFF keeps the phone session as
+  the next action.
+- Every non-Markdown path equals master `eaf87e1`, so Task 11's fresh review
+  covers the merged code. **383 tests / 16 files** pass; lint exit 0;
+  `npm run mobile:sync` exit 0 (411 modules; iOS and Android 13 files each
+  verified). The build output for the phone session is unchanged by Task 11.
+
+### Task 11 record: build configuration type-check, completed on master
+
+Task 11 (D-027, build configuration type-check) is **complete**: built on
+`feat/task11-config-typecheck` from reviewed master `aec3cb2`, freshly reviewed
+and fast-forwarded to master; chosen by the
+builder after the user, still away, asked for continued work without frequent
+questions. Task 10 (D-026, observed processing time) is complete on master and
+verified by native run6. Task 8's phone test waits for the user on its own branch
+(`9c06492`: master `aec3cb2` merged, iOS 26.5.2 reported, S07/S08 inputs
+generated and reviewed); its branch records hold the details. Safari,
+installed-native and real-bench acceptance remain unverified.
+
+### Task 11 Step 1 decision and plan
+
+- Claude Code (Opus 5.5), 2026-11-04. Branch created from `master` at `aec3cb2`,
+  matching `origin/master` after a fetch. Package files unchanged; no reinstall
+  (servers on `[::1]:5173` and `127.0.0.1:5193` still hold `node_modules` files).
+- Measured before any change (the first two commands under Node 22.23.2, the
+  `tsconfig.app.json` check under Node 20; see the correction below):
+  `tsc -p tsconfig.node.json --noEmit` exit 0 (it lists only `vite.config.ts` and
+  nothing runs it); a hand check of `vite.config.ts` and `vitest.config.ts` with
+  strict ES2022/bundler/Node types exit 0; `tsc -p tsconfig.app.json --noEmit`
+  fails on the real source with TS2307 for every `@/` import, because the template
+  file has no `paths` alias (it also omits strict mode). Nothing references
+  `tsconfig.app.json`.
+- Recorded D-027 and the [plan](superpowers/plans/2026-11-04-config-typecheck.md)
+  (its design section replaces a separate design document for a two-file
+  configuration change); updated HANDOFF and the docs/plans indexes.
+- **Correction (recorded in Step 2):** Step 1's commit `3f01ac9` and the line
+  above say its tests/lint/build ran under Node 22.23.2. Only the first
+  measurement command did; later commands prepended the nonexistent
+  `%APPDATA%\nvm\v22.23.2`, so 381 tests, lint, build and the
+  `tsconfig.app.json` failure ran under global Node 20.20.2. Step 2 reran
+  everything under the real `%NVM_HOME%\v22.23.2` (below). Published history is
+  not rewritten; HANDOFF now names the exact path and a `node -v` check.
+
+### Task 11 Step 2 wiring and test
+
+- Claude Code (Opus 5.5), 2026-11-04, under Node 22.23.2/npm 10.9.8 (confirmed
+  with `node -v`).
+- RED: new `scripts/build-config.test.mjs` (Node environment, 2 cases) failed for
+  the intended reasons on the Step 1 files: the build has no
+  `tsc --project tsconfig.node.json` step (index -1), and the compiler's
+  `--listFilesOnly` output lacked `vitest.config.ts`. The second case also
+  requires Node types and rejects `@types/react` and `lib.dom.d.ts`; the old
+  config loaded every installed `@types` package, React included.
+- GREEN: `tsconfig.node.json` includes both config files with `"types": ["node"]`;
+  the build runs `tsc --project tsconfig.node.json` before `vite build`;
+  `tsconfig.app.json` deleted. Both cases pass.
+- Mutation checks, each reverted with `git restore`: a `string`-to-`number`
+  assignment in `vite.config.ts` and in `vitest.config.ts` (TS2322), and
+  `document.title` in `vite.config.ts` (TS2584, no DOM library), each make
+  `npm run build` exit 2. With the first mutation the old three build steps all
+  exit 0 (Vite strips types without checking them), so the check is new coverage.
+- Whole **383 tests / 16 files**, lint exit 0, `npm run mobile:sync` exit 0
+  (411 modules, unchanged; iOS and Android 13 files each verified). No application
+  source, dependency or Vite/Vitest behavior changed.
+
+### Task 11 Step 3 fresh review
+
+- Fresh read-only review (Claude Code subagent, Opus 5.5, no builder conversation)
+  of D-027, the plan and `aec3cb2..fa4fc19`, under Node 22.23.2: 383 tests, lint
+  and build (411 modules) exit 0; it did not run `mobile:sync` (writes native
+  copies). It repeated the three mutations, added `window`/`HTMLElement` in
+  `vitest.config.ts` (TS2304, exit 2) and `environment: 123` (TS2769, so the
+  `test` key stays typed through the `vitest/config` import), and showed the new
+  test fails when `"types": ["node"]` or `vitest.config.ts` is removed (the build
+  alone still passes without the types line). No reference to `tsconfig.app.json`
+  outside documents, including `.github/`. CI runs `npm test` on Ubuntu only;
+  path handling is portable there.
+- No Blocker/High/Medium. Four Low documentation findings, all fixed: the plan's
+  Step 1 box and STATUS's Step 1 measurement line now say which Node ran;
+  HANDOFF describes the old behavior in the past tense; the older known-finding
+  about the unchecked config is marked resolved; README mentions the new check.
+- Speculative concerns: (1) the Windows drive-letter case could differ between
+  the compiler and the file URL; adopted cheaply by comparing lower-cased paths.
+  (2) `capacitor.config.ts` also runs in Node but `tsconfig.mobile.json` checks it
+  with the root DOM settings; pre-existing, recorded as a follow-up, not changed.
+  (3) ESLint applies browser globals to the config files; pre-existing, the
+  compiler now rejects DOM use. (4) The reviewer could not reproduce the
+  `tsconfig.app.json` TS2307 failure from a scratch copy (the copy lost the
+  package context); the builder's in-repository run showed TS2307 on `@/`
+  imports, and the file is unreferenced either way.
 ### Task 8 merge of reviewed master (Task 10)
 
 - Claude Code (Opus 5.5), 2026-11-04. `origin/master` was `aec3cb2` (Task 10
@@ -918,7 +1016,7 @@ These are source-inspection observations. They do not establish that real-video 
 - One detected frame can currently mark a whole clip ready.
 - `SkeletonOverlay.tsx` uses bounded display interpolation without modifying raw observations. Legacy `math.ts` gap filling has no current analyzer consumer and must not be mistaken for measured evidence.
 - Resolved on 2026-11-03: the UI no longer offers exercise/angle choices and its copy no longer claims coach-grade analysis, measurements, or bar tracking. Future analysis types (not rendered) still include arbitrary score fields and lack the required finding-evidence contract.
-- The build's TypeScript check includes application source, but does not reference `tsconfig.node.json` or type-check `vite.config.ts` through that configuration. `@types/node` is now installed for the planned test setup. Wiring a configuration check remains separate work.
+- The build's TypeScript check includes application source, but does not reference `tsconfig.node.json` or type-check `vite.config.ts` through that configuration. `@types/node` is now installed for the planned test setup. Wiring a configuration check remains separate work. Resolved on 2026-11-04 by Task 11 (D-027): the build checks both Vite config files through `tsconfig.node.json`.
 - Unit/component checks cover media helpers, engine, selection, store, dropzone, display helpers, overlay, and player. Full real-browser bench-press acceptance remains pending.
 
 These findings need targeted reproduction and verification during implementation. Do not silently promote them into measured failure rates.

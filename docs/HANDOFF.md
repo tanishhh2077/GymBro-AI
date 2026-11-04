@@ -11,13 +11,15 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 waives routine "Is this clear?" stops, but every phone, account, network or
 settings action is coordinated with the user. Do not merge Task 4.
 
-The branch has merged reviewed master twice with merge commits that keep both
-published histories: `3209025` (Task 9) and then `aec3cb2` (Task 10, the
-processing-time badge, D-026). Its non-Markdown files equal master, so Tasks 9
-and 10's fresh code reviews and native run6 cover the merged code. Under
-process-local Node 22.23.2: **381 tests / 15 files**, lint and guarded
-`mobile:sync` (build, 411 modules, 13 verified files per platform) pass.
-Details are in STATUS, "Task 8 merge of reviewed master (Task 10)".
+The branch has merged reviewed master three times with merge commits that keep
+both published histories: `3209025` (Task 9), `aec3cb2` (Task 10, the
+processing-time badge, D-026) and `eaf87e1` (Task 11, D-027: the build also
+type-checks the Vite/Vitest config files; no application code change). Its
+non-Markdown files equal master, so those tasks' fresh reviews cover the merged
+code; native run6 covers Task 10's source. Under process-local Node 22.23.2:
+**383 tests / 16 files**, lint and guarded `mobile:sync` (build, 411 modules,
+13 verified files per platform) pass. Details are in STATUS, "Task 8 merge of
+reviewed master (Task 11)".
 
 During the phone session, a completed clip shows "Processing took N seconds on
 this device"; record it as the plan's elapsed-time observation (one run; whether
@@ -83,10 +85,12 @@ Do not merge the incomplete branch for tooling or call M1 bench acceptance done.
 
 ## Verification and Git
 
-Use process-local Node 22.23.2 (prepend its nvm folder to `PATH`); never switch
-global Node 20 with `nvm use`. Existing listeners at the merge: an unrelated
-project's Vite on `[::1]:5173` and this checkout's dev server on
-`127.0.0.1:5193`; leave both alone, and note they lock `node_modules` files.
+Use process-local Node 22.23.2: prepend `$env:NVM_HOME\v22.23.2` (under
+`%LOCALAPPDATA%\nvm`, not `%APPDATA%`) to `PATH` and confirm `node -v` prints
+v22.23.2 before checks; never switch
+global Node 20 with `nvm use`. Leave the existing listeners alone: an unrelated
+project's Vite on `[::1]:5173` and this checkout's dev server on `127.0.0.1:5193`
+(they lock `node_modules` files, so `npm ci` would fail while they run).
 Run tests/lint/build before each green step commit, push, and update STATUS and
 this handoff. Stage only the step paths, no media/signing files/private data.
 No attribution trailers, force pushes or published-history rewrites. Retain

@@ -342,6 +342,25 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
 - See the [design](superpowers/specs/2026-11-04-processing-time-design.md) and
   [plan](superpowers/plans/2026-11-04-processing-time.md).
 
+### D-027: Type-check the build configuration files
+
+- On 2026-11-04 the user, still away, asked the builder to "keep working, don't
+  ask me too much, just do the stuff that you can to achieve completion of the
+  project". The builder selected Task 11: the configuration task D-017 deferred.
+- Measured before the change: `npm run build` checks `src/` (root `tsconfig.json`)
+  and `capacitor.config.ts` (`tsconfig.mobile.json`), but nothing checks
+  `vite.config.ts` or `vitest.config.ts`. Both already pass when checked by hand,
+  so this adds protection against future errors and fixes no current defect.
+- `tsconfig.node.json` will include both files, and the build will run it.
+- `tsconfig.app.json` is an unreferenced Vite-template file. Its settings fail
+  on the real source (it cannot resolve the `@/` import alias and omits strict
+  mode), so wiring it in would either break the build or check `src/` more
+  weakly than `tsconfig.json` already does. Task 11 deletes it; Git history keeps it.
+- No application source, dependency, Vite/Vitest behavior or native change.
+  Task 8 and Task 4 stay open and unmerged. The other D-017 deferrals (template
+  assets, `src/core/` subfolders) stay deferred.
+- See the [plan](superpowers/plans/2026-11-04-config-typecheck.md).
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
