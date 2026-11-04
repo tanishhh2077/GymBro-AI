@@ -8,6 +8,8 @@ and remote entrypoint/font resources. This is not a general secret scanner.
 Run `npm run mobile:sync` to build, update native copies and verify them, or
 `npm run mobile:verify` to check existing copies without modifying them.
 `npm test` includes synthetic filesystem failure cases from this directory.
+`build-config.test.mjs` checks that `npm run build` type-checks `vite.config.ts`
+and `vitest.config.ts` through `tsconfig.node.json` with Node types only.
 Native compilation, real offline inference and phone performance remain separate.
 
 `check-simulator-screen.swift` is a macOS-only CI smoke check using Apple's local

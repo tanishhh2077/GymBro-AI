@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && tsc --project tsconfig.mobile.json && vite build",
+    "build": "tsc -b && tsc --project tsconfig.mobile.json && tsc --project tsconfig.node.json && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest run",

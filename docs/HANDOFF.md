@@ -12,7 +12,10 @@ this builder choice of the configuration task D-017 deferred. `npm run build`
 does not check `vite.config.ts`/`vitest.config.ts` today (both pass by hand); Task 11
 points `tsconfig.node.json` at both, runs it in the build, and deletes the
 unreferenced template `tsconfig.app.json`, whose settings fail on the real source.
-No application source or dependency changes. Read the
+No application source or dependency changes. Step 1 (D-027, plan) and Step 2
+(wiring, `scripts/build-config.test.mjs`, **383 tests / 16 files**, lint,
+guarded sync, three build mutations) are done; next is Step 3's fresh review.
+Read the
 [plan](superpowers/plans/2026-11-04-config-typecheck.md); its checkboxes and Git
 show the latest step. D-024 applies. One writer; reviewers read only.
 
@@ -60,7 +63,9 @@ Do not merge the incomplete branch for tooling or call M1 bench acceptance done.
 
 ## Verification and Git
 
-Use process-local Node 22.23.2 (prepend its nvm folder to `PATH`); never switch
+Use process-local Node 22.23.2: prepend `$env:NVM_HOME\v22.23.2` (under
+`%LOCALAPPDATA%\nvm`, not `%APPDATA%`) to `PATH` and confirm `node -v` prints
+v22.23.2 before checks; never switch
 global Node 20 with `nvm use`. Leave the existing listeners alone: an unrelated
 project's Vite on `[::1]:5173` and this checkout's dev server on `127.0.0.1:5193`
 (they lock `node_modules` files, so `npm ci` would fail while they run).

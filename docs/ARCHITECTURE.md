@@ -55,7 +55,7 @@ Generated or local-only, and ignored by Git: `node_modules/`, `dist/` (build out
 
 Every authored directory except `public/` has an `AGENTS.md` (rules), a `CLAUDE.md` (imports those rules for Claude Code), and a `README.md` (what the directory holds). `public/` is the exception because Vite publishes every file in it; its rules are in the root [AGENTS.md](../AGENTS.md#static-files-in-public). Native top-level guidance covers generated platform subdirectories; do not add Markdown to copied web assets or resource catalogs.
 
-TypeScript configuration: `npm run build` runs `tsc -b` against the root `tsconfig.json`, which checks `src/` only. `tsconfig.app.json` and `tsconfig.node.json` are not referenced by it, so their settings do not apply and `vite.config.ts`/`vitest.config.ts` are not type-checked. Wiring them in is separate deferred work ([D-017](DECISIONS.md#d-017-repository-structure-fixes)).
+TypeScript configuration: `npm run build` runs `tsc -b` against the root `tsconfig.json`, which checks `src/` with DOM types and the `@/` alias. It then checks `vite.config.ts` and `vitest.config.ts` through `tsconfig.node.json`, which loads Node types only, because those files run in Node when Vite or Vitest starts ([D-027](DECISIONS.md#d-027-type-check-the-build-configuration-files)). `scripts/build-config.test.mjs` fails if either file leaves that check. The unused template `tsconfig.app.json` was deleted.
 
 The build additionally checks `capacitor.config.ts` through
 `tsconfig.mobile.json`. `npm run mobile:sync` builds `dist/` and uses Capacitor to

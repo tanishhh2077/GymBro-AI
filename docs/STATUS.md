@@ -34,6 +34,35 @@ installed-native and real-bench acceptance remain unverified.
 - Recorded D-027 and the [plan](superpowers/plans/2026-11-04-config-typecheck.md)
   (its design section replaces a separate design document for a two-file
   configuration change); updated HANDOFF and the docs/plans indexes.
+- **Correction (recorded in Step 2):** Step 1's commit `3f01ac9` and the line
+  above say its tests/lint/build ran under Node 22.23.2. Only the first
+  measurement command did; later commands prepended the nonexistent
+  `%APPDATA%\nvm\v22.23.2`, so 381 tests, lint, build and the
+  `tsconfig.app.json` failure ran under global Node 20.20.2. Step 2 reran
+  everything under the real `%NVM_HOME%\v22.23.2` (below). Published history is
+  not rewritten; HANDOFF now names the exact path and a `node -v` check.
+
+### Task 11 Step 2 wiring and test
+
+- Claude Code (Opus 5.5), 2026-11-04, under Node 22.23.2/npm 10.9.8 (confirmed
+  with `node -v`).
+- RED: new `scripts/build-config.test.mjs` (Node environment, 2 cases) failed for
+  the intended reasons on the Step 1 files: the build has no
+  `tsc --project tsconfig.node.json` step (index -1), and the compiler's
+  `--listFilesOnly` output lacked `vitest.config.ts`. The second case also
+  requires Node types and rejects `@types/react` and `lib.dom.d.ts`; the old
+  config loaded every installed `@types` package, React included.
+- GREEN: `tsconfig.node.json` includes both config files with `"types": ["node"]`;
+  the build runs `tsc --project tsconfig.node.json` before `vite build`;
+  `tsconfig.app.json` deleted. Both cases pass.
+- Mutation checks, each reverted with `git restore`: a `string`-to-`number`
+  assignment in `vite.config.ts` and in `vitest.config.ts` (TS2322), and
+  `document.title` in `vite.config.ts` (TS2584, no DOM library), each make
+  `npm run build` exit 2. With the first mutation the old three build steps all
+  exit 0 (Vite strips types without checking them), so the check is new coverage.
+- Whole **383 tests / 16 files**, lint exit 0, `npm run mobile:sync` exit 0
+  (411 modules, unchanged; iOS and Android 13 files each verified). No application
+  source, dependency or Vite/Vitest behavior changed.
 
 ### Task 10 Step 1 baseline and design
 

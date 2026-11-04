@@ -59,14 +59,14 @@ browser-only global used by mistake would pass the check and fail when Vite star
 **Modify:** `tsconfig.node.json`, `package.json` (build script only),
 new `scripts/build-config.test.mjs`; **delete** `tsconfig.app.json`.
 
-- [ ] Write a failing Node-environment test: it reads the build script and
+- [x] Write a failing Node-environment test: it reads the build script and
   requires the `tsconfig.node.json` check before `vite build`, and runs the
   installed TypeScript compiler with `--listFilesOnly` on `tsconfig.node.json`,
   requiring both config files in its list. Observe it fail on the current files.
-- [ ] Make the minimal change; observe it pass.
-- [ ] Mutation checks (reverted): a type error in each config file and a `document`
+- [x] Make the minimal change; observe it pass.
+- [x] Mutation checks (reverted): a type error in each config file and a `document`
   reference in `vite.config.ts` each make `npm run build` fail.
-- [ ] Full tests/lint/build and `npm run mobile:sync`; update docs; commit/push.
+- [x] Full tests/lint/build and `npm run mobile:sync`; update docs; commit/push.
 
 ## Step 3 — fresh review and integration
 
