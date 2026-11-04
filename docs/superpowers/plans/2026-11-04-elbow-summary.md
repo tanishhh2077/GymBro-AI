@@ -47,24 +47,24 @@ component calls the current seek callback. No media/store ownership changes.
 **Consumes:** Existing ElbowSeries and onSeek(time); exact new types are in spec.
 **Produces:** summarizeElbows + ElbowClipSummary; ElbowSummaryPanel({summary,onSeek}).
 
-- [ ] Write a first failing core test for asymmetric counts/extrema with original
+- [x] Write a first failing core test for asymmetric counts/extrema with original
   timestamps/indices. Observe failure because summarizeElbows is absent.
-- [ ] Implement the minimal aggregator. Expand RED→GREEN cases for no data,
+- [x] Implement the minimal aggregator. Expand RED→GREEN cases for no data,
   one sample, 0/180°, missing reasons, earliest ties/raw precision, irregular time,
   invalid metadata/sample/measurement and immutability. No new angle calculation.
-- [ ] Write failing panel tests for values/counts, null buttons, time0/raw-time
+- [x] Write failing panel tests for values/counts, null buttons, time0/raw-time
   callbacks, missing-side independence and required interpretation limits.
-- [ ] Implement the compact accessible panel using the existing visual language.
-- [ ] Write failing ElbowTimeline integration tests for summary rendering and
+- [x] Implement the compact accessible panel using the existing visual language.
+- [x] Write failing ElbowTimeline integration tests for summary rendering and
   result replacement; integrate once-per-pose derivation with existing fallback.
-- [ ] Run full tests/lint/build and `npm run mobile:sync`. Record actual RED/GREEN
+- [x] Run full tests/lint/build and `npm run mobile:sync`. Record actual RED/GREEN
   evidence and sync file comparisons. Update docs, inspect staging, commit/push.
 
 ## Step 3 — browser evidence, fresh review and integration
 
-- [ ] Real no-person GPU/CPU inference in own isolated PC browser: summary counts
+- [x] Real no-person GPU/CPU inference in own isolated PC browser: summary counts
   zero measurable, buttons unavailable/disabled, replay and removal still work.
-- [ ] Supplied synthetic positive geometry for min/max UI and narrow/wide layout;
+- [x] Supplied synthetic positive geometry for min/max UI and narrow/wide layout;
   label it synthetic and verify actual jump/paused media-time state where feasible.
 - [ ] Fresh read-only whole-feature review against spec; fix supported issues
   with appropriate failing tests/checks. Do not invent a finding quota.

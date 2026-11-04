@@ -4,7 +4,8 @@ React/TypeScript shared app for GymBro AI's browser/native prototypes. `main.tsx
 starts React; `App.tsx` connects the interface, native lifecycle and session store;
 CSS supplies presentation, including device safe areas.
 
-- [components](components/README.md): inputs, playback, overlay, and elbow timeline.
+- [components](components/README.md): inputs, playback, overlay, elbow timeline
+  and clip summary with supporting timestamp jumps.
 - [core](core/README.md): media helpers, pose engine, image-space measurements, tests.
 - [store](store/README.md): session and media ownership.
 - [types](types/README.md): shared data contracts.

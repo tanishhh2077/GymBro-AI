@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import type { PoseResult } from '@/types';
 import { adjacentElbowSample, elbowSegments, measureElbows, nearestElbowSample,
   type ElbowMeasurement, type ElbowSide, type ElbowUnavailableReason } from '@/core/elbowAngles';
+import { summarizeElbows } from '@/core/elbowSummary';
+import { ElbowSummaryPanel } from './ElbowSummaryPanel';
 
 export interface ElbowTimelineProps {
   pose: PoseResult;
@@ -22,10 +24,14 @@ const COLORS = { left: '#4ade80', right: '#60a5fa' };
 const FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white';
 
 export function ElbowTimeline({ pose, time, onSeek }: ElbowTimelineProps) {
-  const series = useMemo(() => {
-    try { return measureElbows(pose); }
+  const derived = useMemo(() => {
+    try {
+      const series = measureElbows(pose);
+      return { series, summary: summarizeElbows(series) };
+    }
     catch { return null; }
   }, [pose]);
+  const series = derived?.series ?? null;
   // Compute the immutable plot once per result; playback changes only the cursor
   // and selected observation, without recalculating all angles or point strings.
   const traces = useMemo(() => series ? SIDES.flatMap((side) =>
@@ -36,7 +42,7 @@ export function ElbowTimeline({ pose, time, onSeek }: ElbowTimelineProps) {
       y: 104 - segment[0].degrees / 180 * 104,
     }))) : [], [series]);
 
-  if (!series) return (
+  if (!derived || !series) return (
     <section aria-label="Estimated 2D elbow angles" className="border-t border-white/10 px-4 py-4">
       <h3 className="text-sm font-semibold text-white">Estimated 2D elbow angles</h3>
       <p className="mt-2 text-sm text-slate-400">Angle data unavailable for this result. You can still replay or remove the video.</p>
@@ -94,6 +100,8 @@ export function ElbowTimeline({ pose, time, onSeek }: ElbowTimelineProps) {
           onClick={() => next && onSeek(next.time)}
           className={`rounded-md bg-white/5 px-3 py-2 text-xs text-slate-200 disabled:opacity-40 ${FOCUS}`}>Next sample</button>
       </div>
+
+      <ElbowSummaryPanel summary={derived.summary} onSeek={onSeek} />
 
       <details className="mt-4 text-xs leading-relaxed text-slate-400">
         <summary className={`cursor-pointer text-slate-300 ${FOCUS}`}>How these angles are estimated</summary>

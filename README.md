@@ -11,7 +11,10 @@ estimation, and a skeleton overlay with playback controls. Repetition detection,
 depth/tempo findings, saved sessions, and comparisons are not yet
 implemented. Real-video acceptance and mobile performance remain to be verified.
 The player now includes estimated left/right 2D elbow-angle traces, explicit
-unavailable reasons, observation timestamps, and sample navigation. These are
+unavailable reasons, observation timestamps, and sample navigation. A clip summary
+adds per-elbow measurable-sample counts and jumps to lowest/highest observed
+angles. Counts describe available samples; extrema can include tracking errors.
+These are
 image-space measurements, not validated bench biomechanics or technique findings.
 The UI offers only the supported workflow: one side-view bench-press MP4, with
 recording guidance and no exercise or camera-angle choices. Legacy multi-lift code
@@ -136,8 +139,10 @@ npm test
 Vitest runs `src/**/*.test.{ts,tsx}` once using jsdom's simulated browser
 objects and the app's existing Vite settings, including the `@` source alias.
 It also runs `scripts/**/*.test.mjs` in Node for synthetic packaging fixtures.
-All 320 tests pass: 10 native lifecycle, 2 App integration and 21 package guard
-cases plus the preceding 287 cases: 40 elbow-measurement, 9 timeline component,
+All 364 tests pass: Task9 adds 34 summary-contract, 7 summary-panel and 3 timeline
+integration cases to the previous320. That baseline includes 10 native lifecycle,
+2 App integration and 21 package guard cases plus the preceding287:
+40 elbow-measurement, 9 timeline component,
 58 media-helper cases, 55 pose-engine contract cases, 22
 selection-check cases, 12 session-store cases, 11 dropzone component cases, and
 56 pure display-calculation cases, 10 overlay cases, and 14 player cases.

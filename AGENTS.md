@@ -106,8 +106,8 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
   subdirectories; do not add Markdown to asset catalogs or copied public assets.
 - Lint: `npm run lint` passes after the declared-tooling repair and unused-initializer cleanup; see [STATUS.md](docs/STATUS.md) for verification and remaining prototype limitations.
 - Tests: `npm test` runs source tests in jsdom and packaging tests in Node with
-  the app's Vite settings. Current branch: 320 tests in 13 files, including the
-  preceding 287 plus 10 native lifecycle, 2 App integration and 21 packaging
-  cases. Consult STATUS for current evidence; fake bridge/media/pose data do not
+  the app's Vite settings. Task9: 364 tests in 15 files, adding 34 summary core,
+  7 summary panel and 3 integration cases to the previous320. Consult STATUS
+  for current evidence; fake bridge/media/pose data do not
   prove native behavior or bench accuracy. Task 4's separate branch owns its
   browser/fixture tooling.

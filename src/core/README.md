@@ -16,6 +16,10 @@
   per-side unavailable reasons, raw observation selection, gap-separated segments,
   and sample navigation. Forty synthetic-geometry cases verify the calculations;
   this does not establish anatomical accuracy or real bench landmark identity.
+- `elbowSummary.ts`: Task9 counts measurable/unavailable samples per side and
+  preserves earliest raw extrema with media times/observation indices. Its 34
+  synthetic-contract cases cover endpoints, ties, malformed input and immutability.
+  Availability is not confidence; extremes are not per-rep range of motion.
 
 The engine's lifecycle and time contracts are described in
 [ARCHITECTURE.md](../../docs/ARCHITECTURE.md#pose-engine-lifecycle). Passing tests

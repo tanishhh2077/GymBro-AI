@@ -12,8 +12,9 @@ usage, and these documents are the only handoff; see D-016 in
 
 Task9 PC development is active on `feat/task9-elbow-summary` from reviewed
 master26a831f. The user requested PC work while phone testing waits; D-025
-records the builder-selected observed-elbow summary. Design/plan are written;
-no new application code yet. D-024 guidance was carried from Task8's accepted
+records the builder-selected observed-elbow summary. Step1 is committed/pushed
+as7b3a524; Step2 implementation/checks pass and fresh final review is next.
+D-024 guidance was carried from Task8's accepted
 user instruction; Task8 itself stays open at7198ec1 and is not merged here.
 
 ### Task9 Step1 baseline and design
@@ -35,6 +36,38 @@ user instruction; Task8 itself stays open at7198ec1 and is not merged here.
   plan/scoped rules and the player contract, ran no builds/tests and changed no
   files. The identified stale HANDOFF was updated. Step1 is complete; Step2's
   application behavior will be written only after observed failing tests.
+
+### Task9 Step2 implementation and verification
+
+- Added pure `elbowSummary.ts` and small `ElbowSummaryPanel.tsx`; integrated
+  once-per-pose derivation in ElbowTimeline's existing fallback and onSeek path.
+  Counts/extrema use observed values and raw media times only. No engine/store,
+  runtime dependency, input limit, persistence or native configuration changes.
+- RED: initial missing module was resolved with an empty contract file; then the
+  actual first test failed because summarizeElbows was absent. Minimal aggregation
+  made it pass. Expanded34 cases then had22 expected validation failures before
+  guards; all34 now pass. New timeline cases first failed3/12 because summary was
+  absent; panel cases failed7/7 against the empty scaffold. Implemented presentation/
+  integration, then all53 focused cases across3 files passed.
+- Whole **364 tests/15 files**, lint and `mobile:sync` (including build/config
+  type-check) exit0. Vite transforms411 modules; existing Browserslist warning
+  remains. Both platforms'13 shared files and local model/six runtime files pass
+  byte/config checks. This is sync evidence, not new native compilation.
+- Isolated headless desktop Edge156.0.4314.58 at loopback dev5193 passed5 browser
+  cases: real no-person processing yields0 of120 measurable samples on each side,
+  four unavailable/disabled jumps and paused replay; supplied synthetic geometry
+  yields independent3/4 and4/4 counts and evidence jumps that actually update
+  paused video time/angle (0°,180°,90° at real target times); wide1280x900 and
+  narrow390x844 layouts have no horizontal overflow; removal clears summary and
+  restores admission. No external app-origin requests or page errors observed.
+- Positive geometry was explicitly supplied through the development store after
+  real empty-clip inference, with the clip labeled synthetic. It is not positive
+  model/bench evidence. Browser scratch script/results and three non-human PNGs
+  remain ignored in `build/task9-*`; all images were manually inspected. The
+  real inference delegate was not separately captured in this run. No physical
+  phone, actual private-LAN transport, bench accuracy or performance claim follows.
+- Source READMEs/root counts/architecture/plan/handoff updated. Final fresh
+  whole-feature review remains Step3 before integration. Task8/Task4 stay open.
 
 ### Earlier Task7 planning record
 
