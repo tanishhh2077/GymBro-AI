@@ -30,6 +30,27 @@ details. Safari, installed-native and real-bench acceptance remain unverified.
   `src/types/index.ts`. The store fixes bench/side/upload.
 - Recorded D-028 and the [plan](superpowers/plans/2026-11-04-legacy-cleanup.md)
   (design section inside); updated HANDOFF and the docs/plans indexes.
+- Step 1 checks under Node 22.23.2 (confirmed with `node -v`): 383 tests / 16
+  files, lint and build (411 modules) exit 0; 63 relative links resolve.
+
+### Task 12 Step 2 unreferenced files deleted
+
+- Claude Code (Opus 5.5), 2026-11-04, Node 22.23.2 confirmed with `node -v`.
+- Deleted `src/components/ExercisePicker.tsx`, `src/App.css`,
+  `src/assets/{hero.png,react.svg,vite.svg}`, `public/{favicon.svg,icons.svg}`,
+  `EXERCISE_LIST`/`ANGLE_LIST` in `src/core/exercises.ts`, and the
+  `SquatIcon`/`DeadliftIcon`/`BenchIcon` components in `src/components/icons.tsx`,
+  which only the picker imported (a small extension of the plan's file list,
+  recorded in the plan). No test needed changing: deleting unused code has no
+  behavior to observe, so the evidence is the type-check, the unchanged suites and
+  the build output.
+- **383 tests / 16 files** pass unchanged; lint exit 0; `npm run mobile:sync` exit
+  0 with Vite still transforming **411 modules** (the deleted files were never
+  imported). `dist/` dropped from 13 to 11 files (no SVG); the verifier now
+  reports 11 shared files per platform, and each native copy holds 13 files
+  (those 11 plus Capacitor's two permitted empty Cordova stubs), with no SVG.
+- `git grep` finds no remaining reference to any deleted file or export outside
+  the decision/plan/status records and the HANDOFF description.
 
 ### Task 11 record: build configuration type-check, completed on master
 

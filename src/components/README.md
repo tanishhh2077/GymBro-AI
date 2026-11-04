@@ -5,7 +5,6 @@
   alert, blocks every input path while `disabled` (showing `disabledMessage`), and
   claims file drags anywhere on the page while mounted. Tested in
   `ClipDropzone.test.tsx` (11 cases, React `createRoot`/`act` in jsdom).
-- `ExercisePicker.tsx`: legacy exercise/view controls, no longer rendered.
 - `VideoStage.tsx`: player and playback controls. It leases the clip's URL from
   the store while mounted (`retainMedia` prop), sets the video source in an effect,
   shows kind-specific failures, and keeps no-pose clips replayable with a persistent

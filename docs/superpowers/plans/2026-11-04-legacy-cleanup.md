@@ -71,7 +71,8 @@ Changes:
 `public/favicon.svg`, `public/icons.svg`. **Modify:** `src/core/exercises.ts`
 (drop `EXERCISE_LIST`, `ANGLE_LIST`) and the guides that list these files.
 
-- [ ] Delete; run build, tests, lint and `mobile:sync`; confirm `dist/` and both
+- [x] Delete (also `SquatIcon`/`DeadliftIcon`/`BenchIcon` in `src/components/icons.tsx`,
+  used only by the picker); run build, tests, lint and `mobile:sync`; confirm `dist/` and both
   native copies have no `favicon.svg`/`icons.svg`. Update ARCHITECTURE and the
   component/asset/core guides; commit/push.
 

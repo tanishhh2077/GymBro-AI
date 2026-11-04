@@ -14,37 +14,6 @@ const base = (props: IconProps) => ({
   ...props,
 });
 
-export const SquatIcon = (props: IconProps) => (
-  <svg {...base(props)}>
-    <circle cx="12" cy="4" r="2" />
-    <path d="M12 6v4l-3 3v5M12 10l3 3v5" />
-    <path d="M5 9h14" />
-    <circle cx="5" cy="9" r="1.4" />
-    <circle cx="19" cy="9" r="1.4" />
-  </svg>
-);
-
-export const DeadliftIcon = (props: IconProps) => (
-  <svg {...base(props)}>
-    <circle cx="9" cy="4" r="2" />
-    <path d="M9 6v5l5 2M9 11l-2 7M14 13v5" />
-    <path d="M3 20h16" />
-    <circle cx="3" cy="20" r="1.3" />
-    <circle cx="19" cy="20" r="1.3" />
-  </svg>
-);
-
-export const BenchIcon = (props: IconProps) => (
-  <svg {...base(props)}>
-    <path d="M3 16h18" />
-    <path d="M6 16v3M18 16v3" />
-    <circle cx="9" cy="11" r="1.6" />
-    <path d="M9 12.5v3.5M9 12.5l4-1M13 8v8" />
-    <circle cx="13" cy="8" r="1.2" />
-    <circle cx="17" cy="8" r="1.2" />
-  </svg>
-);
-
 export const UploadIcon = (props: IconProps) => (
   <svg {...base(props)}>
     <path d="M12 16V4M12 4l-4 4M12 4l4 4" />

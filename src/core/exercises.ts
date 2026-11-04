@@ -33,12 +33,6 @@ export const EXERCISES: Record<Exercise, ExerciseMeta> = {
   },
 };
 
-export const EXERCISE_LIST: ExerciseMeta[] = [
-  EXERCISES.squat,
-  EXERCISES.deadlift,
-  EXERCISES.bench,
-];
-
 export interface AngleMeta {
   id: CameraAngle;
   name: string;
@@ -62,5 +56,3 @@ export const ANGLES: Record<CameraAngle, AngleMeta> = {
     description: "A balanced view of depth and tracking.",
   },
 };
-
-export const ANGLE_LIST: AngleMeta[] = [ANGLES.side, ANGLES.front, ANGLES["45"]];
