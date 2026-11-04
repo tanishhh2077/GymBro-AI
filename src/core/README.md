@@ -12,6 +12,10 @@
   (22): all pass as of 2026-11-03, using simulated media and a mocked MediaPipe SDK.
 - `landmarks.ts`, `math.ts`, `exercises.ts`: topology, provisional math, and
   legacy multi-exercise metadata.
+- `elbowAngles.ts`: Task 5 image-pixel shoulder/elbow/wrist estimates, explicit
+  per-side unavailable reasons, raw observation selection, gap-separated segments,
+  and sample navigation. Forty synthetic-geometry cases verify the calculations;
+  this does not establish anatomical accuracy or real bench landmark identity.
 
 The engine's lifecycle and time contracts are described in
 [ARCHITECTURE.md](../../docs/ARCHITECTURE.md#pose-engine-lifecycle). Passing tests

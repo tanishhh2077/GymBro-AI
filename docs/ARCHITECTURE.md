@@ -68,6 +68,13 @@ TypeScript configuration: `npm run build` runs `tsc -b` against the root `tsconf
 
 ## Pose engine lifecycle
 
+Task 5 adds `src/core/elbowAngles.ts` as a separate deterministic measurement
+layer: versioned image-pixel angle estimates, per-side abstention, real media
+times/observation indices, gap-separated lines and measured-sample navigation.
+It does not use inferred model z/world coordinates or legacy score/flag types.
+Its 40 geometry tests are synthetic; real bench/anatomical validity is unverified.
+The timeline/player integration is the next step on `feat/task5-elbow-measurements`.
+
 - Before any work or timer starts, every limit must be a positive finite number and every timeout must fit a browser timer (at most 2,147,483,647 ms); otherwise the call fails with kind `validation`. An invalid value would otherwise disable a bound silently (`duration > NaN` is always false) or fire a timer at once.
 - A `processVideo` call is one job. A second call while a job runs (or while `init()` runs) is rejected with kind `busy` and the message "The pose engine is busy with another operation". The job owns an internal `AbortController`; the caller's `signal`, `close()`, and the total deadline all stop it through that controller.
 - Order: validate the sampling rate; read metadata (10 s budget) and reject duration over 60 s, long edge over 1920 px, or more than 2,073,600 px with kind `validation`, stage `metadata`; then initialize the model. No runtime or model is loaded for a rejected video.

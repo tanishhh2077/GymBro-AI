@@ -140,7 +140,17 @@ The reviewer classified the redundant `result` initialization as a **low-severit
 
 ## One next task
 
-Continue the [Task 5 plan](superpowers/plans/2026-11-03-elbow-timeline.md) under D-021: finish design review, implement tested image-space geometry, then the timeline/player integration and fresh code review. The user delegated proceeding past the fixture blocker; do not reopen this batch's understanding checkpoint. No reps, technique findings, backend, persistence or mobile scaffold is included.
+Task 5 Step 2: implemented four pure functions in `src/core/elbowAngles.ts`.
+The 40 new synthetic-geometry cases all failed first against API stubs, then
+passed. Source-pixel axis scaling, bilateral availability, zero/180 degrees,
+unknown visibility, invalid/out-of-image/degenerate points, immutable raw input,
+observation indices and actual times, bounded nearest sampling, independent gap
+segments, and valid-neighbor navigation are covered. The UI is not yet wired.
+Whole tests: **276/276** across nine files; lint exit **0**; build exit **0**,
+400 modules and existing stale Browserslist warning. Real bench landmark/angle
+accuracy remains unverified.
+
+Continue the [Task 5 plan](superpowers/plans/2026-11-03-elbow-timeline.md) under D-021: panel/player tests, timeline integration, then fresh code review and verification. The user delegated proceeding past the fixture blocker; do not reopen this batch's understanding checkpoint. No reps, technique findings, backend, persistence or mobile scaffold is included.
 
 Task 4 acceptance remains open on its separate branch. The user cannot arrange footage and requested continued licensed-footage search; do not ask them to record again. Real bench identity, anatomy and positive synchronization remain unverified. Do not claim that geometry/component fixtures validate real bench measurements.
 

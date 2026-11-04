@@ -32,7 +32,7 @@ and `{frameIndex, time, left, right}` samples with `{degrees, reason}` results.
 
 - [x] Step 1: Read applicable rules; obtain independent design/builder review;
   verify baseline tests/lint/build/dev server; commit the design/plan/context.
-- [ ] Step 2: Write core tests, observe intended failure against API stubs,
+- [x] Step 2: Write core tests, observe intended failure against API stubs,
   implement the four pure functions. Test every measurement/temporal constraint
   above, preserve raw input, and run whole tests/lint/build before commit/push.
 - [ ] Step 3: Write component and player integration tests first; implement the

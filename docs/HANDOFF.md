@@ -20,9 +20,9 @@ automatic reps, medical claims, backend/storage or mobile scaffold in this batch
 ## Branches and actual implementation
 
 - Current branch: `feat/task5-elbow-measurements`, based on reviewed local/remote
-  `master` at `680201d`. Task 5 implementation has not begun yet; design/builder
-  review returned "nothing important left" and baseline checks pass. Next: the
-  plan's core measurement tests and implementation.
+  `master` at `680201d`. Design review returned "nothing important left". Core
+  measurement functions are implemented: 40 tests failed first against API stubs,
+  then passed. Next: panel/player tests first, then integration and fresh review.
 - Tasks 1-3 are implemented/reviewed on master: bounded media engine, one local
   clip, lifecycle/selection errors, timestamped poses, player and overlay.
 - Task 4 tooling is separately committed/pushed at `34538e4` on
@@ -40,7 +40,8 @@ automatic reps, medical claims, backend/storage or mobile scaffold in this batch
 ## Verification and development
 
 Baseline after branch creation: `npm install --no-audit --no-fund` succeeded and
-removed the three Task 4-only tooling packages. `npm test`: 236/236 in eight files.
+removed the three Task 4-only tooling packages. Original baseline: 236 cases.
+Task 5 core adds 40 cases (276 total); see STATUS for the latest verification.
 Lint and build exited 0; build transformed 400 modules with the existing stale
 Browserslist warning. Own strict-port dev server 5191 returned HTTP 200 before
 feature code. No new dependency is planned.
