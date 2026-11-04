@@ -10,7 +10,44 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task9 PC development is active on `feat/task9-elbow-summary` from reviewed
+Task 10 (D-026, observed processing time) is in progress on
+`feat/task10-processing-time` from reviewed master `3209025`, chosen by the
+builder after the user, away from the PC, asked for PC-side work. Task 8's phone
+test waits for the user on its own branch (`3d8230a`: master merged, iOS 26.5.2
+reported, S07/S08 inputs generated and reviewed); its branch records hold the
+details. Safari, installed-native and real-bench acceptance remain unverified.
+
+### Task 10 Step 1 baseline and design
+
+- Claude Code (Opus 5.5), 2026-11-04. Branch created from `master` at `3209025`,
+  matching `origin/master` after a fetch; `package.json` and the lockfile are
+  unchanged since Task 9's clean `npm ci` (478 packages), and `npm ls --depth=0`
+  passed on identical package files earlier today. No reinstall: running Vite
+  servers on `[::1]:5173` (unrelated project) and `127.0.0.1:5193` hold
+  `node_modules` files and were left running.
+- Recorded D-026, the [design](superpowers/specs/2026-11-04-processing-time-design.md)
+  and [plan](superpowers/plans/2026-11-04-processing-time.md); updated AGENTS.md,
+  docs/README and the specs/plans indexes. The builder chose this feature because
+  the phone plan asks for elapsed time "if observed" and iPhone Safari has no
+  console without a Mac.
+- Fresh read-only design review (Claude Code subagent, Opus 5.5, no inherited
+  builder conversation) inspected the design/plan/D-026, AGENTS, D-013/D-024/
+  D-025, PRODUCT_BRIEF, spec.md, the newest phone plan on the Task 8 branch and
+  the store/types/VideoStage/PoseEngine code. No blockers. Three material
+  questions, all adopted: (1) "late result after replacement" cannot occur,
+  because the store refuses a new clip until the old job settles, so tests now
+  cover a late result after removal and a later clip's own interval; (2) the
+  same-update rule needs a store-subscription test, since a final-state check
+  cannot catch a separate later patch; (3) Task 10 must not delay the phone
+  session. Six suggestions adopted: neutral D-026 wording (no "wall-clock";
+  iOS-suspension behavior unverified), the interval explicitly includes model
+  start-up, the start reading precedes resource creation, throwing readings
+  count as invalid, `toFixed(1)` rounding with "seconds" written in full, and a
+  narrow-width browser check. The reviewer ran no tests/builds/browsers.
+
+### Task 9 record: observed elbow summary, completed on master
+
+Task9 PC development ran on `feat/task9-elbow-summary` from reviewed
 master26a831f. The user requested PC work while phone testing waits; D-025
 records the builder-selected observed-elbow summary. **Task9 is complete**:
 reviewed source is integrated in master9e34ec4, local366 tests/lint/build/sync

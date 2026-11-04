@@ -45,6 +45,8 @@
 - D-025 selects Task9's PC-side observed-elbow summary while phone work waits.
   Use its separate design/plan. Sample availability and 2D extremes do not establish
   confidence, per-rep ROM or validated bench technique.
+- D-026 selects Task10's observed processing-time badge. One run's measured time
+  is not a benchmark, rating or phone-performance validation.
 
 ## Independent judgment
 

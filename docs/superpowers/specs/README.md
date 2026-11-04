@@ -1,5 +1,9 @@
 # Feature designs
 
+[Observed processing time](2026-11-04-processing-time-design.md) defines Task 10
+(D-026, in progress): one completed run's admission-to-result time shown as a
+neutral badge. It is a single-device observation, not a benchmark.
+
 [Clip elbow summary](2026-11-04-elbow-summary-design.md) defines completed Task9's
 observed counts/extrema and evidence jumps. It extends Task5 without rep detection
 or a validated range-of-motion claim; D-025 records the PC-development scope.

@@ -1,5 +1,10 @@
 # Implementation plans
 
+Current feature: [Task 10 observed processing time](2026-11-04-processing-time.md)
+under D-026, on `feat/task10-processing-time` from master `3209025`. It shows one
+completed run's measured time; it is not a benchmark. Task 8's branch has merged
+master `3209025` and holds the phone preparation; it merges Task 10 after review.
+
 Latest completed feature: [Task9 elbow summary](2026-11-04-elbow-summary.md),
 observed counts/extrema navigation under D-025. All3 steps,366 tests, fresh review
 and native run5 pass; source is merged/pushed to master. Task8 phone work stays
