@@ -19,8 +19,10 @@ remains in the source but is not rendered.
 
 Processing currently happens on-device using WebAssembly/WebGL. Choosing a local
 video does not upload it to a server. An installed mobile app is the intended
-release direction; a Capacitor prototype is planned for evaluation after the
-initial pipeline is demonstrated. No mobile project or backend exists yet.
+release direction. Task 6 now adds Capacitor iOS/Android project sources and
+branding, with iPhone first. Native compilation and device video handling are
+not verified yet; no backend exists. See [iOS](ios/README.md),
+[Android](android/README.md) and the [mobile plan](docs/superpowers/plans/2026-11-03-mobile-prototype.md).
 
 ## Project context and development
 
@@ -79,8 +81,10 @@ fields and will need revision before evidence-backed findings are built.
 
 ## Getting started
 
+Use **Node 22+** (`.nvmrc` pins 22.23.2), required by the pinned Capacitor CLI.
+
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -90,8 +94,30 @@ A temporary clean copy passed `npm ci --no-audit --no-fund` and `npm run build`
 on Node 20.20.2 / npm 10.8.2; development-server HTTP checks also passed during
 the initial baseline. ESLint and its plugins are now declared. `npm run lint`
 and `npm run build` pass as of 2026-11-02.
-These checks do not establish successful real-video inference. See
+The current mobile setup also passes the shared checks on Node 22.23.2. These
+checks do not establish successful real-video inference or native compilation. See
 [current status](docs/STATUS.md).
+
+### Native projects
+
+```sh
+npm run mobile:sync
+```
+
+This builds the shared app and copies it and the local model/WASM into both
+native projects; it does not compile an APK or iOS app. `npm run build` also
+type-checks `capacitor.config.ts`. The config has no development-server URL.
+
+- `npm run mobile:assets`: regenerate platform icons/splash from the first-party
+  [vector source](resources/README.md).
+- `npm run mobile:open:ios`: open Xcode on macOS; unavailable on Windows.
+- `npm run mobile:open:android`: open an installed Android Studio.
+
+Java 21/Android SDK and macOS/Xcode respectively are needed for native builds.
+Cloud build setup is a later plan step. iOS simulator output cannot run on a
+physical iPhone; Apple signing/provisioning remains separate. Background handling,
+safe-area layout and removal of the existing remote font requests are Step 3,
+not claims of this source-generation step.
 
 ### Automated tests
 

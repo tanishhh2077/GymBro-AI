@@ -3,14 +3,25 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && tsc --project tsconfig.mobile.json && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "mobile:sync": "npm run build && cap sync",
+    "mobile:assets": "capacitor-assets generate --ios --android --iconBackgroundColor \"#05070d\" --iconBackgroundColorDark \"#05070d\" --splashBackgroundColor \"#05070d\" --splashBackgroundColorDark \"#05070d\"",
+    "mobile:open:ios": "cap open ios",
+    "mobile:open:android": "cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "8.6.0",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.0",
+    "@capacitor/ios": "8.6.0",
     "@mediapipe/tasks-vision": "0.10.35",
     "framer-motion": "^11.15.0",
     "react": "^18.3.1",
@@ -19,6 +30,8 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@capacitor/assets": "4.0.0",
+    "@capacitor/cli": "8.6.0",
     "@eslint/js": "^10.0.1",
     "@types/node": "^20.19.43",
     "@types/react": "^18.3.18",

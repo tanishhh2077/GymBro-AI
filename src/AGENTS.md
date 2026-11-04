@@ -12,7 +12,8 @@ with the approved amendments in [decisions](../docs/DECISIONS.md).
 - The existing pipeline runs on the device. Selecting an uploaded file currently
   creates local access to it; it does not transfer the video to a server.
 - Reuse the existing pipeline before adding infrastructure. Backend services,
-  persistence, and mobile scaffolding are deferred; consult decisions for scope.
+  and persistence remain deferred. D-022 now authorizes bounded mobile prototypes;
+  consult the mobile design/plan before native integration work.
 - Keep uncertainty and missing observations visible through every layer. A
   rendered skeleton does not establish measurement accuracy or good lifting form.
 - Existing multi-lift, multi-angle, and score declarations are legacy scaffolding,

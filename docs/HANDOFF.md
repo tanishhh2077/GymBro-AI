@@ -9,15 +9,18 @@ first, developed from Windows without a MacBook. Read root AGENTS.md, the
 [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md) and
 [Task 6 plan](superpowers/plans/2026-11-03-mobile-prototype.md).
 
-The user confirmed the packaging explanation was clear and requested continuing.
-The current approved teaching step is environment verification and plan review.
-Before Step 2's dependency installation/native generation, explain its purpose
-and alternative, ask "Is this clear?", and wait. Do not interpret the earlier
-larger-batch permission as overriding this latest explicit checkpoint workflow.
+The user confirmed the packaging explanation, then replied "ok cool" to Step 2's
+dependency/native-generation understanding checkpoint. Step 2 is implemented
+and reviewed. Before Step 3's behavior changes, explain their purpose and
+alternative, ask "Is this clear?", and wait. Do not interpret earlier larger-batch
+permission as overriding this latest explicit checkpoint workflow.
 
 Current branch: `feat/task6-mobile-app`, based on reviewed master `f0e9118`.
-Only planning/guidance documents have changed; Capacitor is not installed and no
-native shell has been generated. No paid services, signing/enrollment, store
+Capacitor 8.6.0, App 8.1.2 and assets 4.0.0 are pinned; Node 22+ is required.
+Native iOS/SPM and Android project sources plus first-party dumbbell branding are
+generated. `npm run mobile:sync` builds and updates both local copies; it does
+not compile native binaries. Scoped AGENTS/CLAUDE/README files cover both native
+projects and branding sources. No paid services, signing/enrollment, store
 release or device-validation claims are authorized. Simulator output cannot be
 installed on a physical iPhone. Real bench accuracy remains unverified.
 
@@ -54,10 +57,23 @@ server 5193 returned HTTP 200; its process uses Node 22.23.2. A separate ignored
 `.superpowers/mobile-baseline-20261103` clean install succeeded with 338 packages;
 its fresh-source tests (287), lint and build also passed. Fresh read-only Codex
 design review found no significant issues (model not exposed); no native build
-was run by the reviewer. Step 1 is complete; Step 2 awaits its teaching checkpoint.
+was run by the reviewer. Step 1 was committed/pushed as `75cda7d`.
 Do not change the user's global Node 20 or disturb the older server 5176.
 Java 21 is installed, but Android SDK/emulator and Xcode are unavailable locally.
 No native compilation, simulator run or physical-device test has occurred.
+
+Step 2 whole tests still pass (287); lint and build/mobile config type-check pass.
+Both platform adds, asset generation and subsequent `mobile:sync` exit 0. SHA-256
+checks match the local pose model and six WASM runtime/loader files in each native
+copy. Both generated configs retain the local identity/webDir with no server
+override; copied indexes exist and no Markdown is served. All preexisting locked
+package entries are unchanged. Icons and iOS splash were visually inspected.
+Native compilation is still unrun. Background handling, safe-area CSS, remote
+font removal and packaging guard/tests remain Step 3. Fresh read-only Codex setup
+review (`native_setup_review`, model not exposed) found no significant issues
+and independently matched all seven assets in both copies. It checked native
+references/config/ignores/branding but ran no native compilation. Whole-feature
+review still belongs to Step 5.
 
 Baseline after branch creation: `npm install --no-audit --no-fund` succeeded and
 removed the three Task 4-only tooling packages. Original baseline: 236 cases.

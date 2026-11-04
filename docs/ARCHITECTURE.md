@@ -1,10 +1,13 @@
 # System architecture
 
-Status: observed implementation plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 after Task 5 measurement/timeline wiring.
+Status: observed implementation plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 for Task 6 native project generation.
 
 ## Existing implementation
 
-The repository is a React/TypeScript/Vite browser application. There is no Python service, database, account system, mobile project, or persistence layer.
+The shared application is React/TypeScript/Vite. Capacitor 8.6.0 now wraps its
+build in iOS/Android project sources under D-022. These wrappers are generated,
+not yet compiled or verified on devices. There is no Python service, database,
+account system or persistence layer.
 
 Current data flow:
 
@@ -32,6 +35,9 @@ docs/                  Brief, decisions, handoff, status, architecture, workflow
 docs/superpowers/plans/  Active implementation plan and its progress checkboxes
 src/                   Application source (ownership table below)
 public/                Files served unchanged: pose model, MediaPipe runtime, SVGs; no Markdown
+ios/, android/         Native Capacitor wrappers; scoped root guidance covers generated subdirectories
+resources/             First-party vector branding source for native icons/splash screens
+capacitor.config.ts    Native identity, local dist webDir and system-bar configuration
 .vscode/               Shared editor guidance only; other editor files are ignored
 index.html, *.config.*, tsconfig*.json   Vite, Vitest, ESLint, Tailwind/PostCSS, TypeScript settings
 tests/                 Planned in Task 4 for real-browser tests and fixtures; does not exist yet
@@ -39,9 +45,17 @@ tests/                 Planned in Task 4 for real-browser tests and fixtures; do
 
 Generated or local-only, and ignored by Git: `node_modules/`, `dist/` (build output), `.vitest/`, `*.tsbuildinfo`, and `.superpowers/` (scratch snapshots and logs from earlier sessions; history, not a source of truth).
 
-Every authored directory except `public/` has an `AGENTS.md` (rules), a `CLAUDE.md` (imports those rules for Claude Code), and a `README.md` (what the directory holds). `public/` is the exception because Vite publishes every file in it; its rules are in the root [AGENTS.md](../AGENTS.md#static-files-in-public).
+Every authored directory except `public/` has an `AGENTS.md` (rules), a `CLAUDE.md` (imports those rules for Claude Code), and a `README.md` (what the directory holds). `public/` is the exception because Vite publishes every file in it; its rules are in the root [AGENTS.md](../AGENTS.md#static-files-in-public). Native top-level guidance covers generated platform subdirectories; do not add Markdown to copied web assets or resource catalogs.
 
 TypeScript configuration: `npm run build` runs `tsc -b` against the root `tsconfig.json`, which checks `src/` only. `tsconfig.app.json` and `tsconfig.node.json` are not referenced by it, so their settings do not apply and `vite.config.ts`/`vitest.config.ts` are not type-checked. Wiring them in is separate deferred work ([D-017](DECISIONS.md#d-017-repository-structure-fixes)).
+
+The build additionally checks `capacitor.config.ts` through
+`tsconfig.mobile.json`. `npm run mobile:sync` builds `dist/` and uses Capacitor to
+copy/update both native projects and installed plugin references. Copied web
+assets, runtime config, builds, caches, local SDK paths and signing files are
+ignored. There is no remote development-server URL in the native configuration.
+Safe-area CSS, background lifecycle handling and remote-font removal remain
+Task 6 Step 3; native cloud compilation remains Step 4.
 
 ## Current ownership
 
@@ -133,7 +147,11 @@ Keep analysis logic independent of React. Reuse existing working boundaries inst
 
 ## Mobile direction and deferred services
 
-The intended release is an installed mobile app. After the initial browser milestone is demonstrated, a small Capacitor prototype is the first candidate for exercising the same file-selection, analysis, and replay workflow on a real phone. Packaging does not convert browser inference into a native MediaPipe implementation or establish acceptable performance.
+The intended release is an installed mobile app. D-022 authorizes the iOS/Android
+Capacitor prototype before full bench acceptance, prioritizing iPhone. Generated
+project sources now exist; native compilation and phone workflow checks remain
+future gates. Packaging does not convert browser inference into a native
+MediaPipe implementation or establish acceptable performance.
 
 Record the tested device, OS, runtime, model, delegate, clip characteristics, processing time, failure/cancellation behavior, and available resource measurements. Do not choose the processing architecture from an App Store target alone. Prototype evidence determines whether local processing remains suitable or another implementation/service is justified.
 
@@ -145,5 +163,5 @@ These sources establish available platform capabilities, not GymBro AI's measure
 
 - [MediaPipe Pose Landmarker for iOS](https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker/ios): native support includes stored videos.
 - [MediaPipe Pose Landmarker for Python](https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker/python): a future evaluation/implementation option.
-- [Capacitor documentation](https://capacitorjs.com/docs): a candidate for packaging the existing web application and native device integration.
+- [Capacitor documentation](https://capacitorjs.com/docs): packaging the existing web application and native device integration.
 - [Apple App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/#minimum-functionality): distribution requires a useful, complete experience; a framework choice does not guarantee review outcomes.

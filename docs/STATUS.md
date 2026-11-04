@@ -10,15 +10,17 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 6 mobile planning/environment verification is active on
+Task 6 native project setup is active on
 `feat/task6-mobile-app`, based on reviewed master `f0e9118`. D-022 authorizes
 both native prototypes, prioritizing iPhone, from Windows without a MacBook.
-The user confirmed the mobile packaging explanation; the currently approved
-step verifies the environment and reviews the plan. Step 2 retains the explicit
-understanding checkpoint before installing dependencies or generating projects.
+The user confirmed the mobile packaging explanation, then replied "ok cool" to
+Step 2's dependency/native-generation understanding checkpoint. Step 3 retains
+its explicit understanding checkpoint before background/layout behavior changes.
 Read the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md)
-and [plan](superpowers/plans/2026-11-03-mobile-prototype.md). No native code,
-dependencies, builds, signing or device tests have been added yet.
+and [plan](superpowers/plans/2026-11-03-mobile-prototype.md). Capacitor 8.6.0,
+App plugin 8.1.2 and assets tool 4.0.0 are pinned. iOS/SPM and Android native
+projects are generated with `com.gymbroai.app` / GymBro AI identity and version
+0.1.0. No native compilation, signing or device tests have occurred.
 
 Task 6 verification on 2026-11-03: process-local Node 22.23.2 / npm 10.9.8;
 working-tree tests **287/287** in ten files, lint and production build exit **0**,
@@ -28,10 +30,37 @@ working-tree tests **287/287** in ten files, lint and production build exit **0*
 and build also exit **0**, with 403 transformed modules. Fresh read-only Codex
 design review (`mobile_design_review`, model not exposed) found no significant
 issues after inspecting the plan, store/engine ownership, file admission and local
-asset contracts. It ran no builds and changed no files. Step 1 is complete;
-Step 2 awaits its understanding checkpoint. Java 21 exists locally; Android SDK/emulator and Xcode do
+asset contracts. It ran no builds and changed no files. Step 1 is complete and
+pushed as `75cda7d`. Java 21 exists locally; Android SDK/emulator and Xcode do
 not. Earlier server 5176 is untouched. No physical-device or bench-video
 validation follows from these checks.
+
+### Task 6 Step 2 verification
+
+- Package installation and both `cap add` commands exited 0. All existing lockfile
+  package objects remain unchanged; only native-tooling dependencies were added.
+- Whole `npm test`: **287 passed** in ten files. `npm run lint`: exit **0**.
+  `npm run mobile:sync`: exit **0**, including `npm run build`, the new mobile
+  config TypeScript check, 403 Vite modules, both platform asset copies and App
+  plugin references. No macOS/Xcode or Android Gradle compilation was performed.
+- Manual SHA-256 checks matched all seven model/runtime files in each native
+  copy; both indexes exist, both copied configs have the expected identity/local
+  webDir with no server override, and copied web assets contain no Markdown.
+- Pinned asset generation exited **0**: 74 Android and seven iOS assets generated.
+  Visually inspected the iOS icon, Android legacy icon and iOS splash. Removed
+  newly generated unused template iOS splash files and Android arithmetic/wrong
+  package-name example tests; those do not validate GymBro AI.
+- Copied bundles/config, native builds/caches, local SDK paths and signing files
+  are ignored. Added scoped shared guidance and cross-platform commands. No
+  behavior-mirroring tests were added for generated/configuration files; real
+  sync/type-check/hash checks verify this step. Lifecycle/packaging behavior and
+  associated tests belong to Step 3; native builds belong to Step 4.
+- Fresh read-only Codex setup review (`native_setup_review`, model not exposed)
+  found no significant issues. It inspected dependency/native references,
+  config/ignores/scripts/branding and independently matched all seven assets
+  against both native copies. It changed no files and compiled no native binary.
+  Preserve executable mode on `android/gradlew`. No phone/inference/offline
+  startup claim is made: existing remote fonts are removed in Step 3.
 
 ### Earlier milestone context
 
@@ -57,7 +86,7 @@ These are source-inspection observations. They do not establish that real-video 
 - Verified first-milestone result on a real, permitted side-view bench-press clip.
 - Rep detection/counting, descent/bottom/ascent segmentation, validated anatomical-angle/depth/tempo measurements, or technique findings. Task 5 separately implements limited image-space elbow estimates and explicit missingness; it does not establish those biomechanical capabilities.
 - Saved sessions, comparisons, authentication, backend services, or a database.
-- Installed mobile project, device performance results, or store submission.
+- Compiled/installed mobile build, device performance results, or store submission.
 - Complete real-browser acceptance tests, fixture manifest, evaluation dataset, or measured accuracy benchmarks. The passing unit/component checks are described below.
 
 ## Known inspection findings

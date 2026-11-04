@@ -14,7 +14,7 @@ Swift Package Manager/Xcode on macOS CI, Java 21/Android Gradle on Linux CI.
 
 - [x] Step 1: Confirm environment/platform preference, document D-022, review the
   design, verify current Node-22 tests/lint/build and dev serving; commit/push.
-- [ ] Step 2: Pin Capacitor dependencies, Node engine and build scripts. Configure
+- [x] Step 2: Pin Capacitor dependencies, Node engine and build scripts. Configure
   local dist/ identity, generate iOS/Android shells and branded assets, scoped
   guidance and ignores. Verify build/sync and type-check config; commit/push.
 - [ ] Step 3: Test-first native background/listener ownership and packaging guard;
@@ -33,7 +33,14 @@ Step 1 evidence: Node 22.23.2 / npm 10.9.8 selected per process; clean lockfile
 install succeeds; working-tree and fresh-source 287 tests/lint/build pass;
 own dev port 5193 returns HTTP 200. Fresh Codex design review found no significant
 issues. No native packages or project sources generated. The user confirmed the
-packaging explanation; Step 2 retains its own understanding checkpoint.
+packaging explanation and then approved Step 2 via "ok cool" at its checkpoint.
+
+Step 2 evidence: dependencies/config/native sources and branded assets generated;
+287 tests, lint and build/mobile config check pass; both projects sync. All seven
+model/runtime files match each native copy by SHA-256; local configs/indexes and
+ignores checked. Existing locked package entries unchanged. Fresh read-only Codex
+setup review found no significant issues and independently checked asset hashes.
+No native compilation or device test performed. Step 3 awaits its checkpoint.
 
 `capacitor.config.ts`, `.nvmrc`, package/lock and mobile TS configuration;
 generated/configured `ios/`, `android/`, `resources/` with scoped guidance;
