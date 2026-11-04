@@ -13,7 +13,8 @@ iPhone12ProMax, no Android phone or paid Apple membership. It proposes free
 Safari checks first and keeps installed-native/bench gates separate. Its Step 1
 is in progress as Task 8 on `feat/task8-safari-phone-test`: baseline and verified
 fixture export, seven desktop runtime preflight cases and the Task 9 master merge
-pass. iOS version and private-network setup still need the user's coordination.
+pass. The user reported iOS 26.5.2; private-network setup still needs their
+coordination.
 No Safari/physical-phone cases have run. D-024 waives routine understanding
 stops, not actual device/settings actions.
 

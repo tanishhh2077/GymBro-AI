@@ -26,16 +26,16 @@ forwarded insecure-origin GPU check passed earlier (pause/seek actions exercised
 final seek state not asserted). These are PC evidence, not Safari/LAN/native or
 bench passes.
 
+The user reported the iPhone 12 Pro Max runs **iOS 26.5.2** (Settings, 2026-11-04).
+
 **Next action, with the user present:**
-1. Ask for the iPhone 12 Pro Max's iOS version (Settings > General > About);
-   Safari's user-agent string cannot report it reliably.
-2. Agree on a trusted private connection: home Wi-Fi or the iPhone's Personal
+1. Agree on a trusted private connection: home Wi-Fi or the iPhone's Personal
    Hotspot. The PC is still on Ethernet UWNet, Windows category **Public** (a
    campus network); do not serve on it.
-3. Re-detect the PC's private address on that connection, check ports 5195/5196
+2. Re-detect the PC's private address on that connection, check ports 5195/5196
    are free, and bind the production preview (5195) and fixture server (5196)
    only to that address, as the plan's commands specify.
-4. Verify the phone can reach the PC, transfer the fixtures, then run Step 2's
+3. Verify the phone can reach the PC, transfer the fixtures, then run Step 2's
    Safari cases with the user, recording each as passed/failed/blocked/not run.
 
 Do not change firewall/VPN/router settings automatically; prompts are the user's

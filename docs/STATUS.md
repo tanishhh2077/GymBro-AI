@@ -14,10 +14,19 @@ Task 8 (the phone plan's free Safari slice) has resumed on
 `feat/task8-safari-phone-test`. On 2026-11-04 the branch merged reviewed master
 `3209025` (Task 9's completed elbow summary) with a merge commit that keeps both
 published histories. The merged source is byte-identical to master and the whole
-tests/lint/build/guarded sync pass again. PC preparation is complete. Phone testing
-still needs the user: their iOS version and a trusted private connection between
-the iPhone and the PC. No LAN listener, phone transfer or Safari case has run.
-Safari, installed-native and real-bench acceptance remain unverified.
+tests/lint/build/guarded sync pass again. PC preparation is complete. The user
+reported **iOS 26.5.2**. Phone testing still needs the user for a trusted private
+connection between the iPhone and the PC. No LAN listener, phone transfer or
+Safari case has run. Safari, installed-native and real-bench acceptance remain
+unverified.
+
+### Task 8 iOS version
+
+- On 2026-11-04, while away from the PC, the user reported the iPhone 12 Pro Max
+  runs **iOS 26.5.2**, read from Settings. This is user-reported, not observed by
+  an agent; Safari's frozen user-agent string was not used. The phone plan's
+  resource table and Step 1 record it. LAN reachability is still unchecked, and
+  no phone, network or settings action was taken.
 
 ### Task 8 merge of reviewed master (Task 9)
 

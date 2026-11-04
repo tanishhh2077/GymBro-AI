@@ -26,7 +26,7 @@ settings changes and release remain outside that approval.
 
 | Resource | Observed or user-reported state |
 | --- | --- |
-| Test phone | User's iPhone 12 Pro Max; iOS version not reported |
+| Test phone | User's iPhone 12 Pro Max; iOS 26.5.2 (user-reported from Settings, 2026-11-04) |
 | Android phone | User has no access; physical Android tests remain blocked |
 | Apple Developer Program | User has no membership |
 | Mac | User owns no MacBook; temporary Mac access is unconfirmed |
@@ -74,7 +74,7 @@ service would add work/cost before identifying whether the shared pipeline works
 | Route | Prerequisites and limits | Current disposition |
 | --- | --- | --- |
 | Safari from Windows LAN | Phone and PC reachable on the same trusted private network; browser loads the built app from PC | Proposed free first step; not installed native validation |
-| Xcode Personal Team | Temporary compatible Mac, Xcode 26+, free Apple account, device pairing and required Developer Mode; personal provisioning expires after 7 days and needs rebuilding/reinstalling | Conditional; Mac access/iOS version unconfirmed; no paid membership required for this route |
+| Xcode Personal Team | Temporary compatible Mac, Xcode 26+, free Apple account, device pairing and required Developer Mode; personal provisioning expires after 7 days and needs rebuilding/reinstalling | Conditional; Mac access unconfirmed (iOS 26.5.2 reported); no paid membership required for this route |
 | Paid-program distribution | Membership, approved signing/provisioning, macOS build path and separately chosen TestFlight or registered-device installation workflow | Unavailable now; future proposal only, not an enrollment recommendation |
 | Existing simulator ZIP | macOS simulator runtime | Already tested in CI; cannot install on this iPhone |
 | Existing Android debug APK | A compatible Android device | Retained locally; no physical device currently available |
@@ -84,8 +84,9 @@ Apple documents [free Personal Team testing and seven-day limits](https://develo
 and [Developer Mode](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device).
 [Capacitor's environment requirements](https://capacitorjs.com/docs/getting-started/environment-setup)
 require macOS and Xcode 26+; its [iOS guide](https://capacitorjs.com/docs/ios)
-lists iOS 15+ support. The checked-in deployment target is 15.0, which does not
-prove this phone's unknown OS has been tested.
+lists iOS 15+ support. The checked-in deployment target is 15.0; the reported
+iOS 26.5.2 is above it, but that comparison does not show the app was tested on
+this OS. A later Xcode route must confirm its Xcode supports iOS 26.5 devices.
 [Apple's program page](https://developer.apple.com/programs/) lists paid membership
 at US$99/year and TestFlight benefits; no purchase is approved or required for
 the proposed Safari slice. Recheck requirements before a later signing action.
@@ -102,8 +103,9 @@ and `build/`. Text findings go in `docs/STATUS.md`; no new product module.
 - [x] Merge reviewed master `3209025` (Task 9) into the Task 8 branch with a merge
   commit, keeping both published histories, and repeat whole tests/lint/build and
   guarded sync on the merged tree before any phone case. See STATUS.
-- [ ] Confirm the iOS version in Settings > General > About and phone/PC LAN
-  reachability with the user when available.
+- [x] Confirm the iOS version in Settings > General > About: the user reported
+  **iOS 26.5.2** on 2026-11-04. Safari's user-agent string is not used for it.
+- [ ] Confirm phone/PC LAN reachability with the user when available.
 - [x] Select installed Node 22.23.2 only in the task process. Verify the existing
   dev/build baseline before any later feature code. Preserve servers5193/5176.
 - [x] Export only the following files plus their provenance README from immutable
