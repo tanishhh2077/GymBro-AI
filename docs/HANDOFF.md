@@ -21,12 +21,15 @@ Step1 baseline: clean Node22.23.2/npm10.9.8 install (478 packages), 320 tests in
 Browserslist warning remain. Global Node20 is preserved. Own loopback dev server
 5193 returnsHTTP200. Fresh read-only Codex design review found no significant
 issues. Step1 is committed/pushed as7b3a524. Step2 implements pure summary and
-panel integration test-first: **364 tests/15 files**, lint/build and guarded
-mobile sync pass (411 modules,13 shared files each platform). Five PC browser
+panel integration test-first: **366 tests/15 files**, lint/build and guarded
+mobile sync pass (411 modules,13 shared files each platform). Six PC browser
 cases pass with real no-person inference and explicitly supplied positive
 geometry; evidence jumps were checked against actual paused video time. Images
 were inspected at wide/narrow widths. No bench/phone accuracy claim follows.
-Next is fresh whole-feature code review, supported fixes and reviewed integration.
+Fresh whole-feature review found one accessibility defect: the jump action's
+accessible name omitted its value/time. Fixed with described-by associations;
+two new tests first failed, then passed, and the browser computed tree verifies
+current descriptions. No other significant finding. Integration/native CI is next.
 
 ## Product boundaries
 

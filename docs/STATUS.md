@@ -68,6 +68,38 @@ user instruction; Task8 itself stays open at7198ec1 and is not merged here.
   phone, actual private-LAN transport, bench accuracy or performance claim follows.
 - Source READMEs/root counts/architecture/plan/handoff updated. Final fresh
   whole-feature review remains Step3 before integration. Task8/Task4 stay open.
+- Evidence correction: Step2 commitde63196's body overstates the RED count by
+  saying all34 core cases were observed failing. Actual record above is the
+  first API case failing, then22/34 expected validation failures while12 already
+  passed the minimal aggregation. All7 panel and3 new integration cases did fail
+  before their UI/integration implementation. Published history is preserved;
+  this correction, not the shorthand commit body, is the verification record.
+
+### Task9 Step3 critical review and supported fix
+
+- Fresh read-only Codex review (`elbow_summary_code_review`, explicitly selected
+  gpt-6-astra/high, no inherited builder conversation) inspected26a831f..de63196
+  against D-025/design/plan/source. Independently passed67 focused tests across
+  core/panel/timeline/player and mobile:verify13 files per platform. No authored
+  files/builds/sync/branches changed by the reviewer; no delegated subreview.
+- One Medium accessibility defect: aria-label replaced the button's visible
+  angle/time with only action/side, so tabbing screen-reader users could not hear
+  the evidence before activating. Reviewer reproduced the actual component in
+  isolated Edge and its computed accessibility tree. No other significant finding;
+  Declined to judge: none. Reviewer did not repeat full build/inference/native work.
+- Verified source/effect and fixed in one pass. Two new panel tests first failed
+  for missing description associations/unique IDs. React useId now links each
+  button to its visible value/time or Unavailable; replacement updates description
+  text and multiple panels cannot collide. All9 panel tests pass.
+- Fresh whole **366 tests/15 files**, lint and guarded sync/build pass:411 modules,
+  13 shared files on each platform. The existing Browserslist warning remains.
+- Repeated browser checks for the new accessibility behavior: **six cases pass**,
+  including actual computed AX descriptions for unavailable and synthetic0°/180°
+  evidence values/times, plus real no-person inference, actual paused jumps,
+  narrow/wide layout and removal. No external app-origin requests/page errors.
+  This is browser accessibility-tree evidence, not a physical screen-reader test.
+  Phone/LAN/native/bench gates remain unverified. Review is resolved; integration
+  and new native CI evidence remain to be recorded.
 
 ### Earlier Task7 planning record
 

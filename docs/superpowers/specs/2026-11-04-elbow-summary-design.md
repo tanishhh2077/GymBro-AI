@@ -51,6 +51,8 @@ Task4 bench and Task8 phone acceptance remain incomplete on their own branches.
   **N of T sampled positions measurable** and buttons **Lowest observed** /
   **Highest observed**, with whole-degree values and three-decimal media times.
   Accessible names identify side/action, e.g. **Jump to lowest left elbow angle**.
+  Associate the visible angle/time or Unavailable as the action's accessible
+  description; IDs must remain unique when multiple panels are rendered.
   Buttons pass the unrounded raw timestamp to onSeek, including time0.
 - Null extrema show Unavailable and disable their jump buttons. An invalid pose
   retains the existing readable fallback and replay/removal behavior; summary

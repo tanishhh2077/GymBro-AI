@@ -139,7 +139,7 @@ npm test
 Vitest runs `src/**/*.test.{ts,tsx}` once using jsdom's simulated browser
 objects and the app's existing Vite settings, including the `@` source alias.
 It also runs `scripts/**/*.test.mjs` in Node for synthetic packaging fixtures.
-All 364 tests pass: Task9 adds 34 summary-contract, 7 summary-panel and 3 timeline
+All 366 tests pass: Task9 adds 34 summary-contract, 9 summary-panel and 3 timeline
 integration cases to the previous320. That baseline includes 10 native lifecycle,
 2 App integration and 21 package guard cases plus the preceding287:
 40 elbow-measurement, 9 timeline component,

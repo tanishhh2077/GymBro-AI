@@ -19,10 +19,12 @@
   synthetic geometry, paused seeks, no-pose output, malformed input, and source
   reset. No new media resources, timers, persistence, or technique verdicts.
 - `ElbowSummaryPanel.tsx`: Task9's per-side measurable counts and lowest/highest
-  observed angle buttons call the existing player seek callback. Seven component
+  observed angle buttons call the existing player seek callback. Nine component
   cases cover missing/empty sides, endpoint values, raw timestamps and replacement.
   The parent derives summary/series once per pose and retains its invalid-result
-  fallback. The UI explains tracking-error and per-rep ROM limits.
+  fallback. Visible value/time descriptions are associated with each action for
+  screen readers, with unique IDs per panel. The UI explains tracking-error and
+  per-rep ROM limits.
 - `SkeletonOverlay.tsx`: canvas overlay using `poseDisplay` at actual media time.
   It follows the video box and centered contain content, applies DPR once, clears
   missing/not-ready/seeking data, and animates only while playing. Its 10 tests

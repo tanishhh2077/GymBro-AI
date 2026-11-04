@@ -79,4 +79,27 @@ describe('ElbowSummaryPanel', () => {
     act(() => button('Jump to highest left elbow angle').click());
     expect(seek).toHaveBeenLastCalledWith(2.5);
   });
+  it('associates every action with its current visible value/time or unavailable description', () => {
+    render();
+    const description = (label: string) => {
+      const id = button(label).getAttribute('aria-describedby');
+      expect(id).toBeTruthy();
+      return document.getElementById(id!)?.textContent;
+    };
+    expect(description('Jump to lowest left elbow angle')).toBe('0° at 0.000 s');
+    expect(description('Jump to highest left elbow angle')).toBe('130° at 1.235 s');
+    expect(description('Jump to lowest right elbow angle')).toBe('Unavailable');
+    expect(description('Jump to highest right elbow angle')).toBe('Unavailable');
+    const next = summary(); next.left.highest = { degrees: 150, time: 2.5, frameIndex: 70 };
+    render(next);
+    expect(description('Jump to highest left elbow angle')).toBe('150° at 2.500 s');
+  });
+  it('keeps evidence descriptions unique when two summary panels are rendered', () => {
+    act(() => root.render(<><ElbowSummaryPanel summary={summary()} onSeek={seek} />
+      <ElbowSummaryPanel summary={summary()} onSeek={seek} /></>));
+    const ids = Array.from(container.querySelectorAll('button')).map(target => target.getAttribute('aria-describedby'));
+    expect(ids.every(Boolean)).toBe(true);
+    expect(new Set(ids).size).toBe(8);
+    for (const id of ids) expect(document.getElementById(id!)).not.toBeNull();
+  });
 });

@@ -16,10 +16,11 @@ and [milestone-one contract](../../../spec.md), amended by D-014/D-021/D-022.
 
 ## Authorization and known resources
 
-Task 7 authors/reviews this plan only. On 2026-11-04 the user answered "clear"
-to planning installation prerequisites and phone/video checks. No phone tests,
-LAN listener, fixture export, product code, signing or enrollment are authorized
-by that answer. Execution retains its next teaching checkpoint.
+Task7 originally authorized planning only. Task8 subsequently approved free
+Safari preparation; D-024 waived routine "Is this clear?" stops. Explain and
+proceed within that scope, coordinating actual phone/settings actions with the
+user. Task8 stays open on its separate branch; phone work is deferred until they
+return home. Signing, enrollment and release remain outside that approval.
 
 | Resource | Observed or user-reported state |
 | --- | --- |
@@ -87,18 +88,19 @@ prove this phone's unknown OS has been tested.
 at US$99/year and TestFlight benefits; no purchase is approved or required for
 the proposed Safari slice. Recheck requirements before a later signing action.
 
-## Step 1: Prepare the free Safari slice — not approved/executed
+## Step 1: Prepare the free Safari slice — Task8 approved, phone portion pending
 
 **Paths:** Existing app only; later local outputs under ignored `build/fixtures/`
 and `build/`. Text findings go in `docs/STATUS.md`; no new product module.
 **Consumes:** Current master app and exact synthetic blobs below.
 **Produces:** Known app commit/build, local fixture hashes and a reachable test URL.
 
-- [ ] Explain this step and obtain "Is this clear?" confirmation. Confirm the
-  iOS version in Settings > General > About and phone/PC LAN reachability.
-- [ ] Select installed Node 22.23.2 only in the task process. Verify the existing
+- [x] Explain this step; D-024 waives routine understanding stops.
+- [ ] Confirm the iOS version in Settings > General > About and phone/PC LAN
+  reachability with the user when available.
+- [x] Select installed Node 22.23.2 only in the task process. Verify the existing
   dev/build baseline before any later feature code. Preserve servers5193/5176.
-- [ ] Export only the following files plus their provenance README from immutable
+- [x] Export only the following files plus their provenance README from immutable
   commit `34538e417a724ebceb0971bd2b632a376a7e739e`, paths `tests/fixtures/`.
   Use binary-safe Git archive/extraction into ignored `build/fixtures/`; never
   PowerShell text redirection for MP4 bytes. Verify each SHA-256 before transfer.
@@ -114,7 +116,8 @@ and `build/`. Text findings go in `docs/STATUS.md`; no new product module.
 Source README grants project redistribution of these internally generated black,
 silent H.264 patterns; no human/third-party content. They are not bench fixtures.
 
-- [ ] Build with `npm run build`. Check port5195 is free; set a task-local
+- [x] Build with `npm run build`; desktop checks do not pass phone cases.
+- [ ] When the user returns, check port5195 is free; set a task-local
   `$phoneTestHost` to the PC's actual private LAN address, then later run
   `npm run preview -- --host $phoneTestHost --port 5195 --strictPort`.
   Use a production preview instead of exposing the development server/source.
@@ -132,7 +135,7 @@ silent H.264 patterns; no human/third-party content. They are not bench fixtures
   Browser page loading fetches assets from PC; selected video processing stays
   on the phone. Stop the newly owned preview after testing; leave old servers.
 
-## Step 2: Run shared-pipeline cases — not approved/executed
+## Step 2: Run shared-pipeline cases — pending phone coordination, none executed
 
 Use real UI and model, first Safari and later repeat in native app with separate
 rows. Each outcome is **passed / failed / blocked / not run**; all start not run.

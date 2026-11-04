@@ -8,7 +8,8 @@ The reviewed [phone/video acceptance plan](2026-11-04-phone-video-acceptance.md)
 completes Task 7's planning deliverable, authorized on 2026-11-04. Available device:
 iPhone12ProMax, no Android phone or paid Apple membership. It proposes free
 Safari checks first and keeps installed-native/bench gates separate. Execution
-needs the next teaching checkpoint; no phone cases have run.
+is coordinated with the user under D-024; no phone cases have run. Task8's branch
+retains preparation and PC-preflight evidence while the user is away.
 
 The latest completed plan is [2026-11-03-mobile-prototype.md](2026-11-03-mobile-prototype.md),
 authorized by D-022 for both platforms with iPhone first. All five steps are
