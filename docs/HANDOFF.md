@@ -16,10 +16,9 @@ and documentation checks pass. Check Git for the final integrated document commi
 Proposed next execution step: prepare a free private-LAN Safari test from Windows,
 with verified first-party non-human fixtures exported from Task4's exact commit.
 This can test real phone decoding/model/player behavior without paid membership;
-it cannot verify the installed native app. **Execution is not approved yet.**
-Explain the local preview/fixture transfer, why it helps before native signing,
-and why a paid build service is unnecessary for this first slice; ask
-"Is this clear?" and wait before starting servers/exporting files/phone checks.
+it cannot verify the installed native app. The user approved it on 2026-11-04 and
+then waived routine "Is this clear?" stops ([D-024](DECISIONS.md#d-024-explain-and-proceed-without-routine-is-this-clear-checkpoints)):
+explain briefly and proceed, but coordinate every phone action with the user.
 No product code, fixture export, LAN server or phone test has run in Task 7.
 
 Task 6's bounded mobile prototype is complete, iPhone first, from Windows without

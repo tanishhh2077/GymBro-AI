@@ -282,6 +282,21 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   not replace the still-missing permitted bench footage; do not ask the user to
   record again. Physical Android acceptance remains blocked on device access.
 
+### D-024: Explain and proceed without routine "Is this clear?" checkpoints
+
+- On 2026-11-04, after confirming Task 8's Safari-preparation explanation, the
+  user said: "everything is clear, you dont need to ask me everytime if it is
+  clear. just build". This supersedes the routine stop-and-wait checkpoint in
+  D-007 and root `AGENTS.md`.
+- Agents still explain each meaningful step briefly (what, why, why not the
+  obvious alternative) at first/second-year CS level, then proceed without asking
+  "Is this clear?".
+- Still stop for the user when: a material decision or missing requirement is
+  theirs to make; an action needs the user's phone, accounts, or devices; or a
+  step would spend money, publish, upload human media, or change firewall, VPN,
+  router, or repository settings. Those limits are unchanged.
+- Task 8 (the phone plan's free Safari slice) is the first task run this way.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

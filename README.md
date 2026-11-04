@@ -50,9 +50,9 @@ Paste this as the first message in either tool:
 
 ```text
 Read AGENTS.md and docs/HANDOFF.md, then the relevant project instructions.
-Follow the "First response in a new session" section: explain the next step,
-why it exists and its alternative, ask "Is this clear?", and wait before acting.
-Preserve all existing modified and untracked work.
+Explain the next step briefly (what, why, and why not the obvious alternative),
+then proceed without asking "Is this clear?" (D-024). Stop for my decisions and
+any action on my phone or accounts. Preserve all existing modified and untracked work.
 ```
 
 In Claude Code, `/context` lists the loaded instruction files. Instruction-loading

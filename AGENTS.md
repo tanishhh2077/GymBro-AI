@@ -14,7 +14,7 @@
 ## Work with the user
 
 - Teach at a first- or second-year CS level. Define unfamiliar terms, use concrete scenarios, and show why an obvious alternative can fail.
-- Before each meaningful step, explain what it does, why it exists, and why this approach rather than the obvious alternative. Ask **"Is this clear?"** and stop until the user answers. Respect an explicit, task-specific instruction to proceed through a larger step.
+- Before each meaningful step, briefly explain what it does, why it exists, and why this approach rather than the obvious alternative, then proceed. Do not ask "Is this clear?" routinely ([D-024](docs/DECISIONS.md#d-024-explain-and-proceed-without-routine-is-this-clear-checkpoints)). Stop for the user only for decisions that are theirs, actions on their phone/accounts/devices, spending, publishing or uploading human media, and firewall/VPN/router/repository settings changes.
 - An understanding checkpoint is not a request to choose build options. Ask separate clarification questions only when a material requirement is missing.
 - Get a working development environment running before feature code. Treat an existing `node_modules` folder or an old build result as insufficient evidence of a reproducible setup.
 - Preserve unrelated and preexisting uncommitted work. Report failures, skipped checks, and mistaken assumptions plainly.
