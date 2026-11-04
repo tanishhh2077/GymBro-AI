@@ -81,10 +81,10 @@ Changes:
 **Modify:** `src/types/index.ts`, `src/core/exercises.ts`, new
 `src/core/exercises.test.ts`, the type/core guides.
 
-- [ ] Write a failing test: `EXERCISES` has only `bench` with exactly
+- [x] Write a failing test: `EXERCISES` has only `bench` with exactly
   `id`/`name`/`accent`, and `ANGLES` has only `side` with `id`/`name`. Observe it
   fail on the current metadata.
-- [ ] Narrow the metadata and unions, delete the unused analysis types, rewrite
+- [x] Narrow the metadata and unions, delete the unused analysis types, rewrite
   the misleading comments; observe the test pass and the existing suites pass
   unchanged. Run full checks and `mobile:sync`; update guides; commit/push.
 

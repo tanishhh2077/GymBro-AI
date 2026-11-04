@@ -18,7 +18,7 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
 - Findings must be traceable to observations, measurements, and video time. Decline unsupported conclusions.
 - No invented metrics, arbitrary numeric form scores, LLM-invented technique feedback, medical claims, or claims of verified 3D biomechanics.
 - Pose coverage and model visibility have narrower meanings than accuracy or movement quality.
-- This supersedes legacy required score fields and comments that imply view-invariant measured biomechanics. Those types remain unchanged until an approved implementation task revises them.
+- This supersedes legacy required score fields and comments that imply view-invariant measured biomechanics. Those types remain unchanged until an approved implementation task revises them. (D-028 removed them on 2026-11-04.)
 
 ### D-003: On-device processing for the first milestone
 

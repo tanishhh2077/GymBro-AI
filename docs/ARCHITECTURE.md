@@ -99,7 +99,7 @@ environment values; MainActivity enables edge-to-edge rendering.
 | `src/components/poseDisplay.ts` | Pure display calculations: exact observations, bounded interpolation/endpoint holds, drawing eligibility, and centered CSS-pixel video content; used by the overlay without modifying raw observations |
 | `src/core/landmarks.ts` | Landmark indices, the 33-landmark count, and skeleton topology |
 | `src/core/math.ts` | Geometry/signal helpers; no implemented exercise analyzer consumes them yet |
-| `src/core/exercises.ts` | Legacy multi-exercise and camera-angle metadata; the UI shows only the bench and side-view names and accent, because the taglines/descriptions claim unimplemented measurements |
+| `src/core/exercises.ts` | Display names and accent for the one supported lift and view (Bench Press, Side); no taglines or measurement claims (D-028) |
 | `src/types/index.ts` | Shared data shapes, failure kinds/stages; includes provisional future-analysis types |
 | `public/models/`, `public/wasm/` | Bundled pose model and the MediaPipe runtime, byte-identical to the pinned `@mediapipe/tasks-vision` 0.10.35 package |
 
@@ -108,7 +108,7 @@ environment values; MainActivity enables edge-to-edge rendering.
 Task 5 adds `src/core/elbowAngles.ts` as a separate deterministic measurement
 layer: versioned image-pixel angle estimates, per-side abstention, real media
 times/observation indices, gap-separated lines and measured-sample navigation.
-It does not use inferred model z/world coordinates or legacy score/flag types.
+It does not use inferred model z/world coordinates; the legacy score/flag types were removed (D-028).
 Its 40 geometry tests are synthetic; real bench/anatomical validity is unverified.
 Task9's `src/core/elbowSummary.ts` aggregates that series into per-side sample
 availability and earliest raw extrema. `ElbowSummaryPanel.tsx` links extremes to
@@ -158,7 +158,7 @@ Still open, owned by later tasks:
 - Coverage badges now explicitly say sampling target and percentage of sampled positions with a pose, using neutral styling. They do not describe source FPS or technique quality.
 - The interface was checked in a real Chromium browser on 2026-11-03 (Task 2 Step 7, recorded in STATUS) with rejected inputs, an undecodable file, and a synthetic decodable clip without a person. No bench-press video has been processed, so overlay alignment and landmark quality remain unverified (Task 4).
 - The overlay now preserves missing observations and bounded display gaps through `poseDisplay.ts`. Simulated component tests verify canvas calls and cleanup; real-media timing, anatomical alignment, and actual screen-reader announcements remain unverified (Task 4).
-- The UI no longer offers other exercises or views, and its copy describes pose visualization only. Task 12 (D-028) deleted the unrendered `ExercisePicker.tsx` with its lift icons, `App.css` and the unreferenced Vite template assets in `src/assets/` and `public/`. Still present until Task 12 Step 3: the squat/deadlift and front/45° metadata and future analysis types that imply analyzers, view-invariant biomechanics, and numeric scores.
+- The UI no longer offers other exercises or views, and its copy describes pose visualization only. Task 12 (D-028) deleted the unrendered `ExercisePicker.tsx` with its lift icons, `App.css` and the unreferenced Vite template assets in `src/assets/` and `public/`. Its Step 3 removed the squat/deadlift and front/45° metadata and the unused analysis types that implied analyzers, view-invariant biomechanics and numeric scores; `Exercise`, `CameraAngle` and `ClipSource` now hold only `bench`, `side` and `upload`. `math.ts` gap filling still has no consumer.
 
 [STATUS.md](STATUS.md) tracks verification evidence for these items.
 

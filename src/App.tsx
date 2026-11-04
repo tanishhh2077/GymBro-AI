@@ -22,8 +22,6 @@ export default function App() {
   const removeClip = useSessionStore((s) => s.removeClip);
   const retainClipMedia = useSessionStore((s) => s.retainClipMedia);
 
-  // Only the names are shown; the legacy taglines/descriptions claim measurements
-  // that are not implemented.
   const { name: exerciseName, accent } = EXERCISES[exercise];
   const admissionBlocked = clips.length > 0 || processingState !== "idle";
   const releasing = clips.length === 0 && processingState === "cancelling";

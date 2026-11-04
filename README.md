@@ -140,7 +140,8 @@ npm test
 Vitest runs `src/**/*.test.{ts,tsx}` once using jsdom's simulated browser
 objects and the app's existing Vite settings, including the `@` source alias.
 It also runs `scripts/**/*.test.mjs` in Node for synthetic packaging fixtures.
-All 383 tests pass: Task 11 adds 2 build-configuration cases to Task 10's 381.
+All 385 tests pass: Task 12 adds 2 lift/view metadata cases to Task 11's 383,
+which added 2 build-configuration cases to Task 10's 381.
 Task 10 added 11 store timing and 4 player badge cases to
 Task 9's 366, which added 34 summary-contract, 9 summary-panel and 3 timeline
 integration cases to the previous320. That baseline includes 10 native lifecycle,

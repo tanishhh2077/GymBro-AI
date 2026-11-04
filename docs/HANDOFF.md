@@ -14,7 +14,9 @@ narrows the lift/view/source types and metadata to bench/side/upload. Nothing
 visible changes. Read the [plan](superpowers/plans/2026-11-04-legacy-cleanup.md);
 its checkboxes and Git show the latest step. Step 1 (D-028, plan) and Step 2
 (unreferenced files deleted, plus the picker-only lift icons; 383 tests, lint,
-guarded sync with 11 verified files per platform) are done; next is Step 3. D-024 applies. One writer;
+guarded sync with 11 verified files per platform) and Step 3 (types/metadata
+narrowed, unused analysis types deleted, **385 tests / 17 files**) are done; next
+is Step 4's browser check and fresh review. D-024 applies. One writer;
 reviewers read only.
 
 Task 11 (D-027, the build's Vite/Vitest config type-check) is complete on master

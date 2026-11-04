@@ -12,8 +12,8 @@ Inherit [source guidance](../AGENTS.md). Follow the
   replacement for missing evidence. Preserve uncertainty and reasons to abstain.
 - Future findings should identify supporting measurements and video times, the
   assumptions they require, and limitations that affect interpretation.
-- Do not introduce arbitrary form scores or medical diagnoses. Existing `score`
-  and `overallScore` fields are legacy scaffolding, not an endorsed output design.
+- Do not introduce arbitrary form scores or medical diagnoses. The legacy
+  `score`/`overallScore` scaffolding was removed (D-028); do not restore it.
 - Future contract changes must update producers and consumers together. Do not
   change application types as part of documentation-only work.
 - Keep later persistence and API contracts separate from browser object URLs and

@@ -52,6 +52,27 @@ details. Safari, installed-native and real-bench acceptance remain unverified.
 - `git grep` finds no remaining reference to any deleted file or export outside
   the decision/plan/status records and the HANDOFF description.
 
+### Task 12 Step 3 contracts narrowed
+
+- Claude Code (Opus 5.5), 2026-11-04, Node 22.23.2 confirmed with `node -v`.
+- RED: new `src/core/exercises.test.ts` (2 cases) failed because `EXERCISES` still
+  had squat/deadlift entries with tagline/focus fields and `ANGLES` still had
+  front/45° entries with descriptions.
+- GREEN: `EXERCISES` = `{ bench: { id, name: "Bench Press", accent: "#f472b6" } }`,
+  `ANGLES` = `{ side: { id, name: "Side" } }`; `Exercise = "bench"`,
+  `CameraAngle = "side"`, `ClipSource = "upload"`. Deleted the unused `RepPhase`,
+  `MetricSample`, `FlagSeverity`, `FormFlag`, `Rep`, `ClipAnalysis`,
+  `AngleCapabilities`, `MetricDisagreement`, `SessionReport`, `ExerciseAnalyzer`
+  and `AnalyzerInput`. Rewrote the header and `WorldLandmark` comments (inferred
+  model estimate, unused by measurements) and removed `App.tsx`'s now-stale
+  tagline comment.
+- **385 tests / 17 files** pass with no existing test file changed (the App and
+  VideoStage tests render the names and accent); lint exit 0; `npm run mobile:sync`
+  exit 0 (411 modules; 11 verified files per platform). The built JavaScript no
+  longer contains "Back Squat", "Deadlift", "knee cave" or "Bar path"; it still
+  contains "Bench Press" and `#f472b6`. Type/core/architecture guides, AGENTS and
+  README counts updated; D-002 notes the removal.
+
 ### Task 11 record: build configuration type-check, completed on master
 
 ### Task 11 Step 1 decision and plan
