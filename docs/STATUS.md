@@ -10,6 +10,34 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task9 PC development is active on `feat/task9-elbow-summary` from reviewed
+master26a831f. The user requested PC work while phone testing waits; D-025
+records the builder-selected observed-elbow summary. Design/plan are written;
+no new application code yet. D-024 guidance was carried from Task8's accepted
+user instruction; Task8 itself stays open at7198ec1 and is not merged here.
+
+### Task9 Step1 baseline and design
+
+- Clean Node22.23.2/npm10.9.8 `npm ci --no-audit --no-fund` succeeds:478 packages,
+  with existing uuid/Recharts deprecations. No package/lock changes or new dependencies.
+- Whole320 tests/13 files, lint and build/config type-check exit0;409 modules,
+  existing Browserslist warning. Own loopback dev server5193 starts before feature
+  code. Global Node20 is preserved. No public/LAN binding or phone action.
+- Existing single-writer feature checkout is retained under established project
+  workflow. Independent reviewers read only. If separate isolation becomes
+  necessary, changes must be transferred; no worktree cleanup or branch deletion.
+- Task8 at7198ec1 preserved fixtures/desktop preflight evidence. Its phone cases
+  remain unrun, pending user return/iOS/private-network coordination. Task4 at34538e4
+  still lacks permitted bench footage and remains unmerged.
+- Own dev5193 returnsHTTP200. Fresh independent read-only Codex builder review
+  (`elbow_summary_design_review`, no inherited conversation; model not exposed)
+  found no significant findings/material questions. It inspected source/design/
+  plan/scoped rules and the player contract, ran no builds/tests and changed no
+  files. The identified stale HANDOFF was updated. Step1 is complete; Step2's
+  application behavior will be written only after observed failing tests.
+
+### Earlier Task7 planning record
+
 Task 7's [phone/video acceptance plan](superpowers/plans/2026-11-04-phone-video-acceptance.md)
 is complete as a planning-only deliverable, developed on
 `feat/task7-phone-test-plan` from clean reviewed master `e38cc4b`. The user

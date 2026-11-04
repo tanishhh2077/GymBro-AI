@@ -1,5 +1,9 @@
 # Implementation plans
 
+Active: [Task9 elbow summary](2026-11-04-elbow-summary.md), PC-side observed
+sample counts and extrema navigation under D-025; phone work stays deferred on
+Task8's branch. No rep/ROM/technique validity claim is added.
+
 The reviewed [phone/video acceptance plan](2026-11-04-phone-video-acceptance.md)
 completes Task 7's planning deliverable, authorized on 2026-11-04. Available device:
 iPhone12ProMax, no Android phone or paid Apple membership. It proposes free

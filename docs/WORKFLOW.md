@@ -4,7 +4,7 @@
 
 1. Read root and applicable local `AGENTS.md` files, the original product brief, decisions, current status, and relevant architecture/specification sections.
 2. Inspect actual repository state, including uncommitted work. Resolve stale documentation by recording the discrepancy; do not overwrite the work to make it match a plan.
-3. Explain the next meaningful step, its purpose, and its obvious alternative. Ask "Is this clear?" and wait unless the user explicitly authorized proceeding through that larger step.
+3. Explain the next meaningful step, its purpose, and its obvious alternative, then proceed; do not ask "Is this clear?" routinely ([D-024](DECISIONS.md#d-024-explain-and-proceed-without-routine-is-this-clear-checkpoints)). Stop only for the user's decisions, device/account actions, spending, publishing, or settings changes.
 4. Before feature code, establish a working development environment and relevant baseline checks. Write a bounded implementation plan only after the design is understood and approved.
 
 ## Independent judgment: always applicable
@@ -79,9 +79,10 @@ Keep one writer in the shared checkout and reviewers read-only. Preserve modifie
 and untracked work, including tests written before implementation. A new clone or
 worktree based only on HEAD may not include the current prototype changes.
 
-The first response in a new session must preserve the teaching checkpoint:
-explain the next meaningful step and wait for understanding before coding, unless
-the handoff records explicit task-specific approval to proceed through that step.
+The first response in a new session explains the next meaningful step and
+continues within the approved scope under D-024. Do not restore routine
+"Is this clear?" stops. Coordinate actual user device/account actions and stop
+for the decisions, spending, publishing and settings changes listed in D-024.
 README files describe each directory; they are not substitutes for the approved
 brief/specification or shared agent rules.
 
