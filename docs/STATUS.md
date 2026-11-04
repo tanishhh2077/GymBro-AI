@@ -22,10 +22,11 @@ Read the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md
 and [plan](superpowers/plans/2026-11-03-mobile-prototype.md). Capacitor 8.6.0,
 App plugin 8.1.2 and assets tool 4.0.0 are pinned. iOS/SPM and Android native
 projects are generated with `com.gymbroai.app` / GymBro AI identity and version
-0.1.0. Android and iOS simulator native compilation pass in run 1, but the iOS
-startup screenshot is blank despite green launch status. Rendered UI acceptance
-is unresolved; a diagnostic/readiness fix is in progress. No Apple signing
-credentials or physical-device tests have been used.
+0.1.0. **Run3 passes both native builds and visible iOS startup**, after earlier
+blank/home-screen failures exposed insufficient launch verification. The final
+screenshot was downloaded/hash-verified and manually inspected. Step 4 is
+complete; Step 5's whole-feature review/integration awaits its teaching checkpoint.
+No Apple signing credentials or physical-device tests have been used.
 
 Task 6 verification on 2026-11-03: process-local Node 22.23.2 / npm 10.9.8;
 working-tree tests **287/287** in ten files, lint and production build exit **0**,
@@ -214,6 +215,45 @@ validation follows from these checks.
   passed (**320 tests**, lint, build/config check, guarded sync) before another
   push. Signing metadata/dylib dependencies will also be printed read-only;
   no actual startup repair is claimed.
+- Foreground-launch/crash diagnostic commit `76dd71c` pushed. [Run 3](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41778715047)
+  (`41778715047`) passed shared checks and is compiling Android/iOS. Native
+  startup logs/crash reports and rendered screenshot remain pending.
+
+### Task 6 Step 4 final result
+
+- [Run 3](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41778715047) at
+  `76dd71c` completed **success**: shared checks, Android debug APK and iOS
+  simulator compile/package/UI checks. Swift guard compiles and correctly rejects
+  the first-party splash. Both final packages contain all 13 shared web files.
+- iPhone **17 Pro / iOS 26.4** simulator, Xcode **26.6 / 17F113**, standard
+  macOS26 ARM64: foreground launch returned PID13285; first capture lacked the
+  interface, next capture recognized actual GymBro/bench-press text. The final
+  downloaded 1206x2622 screenshot was manually inspected: header, safe top spacing,
+  hero, recording guidance and supported-workflow labels render correctly.
+  Console reports **WebView loaded**; no fresh matching App crash report found.
+  Absence of a crash report is not a general stability result.
+- Foreground launch plus bounded visible-text retries resolves the verification
+  failure without changing application code. This does not isolate one production
+  defect or measure phone startup/performance; cold shared simulators are slow.
+  Retain the guard, separate stdout/stderr and scoped crash diagnostics.
+- Signing metadata shows `Signature=adhoc`, `flags=0x20002(adhoc,linker-signed)`,
+  `TeamIdentifier=not set`, despite `CODE_SIGNING_ALLOWED=NO`. No Apple identity,
+  credentials or provisioning were used. This is a simulator package, not an IPA
+  installable on a physical iPhone. Earlier "unsigned" shorthand is superseded.
+- Downloaded both current artifacts to ignored `build/artifacts/run-3/`; outer
+  ZIP digests match GitHub metadata. Android artifact `13297429135`, 24,697,556
+  bytes, SHA-256 `d12dc6377297143f57f67ff95a42cdfe327f6bc8ebd0a0f0ba47c6aab59fd24e`.
+  iOS artifact `13298088997`, 20,996,498 bytes, SHA-256
+  `768af2609e771b82f87832fb4195bc7fc193d26b5510b46fa0df662e6ae16590`.
+  Only expected entries were extracted. APK payload is 24,697,416 bytes, SHA-256
+  `06f11dbc5b80a21a5f366db28983eb5033732a7deccdb0cfb6c55bec07b42e32`;
+  simulator ZIP is 19,894,745 bytes; visible startup PNG is 1,101,445 bytes.
+  Both downloaded package payloads independently match all 13 dist files by
+  SHA-256. Artifacts remain one day on GitHub; local ignored copies are retained.
+- No actual phone installation, native file selection/background test, offline
+  inference, video processing or bench calibration occurred. Android compilation
+  does not establish Android UI/device performance; iOS startup proves no pose
+  accuracy. M1/Task4 footage acceptance remains incomplete. No store release.
 
 ### Earlier milestone context
 

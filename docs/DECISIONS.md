@@ -253,6 +253,10 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
 - The user approved Step 2 with "ok cool" and answered "clear" to the explicit
   Step 3 explanation, then "clear" to Step 4's cloud-build explanation. Step 5
   retains the next understanding checkpoint.
+- Step 4's run3 verifies native compilation and visible iPhone-simulator startup.
+  Xcode's ARM64 linker generates an ad-hoc signature despite disabled Xcode
+  signing; no Apple team/identity/provisioning is used. This does not authorize
+  signed physical-iPhone installation, store delivery or unverified device claims.
 
 ## Specification-author defaults and later acceptance
 

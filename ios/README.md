@@ -14,21 +14,27 @@ npm run mobile:sync
 
 These commands also work on Windows and prepare the local web bundle; they do
 not compile iOS. Native sources/branding and the shared lifecycle/layout work
-are implemented. Cloud run 1 compiled on Xcode26.6 and launched an iPhone17Pro
-simulator, but the downloaded screenshot is blank. Visible startup is unresolved;
-see STATUS for diagnostic changes/results. Physical-device behavior is unverified.
+are implemented. Cloud run 3 compiled on Xcode26.6 and verified visible startup
+on an iPhone17Pro/iOS26.4 simulator. The downloaded screenshot was inspected;
+earlier blank/home-screen captures are documented in STATUS. Physical-device
+behavior and video inference remain unverified.
 
-On macOS with Xcode 26+, the planned unsigned simulator build command is:
+On macOS with Xcode 26+, the verified simulator build command is:
 
 ```sh
 xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO build
 ```
 
-An unsigned simulator `.app` cannot be installed on a physical iPhone. Physical
+The ARM64 linker emits an ad-hoc signature despite disabled Xcode signing; no
+Apple identity/team/provisioning is used. This simulator `.app` cannot be
+installed on a physical iPhone. Physical
 installation/TestFlight/App Store delivery needs Apple signing/provisioning and
 a suitable macOS build path. No signing setup or store release is included here.
 File selection, background cancellation, offline inference and phone performance
 need actual platform/device checks before claiming support.
+
+Run3 artifacts and inspected image are retained locally in ignored
+`build/artifacts/run-3/`; GitHub artifacts expire after one day.
 
 Use `npm run mobile:assets` after editing `resources/logo.svg`; inspect generated
 assets. Never commit copied `App/App/public`, credentials, device media or build

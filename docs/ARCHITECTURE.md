@@ -6,8 +6,9 @@ Status: observed implementation plus accepted direction; not a claim of complete
 
 The shared application is React/TypeScript/Vite. Capacitor 8.6.0 now wraps its
 build in iOS/Android projects under D-022. Both native wrappers now compile in
-cloud CI; the iOS process launched but its first screenshot was blank, so native
-interface acceptance is unresolved. Neither is verified on physical devices.
+cloud CI; run3 also verifies visible iPhone-simulator startup after earlier
+blank/home-screen captures exposed weak test readiness. Neither is verified on
+physical devices or native video inference.
 There is no Python service, database,
 account system or persistence layer.
 
@@ -65,7 +66,10 @@ ignored. There is no remote development-server URL in the native configuration.
 installed MediaPipe runtime, allowing only Capacitor's two exact empty Cordova
 compatibility stubs. It checks native bundle IDs/configs, local entrypoints and
 obvious forbidden served files; it is not a general secret/network scanner.
-Native cloud compilation remains Step 4.
+Native cloud compilation and visible iOS startup passed in Step 4; its artifacts
+are retained locally under ignored `build/artifacts/run-3/`. The macOS Vision
+guard recognizes both brand/workflow labels, rejects the splash, and permits
+bounded startup retries. It processes only the empty shell, not workout media.
 
 `src/mobile/nativeLifecycle.ts` owns one native app-state listener per App mount,
 including handles delivered after cleanup. Native background events pause attached

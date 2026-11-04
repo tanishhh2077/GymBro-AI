@@ -11,7 +11,7 @@ dispatch is defined, but GitHub's UI requires the workflow on the repository's
 default branch. That default is still `feat/gymbro-video-landmarks`; this workflow
 does not change repository settings. Feature-branch pushes work independently.
 
-Planned artifacts, retained one day:
+Artifacts, retained one day:
 
 - `GymBroAI-android-debug-<run number>`: debug APK; an Android test installation
   package, not a Play Store release.
@@ -28,8 +28,13 @@ reports matching this app are printed for startup failures. No workout
 image is inspected and no paid OCR service is called. Compilation, launch and
 screen inspection have separate results; none establishes inference/performance.
 Run1 compiled both platforms but its startup PNG was blank despite green jobs;
-run2's visual guard correctly failed on home-screen captures. Launch/log/crash
-diagnostics are being tightened to determine the cause. See
+run2's visual guard correctly failed on home-screen captures. With foreground
+launch and bounded readiness retries, [run3](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41778715047)
+passed all jobs, rendered the actual iPhone17Pro/iOS26.4 interface, and its image
+was manually inspected. No application-code change was required. The ARM64 linker
+emits an ad-hoc signature without an Apple team/identity; this is simulator output.
+Both artifacts were downloaded/hash-verified and are retained locally in ignored
+`build/artifacts/run-3/`. Native video/device checks remain separate. See
 [STATUS](../../docs/STATUS.md) for actual runs and unresolved checks.
 
 Download artifacts from the selected run's summary under the repository's Actions

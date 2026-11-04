@@ -49,6 +49,13 @@ paid services, Apple enrollment, backend uploads, or claims of validated lifting
   Separate successful web bundling, native compilation, simulator launch and
   actual phone/video inference. Report every unavailable check explicitly.
 
+Observed build detail (Step 4): Xcode signing was disabled, but the ARM64 linker
+generated an ad-hoc signature with no Apple team/identity. References to an
+"unsigned simulator app" mean no Apple credentials/provisioning in this design,
+not absence of a linker-generated signature. Physical-iPhone delivery stays
+outside this prototype. Run3 verifies compilation and visible simulator startup;
+real native video/inference and device acceptance remain separate.
+
 ## References
 
 [Capacitor requirements](https://capacitorjs.com/docs/getting-started/environment-setup),

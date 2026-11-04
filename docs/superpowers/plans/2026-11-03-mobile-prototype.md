@@ -20,7 +20,7 @@ Swift Package Manager/Xcode on macOS CI, Java 21/Android Gradle on Linux CI.
 - [x] Step 3: Test-first native background/listener ownership and packaging guard;
   implement cleanup integration and readable safe-area/offline shell. Run whole
   tests/lint/build, native asset checks, document actual results; commit/push.
-- [ ] Step 4: Add reviewed cloud builds for Android APK and unsigned iOS simulator
+- [x] Step 4: Add reviewed cloud builds for Android APK and iOS simulator
   app, using standard public-repo runners, minimal permissions, no signing/store
   deployment. Run/inspect builds; fix actual failures and record logs/artifacts.
 - [ ] Step 5: Obtain fresh whole-feature code review, resolve supported issues,
@@ -52,9 +52,20 @@ insets, no overflow/external requests/errors; screenshots inspected. Fresh Codex
 review found no significant issues and independently passed 100 focused cases
 plus package verification. Preview 5194 stopped/port free. Native compilation,
 actual device lifecycle/insets/offline inference remain unrun. Step 4's cloud-build
-checkpoint was then approved with "clear"; its workflow is authored/reviewed,
-with actionlint 1.7.12 validation and all local checks passed. Native results
-remain pending before the initial push-triggered run.
+checkpoint was then approved with "clear"; its reviewed workflow passed
+actionlint 1.7.12 and all local checks before initial push.
+
+Step 4 evidence: run3 at `76dd71c` passed shared checks, Android debug and iOS
+simulator compilation/package checks. All 13 shared files match both compiled
+packages and downloaded payloads. The Swift guard rejects the first-party splash
+and recognizes actual GymBro/bench UI after foreground launch; the downloaded
+iPhone17Pro/iOS26.4 screenshot was manually inspected. Earlier blank/home-screen
+failures prompted readiness/diagnostic fixes, not speculative app-code changes.
+Both outer artifact hashes match GitHub metadata; current downloads are retained
+in ignored `build/artifacts/run-3/`. Xcode26.6's ARM64 linker emits an ad-hoc
+signature despite disabled Xcode signing, with no Apple team/identity. This is
+not physical-iPhone delivery. No device/video inference or store release checked.
+Step 5 awaits its teaching checkpoint; no whole-feature merge/review yet.
 
 `capacitor.config.ts`, `.nvmrc`, package/lock and mobile TS configuration;
 generated/configured `ios/`, `android/`, `resources/` with scoped guidance;

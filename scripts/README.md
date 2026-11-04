@@ -17,4 +17,6 @@ It requires both the GymBro brand fragment and bench-press label, tolerating
 OCR's observed I/l confusion in the name. The workflow checks its negative path
 against the first-party splash image, then
 retries actual empty-shell captures with a bound. It never inspects workout media
-or calls a paid service. Its compilation/execution must be verified on macOS CI.
+or calls a paid service. macOS compilation, splash rejection and actual native
+startup detection passed in run3; that screenshot was manually inspected. A
+visible empty shell does not verify file selection or pose analysis.

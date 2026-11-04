@@ -21,9 +21,10 @@ Set-Location android
 
 On Linux/macOS, use `./gradlew assembleDebug` inside `android/`. Expected output:
 `app/build/outputs/apk/debug/app-debug.apk`. These native build commands have not
-run locally: this Windows environment lacks an Android SDK/emulator. Cloud run 1
+run locally: this Windows environment lacks an Android SDK/emulator. Cloud run 3
 successfully compiled the debug APK and verified all 13 packaged web files.
-The downloaded APK is retained in ignored `build/artifacts/run-1/` locally.
+The current downloaded APK is retained as
+`build/artifacts/run-3/GymBroAI-android-debug.apk` locally (ignored by Git).
 Debug compilation does not prove file selection,
 inference, background cleanup or performance on an actual phone.
 
