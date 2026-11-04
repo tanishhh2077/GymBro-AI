@@ -297,6 +297,26 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   router, or repository settings. Those limits are unchanged.
 - Task 8 (the phone plan's free Safari slice) is the first task run this way.
 
+### D-025: Continue PC development with an observed-elbow summary
+
+- On 2026-11-04 the user requested "Let’s do the pc side dev" while the phone
+  session was deferred until they returned home. D-024's "just build" instruction
+  continues to waive routine approval stops, not actual device/settings decisions.
+- Builder-selected next feature: summarize measurable elbow samples and lowest/
+  highest observed 2D angles with links to their evidence timestamps. This reuses
+  Task5's angle measurements and its explicit ordering exception under D-021.
+  The user delegated PC work; they did not prescribe this algorithm or UI.
+- No reps, phases, per-rep ROM, confidence/technique scores, smoothing, new model,
+  backend, storage or dependencies. Bench accuracy and native/phone acceptance
+  remain open; summary extremes may reflect tracking errors.
+- Task9 uses its own branch from reviewed master26a831f. Preserve Task8 at
+  `feat/task8-safari-phone-test` (`7198ec1`) and Task4 at `34538e4`; do not merge
+  either unfinished task to obtain tooling. Carry only accepted D-024 guidance
+  and accurate continuity records into this branch.
+- See the [design](superpowers/specs/2026-11-04-elbow-summary-design.md) and
+  [plan](superpowers/plans/2026-11-04-elbow-summary.md). Existing single-writer
+  checkout/feature branches are retained; a fresh reviewer is read-only.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

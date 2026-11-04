@@ -11,7 +11,10 @@ estimation, and a skeleton overlay with playback controls. Repetition detection,
 depth/tempo findings, saved sessions, and comparisons are not yet
 implemented. Real-video acceptance and mobile performance remain to be verified.
 The player now includes estimated left/right 2D elbow-angle traces, explicit
-unavailable reasons, observation timestamps, and sample navigation. These are
+unavailable reasons, observation timestamps, and sample navigation. A clip summary
+adds per-elbow measurable-sample counts and jumps to lowest/highest observed
+angles. Counts describe available samples; extrema can include tracking errors.
+These are
 image-space measurements, not validated bench biomechanics or technique findings.
 The UI offers only the supported workflow: one side-view bench-press MP4, with
 recording guidance and no exercise or camera-angle choices. Legacy multi-lift code
@@ -21,7 +24,7 @@ Processing currently happens on-device using WebAssembly/WebGL. Choosing a local
 video does not upload it to a server. An installed mobile app is the intended
 release direction. Task 6 now adds Capacitor iOS/Android project sources and
 branding, with iPhone first. Android and iOS simulator compilation pass in cloud
-CI; [run 3](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41778715047)
+CI; [run 5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
 also verifies the visible iPhone-simulator interface. Physical-device video
 handling is unverified; no backend exists. See [iOS](ios/README.md),
 [Android](android/README.md) and the [mobile plan](docs/superpowers/plans/2026-11-03-mobile-prototype.md).
@@ -119,8 +122,8 @@ development-server URL.
 
 Java 21/Android SDK and macOS/Xcode respectively are needed for native builds.
 Cloud builds are verified in the [workflow](.github/workflows/README.md);
-download test artifacts from run 3 (one-day GitHub retention). Local copies are
-retained in ignored `build/artifacts/run-3/`. iOS simulator output cannot run on a
+download test artifacts from run5 (one-day GitHub retention). Local copies are
+retained in ignored `build/artifacts/run-5/`. iOS simulator output cannot run on a
 physical iPhone; Apple signing/provisioning remains separate. Native app-state
 events now pause attached videos and cancel unfinished processing; completed clips
 stay in memory. The layout uses device safe areas, and fonts use local system
@@ -136,8 +139,10 @@ npm test
 Vitest runs `src/**/*.test.{ts,tsx}` once using jsdom's simulated browser
 objects and the app's existing Vite settings, including the `@` source alias.
 It also runs `scripts/**/*.test.mjs` in Node for synthetic packaging fixtures.
-All 320 tests pass: 10 native lifecycle, 2 App integration and 21 package guard
-cases plus the preceding 287 cases: 40 elbow-measurement, 9 timeline component,
+All 366 tests pass: Task9 adds 34 summary-contract, 9 summary-panel and 3 timeline
+integration cases to the previous320. That baseline includes 10 native lifecycle,
+2 App integration and 21 package guard cases plus the preceding287:
+40 elbow-measurement, 9 timeline component,
 58 media-helper cases, 55 pose-engine contract cases, 22
 selection-check cases, 12 session-store cases, 11 dropzone component cases, and
 56 pure display-calculation cases, 10 overlay cases, and 14 player cases.

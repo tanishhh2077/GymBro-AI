@@ -23,3 +23,5 @@ Inherit [source guidance](../AGENTS.md). Follow the
   Task 5 is an explicit ordering exception under D-021: the user asked to build
   later work despite the missing fixture. Implement the bounded image-space
   measurement design, preserving real-bench validation as an open requirement.
+- Task9 (D-025) summarizes those same observed angles/counts with timestamped
+  evidence. It does not add rep detection or validate range of motion/technique.

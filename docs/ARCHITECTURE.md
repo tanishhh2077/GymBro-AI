@@ -111,6 +111,11 @@ layer: versioned image-pixel angle estimates, per-side abstention, real media
 times/observation indices, gap-separated lines and measured-sample navigation.
 It does not use inferred model z/world coordinates or legacy score/flag types.
 Its 40 geometry tests are synthetic; real bench/anatomical validity is unverified.
+Task9's `src/core/elbowSummary.ts` aggregates that series into per-side sample
+availability and earliest raw extrema. `ElbowSummaryPanel.tsx` links extremes to
+the same player seek handler. Counts are not confidence or time coverage;
+extremes can contain tracking errors and are not per-rep ROM. No smoothing,
+new geometry, media ownership or detector behavior is introduced.
 `src/components/ElbowTimeline.tsx` now consumes this series for completed clips,
 following the player's media-time events and delegating raw-sample jumps to its
 existing seek handler. Measurement failures leave video replay/removal usable.
@@ -147,7 +152,7 @@ per-side unavailability do not certify a target person or anatomical accuracy.
 
 ## Observed gaps and risks
 
-The engine-level gaps found by earlier inspection (unbounded seek and initialization waits, no concurrency guard, shared detector timestamps, missing duration and dimension bounds) are addressed and covered by mocked contract tests. The 100 MiB file-size bound is enforced by `validateSelection` in the store's `startClip`. The earlier store gaps (an unbounded legacy metadata wait, no cancellation on removal, and a shared engine across clips) are replaced by the session ownership above and covered by mocked store tests. Real decoding and inference behavior remain unverified.
+The engine-level gaps found by earlier inspection (unbounded seek and initialization waits, no concurrency guard, shared detector timestamps, missing duration and dimension bounds) are addressed and covered by mocked contract tests. The 100 MiB file-size bound is enforced by `validateSelection` in the store's `startClip`. The earlier store gaps (an unbounded legacy metadata wait, no cancellation on removal, and a shared engine across clips) are replaced by the session ownership above and covered by mocked store tests. PC decoding/inference on no-person patterns is recorded in STATUS; real bench accuracy and physical-phone behavior remain unverified.
 
 Still open, owned by later tasks:
 

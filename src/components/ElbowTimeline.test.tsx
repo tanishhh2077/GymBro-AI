@@ -95,4 +95,39 @@ describe('ElbowTimeline', () => {
     expect(left().textContent).toBe('Unavailable');
     expect(container.textContent).toContain('Observation 1');
   });
+  it('summarizes both sides and jumps to original earliest evidence at time zero', () => {
+    const p = pose(); p.frames[1].landmarks![11].visibility = 0;
+    render(p, .3);
+    const summary = container.querySelector('[aria-label="Clip measurement summary"]');
+    expect(summary).not.toBeNull();
+    expect(summary?.textContent).toContain('2 of 3 sampled positions measurable');
+    expect(summary?.textContent).toContain('3 of 3 sampled positions measurable');
+    act(() => button('Jump to lowest left elbow angle').click());
+    expect(seek).toHaveBeenLastCalledWith(0);
+  });
+  it('replaces summary counts, extrema and seek targets with the new result', () => {
+    render();
+    expect(container.querySelector('[aria-label="Clip measurement summary"]')).not.toBeNull();
+    const p = pose(); p.frames = [p.frames[2]];
+    Object.assign(p.frames[0].landmarks![11], { x: .1, y: .5 });
+    Object.assign(p.frames[0].landmarks![13], { x: .5, y: .5 });
+    Object.assign(p.frames[0].landmarks![15], { x: .9, y: .5 });
+    render(p, .8);
+    const summary = container.querySelector('[aria-label="Clip measurement summary"]');
+    expect(summary?.textContent).toContain('1 of 1 sampled positions measurable');
+    expect(button('Jump to highest left elbow angle').textContent).toContain('180°');
+    act(() => button('Jump to highest left elbow angle').click());
+    expect(seek).toHaveBeenLastCalledWith(.8);
+  });
+  it('keeps no-pose summary extrema unavailable and all four evidence jumps disabled', () => {
+    const p = pose(); for (const f of p.frames) f.landmarks = null;
+    render(p);
+    const summary = container.querySelector('[aria-label="Clip measurement summary"]');
+    expect(summary).not.toBeNull();
+    expect(summary?.textContent).toContain('0 of 3 sampled positions measurable');
+    for (const side of ['left', 'right']) for (const extremum of ['lowest', 'highest']) {
+      expect(button(`Jump to ${extremum} ${side} elbow angle`).disabled).toBe(true);
+      expect(button(`Jump to ${extremum} ${side} elbow angle`).textContent).toContain('Unavailable');
+    }
+  });
 });

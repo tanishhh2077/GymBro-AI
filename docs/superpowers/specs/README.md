@@ -1,5 +1,9 @@
 # Feature designs
 
+[Clip elbow summary](2026-11-04-elbow-summary-design.md) defines completed Task9's
+observed counts/extrema and evidence jumps. It extends Task5 without rep detection
+or a validated range-of-motion claim; D-025 records the PC-development scope.
+
 [Mobile prototype](2026-11-03-mobile-prototype-design.md) defines Task 6:
 both native platforms, iPhone first, reusing the current local pipeline. Native
 build/startup checks pass; physical-device/video validation remains a separate

@@ -1,14 +1,21 @@
 # Implementation plans
 
+Latest completed feature: [Task9 elbow summary](2026-11-04-elbow-summary.md),
+observed counts/extrema navigation under D-025. All3 steps,366 tests, fresh review
+and native run5 pass; source is merged/pushed to master. Task8's branch has since
+merged this reviewed master (merge commit, both histories kept) and repeated its
+checks; its phone work still waits for the user. No rep/ROM/technique validity
+claim is added.
+
 The reviewed [phone/video acceptance plan](2026-11-04-phone-video-acceptance.md)
 completes Task 7's planning deliverable, authorized on 2026-11-04. Available device:
 iPhone12ProMax, no Android phone or paid Apple membership. It proposes free
 Safari checks first and keeps installed-native/bench gates separate. Its Step 1
 is in progress as Task 8 on `feat/task8-safari-phone-test`: baseline and verified
-fixture export and seven desktop runtime preflight cases pass. The user deferred
-phone work until returning home; iOS/private-network setup still needs their
-coordination. No Safari/physical-phone cases have run. D-024 waives routine
-understanding stops, not actual device/settings actions.
+fixture export, seven desktop runtime preflight cases and the Task 9 master merge
+pass. iOS version and private-network setup still need the user's coordination.
+No Safari/physical-phone cases have run. D-024 waives routine understanding
+stops, not actual device/settings actions.
 
 The latest completed plan is [2026-11-03-mobile-prototype.md](2026-11-03-mobile-prototype.md),
 authorized by D-022 for both platforms with iPhone first. All five steps are

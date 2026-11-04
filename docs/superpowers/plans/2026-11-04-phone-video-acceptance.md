@@ -19,8 +19,10 @@ and [milestone-one contract](../../../spec.md), amended by D-014/D-021/D-022.
 Task 7 authored/reviewed this plan only. Its original "clear" authorized planning,
 not execution. Task 8 subsequently approved Step 1's free Safari preparation;
 D-024 waived routine "Is this clear?" stops. Explain and proceed within that
-scope, coordinating actual phone actions with the user. Signing, enrollment,
-network settings changes and release remain outside that approval.
+scope, coordinating actual phone/settings actions with the user. Task 8 stays
+open on its separate branch, which now merges reviewed master `3209025` (Task 9);
+phone work waits for the user's availability. Signing, enrollment, network
+settings changes and release remain outside that approval.
 
 | Resource | Observed or user-reported state |
 | --- | --- |
@@ -29,7 +31,7 @@ network settings changes and release remain outside that approval.
 | Apple Developer Program | User has no membership |
 | Mac | User owns no MacBook; temporary Mac access is unconfirmed |
 | Windows | Node 22.23.2 available per process; global Node 20 stays unchanged |
-| Native artifacts | Task 6 master run4 compiled APK/simulator app; neither proves phone video processing |
+| Native artifacts | Master run5 (Task 9 source) compiled APK/simulator app, as did Task 6 run4; neither proves phone video processing |
 | Real bench fixture | Still missing; user cannot record one; do not ask again |
 
 Builder recommendation: begin with free Safari checks on the actual phone.
@@ -88,7 +90,7 @@ prove this phone's unknown OS has been tested.
 at US$99/year and TestFlight benefits; no purchase is approved or required for
 the proposed Safari slice. Recheck requirements before a later signing action.
 
-## Step 1: Prepare the free Safari slice — approved, in progress as Task 8
+## Step 1: Prepare the free Safari slice — Task8 approved, phone portion pending
 
 **Paths:** Existing app only; later local outputs under ignored `build/fixtures/`
 and `build/`. Text findings go in `docs/STATUS.md`; no new product module.
@@ -97,8 +99,11 @@ and `build/`. Text findings go in `docs/STATUS.md`; no new product module.
 
 - [x] Explain this step; Task 8 is approved and routine understanding stops are
   waived by D-024. Actual user phone/settings actions still need coordination.
+- [x] Merge reviewed master `3209025` (Task 9) into the Task 8 branch with a merge
+  commit, keeping both published histories, and repeat whole tests/lint/build and
+  guarded sync on the merged tree before any phone case. See STATUS.
 - [ ] Confirm the iOS version in Settings > General > About and phone/PC LAN
-  reachability when the user is available.
+  reachability with the user when available.
 - [x] Select installed Node 22.23.2 only in the task process. Verify the existing
   dev/build baseline before any later feature code. Preserve servers5193/5176.
 - [x] Export only the following files plus their provenance README from immutable
@@ -137,7 +142,7 @@ silent H.264 patterns; no human/third-party content. They are not bench fixtures
   Browser page loading fetches assets from PC; selected video processing stays
   on the phone. Stop the newly owned preview after testing; leave old servers.
 
-## Step 2: Run shared-pipeline cases — not approved/executed
+## Step 2: Run shared-pipeline cases — pending phone coordination, none executed
 
 Use real UI and model, first Safari and later repeat in native app with separate
 rows. Each outcome is **passed / failed / blocked / not run**; all start not run.

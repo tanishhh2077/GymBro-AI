@@ -1,161 +1,86 @@
 # GymBro AI: current handoff
 
-Updated 2026-11-04 (America/Chicago). Start here in Claude Code or Codex.
+Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 
 ## Current task and next action
 
 **Task 8: the phone plan's free Safari slice** (Step 1 of the
 [phone test plan](superpowers/plans/2026-11-04-phone-video-acceptance.md)), on
-branch `feat/task8-safari-phone-test` from master `26a831f`. Approved by the
-user on 2026-11-04; routine "Is this clear?" stops are waived
-([D-024](DECISIONS.md#d-024-explain-and-proceed-without-routine-is-this-clear-checkpoints)),
-but every phone action is coordinated with the user. Do not merge Task 4.
+`feat/task8-safari-phone-test`. Approved by the user on 2026-11-04;
+[D-024](DECISIONS.md#d-024-explain-and-proceed-without-routine-is-this-clear-checkpoints)
+waives routine "Is this clear?" stops, but every phone, account, network or
+settings action is coordinated with the user. Do not merge Task 4.
 
-Done so far (details in STATUS, "Task 8 Step 1 preparation"):
-- Process-local Node 22.23.2 / npm 10.9.8 (nvm folder prepended to PATH per
-  command; global Node 20 untouched). Baseline: **320 tests / 13 files**, lint and
-  build pass, 409 modules.
-- The five non-human fixtures and their README were exported byte-for-byte
-  (`git cat-file blob`) from `34538e4` into ignored `build/fixtures/`; every
-  SHA-256 matches the plan's table and every byte count and Git object ID matches
-  the source tree. The directory holds only those six files.
-- The production build in ignored `dist/` is from app code identical to `26a831f`.
-- Codex reviewed Claude's work and verified every fixture against the immutable
-  source. Fresh 320 tests/lint/build pass. Seven real desktop Edge preflight
-  cases pass: GPU no-pose processing on both empty clips, playback progression,
-  pause/seek control actions and narrow layout,
-  three metadata-limit rejections and active cancellation/replacement. These
-  are PC results, not Safari/phone acceptance. Evidence is in ignored `build/`.
-  Resulting paused/seek state was not independently asserted in that scratch run.
-- A separate Edge check also completed real GPU inference with
-  `isSecureContext=false` at a test HTTP origin; requests were forwarded to the
-  loopback production preview. This tests Edge's HTTP feature gating, not actual
-  LAN transport or Safari compatibility.
+The branch has merged reviewed master `3209025` (Task 9) with a merge commit that
+keeps both published histories. Its non-Markdown files are identical to master,
+so Task 9's fresh code review covers the merged code. Under process-local Node
+22.23.2: **366 tests / 15 files**, lint and guarded `mobile:sync` (build, 411
+modules, 13 verified files per platform) pass; the 13 rebuilt `dist/` files match
+the master run5 APK byte-for-byte. Details are in STATUS, "Task 8 merge of
+reviewed master".
 
-**Next action, when the user returns home:** on 2026-11-04 the user postponed the
-phone portion for roughly six hours while busy. Wait for their return; do not
-start phone/LAN actions or change network settings in the meantime. The PC was
-rechecked on UWNet (Ethernet, Windows category Public), not the required trusted
-private connection. Coordinate home Wi-Fi or Personal Hotspot, confirm the iOS
-version (Settings > General > About), then re-detect the actual private address.
-Bind the production preview5195 and fixture server5196 only to that address;
-verify reachability with the user before file transfer. Firewall/VPN/router
-prompts/settings remain their decision. No LAN listener or phone transfer has run.
-The PC-only preflight used a temporary loopback preview, not the campus address.
+PC preparation is complete: the five first-party non-human fixtures plus their
+provenance README sit in ignored `build/fixtures/`, exported from `34538e4`, and
+every SHA-256 still matches the plan. Seven desktop Edge preflight cases and a
+forwarded insecure-origin GPU check passed earlier (pause/seek actions exercised,
+final seek state not asserted). These are PC evidence, not Safari/LAN/native or
+bench passes.
 
-Task 7's planning-only deliverable is complete (D-023): the user has an
-**iPhone 12 Pro Max**, no Android phone access and no Apple Developer Program
-membership; temporary Mac access remains unconfirmed.
+**Next action, with the user present:**
+1. Ask for the iPhone 12 Pro Max's iOS version (Settings > General > About);
+   Safari's user-agent string cannot report it reliably.
+2. Agree on a trusted private connection: home Wi-Fi or the iPhone's Personal
+   Hotspot. The PC is still on Ethernet UWNet, Windows category **Public** (a
+   campus network); do not serve on it.
+3. Re-detect the PC's private address on that connection, check ports 5195/5196
+   are free, and bind the production preview (5195) and fixture server (5196)
+   only to that address, as the plan's commands specify.
+4. Verify the phone can reach the PC, transfer the fixtures, then run Step 2's
+   Safari cases with the user, recording each as passed/failed/blocked/not run.
 
-Task 6's bounded mobile prototype is complete, iPhone first, from Windows without
-a MacBook (D-022). The reviewed feature was fast-forwarded/pushed to `master` at
-`ed5f1b3` on 2026-11-04; `feat/task6-mobile-app` is retained. Implementation head
-is `76dd71c`; later commits document evidence. Check Git for current tips.
+Do not change firewall/VPN/router settings automatically; prompts are the user's
+decision. No LAN listener, phone transfer or Safari case has run.
 
-On 2026-11-04 the user answered "clear" to Step 5's whole-feature review and
-reviewed-integration explanation. Do not reopen its checkpoint.
-Fresh whole-feature code review found no significant issues and independently
-passed 33 focused tests/package checks. Documentation audit found two stale
-current claims and a plan-index label; these are corrected. All five steps are
-complete: local merged-tree checks and master cloud run4 pass. Task 7 supplied
-the reviewed protocol; Task 8 now owns its approved Safari preparation.
+## Product boundaries
 
-Read root AGENTS.md, the [mobile design](superpowers/specs/2026-11-03-mobile-prototype-design.md),
-[plan](superpowers/plans/2026-11-03-mobile-prototype.md), and scoped guidance
-before edits. Shared AGENTS.md files are imported by adjacent CLAUDE.md files.
+One local side-view bench-press MP4. Existing MediaPipe 0.10.35 model/runtime,
+bounded decoding/cancellation, synchronized player/overlay, image-space elbow
+measurements and Task 9's clip summary (measurable sample counts, lowest/highest
+observed 2D angles with jumps to their timestamps; design and plan in
+`docs/superpowers/`, D-025). No backend, accounts, saved sessions, reps or form
+verdicts. Summary availability is not accuracy confidence; observed extrema can
+include tracking errors and are not per-rep ROM or 3D anatomy.
 
-## Implemented behavior
+Capacitor 8.6.0/App 8.1.2 prototypes use appId `com.gymbroai.app`, version 0.1.0.
+[Master run5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
+compiled both platforms and verified visible iPhone 17 Pro/iOS 26.4 simulator
+startup with Xcode 26.6/17F113. Latest ignored packages/image are in
+`build/artifacts/run-5/`; Android APK SHA-256:
+`91a0a19de40a5616a90f8776fd9d52dcde925699d63a87982217c55447bed9c9`.
+The simulator ZIP cannot install on an iPhone; physical native workflow and
+offline inference remain unverified. Pushing this branch does not trigger the
+workflow (only `feat/task6-mobile-app` and `master` do).
 
-- Pinned Capacitor 8.6.0, App 8.1.2, assets tool 4.0.0; Node 22+ required.
-  iOS/SPM and Android sources, GymBro AI identity `com.gymbroai.app`, version
-  0.1.0, and first-party dumbbell icons/splashes are checked in.
-- The shared React app retains one local side-view bench-press MP4, bounded pose
-  processing, player/overlay and image-space elbow estimates. No backend,
-  accounts, saved sessions, reps or technique verdicts.
-- Native background events pause videos and reset unfinished processing through
-  the existing store's abort/lease cleanup. Completed clips stay in memory;
-  returning never auto-resumes. Late native listener handles are released.
-- Device safe-area CSS and Android edge-to-edge are enabled. Fonts are local
-  system fallbacks. No remote model/runtime or development-server URL.
-- `mobile:sync` builds, copies/updates both platforms and verifies them;
-  `mobile:verify` checks existing copies without mutation. Neither compiles
-  native binaries. Guard rejects stale/missing/extra bundles, wrong identities,
-  remote resources/server overrides and obvious forbidden served files.
-  Runtime bytes match the installed MediaPipe package; only the two exact empty
-  Capacitor compatibility stubs are exempted from dist/native tree matching.
+## Resources and limits
 
-## Verified results and artifacts
+The user has an iPhone 12 Pro Max, no Android phone and no Apple Developer
+Program membership; temporary Mac access is unconfirmed. No paid services,
+signing setup, publication or human-video uploads. Safari success is not
+native-app or bench-accuracy validation.
 
-[Master cloud run4](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41794275180),
-at `ed5f1b3`, succeeded, repeating run3: shared checks, Android debug APK, iOS
-simulator build, compiled-package comparisons, splash rejection and visible app
-startup.
+Task 4 remains at `feat/task4-browser-acceptance` / `34538e4`; licensed bench
+footage is still missing. The user cannot record one; do not ask again.
+Do not merge the incomplete branch for tooling or call M1 bench acceptance done.
 
-- **320 tests / 13 files**, lint, build/config type-check and guarded sync pass
-  locally and in shared Linux CI. Build transforms 409 modules; the existing
-  Browserslist warning remains.
-- Both compiled packages contain all 13 shared web files byte-for-byte, including
-  the model and six runtime/loader files.
-- Xcode **26.6 / 17F113**, macOS 26 ARM64, **iPhone 17 Pro / iOS 26.4 simulator**:
-  the Vision text guard passed and the downloaded screenshot shows the actual
-  interface, manually inspected after outer-artifact hash verification.
-  Console reports WebView loaded; no matching fresh App crash report was found.
-- Run 1's green launch produced a blank image; run 2 correctly failed on home
-  screen captures. Foreground launch and bounded visible-text retries resolved
-  the verification failure without app-code changes. Do not replace this gate
-  with a fixed sleep or equate process launch with rendering. Detailed evidence
-  and diagnostic-review disposition are in STATUS.
-- Although Xcode signing was disabled, the ARM64 linker emitted an ad-hoc
-  signature, with no Apple team/identity. This is a simulator build, **not an
-  installable iPhone app or signed IPA**.
+## Verification and Git
 
-Latest downloaded artifacts and screenshot are retained in ignored
-`build/artifacts/run-4/`: `GymBroAI-android-debug.apk`,
-`GymBroAI-ios-simulator.zip`, `ios-simulator-startup.png`, plus outer ZIPs.
-Both outer ZIP digests matched GitHub metadata. APK SHA-256:
-`a8bdc00bd80188bbdeb8bd3a1b66ea108a8be6fec69d01b943abba38535a2918`.
-GitHub artifact IDs: Android `13305216402`, iOS `13305681152`; retention one day.
-The earlier accepted run3 downloads remain in `build/artifacts/run-3/`.
-Never commit the downloads, screenshots, signing files or copied web assets.
-
-Fresh read-only Codex whole-feature review of `f0e9118..eabf55e` found no
-significant implementation findings. It independently passed 33 focused cases,
-verified both packages' 13 files/configs and APK checksum, and inspected the
-visible iOS image. A separate docs audit verified links/imports/guidance; two
-stale font/compilation claims and a plan-index label are corrected. Review-model
-identifiers were not exposed. No native execution or inference was performed by
-these reviewers.
-Review is resolved. Merged master passes the whole 320 tests, lint and guarded
-sync/build. Master run4 independently passes all three cloud jobs; both downloaded
-packages match all 13 shared files. See STATUS for detailed evidence and limits.
-
-## Limits and continuity
-
-Physical iPhone/Android installation, native file selection/background behavior,
-native offline inference, bench accuracy and phone performance remain unverified.
-No paid service, Apple enrollment/credentials or store release is authorized.
-
-The phone test plan separates free Safari checks, conditional installed-native
-checks and permitted bench evidence. Native installation needs a later available
-Mac/approved signing route; the current simulator ZIP cannot install on the phone.
-Android physical tests have no available device. Bench acceptance still needs
-licensed footage. Keep those gates blocked rather than inferring passes.
-
-Task 4 remains unmerged on `feat/task4-browser-acceptance` at `34538e4`.
-Its permitted bench fixture is still missing; the user cannot record one, so do
-not ask again. Do not merge that incomplete branch just to obtain its tooling.
-Master's Task 5 measurements are limited image-space estimates, not completion
-of milestone-one bench acceptance. Preserve both branches and PRODUCT_BRIEF.
-
-Use process-local Node 22.23.2 / npm 10.9.8; preserve global Node 20.
-Java 21 exists locally; Android SDK/emulator and Xcode do not. At the Codex
-recheck, ports5176/5193 had no listener. No older server was stopped. Temporary
-preflight preview5194 is owned by this run and stopped after verification.
-Browser checks use an isolated profile and only empty/non-human screenshots.
-
-One writer. Before every commit run whole tests/lint/build and inspect staging.
-Commit/push green steps; D-019's reviewed fast-forward/push is complete. Retain
-the feature branch. No attribution trailers, force pushes or history rewrites.
-GitHub's default branch is still
-`feat/gymbro-video-landmarks`; manual-dispatch UI requires the workflow on that
-default, while feature/master push triggers work. Do not change settings silently.
+Use process-local Node 22.23.2 (prepend its nvm folder to `PATH`); never switch
+global Node 20 with `nvm use`. Existing listeners at the merge: an unrelated
+project's Vite on `[::1]:5173` and this checkout's dev server on
+`127.0.0.1:5193`; leave both alone, and note they lock `node_modules` files.
+Run tests/lint/build before each green step commit, push, and update STATUS and
+this handoff. Stage only the step paths, no media/signing files/private data.
+No attribution trailers, force pushes or published-history rewrites. Retain
+feature branches. Task 8 reaches master only after its acceptance and fresh
+review resolve. GitHub default is still `feat/gymbro-video-landmarks`; do not
+change settings. Detailed earlier evidence remains in STATUS and Git history.

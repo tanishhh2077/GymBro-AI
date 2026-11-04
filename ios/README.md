@@ -14,7 +14,7 @@ npm run mobile:sync
 
 These commands also work on Windows and prepare the local web bundle; they do
 not compile iOS. Native sources/branding and the shared lifecycle/layout work
-are implemented. Cloud run 3 compiled on Xcode26.6 and verified visible startup
+are implemented. Master run5 compiled on Xcode26.6 and verified visible startup
 on an iPhone17Pro/iOS26.4 simulator. The downloaded screenshot was inspected;
 earlier blank/home-screen captures are documented in STATUS. Physical-device
 behavior and video inference remain unverified.
@@ -33,8 +33,8 @@ a suitable macOS build path. No signing setup or store release is included here.
 File selection, background cancellation, offline inference and phone performance
 need actual platform/device checks before claiming support.
 
-Run3 artifacts and inspected image are retained locally in ignored
-`build/artifacts/run-3/`; GitHub artifacts expire after one day.
+Run5 artifacts and inspected image are retained locally in ignored
+`build/artifacts/run-5/`; GitHub artifacts expire after one day.
 
 Use `npm run mobile:assets` after editing `resources/logo.svg`; inspect generated
 assets. Never commit copied `App/App/public`, credentials, device media or build

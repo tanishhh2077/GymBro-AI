@@ -42,6 +42,9 @@
 - D-022 explicitly authorizes iOS/Android mobile prototypes, iPhone first, despite
   the earlier scaffold deferral. Follow the mobile design/plan; no paid service,
   signing-secret request, store release or claim of device validation is implied.
+- D-025 selects Task9's PC-side observed-elbow summary while phone work waits.
+  Use its separate design/plan. Sample availability and 2D extremes do not establish
+  confidence, per-rep ROM or validated bench technique.
 
 ## Independent judgment
 
@@ -103,8 +106,8 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
   subdirectories; do not add Markdown to asset catalogs or copied public assets.
 - Lint: `npm run lint` passes after the declared-tooling repair and unused-initializer cleanup; see [STATUS.md](docs/STATUS.md) for verification and remaining prototype limitations.
 - Tests: `npm test` runs source tests in jsdom and packaging tests in Node with
-  the app's Vite settings. Current branch: 320 tests in 13 files, including the
-  preceding 287 plus 10 native lifecycle, 2 App integration and 21 packaging
-  cases. Consult STATUS for current evidence; fake bridge/media/pose data do not
+  the app's Vite settings. Task9: 366 tests in 15 files, adding 34 summary core,
+  9 summary panel and 3 integration cases to the previous320. Consult STATUS
+  for current evidence; fake bridge/media/pose data do not
   prove native behavior or bench accuracy. Task 4's separate branch owns its
   browser/fixture tooling.

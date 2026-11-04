@@ -10,11 +10,187 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 8 (the phone plan's free Safari slice) is in progress on
-`feat/task8-safari-phone-test`: fixtures/baseline and desktop runtime preflight
-are verified. The user postponed phone actions until returning home (roughly six
-hours from their 2026-11-04 message). Phone testing still needs a trusted private
-connection and iOS version. No LAN listener/phone transfer or Safari case has run.
+Task 8 (the phone plan's free Safari slice) has resumed on
+`feat/task8-safari-phone-test`. On 2026-11-04 the branch merged reviewed master
+`3209025` (Task 9's completed elbow summary) with a merge commit that keeps both
+published histories. The merged source is byte-identical to master and the whole
+tests/lint/build/guarded sync pass again. PC preparation is complete. Phone testing
+still needs the user: their iOS version and a trusted private connection between
+the iPhone and the PC. No LAN listener, phone transfer or Safari case has run.
+Safari, installed-native and real-bench acceptance remain unverified.
+
+### Task 8 merge of reviewed master (Task 9)
+
+- Done by Claude Code (Opus 5.5) on 2026-11-04 at the user's request. A fetch
+  showed `origin/master` at `3209025` and the Task 8 remote at `7198ec1`; their
+  merge base is `26a831f`. Merged with `git merge --no-ff master`: no rebase, no
+  force push, no published-history rewrite. Task 4 (`34538e4`) was not merged.
+- Task 8's three commits changed only Markdown; master changed source and docs.
+  Eight documents changed on both sides. Git combined `AGENTS.md` (now identical
+  to master) and `README.md` (master's text plus Task 8's D-024 first-message
+  block, which master still lacked); `WORKFLOW.md` was already identical. In the
+  conflicts, `DECISIONS.md` took master's side (it adds D-025; D-024 was identical
+  on both). The phone plan and plans index keep each side's more precise wording
+  and record this merge. This file keeps every section from both branches, newest
+  task first. `HANDOFF.md` was rewritten for the merged state.
+- Every non-Markdown path in the merged tree is identical to master `3209025`
+  (`git diff master -- . ':(exclude)*.md'` is empty). Task 9's fresh code review
+  therefore covers the merged code; the merge adds no application code to review.
+  Only `README.md`, `HANDOFF.md`, `STATUS.md` and the two plan files differ.
+- Process-local Node 22.23.2 / npm 10.9.8; global Node 20 untouched. No reinstall:
+  `package.json` and the lockfile are unchanged on both branches, and
+  `npm ls --depth=0` exits 0. A clean `npm ci` was not run because two running
+  Vite servers hold files open: an unrelated project on `[::1]:5173` and this
+  checkout's dev server on `127.0.0.1:5193`. Both were left running. Task 9's clean
+  install remains the latest reinstall evidence.
+- Merged tree: `npm test` **366 passed / 15 files**, exit 0; `npm run lint` exit 0;
+  `npm run mobile:sync` exit 0 (build/config type-check, 411 modules, `cap sync`,
+  then verification of iOS and Android: 13 files each, local entrypoints, model and
+  six runtime files). The existing Browserslist warning remains. No tracked file
+  changed.
+- All 13 rebuilt `dist/` files match the web assets inside the ignored run5 APK
+  (`build/artifacts/run-5/GymBroAI-android-debug.apk`) byte-for-byte, so master
+  run5's native compile/launch evidence describes this branch's web bundle. Pushing
+  this branch does not trigger the workflow, which runs only on
+  `feat/task6-mobile-app` and `master`; no new cloud run was made.
+- `build/fixtures/` still holds exactly the six exported files; all five fixture
+  SHA-256 values match the plan and the README hash matches the Step 1 record.
+- Read-only network check: still Ethernet UWNet, Windows category **Public**. No
+  listener was started, no setting was changed and no phone action was taken.
+- Next, with the user: record the iOS version, choose home Wi-Fi or Personal
+  Hotspot, re-detect the private address, bind 5195/5196 only to it, verify phone
+  reachability, transfer the fixtures, then run Step 2's Safari cases. Task 8
+  stays unmerged into master until its acceptance and review are resolved.
+
+### Task 9 record: observed elbow summary, completed on master
+
+Task9 PC development ran on `feat/task9-elbow-summary` from reviewed
+master26a831f. The user requested PC work while phone testing waits; D-025
+records the builder-selected observed-elbow summary. **Task9 is complete**:
+reviewed source is integrated in master9e34ec4, local366 tests/lint/build/sync
+and all three native run5 jobs pass. Final documentation follows that source;
+check Git for current tips. Phone/Safari/native-video/bench gates remain open.
+D-024 guidance was carried from Task8's accepted
+user instruction; Task8 itself stays open at7198ec1 and is not merged here.
+
+### Task9 Step1 baseline and design
+
+- Clean Node22.23.2/npm10.9.8 `npm ci --no-audit --no-fund` succeeds:478 packages,
+  with existing uuid/Recharts deprecations. No package/lock changes or new dependencies.
+- Whole320 tests/13 files, lint and build/config type-check exit0;409 modules,
+  existing Browserslist warning. Own loopback dev server5193 starts before feature
+  code. Global Node20 is preserved. No public/LAN binding or phone action.
+- Existing single-writer feature checkout is retained under established project
+  workflow. Independent reviewers read only. If separate isolation becomes
+  necessary, changes must be transferred; no worktree cleanup or branch deletion.
+- Task8 at7198ec1 preserved fixtures/desktop preflight evidence. Its phone cases
+  remain unrun, pending user return/iOS/private-network coordination. Task4 at34538e4
+  still lacks permitted bench footage and remains unmerged.
+- Own dev5193 returnsHTTP200. Fresh independent read-only Codex builder review
+  (`elbow_summary_design_review`, no inherited conversation; model not exposed)
+  found no significant findings/material questions. It inspected source/design/
+  plan/scoped rules and the player contract, ran no builds/tests and changed no
+  files. The identified stale HANDOFF was updated. Step1 is complete; Step2's
+  application behavior will be written only after observed failing tests.
+
+### Task9 Step2 implementation and verification
+
+- Added pure `elbowSummary.ts` and small `ElbowSummaryPanel.tsx`; integrated
+  once-per-pose derivation in ElbowTimeline's existing fallback and onSeek path.
+  Counts/extrema use observed values and raw media times only. No engine/store,
+  runtime dependency, input limit, persistence or native configuration changes.
+- RED: initial missing module was resolved with an empty contract file; then the
+  actual first test failed because summarizeElbows was absent. Minimal aggregation
+  made it pass. Expanded34 cases then had22 expected validation failures before
+  guards; all34 now pass. New timeline cases first failed3/12 because summary was
+  absent; panel cases failed7/7 against the empty scaffold. Implemented presentation/
+  integration, then all53 focused cases across3 files passed.
+- Whole **364 tests/15 files**, lint and `mobile:sync` (including build/config
+  type-check) exit0. Vite transforms411 modules; existing Browserslist warning
+  remains. Both platforms'13 shared files and local model/six runtime files pass
+  byte/config checks. This is sync evidence, not new native compilation.
+- Isolated headless desktop Edge156.0.4314.58 at loopback dev5193 passed5 browser
+  cases: real no-person processing yields0 of120 measurable samples on each side,
+  four unavailable/disabled jumps and paused replay; supplied synthetic geometry
+  yields independent3/4 and4/4 counts and evidence jumps that actually update
+  paused video time/angle (0°,180°,90° at real target times); wide1280x900 and
+  narrow390x844 layouts have no horizontal overflow; removal clears summary and
+  restores admission. No external app-origin requests or page errors observed.
+- Positive geometry was explicitly supplied through the development store after
+  real empty-clip inference, with the clip labeled synthetic. It is not positive
+  model/bench evidence. Browser scratch script/results and three non-human PNGs
+  remain ignored in `build/task9-*`; all images were manually inspected. The
+  real inference delegate was not separately captured in this run. No physical
+  phone, actual private-LAN transport, bench accuracy or performance claim follows.
+- Source READMEs/root counts/architecture/plan/handoff updated. Final fresh
+  whole-feature review remains Step3 before integration. Task8/Task4 stay open.
+- Evidence correction: Step2 commitde63196's body overstates the RED count by
+  saying all34 core cases were observed failing. Actual record above is the
+  first API case failing, then22/34 expected validation failures while12 already
+  passed the minimal aggregation. All7 panel and3 new integration cases did fail
+  before their UI/integration implementation. Published history is preserved;
+  this correction, not the shorthand commit body, is the verification record.
+
+### Task9 Step3 critical review and supported fix
+
+- Fresh read-only Codex review (`elbow_summary_code_review`, explicitly selected
+  gpt-6-astra/high, no inherited builder conversation) inspected26a831f..de63196
+  against D-025/design/plan/source. Independently passed67 focused tests across
+  core/panel/timeline/player and mobile:verify13 files per platform. No authored
+  files/builds/sync/branches changed by the reviewer; no delegated subreview.
+- One Medium accessibility defect: aria-label replaced the button's visible
+  angle/time with only action/side, so tabbing screen-reader users could not hear
+  the evidence before activating. Reviewer reproduced the actual component in
+  isolated Edge and its computed accessibility tree. No other significant finding;
+  Declined to judge: none. Reviewer did not repeat full build/inference/native work.
+- Verified source/effect and fixed in one pass. Two new panel tests first failed
+  for missing description associations/unique IDs. React useId now links each
+  button to its visible value/time or Unavailable; replacement updates description
+  text and multiple panels cannot collide. All9 panel tests pass.
+- Fresh whole **366 tests/15 files**, lint and guarded sync/build pass:411 modules,
+  13 shared files on each platform. The existing Browserslist warning remains.
+- Repeated browser checks for the new accessibility behavior: **six cases pass**,
+  including actual computed AX descriptions for unavailable and synthetic0°/180°
+  evidence values/times, plus real no-person inference, actual paused jumps,
+  narrow/wide layout and removal. No external app-origin requests/page errors.
+  This is browser accessibility-tree evidence, not a physical screen-reader test.
+  Phone/LAN/native/bench gates remain unverified. Review is resolved; integration
+  and new native CI evidence follow below.
+- Review fix9e34ec4 was committed/pushed after green366 tests/lint/build/sync.
+  Fast-forwarded master26a831f..9e34ec4; reran the whole366 tests/15 files,
+  lint and guarded sync/build on the merged tree, all exit0. Working tree stayed
+  clean and own dev5193 returnedHTTP200. Pushed master and retained feature branch.
+- New native [master run5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
+  at9e34ec4 finalized **success** in all three jobs: shared126826538964,
+  Android126826848597 and iOS126826848662. Shared checks pass366 tests; Android
+  build succeeds and matches13 compiled web files. iOS Xcode26.6/17F113 build and
+  13-file comparison pass, negative splash is rejected, and foreground launch
+  PID14141 eventually shows actual GymBro/bench UI at20:08:06UTC after an initially
+  incomplete capture. iPhone17Pro/iOS26.4; WebView loaded. Matching fresh App
+  crash reports0 is not general stability evidence. No Apple team/signing secrets.
+- Downloaded both artifacts and verified outer SHA-256 against GitHub metadata:
+  Android `13a2919e4cf0b7ff9aa01801eefd1bb86984479d8383fc5170861bb6b5029ddd`;
+  iOS `dd0b2bb07c4b73738c491607a09ebcddab5724c3f725ac25de3aae45955f6609`.
+  Root independently compared all13 dist files inside each downloaded package
+  byte-for-byte. Manual image inspection confirms the real empty app interface.
+  The new summary is bundled but not exercised by this startup-only image.
+  Ignored `build/artifacts/run-5/` retains APK24,698,528 bytes,
+  SHA-256 `91a0a19de40a5616a90f8776fd9d52dcde925699d63a87982217c55447bed9c9`;
+  iOS App.app ZIP19,895,594 bytes and PNG1,105,405 bytes. Artifact IDs Android
+  13358772029/iOS13359342876; one-day retention. Older run4 retained separately.
+- Implementation was by the current Codex session (model identifier not exposed);
+  review model gpt-6-astra/high was explicitly selected as recorded above. No
+  new human footage, private media, native device install, signing or release.
+- Task8 remains at7198ec1 with the earlier source. When resuming, merge reviewed
+  master into its branch, retain both histories and redo checks/build/sync before
+  phone cases. Preserve its factual preparation/evidence in conflict resolution.
+  No published-history rewrite or Task8 merge into master is implied. Phone steps
+  remain deferred until the user is home; Task4 still lacks permitted bench media.
+- Final documentation verification:75 Markdown files,204 relative links/anchors
+  and all19 CLAUDE imports resolve; diff formatting passes. Fresh precommit
+  **366 tests/15 files**, lint and build/config check exit0,411 modules. Source
+  bundle hashes match the verified run5 packages. All Task9 steps are complete;
+  no acceptance-blocking review finding remains. Feature branch is retained.
 
 ### Task 8 Step 1 preparation
 
@@ -127,7 +303,7 @@ connection and iOS version. No LAN listener/phone transfer or Safari case has ru
   its actual address and check phone reachability before transferring fixtures.
   Keep Task8 open/unmerged until its acceptance/review is resolved.
 
-### Task 7 record
+### Earlier Task7 planning record
 
 Task 7's [phone/video acceptance plan](superpowers/plans/2026-11-04-phone-video-acceptance.md)
 is complete as a planning-only deliverable, developed on
