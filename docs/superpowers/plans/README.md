@@ -1,6 +1,11 @@
 # Implementation plans
 
-Latest completed feature: [Task9 elbow summary](2026-11-04-elbow-summary.md),
+Latest completed feature: [Task 10 observed processing time](2026-11-04-processing-time.md)
+under D-026: one completed run's measured time, not a benchmark. All 3 steps,
+381 tests and a fresh review pass; it is fast-forwarded/pushed to master. Task 8's
+branch holds the phone preparation and has merged this master (`aec3cb2`).
+
+Preceding feature: [Task9 elbow summary](2026-11-04-elbow-summary.md),
 observed counts/extrema navigation under D-025. All3 steps,366 tests, fresh review
 and native run5 pass; source is merged/pushed to master. Task8's branch has since
 merged this reviewed master (merge commit, both histories kept) and repeated its
@@ -12,8 +17,8 @@ completes Task 7's planning deliverable, authorized on 2026-11-04. Available dev
 iPhone12ProMax, no Android phone or paid Apple membership. It proposes free
 Safari checks first and keeps installed-native/bench gates separate. Its Step 1
 is in progress as Task 8 on `feat/task8-safari-phone-test`: baseline and verified
-fixture export, seven desktop runtime preflight cases and the Task 9 master merge
-pass. The user reported iOS 26.5.2; private-network setup still needs their
+fixture export, seven desktop runtime preflight cases, generated S07/S08 inputs
+and the Task 9 and Task 10 master merges pass. The user reported iOS 26.5.2; private-network setup still needs their
 coordination.
 No Safari/physical-phone cases have run. D-024 waives routine understanding
 stops, not actual device/settings actions.

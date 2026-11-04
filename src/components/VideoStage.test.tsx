@@ -154,6 +154,20 @@ describe("VideoStage", () => {
     expect(container.textContent).not.toMatch(/30fps|form score/i);
   });
 
+  it.each([
+    [4_123.4, "4.1"],
+    [0, "0.0"],
+    [123_456, "123.5"],
+  ])("reports an observed processing time of %s ms as %s seconds", (ms, shown) => {
+    render({ ...clip(), processingMs: ms });
+    expect(container.textContent).toContain(`Processing took ${shown} seconds on this device`);
+  });
+
+  it("shows no processing-time badge or placeholder when no time was observed", () => {
+    render(clip("no-pose"));
+    expect(container.textContent).not.toMatch(/processing took/i);
+  });
+
   it("pins contain-fit and uses finite duration when browser metadata is unavailable", () => {
     render();
     state(video()).duration = Infinity;

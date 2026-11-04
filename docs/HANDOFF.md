@@ -11,13 +11,17 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 waives routine "Is this clear?" stops, but every phone, account, network or
 settings action is coordinated with the user. Do not merge Task 4.
 
-The branch has merged reviewed master `3209025` (Task 9) with a merge commit that
-keeps both published histories. Its non-Markdown files are identical to master,
-so Task 9's fresh code review covers the merged code. Under process-local Node
-22.23.2: **366 tests / 15 files**, lint and guarded `mobile:sync` (build, 411
-modules, 13 verified files per platform) pass; the 13 rebuilt `dist/` files match
-the master run5 APK byte-for-byte. Details are in STATUS, "Task 8 merge of
-reviewed master".
+The branch has merged reviewed master twice with merge commits that keep both
+published histories: `3209025` (Task 9) and then `aec3cb2` (Task 10, the
+processing-time badge, D-026). Its non-Markdown files equal master, so Tasks 9
+and 10's fresh code reviews and native run6 cover the merged code. Under
+process-local Node 22.23.2: **381 tests / 15 files**, lint and guarded
+`mobile:sync` (build, 411 modules, 13 verified files per platform) pass.
+Details are in STATUS, "Task 8 merge of reviewed master (Task 10)".
+
+During the phone session, a completed clip shows "Processing took N seconds on
+this device"; record it as the plan's elapsed-time observation (one run; whether
+iOS keeps counting during suspension is unverified).
 
 PC preparation is complete: the five first-party non-human fixtures plus their
 provenance README sit in ignored `build/fixtures/`, exported from `34538e4`, and
@@ -50,16 +54,18 @@ One local side-view bench-press MP4. Existing MediaPipe 0.10.35 model/runtime,
 bounded decoding/cancellation, synchronized player/overlay, image-space elbow
 measurements and Task 9's clip summary (measurable sample counts, lowest/highest
 observed 2D angles with jumps to their timestamps; design and plan in
-`docs/superpowers/`, D-025). No backend, accounts, saved sessions, reps or form
+`docs/superpowers/`, D-025) and Task 10's observed processing-time badge
+(D-026; one run's value, not a benchmark). No backend, accounts, saved sessions, reps or form
 verdicts. Summary availability is not accuracy confidence; observed extrema can
 include tracking errors and are not per-rep ROM or 3D anatomy.
 
 Capacitor 8.6.0/App 8.1.2 prototypes use appId `com.gymbroai.app`, version 0.1.0.
-[Master run5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
-compiled both platforms and verified visible iPhone 17 Pro/iOS 26.4 simulator
-startup with Xcode 26.6/17F113. Latest ignored packages/image are in
-`build/artifacts/run-5/`; Android APK SHA-256:
-`91a0a19de40a5616a90f8776fd9d52dcde925699d63a87982217c55447bed9c9`.
+[Master run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41913320712)
+(Task 10 source) compiled both platforms and passed its iOS simulator startup
+job; its packages were not downloaded (that needs a signed-in account).
+[Run5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
+verified visible iPhone 17 Pro/iOS 26.4 simulator startup with Xcode 26.6/17F113;
+its packages are in ignored `build/artifacts/run-5/` (Task 9 source, no badge).
 The simulator ZIP cannot install on an iPhone; physical native workflow and
 offline inference remain unverified. Pushing this branch does not trigger the
 workflow (only `feat/task6-mobile-app` and `master` do).

@@ -114,6 +114,12 @@ export interface Clip {
   errorKind?: ProcessingFailureKind;
   /** Live progress while processing. */
   progress?: PoseProgress;
+  /**
+   * Observed milliseconds from admission to the completed result on this device,
+   * including model start-up. One run's observation, not a benchmark; absent when
+   * the job did not complete or the clock reading was invalid.
+   */
+  processingMs?: number;
 }
 
 /**

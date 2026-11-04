@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { PoseLandmarkerOptions, PoseLandmarkerResult } from "@mediapipe/tasks-vision";
 import type { PoseProgress, PoseResult } from "@/types";
+import { PoseEngine } from "@/core/PoseEngine";
 import { createSessionStore, type SessionEngine } from "./useSessionStore";
 
 interface Detector {
@@ -77,6 +78,7 @@ function videoFixture(options: { duration?: number; stallSeeks?: boolean } = {})
 function setup(options: {
   video?: () => HTMLVideoElement;
   engine?: () => SessionEngine;
+  now?: () => number;
 } = {}) {
   const videos: HTMLVideoElement[] = [];
   let urls = 0;
@@ -91,6 +93,7 @@ function setup(options: {
       return video;
     },
     ...(options.engine ? { createEngine: options.engine } : {}),
+    ...(options.now ? { now: options.now } : {}),
   });
   return { store, createObjectURL, revokeObjectURL, videos };
 }
@@ -100,6 +103,16 @@ function mp4(name = "bench.mp4", size = 1_000) {
 }
 
 const settle = () => vi.advanceTimersByTimeAsync(0);
+
+/** A clock that returns the given readings in order; an Error reading throws. */
+function clock(...readings: Array<number | Error>) {
+  return vi.fn<() => number>(() => {
+    const next = readings.shift();
+    if (next === undefined) throw new Error("Unexpected extra clock reading");
+    if (next instanceof Error) throw next;
+    return next;
+  });
+}
 
 describe("session store: one clip, owned job, leased media", () => {
   let detector: ReturnType<typeof makeDetector>;
@@ -330,5 +343,122 @@ describe("session store: one clip, owned job, leased media", () => {
     expect(revokeObjectURL).not.toHaveBeenCalled();
     release();
     expect(revokeObjectURL).toHaveBeenCalledTimes(1);
+  });
+
+  it("records the admission-to-result time for ready and no-pose results", async () => {
+    const ready = setup({ now: clock(1_000, 5_123.4) });
+    ready.store.getState().startClip(mp4());
+    await settle();
+    expect(ready.store.getState().clips[0]).toMatchObject({ status: "ready", processingMs: 4_123.4 });
+
+    detector.detectForVideo.mockReturnValue(noPoseResult());
+    const empty = setup({ now: clock(20, 20) });
+    empty.store.getState().startClip(mp4());
+    await settle();
+    expect(empty.store.getState().clips[0]).toMatchObject({ status: "no-pose", processingMs: 0 });
+  });
+
+  it("delivers the time in the same update as the result", async () => {
+    const { store } = setup({ now: clock(10, 40) });
+    const resultStates: Array<number | undefined> = [];
+    const unsubscribe = store.subscribe((state) => {
+      const [clip] = state.clips;
+      if (clip?.pose) resultStates.push(clip.processingMs);
+    });
+    store.getState().startClip(mp4());
+    await settle();
+    unsubscribe();
+
+    expect(resultStates.length).toBeGreaterThan(0);
+    expect(resultStates.every((ms) => ms === 30)).toBe(true);
+  });
+
+  it("records no time for a failed job", async () => {
+    detector.detectForVideo.mockImplementationOnce(() => { throw new Error("Inference failed"); });
+    const now = clock(1_000);
+    const { store } = setup({ now });
+    store.getState().startClip(mp4());
+    await settle();
+
+    expect(store.getState().clips[0].status).toBe("error");
+    expect(store.getState().clips[0].processingMs).toBeUndefined();
+    expect(now).toHaveBeenCalledTimes(1);
+  });
+
+  it("ignores a late result after removal and times a later clip from its own start", async () => {
+    const pending = deferred<PoseResult>();
+    const lateEngine: SessionEngine = { processVideo: vi.fn(() => pending.promise), close: vi.fn() };
+    let engines = 0;
+    const now = clock(100, 200, 250);
+    const { store } = setup({
+      now,
+      engine: () => (engines++ === 0 ? lateEngine : new PoseEngine()),
+    });
+    store.getState().startClip(mp4());
+    store.getState().removeClip(store.getState().clips[0].id);
+    pending.resolve({
+      frames: [], fps: 30, duration: .2, width: 640, height: 360, delegate: "CPU",
+      coverage: { totalFrames: 0, framesWithPose: 0, detectionRate: 0, meanVisibility: 0 },
+    });
+    await settle();
+    expect(store.getState().clips).toEqual([]);
+    expect(now).toHaveBeenCalledTimes(1);
+
+    expect(store.getState().startClip(mp4("next.mp4"))).toBeNull();
+    await settle();
+    expect(store.getState().clips[0]).toMatchObject({ name: "next.mp4", status: "ready", processingMs: 50 });
+  });
+
+  it.each([
+    ["a non-finite start", [Number.NaN, 5]],
+    ["a non-finite end", [5, Number.POSITIVE_INFINITY]],
+    ["a backwards reading", [500, 499]],
+    ["a throwing end reading", [5, new Error("clock unavailable")]],
+  ] as const)("completes without a time after %s", async (_label, readings) => {
+    const { store } = setup({ now: clock(...readings) });
+    store.getState().startClip(mp4());
+    await settle();
+
+    const [clip] = store.getState().clips;
+    expect(clip.status).toBe("ready");
+    expect(clip).not.toHaveProperty("processingMs");
+  });
+
+  it("reads the start time before creating the engine or the URL", async () => {
+    const now = clock(1, 2);
+    const createEngine = vi.fn(() => new PoseEngine());
+    const { store, createObjectURL } = setup({ now, engine: createEngine });
+    store.getState().startClip(mp4());
+    await settle();
+
+    const startOrder = now.mock.invocationCallOrder[0];
+    expect(startOrder).toBeLessThan(createEngine.mock.invocationCallOrder[0]);
+    expect(startOrder).toBeLessThan(createObjectURL.mock.invocationCallOrder[0]);
+  });
+
+  it("uses the monotonic performance clock by default", async () => {
+    const readings = [100, 350];
+    const spy = vi.spyOn(performance, "now").mockImplementation(() => readings.shift() ?? 350);
+    try {
+      const { store } = setup();
+      store.getState().startClip(mp4());
+      await settle();
+      expect(store.getState().clips[0].processingMs).toBe(250);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("admits and releases normally when the start reading throws", async () => {
+    const { store, createObjectURL, revokeObjectURL } = setup({ now: clock(new Error("clock unavailable"), 5) });
+    expect(store.getState().startClip(mp4())).toBeNull();
+    await settle();
+
+    expect(store.getState().clips[0]).toMatchObject({ status: "ready" });
+    expect(store.getState().clips[0]).not.toHaveProperty("processingMs");
+    store.getState().removeClip(store.getState().clips[0].id);
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURL).toHaveBeenCalledTimes(1);
+    expect(store.getState().processingState).toBe("idle");
   });
 });

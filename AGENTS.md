@@ -45,6 +45,8 @@
 - D-025 selects Task9's PC-side observed-elbow summary while phone work waits.
   Use its separate design/plan. Sample availability and 2D extremes do not establish
   confidence, per-rep ROM or validated bench technique.
+- D-026 selects Task10's observed processing-time badge. One run's measured time
+  is not a benchmark, rating or phone-performance validation.
 
 ## Independent judgment
 
@@ -106,8 +108,8 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
   subdirectories; do not add Markdown to asset catalogs or copied public assets.
 - Lint: `npm run lint` passes after the declared-tooling repair and unused-initializer cleanup; see [STATUS.md](docs/STATUS.md) for verification and remaining prototype limitations.
 - Tests: `npm test` runs source tests in jsdom and packaging tests in Node with
-  the app's Vite settings. Task9: 366 tests in 15 files, adding 34 summary core,
-  9 summary panel and 3 integration cases to the previous320. Consult STATUS
+  the app's Vite settings. Task10: 381 tests in 15 files, adding 11 store
+  timing and 4 player badge cases to Task9's 366. Consult STATUS
   for current evidence; fake bridge/media/pose data do not
   prove native behavior or bench accuracy. Task 4's separate branch owns its
   browser/fixture tooling.

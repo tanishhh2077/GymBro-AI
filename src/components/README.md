@@ -10,8 +10,11 @@
   the store while mounted (`retainMedia` prop), sets the video source in an effect,
   shows kind-specific failures, and keeps no-pose clips replayable with a persistent
   live region. Seek events synchronize controls; rejected play/restart requests
-  show retry guidance. Source identity resets player state. Its 14 tests cover
-  these behaviors, selected speed, finite duration, and StrictMode lease cleanup.
+  show retry guidance. Source identity resets player state. A completed clip
+  with `processingMs` adds the badge "Processing took N seconds on this device"
+  (one decimal; no badge or placeholder when absent; Task 10, D-026). Its 18
+  tests cover these behaviors, selected speed, finite duration, and StrictMode
+  lease cleanup.
 - `ElbowTimeline.tsx`: versioned raw-observation angle series from `core/elbowAngles`,
   independent left/right estimates, unavailable reasons, gap-separated SVG lines,
   and previous/next measured-sample navigation through the player's existing seek

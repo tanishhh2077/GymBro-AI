@@ -10,16 +10,150 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 8 (the phone plan's free Safari slice) has resumed on
-`feat/task8-safari-phone-test`. On 2026-11-04 the branch merged reviewed master
-`3209025` (Task 9's completed elbow summary) with a merge commit that keeps both
-published histories. The merged source is byte-identical to master and the whole
-tests/lint/build/guarded sync pass again. PC preparation is complete. The user
-reported **iOS 26.5.2**. Phone testing still needs the user for a trusted private
-connection between the iPhone and the PC. No LAN listener, phone transfer or
-Safari case has run. Safari, installed-native and real-bench acceptance remain
-unverified.
+Task 8 (the phone plan's free Safari slice) is ready for the phone session on
+`feat/task8-safari-phone-test`. It has merged reviewed master `aec3cb2`, which
+adds Task 10's processing-time badge, on top of its earlier Task 9 merge; both
+merges keep both published histories. The merged source is byte-identical to
+master and the whole tests/lint/guarded sync pass. The user reported **iOS
+26.5.2**. Phone testing still needs the user for a trusted private connection
+between the iPhone and the PC. No LAN listener, phone transfer or Safari case has
+run. Safari, installed-native and real-bench acceptance remain unverified.
 
+### Task 8 merge of reviewed master (Task 10)
+
+- Claude Code (Opus 5.5), 2026-11-04. `origin/master` was `aec3cb2` (Task 10
+  complete; native run6 green at its source commit `2fbafce`) and the Task 8
+  remote `3d8230a`. Merged with `git merge --no-ff master`: no rebase or force
+  push; Task 4 not merged. A first attempt before Task 10's final documentation
+  commit was aborted uncommitted, so only this merge exists.
+- Git merged every file except `HANDOFF.md` and `STATUS.md`. This file keeps every
+  section from both branches, newest first; HANDOFF was rewritten so the phone
+  session stays the next action and the badge is mentioned.
+- Every non-Markdown path equals master `aec3cb2`, so Task 10's fresh code review
+  and run6 cover the merged code. Process-local Node 22.23.2: `npm ls --depth=0`
+  exit 0; **381 tests / 15 files** pass; lint exit 0; `npm run mobile:sync` exit 0
+  (411 modules; iOS and Android 13 files each verified). All nine files in
+  `build/fixtures/` still match their recorded SHA-256 values.
+- The phone session can now also read the badge, "Processing took N seconds on
+  this device", as the plan's elapsed-time observation; it is one run's value,
+  and whether iOS keeps counting during suspension is unverified.
+
+### Task 10 record: observed processing time, completed on master
+
+Task 10 (D-026, observed processing time) is **complete**: built on
+`feat/task10-processing-time` from reviewed master `3209025`, chosen by the
+builder after the user, away from the PC, asked for PC-side work, freshly
+reviewed, fast-forwarded to master and verified by native run6. Task 8's phone
+test waits for the user on its own branch (`3d8230a`: master merged, iOS 26.5.2
+reported, S07/S08 inputs generated and reviewed); its branch records hold the
+details. Safari, installed-native and real-bench acceptance remain unverified.
+
+### Task 10 Step 1 baseline and design
+
+- Claude Code (Opus 5.5), 2026-11-04. Branch created from `master` at `3209025`,
+  matching `origin/master` after a fetch; `package.json` and the lockfile are
+  unchanged since Task 9's clean `npm ci` (478 packages), and `npm ls --depth=0`
+  passed on identical package files earlier today. No reinstall: running Vite
+  servers on `[::1]:5173` (unrelated project) and `127.0.0.1:5193` hold
+  `node_modules` files and were left running.
+- Recorded D-026, the [design](superpowers/specs/2026-11-04-processing-time-design.md)
+  and [plan](superpowers/plans/2026-11-04-processing-time.md); updated AGENTS.md,
+  docs/README and the specs/plans indexes. The builder chose this feature because
+  the phone plan asks for elapsed time "if observed" and iPhone Safari has no
+  console without a Mac.
+- Fresh read-only design review (Claude Code subagent, Opus 5.5, no inherited
+  builder conversation) inspected the design/plan/D-026, AGENTS, D-013/D-024/
+  D-025, PRODUCT_BRIEF, spec.md, the newest phone plan on the Task 8 branch and
+  the store/types/VideoStage/PoseEngine code. No blockers. Three material
+  questions, all adopted: (1) "late result after replacement" cannot occur,
+  because the store refuses a new clip until the old job settles, so tests now
+  cover a late result after removal and a later clip's own interval; (2) the
+  same-update rule needs a store-subscription test, since a final-state check
+  cannot catch a separate later patch; (3) Task 10 must not delay the phone
+  session. Six suggestions adopted: neutral D-026 wording (no "wall-clock";
+  iOS-suspension behavior unverified), the interval explicitly includes model
+  start-up, the start reading precedes resource creation, throwing readings
+  count as invalid, `toFixed(1)` rounding with "seconds" written in full, and a
+  narrow-width browser check. The reviewer ran no tests/builds/browsers.
+
+### Task 10 Step 2 measurement and badge
+
+- Changed: `src/types/index.ts` (optional `Clip.processingMs`),
+  `src/store/useSessionStore.ts` (`SessionDeps.now`, default `performance.now()`;
+  one guarded `readClock`; start read before engine/URL creation and kept on the
+  job; `processingMs` set in the same patch as a `ready`/`no-pose` result when
+  both readings are valid and the difference is not negative),
+  `src/components/VideoStage.tsx` (one chip in `CoverageBadges`), their tests,
+  and the store/components READMEs, AGENTS/README counts and ARCHITECTURE rows.
+  No engine, limit, dependency, storage or native change.
+- RED: the first store test (ready 1000→5123.4 ms and no-pose 20→20 ms) failed
+  because the result had no `processingMs`; the other 12 store tests passed. The
+  minimal implementation was written together with its clock guards, so the
+  guard cases could not show a natural RED first. Instead, after the 9 store
+  timing cases passed, a scratch script applied five mutations one at a time and
+  restored the file (hash unchanged): no finite check, no throw guard, no
+  backwards check, time in a later patch, and start read after URL creation.
+  Each mutation failed at least one test (1, 2, 1, 1 and 1 failures). The three
+  badge-text cases failed against the old player (no badge text), then passed;
+  the absence case passed before and after, as expected for current behavior.
+- Merged test changes: 9 store cases (ready/no-pose times, same-update
+  subscription, failed job, late result after removal plus a later clip's own
+  50 ms interval, non-finite start/end, backwards and throwing end readings, a
+  throwing start reading that still admits, creates one URL and revokes it) and
+  4 player cases (4123.4/0/123456 ms → 4.1/0.0/123.5 seconds; no badge when absent).
+- Whole **379 tests / 15 files** pass, lint exit 0, `npm run mobile:sync` exit 0
+  (build and config type-check, 411 modules, iOS and Android 13 files each
+  verified). No tracked file changed by sync. Node 22.23.2 process-local.
+
+### Task 10 Step 3 browser evidence, review and fix
+
+- Browser check: a temporary production preview of the `e1a0e79` build bound to
+  `127.0.0.1:5194`, driven by the Playwright MCP Chromium browser with the real
+  local model (no mocks). `no-person.mp4` processed on the GPU delegate to the
+  no-pose result, and the badge read **"Processing took 3.2 seconds on this
+  device"**; the harness's own timer from file selection to badge measured
+  3,256 ms, consistent with it. No badge before processing; removal cleared it.
+  No horizontal overflow at 1280x900 or 390x844; at 390 px the badge wraps onto
+  its own line in the chip style. Both non-human UI screenshots were inspected
+  and kept in ignored `build/task10-wide.png` and `build/task10-narrow.png`.
+  No request left the preview origin except in-memory `blob:` URLs; console had
+  the known `favicon.ico` 404 and MediaPipe's OpenGL notice. Preview process
+  87140 was stopped and port 5194 confirmed free. This is desktop evidence, not
+  a phone, Safari or benchmark result.
+- Fresh read-only whole-feature review (Claude Code subagent, Opus 5.5, no
+  inherited builder conversation) of `3209025..e1a0e79` ran 39 focused and the
+  full 379 tests (all pass), read every changed file and ran its own mutations
+  on a scratch copy outside the repository. No Critical/High/Medium finding.
+  Three Low findings, all fixed in the review-fix commit:
+  1. The start-before-resources ordering was untested. **Correction to the
+     Step 2 record above:** its "start read after URL creation" mutation also
+     removed the guard, so the failure it reported came from the throw guard,
+     not from ordering; the reviewer's guarded-ordering mutation passed all 21
+     tests. A call-order test now asserts the start reading precedes
+     `createEngine` and `createObjectURL`; the guarded-ordering mutation fails it.
+  2. HANDOFF quoted the badge as "N s"; it now matches the code ("N seconds").
+  3. The default clock was untested; a new test spies on `performance.now()`,
+     and a mutation to `Date.now()` fails it.
+  The reviewer did not run lint/build/sync or any browser check.
+- After the fix: **381 tests / 15 files** (23 store cases), lint and guarded sync
+  pass; review fix `2fbafce` committed/pushed. The fix adds two tests and docs
+  only, so no repeat whole review was run.
+- Integration: `origin/master` `3209025` was an ancestor; fast-forwarded master
+  `3209025..2fbafce` and pushed. Native
+  [master run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41913320712)
+  at `2fbafce` finished **success** in all three jobs: shared checks
+  126866303879 (21:08:59–21:09:40 UTC), Android debug APK 126866720563
+  (21:09:42–21:11:21) and iOS simulator build and startup 126866720990
+  (21:09:43–21:21:31). Artifacts: Android `GymBroAI-android-debug-6`
+  (13364016806, 24,698,796 bytes, sha256 `d89d0b5d…c5d0`) and iOS
+  `GymBroAI-ios-simulator-6` (13365275347, 20,996,418 bytes, sha256
+  `4c4c70e2…0c95`), as reported by GitHub's public API. Run status was read via
+  the unauthenticated public API (no `gh` CLI here). The artifacts were **not
+  downloaded or compared** with local `dist/`, because GitHub requires a signed-in
+  account to download them and adding credentials is an account action. The
+  simulator startup does not exercise the new badge or native video inference.
+- Task 10 is complete. The feature branch is retained. Task 8 merges this master
+  next, before its phone cases; Task 4 stays unmerged.
 ### Task 8 generated S07/S08 inputs
 
 - Claude Code (Opus 5.5), 2026-11-04. The plan's S07 needs a zero-byte MP4 and a

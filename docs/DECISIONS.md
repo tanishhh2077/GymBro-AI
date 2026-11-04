@@ -317,6 +317,31 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   [plan](superpowers/plans/2026-11-04-elbow-summary.md). Existing single-writer
   checkout/feature branches are retained; a fresh reviewer is read-only.
 
+### D-026: Show the observed processing time for a completed clip
+
+- On 2026-11-04 the user, away from the PC, asked the builder to "Find other
+  tasks to do for the next few hours" while the phone session waits. D-024 still
+  applies. The user delegated the choice; they did not prescribe this feature.
+- Builder-selected Task 10: measure the time from clip admission to a completed
+  result (pose found or no pose, including model start-up) with a monotonic
+  clock, keep it on the
+  clip, and show it as one neutral badge. Reason: phone Safari has no developer
+  console without a Mac, the phone plan asks for elapsed time "if observed", and
+  mobile performance is listed as unverified. An on-screen observation replaces
+  a hand-held stopwatch.
+- The value is a single-run observation on one device, not a benchmark, speed
+  rating or performance claim. Background suspension, thermal limits and other
+  apps can change it; whether the clock counts during iOS suspension is
+  unverified. Failed and cancelled jobs record no time; an invalid or throwing
+  clock reading leaves the value absent rather than showing zero.
+- No engine, limit, model, dependency, storage or native change. Task 10 uses its
+  own branch from reviewed master `3209025`. Task 8 (`feat/task8-safari-phone-test`)
+  and Task 4 (`34538e4`) stay open and unmerged. Task 8 merges the reviewed
+  result if it is ready; Task 10 never delays the phone session, which otherwise
+  runs on the current Task 8 build without the badge.
+- See the [design](superpowers/specs/2026-11-04-processing-time-design.md) and
+  [plan](superpowers/plans/2026-11-04-processing-time.md).
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
