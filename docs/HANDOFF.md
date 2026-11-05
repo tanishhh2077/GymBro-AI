@@ -70,9 +70,10 @@ not app/native sources; later master workflows are separate evidence. Pushing
 Task 8 does not trigger these workflows; do not change repository settings.
 [Master browser run 2](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41948751190)
 for `a524387` also passed: 391 tests/lint/build and 10 browser cases in 5.6 minutes,
-same browser/GPU delegate label/120 no-person samples. Native run 9 (`41948751280`)
-has passed shared checks and Android compilation; iOS simulator startup is still
-running. Do not report the whole native run as passed yet.
+same browser/GPU delegate label/120 no-person samples.
+[Native run 9](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41948751280)
+also passed all three jobs: shared checks, Android debug APK, and iOS simulator
+build/visible startup. No physical-phone or native-video acceptance is implied.
 
 ## Video and product boundaries
 
