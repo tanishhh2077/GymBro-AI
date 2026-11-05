@@ -10,6 +10,61 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task15 starts from reviewed master `b09f79a` in isolated `GymBro AI-task15`, branch
+`feat/task15-rest-timer`. User answered Q9 A (workout-record sync only, no videos),
+then said "Clear bro now work"; D-032/D-033 and PRODUCT_DIRECTION preserve this.
+Builder selects the already requested manual rest timer as the next bounded
+tracking task. Q&A resumes at Q10 later; no routine confirmation stop.
+
+- Original Task8 checkout is clean at `52789b0`; no phone code was brought across.
+  Cherry-picking Q8 notes encountered only documentation conflicts; it was aborted
+  without keeping partial changes. The four current documentation files were
+  copied instead, preserving decisions/history and updating this branch's handoff.
+- Managed worktree creation already failed repeatedly in this session because
+  chat metadata points to the old `liftform` path. Normal Git sibling fallback
+  follows the existing worktree convention; no unrelated checkout/server changed.
+- Clean process-local Node22.23.2 install:482 packages,448 tests/22files, lint/build
+  pass. Vite4183 binds loopback only and responds200. No feature code written
+  before that baseline. Plan self-review maps all review-focus cases to tests.
+
+### Previous accepted state (Task14/Q8)
+
+Task 14 is complete and pushed to master `b09f79a`: manual local workout logging,
+Home and history alongside existing bench analysis. Task 8 is incorporating it
+in the original checkout with a sixth preserved-history merge (Tasks9-14).
+Only HANDOFF/STATUS conflict; this record retains both branches' evidence and
+HANDOFF identifies current Q&A/phone prerequisites. Local merge checks follow.
+
+The temporary Claude transfer was cancelled; Codex resumed the unchanged task.
+Q8 is now accepted: user answered "A", then "Clear", selecting guest logging
+with optional accounts for backup and syncing (D-031). This is a future product
+requirement; accounts/sync are not implemented and sync/media scope is undecided.
+Accepted decisions, PRODUCT_DIRECTION and HANDOFF now preserve the answer for
+both providers. No application or service changes. Continue Q9 one MCQ at a time.
+The one-time Codex automation remains paused after fulfilling its purpose.
+
+### Task 8 merge of reviewed master (Task 14)
+
+- Original checkout was clean at `8151248`; `git merge --no-commit master` keeps
+  histories. No Task4 merge. Final code `efa0c04` has fresh reviews, the single
+  Medium/P2 fix verified RED/GREEN, 448 local tests/lint/guarded sync, final hosted
+  browser4 (448 shared checks/13cases) and native11 success. Master `b09f79a`
+  adds only final documentation after that code. Non-Markdown parity must hold.
+- Q1-Q7, roadmap and provisional defaults are in PRODUCT_DIRECTION. First slice
+  is manual logging and standalone bench analysis, not routines/timers/charts/PRs,
+  set-linked persistence or live feedback. Phone/real-bench acceptance stay open.
+- Original checkout installed exactly1 new dev package; process-local Node22.23.2:
+  **448 tests / 22 files**, lint and guarded mobile sync/build pass, 418modules,
+  11 verified files/platform. Non-Markdown diff against master `b09f79a` is empty;
+  the reviewed/hosted source therefore covers this merge. Only HANDOFF/STATUS
+  conflicts were resolved, with both task histories preserved.
+- Preserved empty Home previews in ignored `build/visual-review/task14/`; verified
+  the temporary worktree's exact resolved path/clean state and removed it with
+  normal Git worktree removal. All task branches remain. No private media or
+  user workout logs moved, staged or uploaded.
+
+### Task 14 recorded implementation and acceptance
+
 Task 14 passes acceptance and review: local manual workout logging/Home under D-030, from
 reviewed master `a524387`, with user authorization after Q1-Q7. Q&A resumes at
 Q8 in about an hour via a one-time scheduled thread follow-up. No live analysis,
@@ -131,11 +186,63 @@ cloud/account or media persistence. Read PRODUCT_DIRECTION and the separate plan
 
 ### Earlier task evidence
 
-Task 13 (D-029) passes acceptance and review on `feat/task13-browser-checks` from reviewed
-master `1c44729`. It makes the existing non-human browser checks reproducible
-without merging unfinished Task 4. The user approved this step and said "Clear
-just start working". Hotspot/video will come later; no new user input is needed
-for this bounded PC task. No human footage has been supplied or accepted.
+### Prior Task 8 state before the Task 14 merge
+
+Task 8 is ready for the coordinated phone session, with reviewed Task 13 merged
+from master `a524387` (fifth preserved-history merge, after Tasks 9-12). No
+runtime app behavior changes in Task 13; the maintained browser suite and
+first-party fixtures are now available in this checkout. The merge resolves
+README/HANDOFF/STATUS wording while retaining all phone evidence below. The
+user will bring a trusted hotspot connection and video later; neither is ready
+for acceptance now. No LAN listener, phone transfer, Safari case or human-video
+processing has run. Local merge verification passes as recorded below.
+
+The user has deferred a detailed future Q&A about Hevy, features and app
+appearance (15-30 questions if useful) until after the current task. Recorded in
+HANDOFF for provider continuity; no new feature/integration/design is specified.
+
+### Post-merge automated checks
+
+- [Master browser run 2](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41948751190),
+  source `a524387`, completed successfully: 391 tests, lint/build and all 10
+  real-browser cases in 5.6 minutes. Logs record browser 156.0.8078.4/GPU delegate
+  label/120 no-person samples. Timing varies across hosts/runs; no phone or
+  physical-GPU performance claim.
+- [Native run 9](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41948751280)
+  for `a524387` completed successfully: shared checks, Android debug APK, and
+  iOS simulator build/visible startup all passed. This is automated prototype
+  evidence, not physical-phone or native-video acceptance. Packages not downloaded.
+- Documentation-only follow-up: recorded the user's deferred Hevy/design Q&A.
+  Fresh process-local Node 22.23.2 checks: 391 tests / 18 files, lint/build pass,
+  411 modules and unchanged app bundles. No phone, network/settings or human-media
+  action. Keep the current validation gates open until actual evidence arrives.
+
+### Task 8 merge of reviewed master (Task 13)
+
+- Codex, 2026-11-04. Master `a524387` includes fresh design/code review and
+  hosted Ubuntu browser run 41947939605: 391 tests, lint/build and 10 real-browser
+  cases passed. The one Low documentation finding is resolved. Task 4 remains
+  incomplete and unmerged; selected fixed non-human sources were ported only.
+- Original checkout was clean before `git merge --no-commit master`.
+  README, HANDOFF and STATUS conflicted. README keeps the current coordination
+  wording, HANDOFF keeps phone testing next, and STATUS preserves both histories.
+- Existing Vite listeners 5173/5193 are untouched. Install only the three missing
+  pinned development packages with `npm install --ignore-scripts --no-audit
+  --no-fund`; do not run destructive clean install against the locked checkout.
+  A clean locked install is independently proven by the isolated setup/hosted CI.
+- Installation added exactly 3 packages; no lockfile change beyond reviewed
+  master. Process-local Node 22.23.2: **391 tests / 18 files**, lint/build exit 0,
+  411 modules and unchanged app bundle hashes. Read-only `mobile:verify` passes
+  11 files per platform, local model and six runtime files; no sync performed.
+  Default `node --version` remains global v20.20.2. Non-Markdown diff against
+  reviewed master is empty, so its fresh code review covers this merge's code.
+- Verified temporary worktree path/branch/clean tracked state and its generated
+  scratch inputs, then removed it with normal `git worktree remove`. No branch
+  deleted. Existing Vite listener PIDs 67572/88812 remain; no test port remains.
+- Master browser run 2 (`41948751190`) and native run 9 (`41948751280`), both
+  source `a524387`, are in progress. Browser run 1 is the completed evidence.
+  Task 8 remains open for user-coordinated phone testing and is not merged into
+  master. Human video acceptance is still unverified.
 
 ### Task 13 Step 1: audit, clean setup and plan
 
@@ -191,7 +298,7 @@ for this bounded PC task. No human footage has been supplied or accepted.
   workflow execution and fresh whole-branch code review. These results do not
   validate a human lifter, rotation metadata, Safari, native/offline or a phone.
 
-### Task 13 Step 3: hosted workflow (execution pending)
+### Task 13 Step 3: hosted workflow and review
 
 - Added `browser-checks.yml`: standard Ubuntu 24.04, Node from `.nvmrc`, locked
   install, unit tests/lint/build, pinned Chromium install and smoke command.
@@ -222,7 +329,37 @@ for this bounded PC task. No human footage has been supplied or accepted.
   Task 4 remains incomplete/unmerged; a human video is expected later, not yet
   accepted. No private media, native sync or network/settings action occurred.
 
-### Previous completed task
+### Prior Task 8 stage before the Task 13 merge
+
+Task 8 (the phone plan's free Safari slice) is ready for the phone session on
+`feat/task8-safari-phone-test`. It has merged reviewed master four times, each
+with a merge commit keeping both published histories: Task 9, Task 10 (the
+processing-time badge), Task 11 (build configuration type-check) and now
+`1c44729` (Task 12, legacy code and template asset cleanup; screens unchanged).
+The merged non-Markdown files equal master and the whole tests/lint/guarded sync
+pass. The user reported **iOS 26.5.2**. Phone testing still needs the user for a
+trusted private connection between the iPhone and the PC. No LAN listener, phone
+transfer or Safari case has run. Safari, installed-native and real-bench
+acceptance remain unverified.
+
+### Task 8 merge of reviewed master (Task 12)
+
+- Claude Code (Opus 5.5), 2026-11-04, under Node 22.23.2 (confirmed with
+  `node -v`). `origin/master` was `1c44729` (Task 12 complete, fresh review
+  resolved) and the Task 8 remote `398b5c0`. Merged with `git merge --no-ff
+  master`: no rebase or force push; Task 4 not merged.
+- Git merged every file except `HANDOFF.md` and `STATUS.md`. This file keeps every
+  section from both branches, newest first (master's repeated Task 11 record
+  heading appears once); HANDOFF keeps the phone session as the next action.
+- Every non-Markdown path equals master `1c44729`, so Task 12's fresh review
+  covers the merged code. **385 tests / 17 files** pass; lint exit 0;
+  `npm run mobile:sync` exit 0 (411 modules; iOS and Android 11 shared files each
+  verified). The phone session's screens match Task 10's; the built site no
+  longer ships the two unused template SVGs.
+- Native run8 (41938020495, master `1c44729`) passed shared checks, the Android
+  debug APK and iOS simulator build/startup; packages were not downloaded.
+
+### Task 12 record: legacy code and template asset cleanup, completed on master
 
 Task 12 (D-028, legacy code and template asset cleanup) is **complete**: built on
 `feat/task12-legacy-cleanup` from reviewed master `eaf87e1`, freshly reviewed and
@@ -330,7 +467,31 @@ details. Safari, installed-native and real-bench acceptance remain unverified.
   consumer. Rechecked under Node 22.23.2: 385 tests / 17 files, lint and
   `npm run mobile:sync` (411 modules, 11 verified files per platform) pass.
 
+### Task 8 merge of reviewed master (Task 11)
+
+- Claude Code (Opus 5.5), 2026-11-04, under Node 22.23.2 (confirmed with
+  `node -v`). `origin/master` was `eaf87e1` (Task 11 complete, fresh review
+  resolved) and the Task 8 remote `9c06492`. Merged with `git merge --no-ff
+  master`: no rebase or force push; Task 4 not merged.
+- Git merged every file except `HANDOFF.md` and `STATUS.md`. This file keeps every
+  section from both branches, newest first; HANDOFF keeps the phone session as
+  the next action.
+- Every non-Markdown path equals master `eaf87e1`, so Task 11's fresh review
+  covers the merged code. **383 tests / 16 files** pass; lint exit 0;
+  `npm run mobile:sync` exit 0 (411 modules; iOS and Android 13 files each
+  verified). The build output for the phone session is unchanged by Task 11.
+
 ### Task 11 record: build configuration type-check, completed on master
+
+Task 11 (D-027, build configuration type-check) is **complete**: built on
+`feat/task11-config-typecheck` from reviewed master `aec3cb2`, freshly reviewed
+and fast-forwarded to master; chosen by the
+builder after the user, still away, asked for continued work without frequent
+questions. Task 10 (D-026, observed processing time) is complete on master and
+verified by native run6. Task 8's phone test waits for the user on its own branch
+(`9c06492`: master `aec3cb2` merged, iOS 26.5.2 reported, S07/S08 inputs
+generated and reviewed); its branch records hold the details. Safari,
+installed-native and real-bench acceptance remain unverified.
 
 ### Task 11 Step 1 decision and plan
 
@@ -403,6 +564,34 @@ details. Safari, installed-native and real-bench acceptance remain unverified.
   `tsconfig.app.json` TS2307 failure from a scratch copy (the copy lost the
   package context); the builder's in-repository run showed TS2307 on `@/`
   imports, and the file is unreferenced either way.
+### Task 8 merge of reviewed master (Task 10)
+
+- Claude Code (Opus 5.5), 2026-11-04. `origin/master` was `aec3cb2` (Task 10
+  complete; native run6 green at its source commit `2fbafce`) and the Task 8
+  remote `3d8230a`. Merged with `git merge --no-ff master`: no rebase or force
+  push; Task 4 not merged. A first attempt before Task 10's final documentation
+  commit was aborted uncommitted, so only this merge exists.
+- Git merged every file except `HANDOFF.md` and `STATUS.md`. This file keeps every
+  section from both branches, newest first; HANDOFF was rewritten so the phone
+  session stays the next action and the badge is mentioned.
+- Every non-Markdown path equals master `aec3cb2`, so Task 10's fresh code review
+  and run6 cover the merged code. Process-local Node 22.23.2: `npm ls --depth=0`
+  exit 0; **381 tests / 15 files** pass; lint exit 0; `npm run mobile:sync` exit 0
+  (411 modules; iOS and Android 13 files each verified). All nine files in
+  `build/fixtures/` still match their recorded SHA-256 values.
+- The phone session can now also read the badge, "Processing took N seconds on
+  this device", as the plan's elapsed-time observation; it is one run's value,
+  and whether iOS keeps counting during suspension is unverified.
+
+### Task 10 record: observed processing time, completed on master
+
+Task 10 (D-026, observed processing time) is **complete**: built on
+`feat/task10-processing-time` from reviewed master `3209025`, chosen by the
+builder after the user, away from the PC, asked for PC-side work, freshly
+reviewed, fast-forwarded to master and verified by native run6. Task 8's phone
+test waits for the user on its own branch (`3d8230a`: master merged, iOS 26.5.2
+reported, S07/S08 inputs generated and reviewed); its branch records hold the
+details. Safari, installed-native and real-bench acceptance remain unverified.
 
 ### Task 10 Step 1 baseline and design
 
@@ -510,6 +699,110 @@ details. Safari, installed-native and real-bench acceptance remain unverified.
   simulator startup does not exercise the new badge or native video inference.
 - Task 10 is complete. The feature branch is retained. Task 8 merges this master
   next, before its phone cases; Task 4 stays unmerged.
+### Task 8 generated S07/S08 inputs
+
+- Claude Code (Opus 5.5), 2026-11-04. The plan's S07 needs a zero-byte MP4 and a
+  file over 100 MiB, and S08 a nonempty corrupt MP4; the five exported fixtures
+  and Task 4's `tests/fixtures/` (checked at `34538e4`) contain none of them.
+  Builder-proposed plan amendment: generate `zero-byte.mp4` (0 bytes; first
+  generated as `empty.mp4` and renamed after review, same bytes and hash),
+  `corrupt.mp4` (68 ASCII bytes) and `over-size.mp4` (104,857,601 zero bytes)
+  into ignored `build/fixtures/`. A Python script wrote raw bytes, refusing to
+  overwrite; the printed SHA-256 values are in the plan table. `git check-ignore`
+  confirms `build/` is ignored. The folder now holds those nine files only.
+- PC behavior check, desktop only: a temporary production preview bound to
+  `127.0.0.1:5194` served the Task 8 tip's build (source identical to master
+  `3209025`) to the Playwright MCP Chromium browser. Inputs were set on the real
+  file input. The zero-byte input (then named `empty.mp4`) showed alert "Video not accepted — This file is empty.
+  Choose a recorded video."; `over-size.mp4` showed "This video is larger than
+  100 MiB…". Neither created a video element; Choose video stayed enabled.
+  `corrupt.mp4` was admitted and ended in alert "The video could not be read —
+  The browser could not load this video. Remove the clip to try another.", not a
+  no-pose result; Choose video was disabled and Remove present. After removal,
+  `no-person.mp4` processed to the no-pose result in about 4 s, with the old
+  filename gone. No request went anywhere except the preview origin and
+  in-memory `blob:` URLs for the selected files. Console: one
+  `favicon.ico` 404 (the app ships no favicon; cosmetic) and MediaPipe's OpenGL
+  notice. Preview process 50072 was stopped and port 5194 confirmed free; upload
+  copies in ignored `.playwright-mcp/` were deleted.
+- This shows the inputs reach the intended code paths in desktop Chromium. It is
+  not a Safari, iPhone Files-provider or native result; the phone may filter,
+  rename or refuse to download a zero-byte file, which S07 records as observed.
+
+- Fresh read-only review (Claude Code subagent, Opus 5.5, no inherited builder
+  conversation; read only Git objects and `build/fixtures/`) of `fedc7e2..e10cc93`
+  found no Critical/High/Medium issue. It recomputed all three inputs' bytes and
+  SHA-256 from the files and from the plan text alone, confirmed `build/` is
+  ignored with nothing tracked, matched every quoted alert to `clipPolicy.ts`,
+  `video.ts` and `VideoStage.tsx`, and found the iOS record consistent. It ran no
+  tests/builds/servers and could not see the Chromium run or phone behavior.
+- Three Low findings, all fixed in the following commit: (1) the name
+  `empty.mp4` could be confused with the plan's "known empty clip"
+  (`no-person.mp4`), so the input is now `zero-byte.mp4` and S08 names
+  `no-person.mp4`; (2) the plan claimed a review "recorded in STATUS" before
+  one existed, now this record; (3) "Only `blob:` requests left the preview
+  origin" was reworded, because `blob:` URLs never leave the page.
+- Two unverified concerns, addressed in the plan: the text-file `corrupt.mp4`
+  exercises only the earliest (metadata) failure, now stated, and a timeout
+  message with removal guidance also counts as S08's actionable failure;
+  phone Safari may play rather than download an `.mp4` link, so the transfer
+  step now says to long-press and choose "Download Linked File". The reviewer's
+  minor note is also adopted: the amendment repeats "verify each SHA-256".
+- Commit hygiene note: commit `e10cc93`'s subject begins with an invisible UTF-8
+  byte-order mark, written by Windows PowerShell 5.1 into the message file. The
+  commit's content is correct; the published history is left unchanged. Later
+  message files are written fresh without one.
+
+### Task 8 iOS version
+
+- On 2026-11-04, while away from the PC, the user reported the iPhone 12 Pro Max
+  runs **iOS 26.5.2**, read from Settings. This is user-reported, not observed by
+  an agent; Safari's frozen user-agent string was not used. The phone plan's
+  resource table and Step 1 record it. LAN reachability is still unchecked, and
+  no phone, network or settings action was taken.
+
+### Task 8 merge of reviewed master (Task 9)
+
+- Done by Claude Code (Opus 5.5) on 2026-11-04 at the user's request. A fetch
+  showed `origin/master` at `3209025` and the Task 8 remote at `7198ec1`; their
+  merge base is `26a831f`. Merged with `git merge --no-ff master`: no rebase, no
+  force push, no published-history rewrite. Task 4 (`34538e4`) was not merged.
+- Task 8's three commits changed only Markdown; master changed source and docs.
+  Eight documents changed on both sides. Git combined `AGENTS.md` (now identical
+  to master) and `README.md` (master's text plus Task 8's D-024 first-message
+  block, which master still lacked); `WORKFLOW.md` was already identical. In the
+  conflicts, `DECISIONS.md` took master's side (it adds D-025; D-024 was identical
+  on both). The phone plan and plans index keep each side's more precise wording
+  and record this merge. This file keeps every section from both branches, newest
+  task first. `HANDOFF.md` was rewritten for the merged state.
+- Every non-Markdown path in the merged tree is identical to master `3209025`
+  (`git diff master -- . ':(exclude)*.md'` is empty). Task 9's fresh code review
+  therefore covers the merged code; the merge adds no application code to review.
+  Only `README.md`, `HANDOFF.md`, `STATUS.md` and the two plan files differ.
+- Process-local Node 22.23.2 / npm 10.9.8; global Node 20 untouched. No reinstall:
+  `package.json` and the lockfile are unchanged on both branches, and
+  `npm ls --depth=0` exits 0. A clean `npm ci` was not run because two running
+  Vite servers hold files open: an unrelated project on `[::1]:5173` and this
+  checkout's dev server on `127.0.0.1:5193`. Both were left running. Task 9's clean
+  install remains the latest reinstall evidence.
+- Merged tree: `npm test` **366 passed / 15 files**, exit 0; `npm run lint` exit 0;
+  `npm run mobile:sync` exit 0 (build/config type-check, 411 modules, `cap sync`,
+  then verification of iOS and Android: 13 files each, local entrypoints, model and
+  six runtime files). The existing Browserslist warning remains. No tracked file
+  changed.
+- All 13 rebuilt `dist/` files match the web assets inside the ignored run5 APK
+  (`build/artifacts/run-5/GymBroAI-android-debug.apk`) byte-for-byte, so master
+  run5's native compile/launch evidence describes this branch's web bundle. Pushing
+  this branch does not trigger the workflow, which runs only on
+  `feat/task6-mobile-app` and `master`; no new cloud run was made.
+- `build/fixtures/` still holds exactly the six exported files; all five fixture
+  SHA-256 values match the plan and the README hash matches the Step 1 record.
+- Read-only network check: still Ethernet UWNet, Windows category **Public**. No
+  listener was started, no setting was changed and no phone action was taken.
+- Next, with the user: record the iOS version, choose home Wi-Fi or Personal
+  Hotspot, re-detect the private address, bind 5195/5196 only to it, verify phone
+  reachability, transfer the fixtures, then run Step 2's Safari cases. Task 8
+  stays unmerged into master until its acceptance and review are resolved.
 
 ### Task 9 record: observed elbow summary, completed on master
 
@@ -640,6 +933,117 @@ user instruction; Task8 itself stays open at7198ec1 and is not merged here.
   **366 tests/15 files**, lint and build/config check exit0,411 modules. Source
   bundle hashes match the verified run5 packages. All Task9 steps are complete;
   no acceptance-blocking review finding remains. Feature branch is retained.
+
+### Task 8 Step 1 preparation
+
+- Done by Claude Code (Opus 5.5) on 2026-11-04 after the user approved the
+  explanation; the user then waived routine "Is this clear?" stops (D-024).
+  Branch `feat/task8-safari-phone-test` created from master `26a831f`, which
+  matched `origin/master` after a fetch.
+- Node: `C:\nvm4w\nodejs` (global, v20.20.2) was left unchanged. Each command
+  prepended the nvm folder for v22.23.2 to `PATH`; `node --version` reported
+  v22.23.2 and npm 10.9.8. `nvm use` was not run, because it switches the global
+  link.
+- Baseline under Node 22.23.2: `npm test` **320 passed / 13 files**, exit 0;
+  `npm run lint` exit 0; `npm run build` exit 0, 409 modules. Working tree clean.
+- Fixture export from `34538e417a724ebceb0971bd2b632a376a7e739e:tests/fixtures/`
+  with `git cat-file blob` (raw stored bytes, no line-ending or text filters;
+  equivalent to the plan's binary-safe archive/extraction) into ignored
+  `build/fixtures/`, which did not exist beforehand:
+
+  | File | Bytes | SHA-256 vs plan | Git object ID matches tree |
+  | --- | --- | --- | --- |
+  | no-person.mp4 | 4,890 | OK | `ee7fdd4` OK |
+  | no-person-portrait.mp4 | 3,216 | OK | `b59102c` OK |
+  | over-duration.mp4 | 52,626 | OK | `83baafa` OK |
+  | over-long-edge.mp4 | 2,391 | OK | `5b823db` OK |
+  | over-pixels.mp4 | 2,374 | OK | `4c917f3` OK |
+  | README.md (provenance) | 2,631 | not in plan; SHA-256 `aac2cdac1d5cc213208d869c3678abb4dad3267ba7accae511e86bea357e7d00` | `5ef78be` OK |
+
+  The directory holds exactly these six files. The README's relative links point
+  to files beside its original Task 4 location and do not resolve in the copy.
+- Environment observed (read-only) for the LAN step: Python 3.12.10 available;
+  ports 5195 and 5196 free; this session's earlier servers are gone, an older
+  dev server still listens on 127.0.0.1:5176 and another on 127.0.0.1:5193
+  (both left alone). The PC's only connected network is Ethernet "UWNet",
+  Windows category **Public**; NordVPN adapters (NordLynx, OpenVPN) are present;
+  Wi-Fi is disconnected. Enabled inbound firewall rules already allow
+  `node.exe`/`python.exe` on the Public profile (rule program paths were not
+  inspected). A campus network is not the plan's trusted private network and may
+  block device-to-device traffic, so the recommended route is the iPhone's
+  Personal Hotspot with both servers bound only to the hotspot address.
+- Claude's inspection did not identify secure-context-only features in the
+  selected processing path. This was an expectation about plain HTTP, not a
+  Safari result; model startup on an actual phone LAN origin remains unverified.
+- Not done by Claude: binding the preview/fixture servers, phone transfer, opening the
+  page in Safari, and the iOS version. No server has been started, no file has
+  been sent to the phone, and no Step 2 case has run.
+
+### Task 8 Codex continuation: PC runtime preflight
+
+- On 2026-11-04 the user asked Codex to inspect Claude's work and resume. Git was
+  clean at `10524e9`, matching its remote; fetch left master at `26a831f`. The
+  two Claude commits (`49538b2`, `10524e9`) change documentation only, including
+  the user's D-024 waiver. App/native/package/tooling source is unchanged.
+- Fresh read-only Codex review (`claude_task8_review`, no inherited conversation;
+  model identifier not exposed) found no acceptance-blocking issue. All six
+  ignored fixture files, sizes, SHA-256 and Git blob IDs match immutable
+  `34538e417a724ebceb0971bd2b632a376a7e739e`, with no hidden extras/directories.
+  Their README documents internally generated black/silent H.264 and permitted
+  redistribution. The reviewer ran no tests/builds/servers/device actions.
+- One supported low-severity finding was corrected: WORKFLOW's new-session
+  paragraph and the phone plan's combined Step1 checkbox still mandated routine
+  understanding stops, contradicting D-024. Current instructions now distinguish
+  explain-and-proceed from actual user phone/settings coordination. Task7's
+  approval language below is historical; Task8 now authorizes preparation.
+- The user then postponed only the phone portion until returning home, about
+  six hours later. No phone/network-setting action was attempted. Read-only
+  network inspection still found Ethernet UWNet on the Public profile. Unlike
+  the earlier Claude snapshot, ports5176/5193 had no listener at Codex's check;
+  no existing server was stopped. No campus-bound or all-interface listener ran.
+- Fresh Node22.23.2 verification: **320 tests/13 files**, lint and build/config
+  type-check exit **0**, 409 modules; existing Browserslist warning remains.
+  No dependencies installed or native build/sync needed for unchanged sources.
+- A temporary Vite production preview bound only to **127.0.0.1:5194** was used
+  with an isolated headless desktop **Edge156.0.4314.58** context. Existing
+  Playwright1.64.1 was reused from the ignored clean-Task4 cache; no Task4 app or
+  unfinished test tooling was merged. The real production UI/decoder/local model
+  ran with no inference mocks or seeded poses. Seven scratch preflight cases passed:
+  startup; landscape and portrait empty-clip GPU processing with no-pose/0%
+  coverage/unavailable elbow values, actual playback progression, pause/seek
+  control actions and narrow layout;
+  all three over-limit metadata rejections; active cancellation and successful
+  replacement without the previous filename returning. The narrow viewport is
+  desktop Edge layout evidence, not iPhone/WebKit emulation or acceptance.
+- No external app-origin requests, page errors or console errors were observed
+  in that context. A non-human full-page result image was manually inspected.
+  Scratch script/results/image remain ignored at `build/task8-pc-preflight.mjs`,
+  `build/task8-pc-preflight-results.json`, `build/task8-pc-no-person.png`. These
+  are local manual evidence, not seven new npm tests or committed CI tooling.
+  They do not establish bench accuracy, native behavior or a general privacy audit.
+  Pause and slider actions were exercised but the scratch harness did not assert
+  the resulting paused/seek state; do not promote these actions to verified seeking.
+- A separate scratch HTTP-origin check passed on the same desktop Edge:
+  `http://gymbro.test` reported **isSecureContext=false**, completed real GPU
+  processing of the empty fixture, and displayed no-pose/0%/unavailable angles.
+  Browser request interception forwarded exact production responses from the
+  loopback preview, with no inference replacement. No external requests/page
+  errors were observed. Script/results are ignored at
+  `build/task8-http-preflight.mjs` and `build/task8-http-preflight-results.json`.
+  This narrows the secure-context concern for Edge only; interception is not an
+  actual LAN connection and cannot verify iPhone Safari or hotspot routing.
+- Temporary loopback previews were stopped after checks. One immediate stop
+  probe still reported a listener; a subsequent independent query found neither
+  port5194's listener nor its preview process. No older process was stopped.
+  Global Node20.20.2 was rechecked and preserved; no LAN listeners were started.
+- Targeted follow-up by the same read-only reviewer confirmed the D-024 fix,
+  phone deferral and PC/forwarded-HTTP evidence boundaries. It identified the
+  pause/seek assertion limitation above; claims were narrowed accordingly.
+  No remaining acceptance-blocking finding; Task8 remains incomplete for the phone.
+- All Safari/physical-phone cases remain unrun. Resume when the user returns:
+  obtain iOS version, coordinate a trusted private connection, bind narrowly to
+  its actual address and check phone reachability before transferring fixtures.
+  Keep Task8 open/unmerged until its acceptance/review is resolved.
 
 ### Earlier Task7 planning record
 

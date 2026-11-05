@@ -14,6 +14,8 @@ have not been specified. MCQs must include a recommendation and brief reason.
 | 5. Tracking scope | B: exercises/sets/reps/weights/routines/history plus timers, charts, personal bests and custom exercises; community deferred |
 | 6. First public AI exercise coverage | A only: bench press; logging may cover other exercises |
 | 7. Analysis timing | Post-video for now; live plus post-video is a future goal |
+| 8. Accounts and sync | A: guest logging with optional accounts for backup and syncing; sign-up must not block a first workout |
+| 9. Sync contents | A: workout records only; no video uploads |
 
 After Q7 the user explicitly said to start building while they are busy, then
 resume questions in an hour. A one-time thread follow-up
@@ -33,8 +35,24 @@ actions and the existing standalone video screen. It does not claim the whole
 tracking wish list, set-linked analysis, live analysis, or validated bench findings.
 Builder defaults: existing visual tokens/system font; provisional three-view
 navigation; visible lb/kg selection for each new workout, initially lb (US-first
-direction), no conversion; local IndexedDB only. Unit preference, accounts/cloud,
-video acquisition/retention, routines, metrics and final styling remain Q&A topics.
+direction), no conversion; local IndexedDB only. Q8 now selects guest use with
+optional accounts and sync as the future direction; neither is implemented.
+Q9 restricts future sync to workout records, excluding videos. Guest-data
+migration, unit preference, local video acquisition/retention,
+routines, metrics and final styling remain Q&A topics.
 
 Keep workout records separate from AI/media data. No videos, frames, landmarks,
 object URLs, form scores, server transfer or third-party integration is persisted.
+
+Q&A resumed around23:29 Chicago after Codex resumed. The user answered Q8 "A",
+then confirmed "Clear" after the explanation. D-031 records that accepted
+direction. The user then answered Q9 "A", confirmed "Clear bro now work", and
+asked to resume development. Continue at Q10 when Q&A next resumes; do not stop
+routine development for further MCQs. Recommendations are not decisions.
+The one-time Codex follow-up is fulfilled and paused to avoid duplicate prompts.
+
+Task15 adds a bounded manual rest timer from Q5's accepted tracking wishlist.
+Builder defaults: 90 seconds initially; 30/60/90/120/180/300-second choices; manual
+start/pause/resume/reset; retained between screens for the active workout only.
+No automatic start, reload persistence, sound or background notifications in this
+slice. The limit is visible in the UI. Remaining preferences stay open.

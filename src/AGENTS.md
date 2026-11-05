@@ -22,6 +22,8 @@ with the approved amendments in [decisions](../docs/DECISIONS.md).
 - The legacy multi-lift, multi-angle and score declarations were removed (D-028).
   Do not reintroduce them without an accepted decision beyond the agreed milestone.
 - Put concise local `AGENTS.md` guidance in each new authored source directory.
+  D-033 additionally permits a root-mounted manual active-workout rest timer,
+  separate from saved records and analysis; use its bounded design/plan.
   Do not add guidance inside dependencies, build output, or generated caches.
 - Task 5 adds a separate, explicitly limited image-space measurement layer under
   D-021 while Task 4 acceptance stays incomplete; consult its design/plan.

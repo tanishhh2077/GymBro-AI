@@ -55,6 +55,12 @@
 
 ## Independent judgment
 
+- D-031/D-032 select guest access with optional workout-record sync only; videos
+  must not be uploaded. This remains a future product direction, not a service.
+- D-033 authorizes Task15's manual session-only rest timer. Read its design/plan;
+  keep timer state independent of saved workout/media data and state reload and
+  in-app-completion limits honestly. Continue routine work after "Clear bro now work".
+
 - Accuracy matters more than agreement. Evaluate the user's idea and your own earlier idea by the same evidential standard.
 - Explain concrete failure cases and meaningful tradeoffs. Offer a better approach when one is justified; do not praise, agree, disagree, or criticize without a reason.
 - Separate observations, assumptions, proposals, and accepted decisions. Admit uncertainty and change your conclusion when stronger evidence warrants it.

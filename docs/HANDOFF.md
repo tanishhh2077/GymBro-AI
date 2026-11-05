@@ -1,77 +1,87 @@
 # GymBro AI: current handoff
 
-Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS first.
+Updated2026-11-04 America/Chicago. Read root/scoped AGENTS first.
 
-## Current task
+## Current state and next action
 
-**Codex resumed:** the user cancelled the temporary Claude handoff ("False alarm,
-continue working where you left off"). Continue this `GymBro AI-task14` worktree,
-not the original phone checkout. No Claude implementation occurred in between;
-the checkout was clean at `6fbd348`. The one-time Codex Q&A follow-up is restored
-for the original approximately23:28 Chicago time. Resume at Q8, one MCQ with a
-recommendation and brief reason; do not duplicate answers already provided.
+**Task15 in progress:** manual active-workout rest timer (D-033), isolated sibling
+checkout `GymBro AI-task15`, branch `feat/task15-rest-timer`, from reviewed master
+`b09f79a`. Original checkout stays on `feat/task8-safari-phone-test` at `52789b0`;
+do not merge Task8 or Task4 into master. Task14 remains complete. Baseline clean
+install,448tests/22files, lint/build and owned loopback Vite4183 health pass.
+Plan self-review complete; implement Step2 test-first, then obtain fresh code review.
 
-Task 14, local workout logging/Home, **passes acceptance and review**, on `feat/task14-workout-logging` in the
-isolated `GymBro AI-task14` checkout from reviewed master `a524387`. User answered
-seven MCQs and explicitly authorized building while busy; no more questions
-until the user is available (originally around 23:28 Chicago). Resume at Q8, MCQ with a
-recommendation and reason. See [PRODUCT_DIRECTION](PRODUCT_DIRECTION.md), D-030,
-[design](superpowers/specs/2026-11-04-workout-logging-design.md) and
-[plan](superpowers/plans/2026-11-04-workout-logging.md). Fresh design review ready.
+The user cancelled the temporary Claude handoff; Codex resumed without any
+intervening implementation. **Q8 accepted:** the user answered "A", then "Clear":
+guest logging with optional accounts for backup and syncing (D-031). Accounts and
+sync remain future work; no cloud implementation or media transfer is implied.
+**Q9 also accepted:** workout records only; no video uploads (D-032). The user
+confirmed "Clear bro now work"; build now and resume MCQs at Q10 later.
+When Q&A resumes, ask one MCQ at a time with a recommendation and brief reason.
+Do not treat a recommendation as an accepted choice. The Codex reminder was paused
+after the follow-up was fulfilled; no duplicate reminder or Claude task is active.
 
-Clean Node 22.23.2 install/baseline: 391 tests, lint/build passed. New local
-transactional workout contracts/repository/store pass 46 focused tests and
-**437 total tests / 21 files**, lint/build at foundation commit `f03ffc2`.
-Home/editor/history UI is now connected. Current shared checks: **448 tests /
-22 files**, lint and guarded sync/build (418 modules, 11 files/platform) pass.
-Full local **13-case browser suite** passed on `5949c24`, including existing real inference,
-navigation away/back, reload/history, two-tab conflict and long names at390px.
-Fresh review's Medium size/revision boundary bug is fixed with a RED/GREEN
-regression in `efa0c04`; 448 tests/lint/guarded sync pass on that source. The full
-local browser suite was not repeated after this one-line boundary fix. Final
-hosted verification is complete:
+Read [PRODUCT_DIRECTION](PRODUCT_DIRECTION.md) for Q1-Q9. Product target: tracking
+and AI equally central; mixed levels; linked/standalone analysis; Home actions
+plus compact dashboard; full personal tracking/community deferred; bench-only
+AI at first public release; post-video now, live+post-video later. D-030 permits
+this bounded implementation. D-033 permits the timer; remaining sync design/local
+retention choices wait. No cloud/account service or video upload is implemented.
 
+## Implemented and verified
+
+Manual workout start/resume, explicit lb/kg fixed per workout, free-name exercise
+entries, log/edit/remove sets, finish and reopen/delete history. IndexedDB uses
+validated versioned plain data, atomic revision checks and save-before-state
+updates. Unknown data/failed or uncertain saves preserve confirmed state and
+require appropriate recovery. Existing analysis remains an independent in-memory
+bench workflow. No media/pose persistence or cloud/account/social/live service.
+Routines, timers, charts/PRs, set-linked analysis and final styling remain future.
+
+[Design](superpowers/specs/2026-11-04-workout-logging-design.md),
+[plan](superpowers/plans/2026-11-04-workout-logging.md),
+[code review](superpowers/specs/2026-11-04-workout-logging-code-review.md).
+Single Medium/P2 revision-size boundary issue fixed with exact-limit regression;
+no unresolved finding. Code source `efa0c04`; later changes are documentation.
+
+- 448 tests/22files, lint/build and guarded mobile sync pass; 418modules,
+  11 verified shared files per platform.
 - [Browser run4](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437861)
+  passes448 shared checks and13 real browser cases (3.3minutes), including model,
+  navigation, logging/reload/history, two tabs and long names at390px. Chromium
+  156.0.8078.4/GPU delegate label/120 no-person samples, not a hardware benchmark.
 - [Native run11](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437881)
+  passes shared/Android/iOS compile and visible empty Home simulator startup.
+  This is not physical-device persistence/video validation. Packages not downloaded.
+- Actual production preview logged while offline after initial load, then
+  reconnect/reload/resume/finish retained values/units with no external/mutation
+  requests or page errors. Offline cold start/video inference remain unverified.
+- Empty Home visually inspected at390 and1280px, no overflow. Previews are kept
+  locally in ignored `build/visual-review/task14/` here, not uploaded or human data.
 
-Browser run4 passed **448 tests/lint/build and 13 browser cases (3.3 minutes)**
-on source `efa0c04`; native run11 passed shared checks, Android compilation,
-and iOS compile/visible simulator startup.
-Both were in progress at the cancelled provider transfer. Prior run3/native10
-were cancelled by normal superseding workflow concurrency, not failures. Fresh
-design/code reviews are complete; no unresolved finding. A separate production
-preview check started/logged while offline after initial load, then reconnected,
-reloaded/resumed/finished with units/values intact and no external/mutation
-requests or page errors. This does not establish offline cold startup or video
-inference. **Next: integrate reviewed master per D-018 and incorporate it into Task8 preserving
-history. Do not reimplement finished work or repeat a full review without a new
-material change.** No media/pose
-persistence, cloud/account/social/live feature, new AI lift or form claim.
-Units/navigation/storage defaults are builder choices pending further Q&A.
-The remaining first-release wishlist is in PRODUCT_DIRECTION; this slice does
-not implement routines/timers/charts/PRs/set-linked analysis or live analysis.
+## Phone/video acceptance remains open
 
-## Open acceptance and preserved work
+User will provide hotspot/video later; do not ask again now. iPhone12ProMax,
+reported iOS26.5.2; no Android phone, paid Apple membership or owned Mac. Follow
+[phone plan](superpowers/plans/2026-11-04-phone-video-acceptance.md) only with user
+present: trusted private connection, re-detect address, ports5195/5196 bound only
+there. Campus Ethernet was Public; do not expose it or alter firewall/VPN/router.
+No LAN listener, phone transfer or Safari case has run. Simulator ZIP is not an
+installable iPhone app. No signing/payment/store release authorized.
 
-Original checkout remains `feat/task8-safari-phone-test` at `8151248`, with
-non-human fixtures in ignored `build/fixtures/` and the current phone plan.
-User will supply trusted hotspot/video later; no actual phone/network/settings
-or human-media action yet. iPhone12ProMax, reported iOS26.5.2, no Android phone,
-Apple membership or owned Mac. Coordinate private-network ports5195/5196 only
-when user returns; don't expose campus Public Ethernet or change firewall/VPN.
+Ignored build/fixtures in this original checkout holds five non-human patterns
+and S07/S08 inputs/provenance, previously hash-checked. Human bench footage is not
+accepted yet. Treat offered video as private; permission/framing/encoding/real
+inference and manual lifter-landmark identity checks still required. Never upload
+or commit human footage, frames or pose traces. M1/accuracy remain unverified.
 
-Task 13's 391 tests and ten real non-human browser cases pass on Windows and
-Ubuntu; native run9 for `a524387` passes shared checks, Android and iOS simulator
-startup. This is the old video-only interface, not Task14 UI/device validation.
-Task4/bench M1 remain open; no accepted human fixture. Treat offered media as
-private; no uploads/commits of footage, frames or pose traces. Later set-linked
-analysis, routines, timers/charts/PRs and final styling remain unimplemented.
+## Environment and Git
 
-## Environment
-
-Use process-local Node22.23.2 under `%LOCALAPPDATA%/nvm/v22.23.2`; never global
-`nvm use`. Original listeners5173/5193 stay. Full tests/lint/build before each
-green commit/push, fresh code review before master integration, no attribution
-trailers/force pushes/branch deletion. Task8 must incorporate reviewed Task14
-before its phone session; keep both published histories. One writer/reviewers
-read-only. Shared AGENTS/CLAUDE imports and Markdown are the provider handoff.
+Use process-local Node22.23.2 from %LOCALAPPDATA%/nvm/v22.23.2; never nvm use or
+change global Node20. Do not stop unrelated listener5173. Earlier5193 was absent
+at latest check; no action targeted it. Full tests/lint/build before each green
+commit, no attribution trailers, force pushes or branch deletion. Retain both
+Task8 and Task14 histories. GitHub default remains feat/gymbro-video-landmarks.
+Temporary Task14 worktree was removed after verification; its empty Home previews
+were preserved here and all branches retained. Continue in this original folder.
+Markdown is the provider-neutral handoff.
