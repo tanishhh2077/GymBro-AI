@@ -143,7 +143,7 @@ inference still need platform checks.
 
 ### Automated tests
 
-Task 14 currently passes **447 tests / 22 files**, lint and guarded mobile sync.
+Task 14 currently passes **448 tests / 22 files**, lint and guarded mobile sync.
 Manual-workout schema/repository/store and App-flow tests supplement the media
 tests below. The browser suite additionally checks synthetic logging and two-tab
 conflicts; consult STATUS for the latest full-browser/hosted/native results.

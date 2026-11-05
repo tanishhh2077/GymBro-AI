@@ -43,6 +43,31 @@ describe('transactional workout repository', () => {
     expect(rejected?.status === 'rejected' && rejected.reason.kind).toBe('conflict');
     expect((await createWorkoutRepository(factory).load()).revision).toBe(1);
   });
+  it('preserves a full valid library when revision rollover would exceed the size limit', async () => {
+    const record = (index: number) => ({ id: `w-${index}`, name: 'W', unit: 'kg' as const,
+      startedAt: 1, finishedAt: 2, exercises: [{ id: `e-${index}`, name: 'E',
+        sets: Array.from({ length: 100 }, (_, i) => ({ id: `s-${i}`, reps: 1, weight: 1 })) }] });
+    const data = { version: 1, revision: 9, active: null, history: [record(0)] };
+    while (JSON.stringify(data).length < 1_000_000) data.history.push(record(data.history.length));
+    let last = data.history[data.history.length - 1];
+    while (JSON.stringify(data).length > 1_000_000 && last.exercises[0].sets.length > 1) last.exercises[0].sets.pop();
+    if (JSON.stringify(data).length > 1_000_000) { data.history.pop(); last = data.history[data.history.length - 1]; }
+    let remaining = 1_000_000 - JSON.stringify(data).length;
+    const pad = (value: string) => {
+      const padding = Math.min(80 - value.length, remaining); remaining -= padding;
+      return value + 'x'.repeat(padding);
+    };
+    last.name = pad(last.name); last.exercises[0].name = pad(last.exercises[0].name);
+    last.exercises[0].sets[0].id = pad(last.exercises[0].sets[0].id);
+    expect(JSON.stringify(data).length).toBe(1_000_000);
+    await raw(data);
+    const repository = createWorkoutRepository(factory);
+    expect((await repository.load()).revision).toBe(9);
+    const result = await repository.save(9, data).then(() => ({ ok: true }), (error: unknown) => ({ ok: false, kind: (error as { kind: string }).kind }));
+    expect(result).toEqual({ ok: false, kind: 'validation' });
+    expect((await repository.load()).revision).toBe(9);
+    expect(JSON.stringify(await raw()).length).toBe(1_000_000);
+  });
   it('never replaces an unknown stored schema on read or write', async () => {
     const future = { version: 99, private: 'sentinel' }; await raw(future);
     const repository = createWorkoutRepository(factory);

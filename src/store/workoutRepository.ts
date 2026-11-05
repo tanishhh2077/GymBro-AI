@@ -30,7 +30,7 @@ export function createWorkoutRepository(factory?: IDBFactory): WorkoutRepository
             throw new WorkoutError('validation', 'The workout revision is invalid.');
           }
           // Capture a plain-data snapshot before asynchronous open/transaction events.
-          candidate = { ...JSON.parse(JSON.stringify(valid)) as WorkoutData, revision: expectedRevision + 1 };
+          candidate = validateWorkoutData({ ...JSON.parse(JSON.stringify(valid)) as WorkoutData, revision: expectedRevision + 1 });
         }
         const request = factory.open('gymbro-workouts', 1);
         request.onblocked = () => fail();
