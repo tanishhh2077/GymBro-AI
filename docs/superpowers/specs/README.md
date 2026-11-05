@@ -1,5 +1,9 @@
 # Feature designs
 
+[Local workout logging/Home](2026-11-04-workout-logging-design.md) defines Task14,
+with accepted direction in PRODUCT_DIRECTION/D-030 and fresh design/code reviews.
+This slice is separate from the remaining tracking wishlist and live-analysis goal.
+
 [Non-human browser checks](2026-11-04-browser-smoke-design.md) defines Task 13
 (D-029), making real-decoder/no-person checks repeatable locally and in hosted
 CI while phone and bench acceptance wait. No private footage enters this suite.

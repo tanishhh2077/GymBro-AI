@@ -19,6 +19,9 @@ After Q7 the user explicitly said to start building while they are busy, then
 resume questions in an hour. A one-time thread follow-up
 `resume-gymbro-ai-design-q-a` is scheduled for about 23:28 America/Chicago.
 Resume at Q8, one MCQ at a time. More design/product choices remain open.
+At the user's subsequent Codex-limit handoff to Claude, this automation was
+paused so it consumes no further Codex usage. Claude resumes questions when the
+user is available; no automatic Claude reminder has been created.
 
 ## Bounded next implementation
 

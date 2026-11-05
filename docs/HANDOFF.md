@@ -4,10 +4,17 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS first.
 
 ## Current task
 
+**Provider handoff: user hit the Codex subscription limit and explicitly asked
+Claude Code to take over. Codex is stopping development after this handoff.**
+Continue in this `GymBro AI-task14` worktree, not the original phone checkout.
+The Codex Q&A automation `resume-gymbro-ai-design-q-a` is PAUSED to avoid further
+Codex usage; Claude should resume Q8 when the user is available, not assume a
+Claude-side reminder has been scheduled.
+
 Task 14, local workout logging/Home, on `feat/task14-workout-logging` in the
 isolated `GymBro AI-task14` checkout from reviewed master `a524387`. User answered
 seven MCQs and explicitly authorized building while busy; no more questions
-until the one-time follow-up around 23:28 Chicago. Resume at Q8, MCQ with a
+until the user is available (originally around 23:28 Chicago). Resume at Q8, MCQ with a
 recommendation and reason. See [PRODUCT_DIRECTION](PRODUCT_DIRECTION.md), D-030,
 [design](superpowers/specs/2026-11-04-workout-logging-design.md) and
 [plan](superpowers/plans/2026-11-04-workout-logging.md). Fresh design review ready.
@@ -17,13 +24,27 @@ transactional workout contracts/repository/store pass 46 focused tests and
 **437 total tests / 21 files**, lint/build at foundation commit `f03ffc2`.
 Home/editor/history UI is now connected. Current shared checks: **448 tests /
 22 files**, lint and guarded sync/build (418 modules, 11 files/platform) pass.
-Full local **13-case browser suite** passes, including existing real inference,
+Full local **13-case browser suite** passed on `5949c24`, including existing real inference,
 navigation away/back, reload/history, two-tab conflict and long names at390px.
 Fresh review's Medium size/revision boundary bug is fixed with a RED/GREEN
-regression; hosted verification of final source is pending. No media/pose
+regression in `efa0c04`; 448 tests/lint/guarded sync pass on that source. The full
+local browser suite was not repeated after this one-line boundary fix. Final
+hosted verification is pending:
+
+- [Browser run4](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437861)
+- [Native run11](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437881)
+
+Both were in progress at provider transfer, source `efa0c04`. Prior run3/native10
+were cancelled by normal superseding workflow concurrency, not failures. Fresh
+design/code reviews are complete; no unresolved finding. **Next: inspect final
+hosted results, fix supported failures if any, record actual outcomes, then
+integrate reviewed master per D-018 and incorporate it into Task8 preserving
+history. Do not reimplement finished work or repeat a full review without a new
+material change.** No media/pose
 persistence, cloud/account/social/live feature, new AI lift or form claim.
 Units/navigation/storage defaults are builder choices pending further Q&A.
-Next: finish Step 3's full checks/browser/native proof and fresh code review.
+The remaining first-release wishlist is in PRODUCT_DIRECTION; this slice does
+not implement routines/timers/charts/PRs/set-linked analysis or live analysis.
 
 ## Open acceptance and preserved work
 

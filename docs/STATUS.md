@@ -15,6 +15,25 @@ reviewed master `a524387`, with user authorization after Q1-Q7. Q&A resumes at
 Q8 in about an hour via a one-time scheduled thread follow-up. No live analysis,
 cloud/account or media persistence. Read PRODUCT_DIRECTION and the separate plan.
 
+### Provider transfer to Claude Code
+
+- User explicitly requested handoff after hitting the Codex subscription limit.
+  Codex stops feature work; continue the clean `GymBro AI-task14` worktree on
+  `feat/task14-workout-logging`, source HEAD `efa0c04` plus this handoff record.
+  Original Task8 checkout remains `8151248`; master stays `a524387` until final
+  hosted verification resolves. No source changes or merges during transfer.
+- Final-source browser run4 `41972437861` and native run11 `41972437881` were
+  in progress on `efa0c04`. Run3/native10 were cancelled by superseding concurrency.
+  Check actual results before declaring Task14 complete or advancing master.
+- Local448 tests/lint/guarded sync pass; local13-case browser run passed before
+  the one-line final size-boundary fix. Fresh reviews complete, single Medium/P2
+  fixed with RED/GREEN regression. Do not repeat completed implementation/review
+  without new evidence. Last local empty Home visual checks at390/1280px show no
+  horizontal overflow; generated previews are ignored in `build/visual-review/`.
+- Q1-Q7 saved in PRODUCT_DIRECTION. MCQs with recommendations resume atQ8 when
+  user returns; post-video bench-only AI now, live+post-video future. Codex
+  automation `resume-gymbro-ai-design-q-a` is PAUSED; no Claude reminder is scheduled.
+
 ### Task 14 setup and state foundation
 
 - Normal Git worktree used because native tool still references old `liftform`.

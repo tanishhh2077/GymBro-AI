@@ -1,5 +1,9 @@
 # Implementation plans
 
+Current: [Task14 local workout logging](2026-11-04-workout-logging.md), D-030.
+Implementation/local checks/review fix are done; final hosted results and master
+integration remain. User requested Claude handoff; start with current HANDOFF.
+
 Current PC work: [Task 13 browser smoke](2026-11-04-browser-smoke.md), approved
 under D-029 while the user's hotspot/video are deferred. Read HANDOFF for actual
 progress and keep pending phone/bench acceptance separate.
