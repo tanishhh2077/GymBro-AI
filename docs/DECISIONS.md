@@ -510,6 +510,15 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   git-ignored), because the development server can serve any file under the
   project folder, and during a phone test that server listens on the network.
 
+### D-036: Lean documentation updates
+
+- On 2026-11-05 the user said too much effort went into Markdown changes after
+  every prompt and asked to speed up feature work. Documents are updated once per
+  task (or at a tool handover), not after each request; answers and small chat
+  actions change no files. HANDOFF stays current and short; STATUS gets one brief
+  entry per task. Decisions, privacy rules, tests and reviews are unchanged. This
+  supersedes the wording that every work chunk updates every affected document.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
