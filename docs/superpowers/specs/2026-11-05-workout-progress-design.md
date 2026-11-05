@@ -4,7 +4,7 @@
 
 The user asked to "keep building the next things" after the Task16 handoff.
 Q5 already includes charts and personal bests in the personal-tracking roadmap.
-D-036 selects this bounded next slice. The builder chooses the metric definitions
+D-037 selects this bounded next slice. The builder chooses the metric definitions
 below. They are descriptions of entered workout data. D-035's any-view bench
 direction follows its separately approved design and per-view validation process.
 The earlier hosted file-chooser failure remains an open incident, with a fix

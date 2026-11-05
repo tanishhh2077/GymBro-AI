@@ -1,7 +1,7 @@
 # Implementation plans
 
 Current work is [Task17 workout progress](2026-11-05-workout-progress.md) under
-D-036. Local checks pass 511 tests and 19 browser cases. Fresh design/code reviews
+D-037. Local checks pass 511 tests and 19 browser cases. Fresh design/code reviews
 found no significant issues. Hosted browser/native checks pass on source
 `22d694b`. Earlier browser-incident handling retains the user's repeat rule.
 

@@ -5,7 +5,7 @@ Detailed historical verification belongs in [STATUS.md](STATUS.md).
 
 ## Current task and next action
 
-Task17 adds workout Progress and personal records under D-036. The user said
+Task17 adds workout Progress and personal records under D-037. The user said
 "ok keep building the next things". Codex selected this slice from the accepted
 tracking roadmap. D-024 applies. Briefly explain each meaningful step and proceed.
 No routine understanding checkpoint is pending.

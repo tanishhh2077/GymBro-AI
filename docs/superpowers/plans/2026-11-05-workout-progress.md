@@ -18,7 +18,7 @@ Existing React18,TypeScript,Zustand,Vite,Capacitor,IndexedDB,Vitest and Playwrig
 
 ## Global constraints
 
-- D-036 selects this slice from the accepted personal-tracking roadmap.
+- D-037 selects this slice from the accepted personal-tracking roadmap.
 - Group exact stored names and units. Source metrics from completed actual sets.
 - Preserve numeric pairs/source IDs and zero values. Derive fresh data after edits.
 - Heaviest ranks weight/reps, most-reps ranks reps/weight, ties use earliest date/source identity.
@@ -45,7 +45,7 @@ contracts exactly as the design through buildWorkoutProgress(history).
 
 - [x] Create isolated branch from master11bb3e3, preserving original Task8 checkout.
 - [x] Confirm process-local Node22.23.2, locked install,494-test/lint/build baseline and owned loopback health.
-- [x] Record D-036 and obtain fresh read-only design review.
+- [x] Record D-037 and obtain fresh read-only design review.
 - [x] Write core regression tests, observe RED, implement aggregation, observe GREEN.
 - [x] Update current docs and scoped guides, full checks, commit/push green foundation.
 

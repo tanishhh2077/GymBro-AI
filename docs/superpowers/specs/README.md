@@ -1,7 +1,7 @@
 # Feature designs
 
 [Workout progress](2026-11-05-workout-progress-design.md) defines Task17 under
-D-036. Exact exercise/unit groups supply completed-set personal records,
+D-037. Exact exercise/unit groups supply completed-set personal records,
 finish-order charts and source-workout links. Its
 [design review](2026-11-05-workout-progress-design-review.md) and
 [code review](2026-11-05-workout-progress-code-review.md) found no significant issues.

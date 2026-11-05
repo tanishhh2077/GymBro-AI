@@ -55,7 +55,7 @@
 
 ## Independent judgment
 
-- D-036 adds derived workout progress and personal records from completed actual
+- D-037 adds derived workout progress and personal records from completed actual
   sets. Follow Task17's exact name/unit groups, source-linked metric definitions,
   chronological workout order and deletion/reload behavior.
 
@@ -79,7 +79,8 @@
 - `AGENTS.md` is the shared instruction source for Codex and Claude Code. Adjacent `CLAUDE.md` files import it with `@AGENTS.md`; edit shared rules here rather than maintaining a second copy. Check actual instruction loading in a fresh tool session.
 - Use native tools available in the active assistant. Codex-specific skill paths, scratch scripts, or agent tools are not dependencies Claude must install. Preserve the approved contract when using an equivalent command or workflow.
 - Any task, implementation or review, may run in Claude Code or Codex. The user picks whichever has more remaining usage at the time; no provider owns a role ([D-016](docs/DECISIONS.md#d-016-provider-neutral-documentation-first-continuity)). A review is independent because it runs in a fresh session that never saw the implementer's conversation, not because of which provider runs it.
-- The Markdown files are the only handoff between sessions. A new agent must be able to learn the project's structure, current state, and next task from them alone. Before reporting a work chunk done, update every document whose facts changed.
+- The Markdown files are the only handoff between sessions. A new agent must be able to learn the project's structure, current state, and next task from them alone.
+- Keep documentation lean ([D-036](docs/DECISIONS.md#d-036-lean-documentation-updates)): update documents once at the end of a task (or when handing over to another tool), not after every request. Questions, explanations and small chat actions change no files. Keep `docs/HANDOFF.md` current and short; add one brief STATUS entry per task with its checks and limits. Prefer building features over recording process.
 - Respect the user's subscription constraints. Do not introduce API-key services to bypass a usage limit, and do not spend a provider the user did not choose. Record which tool and model actually implemented or reviewed a change.
 - Use one writer at a time in a shared working tree. A reviewer reads only; parallel implementation needs separate ownership and isolation.
 - Elephant has the broad context and maintains the approved brief, decisions, status, and bounded task specification. Goldfish starts without the Elephant conversation and reviews the specification against the approved source material and repository.

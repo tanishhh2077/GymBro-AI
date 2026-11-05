@@ -8,7 +8,7 @@ strict legacy v1 with size-preserving/no-write normalization. `routines.test.ts`
 adds target/count/unknown-data/legacy boundaries; storage remains media-free.
 
 `workoutProgress.ts` derives manual tracking groups from completed actual sets
-under D-036. Exact exercise names/units define groups. Record ranking retains
+under D-037. Exact exercise names/units define groups. Record ranking retains
 source IDs, numeric pairs and earliest stable ties. Its11 tests cover empty and
 zero data, duplicate entries, ordering, precision, deletion and1000 workouts.
 

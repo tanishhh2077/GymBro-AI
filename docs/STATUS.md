@@ -10,7 +10,7 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task17 workout progress/records starts under D-036 after the user's "ok keep
+Task17 workout progress/records starts under D-037 after the user's "ok keep
 building the next things". Base11bb3e3, branch feat/task17-workout-progress in
 the isolated GymBro AI-task17 sibling. Original Task8 checkout is preserved.
 The source is saved completed workout history, with exact name/unit grouping

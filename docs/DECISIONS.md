@@ -510,7 +510,16 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   git-ignored), because the development server can serve any file under the
   project folder, and during a phone test that server listens on the network.
 
-### D-036 Workout progress follows saved routines
+### D-036: Lean documentation updates
+
+- On 2026-11-05 the user said too much effort went into Markdown changes after
+  every prompt and asked to speed up feature work. Documents are updated once per
+  task (or at a tool handover), not after each request; answers and small chat
+  actions change no files. HANDOFF stays current and short; STATUS gets one brief
+  entry per task. Decisions, privacy rules, tests and reviews are unchanged. This
+  supersedes the wording that every work chunk updates every affected document.
+
+### D-037 Workout progress follows saved routines
 
 - After the handoff and discussion of the pending manual browser rerun, the user
   said "ok keep building the next things". This directs further development
@@ -519,7 +528,7 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   with source-linked records and a per-workout heaviest-load chart.
 - Builder choices are exact stored exercise-name/unit groups, heaviest-set and
   most-reps summaries, rep records at each logged load, deterministic ties,
-  evenly spaced workouts in finish order and20-row table pagination.
+  evenly spaced workouts in finish order and 20-row table pagination.
 - Recorded values provide the metrics. Existing local storage supplies the
   validated history. D-035 retains its own design/per-view validation requirements.
 - The old file-chooser incident follows the user's repeat-failure condition.

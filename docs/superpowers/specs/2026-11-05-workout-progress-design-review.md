@@ -1,12 +1,12 @@
 # Task17 fresh design review
 
 A fresh read-only Codex reviewer inspected root/scoped guidance, original brief,
-WORKFLOW, PRODUCT_DIRECTION, D-030 through D-036, design/plan and the relevant
+WORKFLOW, PRODUCT_DIRECTION, D-030 through D-035 and the Task17 decision (now D-037), design/plan and the relevant
 workout validation/store/Home/history/App architecture. The actual model
 identifier was unavailable. The reviewer executed source inspection.
 
 The design is ready for implementation. Findings, blockers and material open
-questions were empty. Q4/Q5 and D-036 support the bounded screen. Metric
+questions were empty. Q4/Q5 and D-037 support the bounded screen. Metric
 definitions, ordinal workout spacing and20-row paging are explicit builder choices.
 
 Exact name/unit groups, duplicate-entry handling and actual-set eligibility

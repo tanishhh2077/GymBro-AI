@@ -63,7 +63,7 @@ exercises, optional set/rep targets and a fresh workout with zero completed sets
 Task16 implements that local slice, keeping targets separate from actual logged
 work. Q&A still resumes at Q10 when requested, without blocking approved work.
 
-The user then said "ok keep building the next things". D-036 selects Task17
+The user then said "ok keep building the next things". D-037 selects Task17
 progress/records from Q5's roadmap. Builder-defined metrics are heaviest actual
 set, most reps in an actual set, best reps at each entered load and a chart of
 the heaviest set per completed workout. Exact saved name/unit groups and

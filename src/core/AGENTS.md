@@ -5,7 +5,7 @@ Inherit [source guidance](../AGENTS.md). Follow the
 
 - Keep processing independent of React. Separate decoded/model observations,
   deterministic measurements, and interpretations into explicit stages.
-- D-036's workoutProgress reads validated manual history. Keep exact name/unit
+- D-037's workoutProgress reads validated manual history. Keep exact name/unit
   groups, actual-set provenance and deterministic ties throughout derived results.
 - Preserve actual media timestamps in seconds. Variable-frame-rate videos have
   uneven frame intervals; do not invent time from frame index divided by FPS.
