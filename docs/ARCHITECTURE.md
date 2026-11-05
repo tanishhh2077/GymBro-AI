@@ -1,6 +1,15 @@
 # System architecture
 
-Status: observed implementation plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-03 for Task 6 native lifecycle and packaging checks.
+Status: observed implementation plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-04 for Task 13 non-human browser checks.
+
+Task 13's `tests/browser/` exercises the existing development-server application
+with actual media decoding and local MediaPipe, reading the existing dev store
+without adding production globals. Fixed first-party patterns in `tests/fixtures/`
+are gated by regular-file/length/SHA-256 preflight. Playwright owns loopback 4179
+with strict port/no reuse, one worker and no media captures or retained test
+output. The planned separate Ubuntu browser workflow uploads no artifacts. This adds
+development tooling only; hosted/local results belong in STATUS and establish
+neither production/native execution nor useful human landmarks.
 
 ## Existing implementation
 

@@ -17,8 +17,8 @@ angles. Counts describe available samples; extrema can include tracking errors.
 These are
 image-space measurements, not validated bench biomechanics or technique findings.
 The UI offers only the supported workflow: one side-view bench-press MP4, with
-recording guidance and no exercise or camera-angle choices. Legacy multi-lift code
-remains in the source but is not rendered.
+recording guidance and no exercise or camera-angle choices. Unused legacy
+multi-lift code and score-bearing report types were removed in Task 12.
 
 Processing currently happens on-device using WebAssembly/WebGL. Choosing a local
 video does not upload it to a server. An installed mobile app is the intended
@@ -53,8 +53,8 @@ Paste this as the first message in either tool:
 
 ```text
 Read AGENTS.md and docs/HANDOFF.md, then the relevant project instructions.
-Follow the "First response in a new session" section: explain the next step,
-why it exists and its alternative, ask "Is this clear?", and wait before acting.
+Explain the next step, why it exists and its alternative, then proceed with
+authorized PC work under D-024. Coordinate phone/account/settings actions.
 Preserve all existing modified and untracked work.
 ```
 
@@ -139,8 +139,9 @@ npm test
 
 Vitest runs `src/**/*.test.{ts,tsx}` once using jsdom's simulated browser
 objects and the app's existing Vite settings, including the `@` source alias.
-It also runs `scripts/**/*.test.mjs` in Node for synthetic packaging fixtures.
-All 385 tests pass: Task 12 adds 2 lift/view metadata cases to Task 11's 383,
+It also runs `scripts/**/*.test.mjs` in Node for synthetic packaging fixtures
+and `tests/browser/**/*.test.ts` for fixed-pattern integrity checks. Task 13
+adds 6 fixture-preflight cases to the previous 385 tests. Task 12 adds 2 lift/view metadata cases to Task 11's 383,
 which added 2 build-configuration cases to Task 10's 381.
 Task 10 added 11 store timing and 4 player badge cases to
 Task 9's 366, which added 34 summary-contract, 9 summary-panel and 3 timeline
@@ -172,8 +173,19 @@ selection rejection before any URL is created, cancellation on removal/reset,
 blocked admission until cleanup, ignored late callbacks, no-pose versus typed
 failure, and URL leases revoked exactly once.
 An empty suite exits 1 rather than appearing to pass.
-jsdom does not decode real videos or establish MediaPipe inference accuracy;
-real-browser checks remain part of the later milestone acceptance.
+jsdom does not decode real videos or establish MediaPipe inference accuracy.
+
+For repeatable real-decoder/no-person browser checks:
+
+```sh
+npx playwright install chromium
+npm run test:browser
+```
+
+This uses fixed first-party black patterns, the actual local model/runtime and
+an owned loopback development server. See [browser setup and limits](tests/browser/README.md).
+No human footage or captures enter this suite. Phone/native and real-bench
+acceptance remain separate; check STATUS for actual results.
 
 ### Model & WASM assets
 

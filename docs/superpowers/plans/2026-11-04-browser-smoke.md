@@ -30,7 +30,7 @@
 
 - [x] Create isolated feature branch from `1c44729`, clean locked install and run unit tests/lint/build. Leave existing servers/phone checkout intact.
 - [x] Fresh read-only design review; resolve supported findings and record D-029/scope and current handoff.
-- [ ] Commit/push the reviewed plan after the baseline is green.
+- [x] Commit/push the reviewed plan after the baseline is green (`f6b3d14`).
 
 ## Step 2: checksummed browser suite
 
@@ -43,10 +43,10 @@ known lengths and SHA-256s; default export invokes it as Playwright global setup
 `sessionSnapshot(page: Page)` reads the existing development store for observed
 clip identity/status/pose/delegate/URL/processing state. No production global.
 
-- [ ] Write preflight tests for five valid assets, missing file, modified same-length bytes, wrong length and non-regular input. Observe RED before implementing the preflight. Inputs in these unit tests are explicitly non-media test bytes.
-- [ ] Add exact dev pin/scripts/config, selected adapted smoke specs and binary pattern blobs. Real browser checks cover the cases in the design; never invent positive detections. Use safe fixed fixture names.
-- [ ] Install Chromium, run preflight tests, all unit tests, lint, build and `npm run test:browser`; diagnose failures before fixes. Check busy-port refusal. Record actual runtime/delegate and evidence limits.
-- [ ] Update progress/status/handoff, commit/push green changes.
+- [x] Write preflight tests for five valid assets, missing file, modified same-length bytes, wrong length and non-regular input. Observe RED before implementing the preflight. Inputs in these unit tests are explicitly non-media test bytes.
+- [x] Add exact dev pin/scripts/config, selected adapted smoke specs and binary pattern blobs. Real browser checks cover the cases in the design; never invent positive detections. Use safe fixed fixture names.
+- [x] Install Chromium, run preflight tests, all unit tests, lint, build and `npm run test:browser`; diagnose failures before fixes. Check busy-port refusal. Record actual runtime/delegate and evidence limits.
+- [x] Update progress/status/handoff, commit/push green changes.
 
 ## Step 3: hosted checks and final review
 
@@ -64,3 +64,4 @@ root README/AGENTS, docs STATUS/HANDOFF/ARCHITECTURE, review record.
 - Author: Codex, current session model (exact runtime model identifier unavailable). Reviewers will record actual tool/model limits.
 - Pre-flight: Step 2 produces the smoke command/config and fixed assets consumed by Step 3 CI. CI must install the same pinned runner/browser and must not add artifact uploads. No interface contradiction found.
 - Fresh design review is ready, no blockers. Browser codec compatibility is an explicit execution condition; see the [review](../specs/2026-11-04-browser-smoke-review.md).
+- Step 2 complete: 391 unit/helper tests, lint, build, ten real browser cases (2.8 minutes), busy-port refusal. Windows browser 156.0.8078.4/GPU, 120 no-person samples. Initial selector encoding failure corrected; no application-source fix. Hosted browser compatibility remains to be proved.

@@ -13,8 +13,10 @@ coordinate device/account/settings actions. One writer; reviewers read only.
 Read the [design](superpowers/specs/2026-11-04-browser-smoke-design.md) and
 [plan](superpowers/plans/2026-11-04-browser-smoke.md). Fresh clean locked install
 on process-local Node 22.23.2: **385 tests / 17 files**, lint and build pass.
-Step 1 design review is ready with no blockers; next is the fixed-pattern Playwright suite and
-hosted checks. No application behavior change, native sync, LAN listener or
+Step 1 design review is ready with no blockers. Step 2 passes **391 tests / 18
+files**, lint/build and **10 browser cases** on pinned Chromium 156.0.8078.4/GPU
+(120 samples, no-person pattern). Next: hosted workflow and fresh code review.
+No application behavior change, native sync, LAN listener or
 private-video processing. Task 4 stays incomplete and unmerged. Selected safe
 patterns/tests may be ported from `34538e4` with provenance.
 

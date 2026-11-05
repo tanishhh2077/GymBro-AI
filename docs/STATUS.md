@@ -39,6 +39,39 @@ for this bounded PC task. No human footage has been supplied or accepted.
 
 ### Previous completed task
 
+### Task 13 Step 2: fixed-pattern smoke suite
+
+- Exact development pin `@playwright/test` 1.64.1 adds three packages; runtime
+  dependency versions and app source stay unchanged. `npm run test:browser`
+  owns loopback 4179, one worker/no retries, 15-minute suite bound, 6-minute test
+  bound, 10-second UI action and 30-second navigation bounds. Browser config and
+  test sources are type-checked in the build; Vitest discovers only helper unit
+  tests, not browser specs. New test directories have shared guidance/imports.
+- Ported five first-party black/silent H.264 blobs byte-for-byte and adapted
+  applicable tests from `34538e4`. No Task 4 merge, loader or human test. New
+  regular-file/length/SHA-256 global setup refuses missing/replaced inputs.
+  Preflight RED: four rejection tests failed against a no-op scaffold; GREEN:
+  all six passed. Their modified bytes are explicitly invalid unit-test data.
+- Initial smoke attempt processed real media but hit a copied selector encoded
+  incorrectly by Windows Python text output (`0.5` speed label), then waited for
+  the test deadline. Corrected UTF-8 and added short action bounds. Direct probes
+  confirmed real 320x180/4-second decoding and GPU no-pose inference. The final
+  full suite then passed **10/10 in 2.8 minutes**, Chrome for Testing/headless
+  Chromium **156.0.8078.4**, **GPU**, first no-person result **120 samples**.
+- Passed input rejection/decode recovery/keyboard focus, local model/WASM loads,
+  no-pose output/zero coverage, actual pause/seek/rate/restart, revoked URL, new
+  job identity, cancel/idle/replacement, and 160x240 portrait layout at 1280x800
+  and 390x844. All checks enforce local read requests and no uncaught page errors.
+- A second runner refused occupied 4179 before tests (expected nonzero), leaving
+  the first runner intact. Playwright removed its server afterward. Captures are
+  off, output not retained; the pinned automatic ARIA-snapshot switch is set in
+  both config and worker because config environment changes may not propagate.
+- Full **391 tests / 18 files**, lint and build pass. App bundle hashes remain
+  identical, Vite 411 modules. Existing stale Browserslist and upstream missing
+  MediaPipe development sourcemap warnings remain; no vendor edits. Next: hosted
+  workflow execution and fresh whole-branch code review. These results do not
+  validate a human lifter, rotation metadata, Safari, native/offline or a phone.
+
 Task 12 (D-028, legacy code and template asset cleanup) is **complete**: built on
 `feat/task12-legacy-cleanup` from reviewed master `eaf87e1`, freshly reviewed and
 fast-forwarded to master; chosen by the builder
