@@ -101,15 +101,19 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
 - Development: `npm run dev`.
 - Use Node 22+ for mobile tooling (`.nvmrc`: 22.23.2). Preserve the user's global
   Node selection; on this Windows host select the installed version per process.
-- Build/type check: `npm run build` (`tsc -b`, mobile config check, then Vite).
+- Build/type check: `npm run build` (source, mobile, Node-tool and browser-test
+  configuration checks, then Vite).
 - Native copy/update: `npm run mobile:sync` builds and syncs both platforms;
   it is not native compilation. Branding: `npm run mobile:assets`.
 - `ios/` and `android/` have scoped guidance covering their generated native
   subdirectories; do not add Markdown to asset catalogs or copied public assets.
 - Lint: `npm run lint` passes after the declared-tooling repair and unused-initializer cleanup; see [STATUS.md](docs/STATUS.md) for verification and remaining prototype limitations.
-- Tests: `npm test` runs source tests in jsdom and packaging tests in Node with
-  the app's Vite settings. Task12: 385 tests in 17 files, adding 2 lift/view
-  metadata cases to Task11's 383. Consult STATUS
+- Tests: `npm test` runs source tests in jsdom and packaging/fixture tests in Node
+  with the app's Vite settings. Task13 adds 6 fixed-pattern integrity cases to
+  Task12's 385 tests in 17 files. Consult STATUS
   for current evidence; fake bridge/media/pose data do not
-  prove native behavior or bench accuracy. Task 4's separate branch owns its
-  browser/fixture tooling.
+  prove native behavior or bench accuracy. `npm run test:browser` owns the
+  maintained non-human smoke suite; install its pinned browser with
+  `npx playwright install chromium`. Read `tests/AGENTS.md` and scoped guidance.
+  No human inputs/captures/uploads. Task 4's separate branch still owns its
+  incomplete human-fixture/bench-acceptance tooling; do not merge it for tests.

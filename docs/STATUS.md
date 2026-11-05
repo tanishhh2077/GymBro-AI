@@ -10,6 +10,129 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task 8 is ready for the coordinated phone session, with reviewed Task 13 merged
+from master `a524387` (fifth preserved-history merge, after Tasks 9-12). No
+runtime app behavior changes in Task 13; the maintained browser suite and
+first-party fixtures are now available in this checkout. The merge resolves
+README/HANDOFF/STATUS wording while retaining all phone evidence below. The
+user will bring a trusted hotspot connection and video later; neither is ready
+for acceptance now. No LAN listener, phone transfer, Safari case or human-video
+processing has run. Local merge verification passes as recorded below.
+
+### Task 8 merge of reviewed master (Task 13)
+
+- Codex, 2026-11-04. Master `a524387` includes fresh design/code review and
+  hosted Ubuntu browser run 41947939605: 391 tests, lint/build and 10 real-browser
+  cases passed. The one Low documentation finding is resolved. Task 4 remains
+  incomplete and unmerged; selected fixed non-human sources were ported only.
+- Original checkout was clean before `git merge --no-commit master`.
+  README, HANDOFF and STATUS conflicted. README keeps the current coordination
+  wording, HANDOFF keeps phone testing next, and STATUS preserves both histories.
+- Existing Vite listeners 5173/5193 are untouched. Install only the three missing
+  pinned development packages with `npm install --ignore-scripts --no-audit
+  --no-fund`; do not run destructive clean install against the locked checkout.
+  A clean locked install is independently proven by the isolated setup/hosted CI.
+- Installation added exactly 3 packages; no lockfile change beyond reviewed
+  master. Process-local Node 22.23.2: **391 tests / 18 files**, lint/build exit 0,
+  411 modules and unchanged app bundle hashes. Read-only `mobile:verify` passes
+  11 files per platform, local model and six runtime files; no sync performed.
+  Default `node --version` remains global v20.20.2. Non-Markdown diff against
+  reviewed master is empty, so its fresh code review covers this merge's code.
+- Verified temporary worktree path/branch/clean tracked state and its generated
+  scratch inputs, then removed it with normal `git worktree remove`. No branch
+  deleted. Existing Vite listener PIDs 67572/88812 remain; no test port remains.
+- Master browser run 2 (`41948751190`) and native run 9 (`41948751280`), both
+  source `a524387`, are in progress. Browser run 1 is the completed evidence.
+  Task 8 remains open for user-coordinated phone testing and is not merged into
+  master. Human video acceptance is still unverified.
+
+### Task 13 Step 1: audit, clean setup and plan
+
+- Codex inspected Claude's Tasks 10–12; a fresh read-only Codex reviewer found
+  no material defects and ran 45 focused tests. Task 8 `4a752dd` equals master
+  `1c44729` in all non-Markdown files; its eight prepared inputs match their
+  recorded bytes/hashes. Neither audit proves phone or positive-pose accuracy.
+- Native worktree creation rejected the renamed repo because this chat still
+  points to `liftform`. Standard Git created sibling `GymBro AI-task13`, branch
+  `feat/task13-browser-checks`; the original Task 8 checkout and existing ports
+  5173/5193 remain untouched. This is a managed-by-Git checkout, not an app-managed
+  worktree; use normal Git worktree cleanup when finished.
+- Process-local Node 22.23.2, clean `npm ci --no-audit --no-fund`: 478 packages.
+  Fresh **385 tests / 17 files**, lint and build exit 0; Vite 411 modules,
+  identical app bundles. Existing uuid/recharts deprecation notices and stale
+  Browserslist warning remain. No global Node change, native sync or LAN server.
+- Wrote the bounded [design](superpowers/specs/2026-11-04-browser-smoke-design.md)
+  and [plan](superpowers/plans/2026-11-04-browser-smoke.md). Fresh design review
+  is ready with no blockers; actual H.264 decoding on Windows/Ubuntu is an
+  explicit execution condition. Browser tooling has not been implemented yet. Exact served model
+  identifier for this Codex session is unavailable.
+
+### Task 13 Step 2: fixed-pattern smoke suite
+
+- Exact development pin `@playwright/test` 1.64.1 adds three packages; runtime
+  dependency versions and app source stay unchanged. `npm run test:browser`
+  owns loopback 4179, one worker/no retries, 15-minute suite bound, 6-minute test
+  bound, 10-second UI action and 30-second navigation bounds. Browser config and
+  test sources are type-checked in the build; Vitest discovers only helper unit
+  tests, not browser specs. New test directories have shared guidance/imports.
+- Ported five first-party black/silent H.264 blobs byte-for-byte and adapted
+  applicable tests from `34538e4`. No Task 4 merge, loader or human test. New
+  regular-file/length/SHA-256 global setup refuses missing/replaced inputs.
+  Preflight RED: four rejection tests failed against a no-op scaffold; GREEN:
+  all six passed. Their modified bytes are explicitly invalid unit-test data.
+- Initial smoke attempt processed real media but hit a copied selector encoded
+  incorrectly by Windows Python text output (`0.5` speed label), then waited for
+  the test deadline. Corrected UTF-8 and added short action bounds. Direct probes
+  confirmed real 320x180/4-second decoding and GPU no-pose inference. The final
+  full suite then passed **10/10 in 2.8 minutes**, Chrome for Testing/headless
+  Chromium **156.0.8078.4**, **GPU**, first no-person result **120 samples**.
+- Passed input rejection/decode recovery/keyboard focus, local model/WASM loads,
+  no-pose output/zero coverage, actual pause/seek/rate/restart, revoked URL, new
+  job identity, cancel/idle/replacement, and 160x240 portrait layout at 1280x800
+  and 390x844. All checks enforce local read requests and no uncaught page errors.
+- A second runner refused occupied 4179 before tests (expected nonzero), leaving
+  the first runner intact. Playwright removed its server afterward. Captures are
+  off, output not retained; the pinned automatic ARIA-snapshot switch is set in
+  both config and worker because config environment changes may not propagate.
+- Full **391 tests / 18 files**, lint and build pass. App bundle hashes remain
+  identical, Vite 411 modules. Existing stale Browserslist and upstream missing
+  MediaPipe development sourcemap warnings remain; no vendor edits. Next: hosted
+  workflow execution and fresh whole-branch code review. These results do not
+  validate a human lifter, rotation metadata, Safari, native/offline or a phone.
+
+### Task 13 Step 3: hosted workflow and review
+
+- Added `browser-checks.yml`: standard Ubuntu 24.04, Node from `.nvmrc`, locked
+  install, unit tests/lint/build, pinned Chromium install and smoke command.
+  Reuses the existing exact checkout/setup-node action SHAs, read-only contents,
+  no persistent Git credentials/cache/artifact uploads, 25-minute job bound.
+  Relevant pushes on Task 13/master trigger it; no repository setting changed.
+- Local actionlint 1.7.12 accepts the workflow. Full local checks and the hosted
+  job will be recorded after execution. Fresh whole-branch review is next.
+- `ec5395f` pushed; [browser run 1](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41947939605)
+  **passed** clean install, 391 tests/lint/build, browser installation and all
+  **10 browser cases in 3.1 minutes** on Ubuntu 24.04. Browser 156.0.8078.4,
+  GPU delegate label, 120 no-person samples; this does not establish physical
+  GPU hardware or phone performance. The last full local checks before that commit
+  again pass 391 tests/lint/build; no browser source changed since the ten-pass run.
+- Fresh read-only whole-branch Codex review (`gpt-6-astra` requested, exact served
+  identifier unavailable) independently passed 6 helper tests. No code blocker;
+  a focused follow-up identified Low wording about "no attachments". Corrected
+  guidance to distinguish transient error/source diagnostics from prohibited
+  page/media/pose captures. The author's initial probe overclassified a diagnostic
+  filename as a capture; inspecting its contents showed no page/media capture.
+  Corrected intentional-failure probes both pass: no page/media snapshot with
+  output preserved, and no diagnostic retained with tracked `preserveOutput:
+  'never'`. See the [review record](superpowers/specs/2026-11-04-browser-smoke-code-review.md).
+- Both design/code reviews and their supported dispositions are complete. No
+  code blocker or deferred finding remains. Task 13 is complete; D-018 integrates
+  the final reviewed branch to master after the final record's checks/push.
+  Task 8 must incorporate that master before its coordinated phone session.
+  Task 4 remains incomplete/unmerged; a human video is expected later, not yet
+  accepted. No private media, native sync or network/settings action occurred.
+
+### Prior Task 8 stage before the Task 13 merge
+
 Task 8 (the phone plan's free Safari slice) is ready for the phone session on
 `feat/task8-safari-phone-test`. It has merged reviewed master four times, each
 with a merge commit keeping both published histories: Task 9, Task 10 (the

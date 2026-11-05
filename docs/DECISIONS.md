@@ -386,6 +386,25 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   is a separate visible change.
 - See the [plan](superpowers/plans/2026-11-04-legacy-cleanup.md).
 
+### D-029: Reproducible non-human browser checks
+
+- On 2026-11-04 the user asked Codex to audit Claude's changes and continue PC
+  work while hotspot access and a video wait. They approved the explanation of
+  automated browser checks, then said "Clear just start working". Proceed with
+  routine implementation; retain D-024's device/account/settings boundaries.
+- The builder selects Task 13: maintained Playwright/Chromium checks of actual
+  decoding, no-person inference, input failures, playback and cleanup. Port
+  selected synthetic assets/tests from `34538e4`, not the incomplete Task 4
+  branch or human-fixture tooling. Pin development runner 1.64.1, verify fixed
+  pattern hashes and add standard hosted checks without captures/uploads.
+- No product/runtime feature change or bench/native acceptance claim. The user
+  now expects to supply a video later, superseding the earlier availability
+  constraint; permission, encoding, framing and useful lifter landmarks still
+  need verification when it arrives. Do not request it again now.
+- See the [design](superpowers/specs/2026-11-04-browser-smoke-design.md) and
+  [plan](superpowers/plans/2026-11-04-browser-smoke.md). Exact harness choices
+  are builder decisions within that scope, not user-prescribed architecture.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

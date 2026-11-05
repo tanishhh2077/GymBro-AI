@@ -1,5 +1,9 @@
 # Implementation plans
 
+Current PC work: [Task 13 browser smoke](2026-11-04-browser-smoke.md), approved
+under D-029 while the user's hotspot/video are deferred. Read HANDOFF for actual
+progress and keep pending phone/bench acceptance separate.
+
 Latest completed feature: [Task 12 legacy cleanup](2026-11-04-legacy-cleanup.md)
 under D-028: unrendered legacy code, unused analysis types and template assets
 removed; screens unchanged. All 4 steps, 385 tests and a fresh review pass;
