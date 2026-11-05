@@ -4,8 +4,9 @@ interface Props {
   data: WorkoutData; available: boolean; busy: boolean;
   onWorkout: () => void; onAnalyze: () => void; onHistory: (id?: string) => void;
   onRoutines: () => void;
+  onProgress: () => void;
 }
-export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines }: Props) {
+export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines, onProgress }: Props) {
   const sets = data.history.reduce((total, w) => total + w.exercises.reduce((n, e) => n + e.sets.length, 0), 0);
   const history = [...data.history].sort((a, b) => b.finishedAt! - a.finishedAt!);
   return <div className="space-y-7">
@@ -23,10 +24,16 @@ export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHis
         <span className="mt-2 block text-sm text-slate-300">Side-view bench press review</span>
       </button>
     </div>
-    {available && <dl className="grid grid-cols-2 gap-4 border-y border-white/10 py-5">
-      <div><dt className="text-sm text-slate-400">Workouts saved</dt><dd className="mt-1 text-3xl font-semibold text-white">{data.history.length}</dd></div>
-      <div><dt className="text-sm text-slate-400">Sets logged</dt><dd className="mt-1 text-3xl font-semibold text-white">{sets}</dd></div>
-    </dl>}
+    {available && <section aria-label="Training totals" className="space-y-4 border-y border-white/10 py-5">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-semibold text-white">Training totals</h2>
+        <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={onProgress}>View progress</button>
+      </div>
+      <dl className="grid grid-cols-2 gap-4">
+        <div><dt className="text-sm text-slate-400">Workouts saved</dt><dd className="mt-1 text-3xl font-semibold text-white">{data.history.length}</dd></div>
+        <div><dt className="text-sm text-slate-400">Sets logged</dt><dd className="mt-1 text-3xl font-semibold text-white">{sets}</dd></div>
+      </dl>
+    </section>}
     {available && <section className="flex flex-wrap items-center justify-between gap-3" aria-label="Saved routines">
       <div><h2 className="text-lg font-semibold text-white">Your routines</h2>
         <p className="mt-1 text-sm text-slate-400">{data.routines?.length ?? 0} saved · exercise plans for a fresh workout</p></div>

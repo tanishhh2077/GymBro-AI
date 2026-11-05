@@ -57,13 +57,13 @@ Modify App.tsx, WorkoutHome.tsx and feature workflow triggers.
 WorkoutProgress consumes data, available, onHome, onWorkout and onHistory(id).
 The chart consumes the selected group's chronological workout records and unit.
 
-- [ ] React tests RED through normal entry points, then implement selection/cards/chart/tables/source navigation.
-- [ ] Add synthetic real-browser flows, preserving the17 existing cases and guard rules.
+- [x] React tests RED through normal entry points, then implement selection/cards/chart/tables/source navigation.
+- [x] Add synthetic real-browser flows, preserving the17 existing cases and guard rules.
 - [ ] Run full tests/lint/build/guarded sync/browser suite, inspect390/1280 UI, commit/push green implementation.
 
 ## Step3 review and integration
 
-- [ ] Fresh read-only whole-branch review against design/plan, resolve supported findings test-first.
+- [x] Fresh read-only whole-branch review against design/plan, resolve supported findings test-first.
 - [ ] Read actual hosted browser/native results and record the earlier incident's latest evidence.
 - [ ] Final current docs, reviewed master fast-forward/push, original Task8 preserved-history merge and checks, retain branches and clean temporary worktree.
 
@@ -74,7 +74,7 @@ managed-worktree attempts in this conversation reject the stale liftform metadat
 The established Git sibling fallback creates GymBro AI-task17. Original Task8
 remains at11bb3e3. The user directs further building while their manual rerun is
 pending. Task17 metric definitions, exact grouping and ordinal chart spacing are
-explicit builder choices. Baseline/design review and implementation are pending.
+explicit builder choices. Execution evidence follows.
 
 Baseline passed494tests/26files,lint/build after a482-package locked install,
 with node-v22.23.2 confirmed. Owned loopback4183 returned200. Fresh Goldfish
@@ -84,3 +84,13 @@ empty implementation before the aggregation code. Focused GREEN follows.
 Step1 passes11 focused tests and505total tests/27files,lint/build. Fresh design
 review is ready with empty findings. Core aggregation retains source pairs and
 unit/name groups. Step2 creates the interface and real-browser evidence.
+
+Step2 observed six React failures for the missing Home entry before implementing
+Progress. All six then passed with13 surrounding App tests. Full511tests/28files,
+lint and guarded mobile sync pass. The build has424 modules, CSSindex-C75j78x9,
+JSindex-t36OqT5D and web-Da5vG2kf. All19 Chromium156.0.8078.4 browser cases pass
+in2.9minutes, including the previously failing keyboard file-chooser case in770ms.
+The earlier hosted failure's cause remains unknown. Four synthetic previews were
+inspected at390/1280px, including the zero-load marker. No horizontal overflow
+was observed. Fresh whole-feature code review found no significant findings and
+independently passed86tests/7files. The dated review records its limits.

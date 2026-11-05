@@ -28,3 +28,6 @@ Inherit [source guidance](../AGENTS.md). Follow the
   opening revision together; preserve failed drafts and reject stale edits after
   reload. Keep targets visibly separate from actual-set rows/counts and retain
   active workout/timer/analysis when templates change. Confirm saved-routine deletion.
+- D-036 adds Progress through Home. Keep exact exercise names and units separate,
+  source-link every record, explain finish-order chart spacing and expose exact
+  values in tables. Reset paging after a group or library revision changes.

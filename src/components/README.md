@@ -23,6 +23,14 @@ requires reopening after a stale-editor reload. Saving/deleting is confirmed by
 the repository before success UI; deletion requires confirmation. WorkoutEditor
 shows copied targets above actual sets; template edits cannot rewrite snapshots.
 
+Task17 adds `WorkoutProgress.tsx` through Home's View progress. It selects exact
+exercise/unit groups, displays heaviest and most-reps actual sets, and links back
+to their saved workouts. History and per-weight rep-record tables begin with20
+rows each. Group/revision changes reset paging. `WorkoutProgressChart.tsx` draws
+an accessible SVG with readable HTML axes and a visible single-workout marker.
+Completed workouts are evenly spaced in finish order. The existing root timer
+keeps its state through Progress navigation.
+
 - `ClipDropzone.tsx`: local file selection and drop area. It applies
   `validateSelection`, hands one file to `onSelect`, shows rejections in a named
   alert, blocks every input path while `disabled` (showing `disabledMessage`), and

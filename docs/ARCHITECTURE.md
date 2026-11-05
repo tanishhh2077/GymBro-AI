@@ -1,6 +1,7 @@
 # System architecture
 
-Status: observed implementation plus accepted direction; not a claim of completed MVP behavior. Updated 2026-11-04 for Task 13 non-human browser checks.
+Updated 2026-11-05 through Task17 workout progress. This map distinguishes
+observed implementation and accepted future direction.
 
 Task 13's `tests/browser/` exercises the existing development-server application
 with actual media decoding and local MediaPipe, reading the existing dev store
@@ -31,8 +32,9 @@ store/repository; `AnalysisWorkspace` retains the existing video pipeline.
 Leaving analysis pauses/releases the visible player without removing its clip
 or canceling the independent job; native app-background cancellation remains.
 No video, object URL, frame, landmark or form finding enters the workout database.
-Units are fixed per workout; history does not sum mixed loads. This prototype
-does not yet implement routines, charts/PRs, timers or set-linked/live analysis.
+Units are fixed per workout. History retains those units. The local tracking
+features include saved routines, a session-only rest timer and derived workout
+progress/records. Set-linked and live analysis remain future work.
 
 Current data flow:
 
@@ -70,7 +72,7 @@ capacitor.config.ts    Native identity, local dist webDir and system-bar configu
 scripts/               Native bundle/model/runtime integrity guard and synthetic filesystem tests
 .vscode/               Shared editor guidance only; other editor files are ignored
 index.html, *.config.*, tsconfig*.json   Vite, Vitest, ESLint, Tailwind/PostCSS, TypeScript settings
-tests/                 Planned in Task 4 for real-browser tests and fixtures; does not exist yet
+tests/                 Maintained non-human browser checks and fixed synthetic fixtures
 ```
 
 Generated or local-only, and ignored by Git: `node_modules/`, `dist/` (build output), `.vitest/`, `*.tsbuildinfo`, and `.superpowers/` (scratch snapshots and logs from earlier sessions; history, not a source of truth).
@@ -239,6 +241,22 @@ or discarding the workout after a successful save unmounts it; failed saves keep
 the same timer. No persisted record/schema, media store or native plugin changes.
 Reload/restart resets this session-only timer; completion is in-app, not an OS
 notification. Default/presets are builder choices, not rest recommendations.
+
+## Derived workout progress (Task17)
+
+`core/workoutProgress.ts` reads validated completed history and produces readonly
+`types/progress.ts` records. Exact saved exercise name and unit identify each
+group. Actual logged sets supply heaviest weight, most reps and best reps at each
+entered load. Each result retains its workout/exercise/set identity and original
+weight/reps pair. Ranking uses secondary reps/weight, then earliest finish and
+lexical source identity. Duplicate exercise entries share one workout chart point.
+
+Home opens `WorkoutProgress`. Its native SVG shows all completed-workout points,
+evenly spaced in finish order, with exact values and source links in tables.
+Tables initially show20 rows and reset paging on group/revision changes. Current
+history is the only source, so reload/deletion recomputes results. Derived stats
+add no persisted schema. Root navigation reuses saved-workout detail and retains
+the active-workout-keyed timer.
 
 ## Runtime reference sources
 

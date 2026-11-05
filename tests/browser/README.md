@@ -34,6 +34,11 @@ fresh actual-set history, native IndexedDB v1 read-without-write/first v2 save,
 and two-tab stale-editor recovery. Use synthetic workout values only. Await save
 confirmation before reload; a click is not proof that its async write finished.
 
+Task17 brings the suite to19 cases. Progress uses completed synthetic workouts to
+verify reload, separate units, source links, deletion, long names, table paging,
+all chart points and a visible zero-load marker at390px. Its larger fixture uses
+the existing development repository module and a separate temporary context.
+
 Screenshots, videos, traces and automatic page/ARIA snapshots are off. On failure
 Playwright can still create temporary error/source diagnostics; test output is
 removed afterward, while last-run metadata may remain. CI uploads no browser

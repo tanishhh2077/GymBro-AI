@@ -15,7 +15,7 @@ building the next things". Base11bb3e3, branch feat/task17-workout-progress in
 the isolated GymBro AI-task17 sibling. Original Task8 checkout is preserved.
 The source is saved completed workout history, with exact name/unit grouping
 and traceable actual-set records. Metric and chart definitions are builder
-choices in the separate design/plan. Baseline and fresh design review follow.
+choices in the separate design/plan. Implementation evidence follows.
 The old browser run remains at attempt1, with the manual rerun awaiting user
 action. Its fix remains conditional on an observed repeat.
 
@@ -32,6 +32,33 @@ action. Its fix remains conditional on an observed repeat.
   source pairing/ties, zero/fractional/extreme values, immutable reads and1000
   completed workouts. Full505tests/27files,lint/build pass. Source build has421
   modules with the prior bundle because the UI consumer is Step2.
+
+### Task17 Step2 interface and review
+
+- Six new React cases first failed at the missing View progress entry. The
+  implementation then passed all six plus 13 surrounding App cases. Full checks
+  pass 511 tests in 28 files, lint and build under process-local Node 22.23.2.
+- Guarded mobile sync passes for both native projects with 11 shared web files
+  checked byte-for-byte. Build output has 424 modules, CSS `index-C75j78x9.css`,
+  JS `index-t36OqT5D.js` and `web-Da5vG2kf.js`.
+- Both new real-browser Progress cases pass. The full maintained suite passes
+  all 19 cases in 2.9 minutes in Chromium 156.0.8078.4. Real no-person inference
+  reported GPU and 120 samples. Progress inputs were synthetic manual records.
+- The previously failing keyboard file-chooser case passes locally in 770 ms.
+  GitHub still shows the original master run at attempt 1, with no user rerun.
+  Its cause remains unknown. No conditional incident fix has been made.
+- Four synthetic previews were inspected at 390 and 1280 px, including Home,
+  Progress and the zero-load single marker. No horizontal overflow was observed.
+  Images/script stay ignored under `build/visual-review/task17/` and are separate
+  from the capture-free browser-test harness.
+- Fresh whole-feature code review found no significant findings and independently
+  passed 86 tests in 7 files. Requested model gpt-6-astra, actual runtime ID
+  unavailable. Review scope/limits are in the dated code-review record.
+- No dependency, persisted schema, cloud service or media persistence changed.
+  Hosted browser/native verification and integration follow this green step.
+- The original checkout and master advanced concurrently to `b7e4b39`, adding
+  only the user's smooth/responsive phone requirement to HANDOFF. The new compact
+  handoff carries that requirement. Preserve this history during integration.
 
 ### Previous integrated state
 

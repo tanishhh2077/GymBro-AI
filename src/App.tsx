@@ -11,9 +11,10 @@ import { WorkoutEditor } from '@/components/WorkoutEditor';
 import { WorkoutHistory } from '@/components/WorkoutHistory';
 import { WorkoutRestTimer } from '@/components/WorkoutRestTimer';
 import { WorkoutRoutines } from '@/components/WorkoutRoutines';
+import { WorkoutProgress } from '@/components/WorkoutProgress';
 import { ShieldIcon } from '@/components/icons';
 
-type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines';
+type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines' | 'progress';
 export default function App({ workouts = workoutStore }: { workouts?: WorkoutStore } = {}) {
   useEffect(() => connectNativeLifecycle({
     isNative: Capacitor.isNativePlatform(), app: NativeApp, session: useSessionStore, document,
@@ -30,6 +31,7 @@ export default function App({ workouts = workoutStore }: { workouts?: WorkoutSto
     previousView.current = view;
   }, [view]);
   function navigate(next: View) { setView(next); setNotice(''); }
+  function openHistory(id?: string) { setSelected(id); navigate('history'); }
   const available = state.loaded && !state.needsReload;
   return <div className="app-safe-sides min-h-full">
     <Header />
@@ -49,11 +51,13 @@ export default function App({ workouts = workoutStore }: { workouts?: WorkoutSto
       {view === 'home' && <WorkoutHome data={state.data} available={available} busy={state.busy}
         onWorkout={() => navigate('workout')} onAnalyze={() => navigate('analysis')}
         onRoutines={() => navigate('routines')}
-        onHistory={id => { setSelected(id); navigate('history'); }} />}
+        onProgress={() => navigate('progress')} onHistory={openHistory} />}
       {view === 'workout' && <WorkoutEditor store={workouts} onFinished={() => { setView('home'); setNotice('Workout saved.'); }} />}
       {view === 'history' && <WorkoutHistory store={workouts} initialId={selected} />}
       {view === 'analysis' && <AnalysisWorkspace />}
       {view === 'routines' && <WorkoutRoutines store={workouts} onStarted={() => navigate('workout')} onResume={() => navigate('workout')} />}
+      {view === 'progress' && <WorkoutProgress data={state.data} available={available} onHome={() => navigate('home')}
+        onWorkout={() => navigate('workout')} onHistory={openHistory} />}
     </main>
   </div>;
 }

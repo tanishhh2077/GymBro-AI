@@ -16,7 +16,9 @@ but resets on reload/restart; no background alert. Saved routines support create
 edit, delete, exercise order and optional set/rep targets. Each routine starts a
 fresh workout with no completed sets; editing a routine keeps existing workouts
 unchanged. Routines use the same local library, including safe reads of earlier
-workout records. Personal bests/charts, set-linked and live analysis remain future
+workout records. Home's View progress opens exercise/unit-specific personal records,
+heaviest-load charts and source-linked workout tables. Records use completed
+actual sets and update after deletion. Set-linked and live analysis remain future
 work. Accepted Q&A selects
 guest access with optional workout-record sync only, excluding videos; those
 services are not built. See [PRODUCT_DIRECTION](docs/PRODUCT_DIRECTION.md).
