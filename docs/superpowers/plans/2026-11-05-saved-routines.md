@@ -54,7 +54,7 @@
 ## Step3: review, hosted verification and integration
 
 - [x] Fresh read-only whole-feature reviewer against design/plan/base; no significant finding, no fix required; record limits.
-- [ ] Read actual hosted browser/native results, separately from local and physical-device evidence.
+- [x] Read actual hosted browser/native results, separately from local and physical-device evidence.
 - [ ] Complete current docs, reviewed fast-forward/push master; bring it into original Task8 checkout preserving histories and verify merged source/checks. Retain branches, close only owned servers and remove clean temporary worktree after preserving previews.
 
 ## Execution record
@@ -66,3 +66,4 @@
 - Step1 complete:488tests/25files,lint/build green; no dependencies/repository interface/native changes. Routine and opening revision will be captured together in parent to avoid a snapshot/revision mismatch before editor mount; this refines, rather than changes, the stale-draft contract.
 - Step2 in progress:6 UI tests RED->GREEN;494tests/26files,lint/build/guarded sync pass. Three actual browser routine cases pass after correcting a test-only reload-before-save race with visible saved-state waits. Full17 suite/fresh code review pending; synthetic390/1280 editor/library visual checks pass with no overflow.
 - Step2 complete:17/17 actual Chromium cases pass3.5minutes, including all14 existing cases. Fresh read-only code reviewer independently77tests/8files and diff check pass; no significant findings, production unchanged afterward. Hosted/browser/native results follow the green UI commit.
+- Hosted browser8/native15 both succeed on exact4c1b519, including shared494tests and visible simulator startup. Final local494tests/lint/build pass. User now requests Claude Code transfer after Codex limit; Codex stops after handoff. Only final Step3 documentation/integration/cleanup remains; do not rebuild the feature or repeat fresh reviews.

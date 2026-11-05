@@ -2,129 +2,101 @@
 
 Updated2026-11-05 America/Chicago. Read root/scoped AGENTS first.
 
-## Current state and next action
+## Current task and next action
 
-**Task16 in progress:** user approved all three proposed routine features with
-"Yes create all of that" (D-034). Isolated sibling GymBro AI-task16, branch
-feat/task16-saved-routines, from reviewed master7d97ac6. Original checkout remains
-Task8 at0895f32, clean; its Task15 merge already passed458tests/lint/guarded sync.
-No Task8/Task4 merge into master. Read saved-routines design/plan dated2026-11-05.
-Fresh locked install482packages,458baseline tests/lint/build/loopback4183 health
-and independent Goldfish review pass. Schema2 normalization and routine actions
-now pass488tests/25files,lint/build;16 unsupported-behavior failures observed
-before implementation,82focused tests green.
-Step2 UI now works: library/editor, reorder/targets, new workout snapshots,
-confirmed deletion and failure/stale-draft recovery.494tests/26files,lint/build,
-guarded sync andall17 browser cases pass (3.5minutes). Fresh code review found
-no significant defect and independently passed77tests/8files;
-hosted checks not started for this UI source yet. No new dependencies/services.
+Task16 saved routines are implemented and freshly reviewed, source4c1b519,
+branch feat/task16-saved-routines in isolated GymBro AI-task16 from master7d97ac6.
+Original checkout remains clean Task8 at0895f32; do not merge Task8/Task4 into master.
+User approved the three proposed routine features with "Yes create all of that"
+(D-034), then hit the Codex five-hour limit and requested transfer to Claude Code.
+Codex stops development after this handoff. Continue in THIS Task16 worktree;
+original Task8 checkout still contains Task15 only. Master has NOT advanced yet.
 
-Legacy v1 reads must not write or grow the JSON at its exact1,000,000-char cap.
-Optional routines key/target metadata; new workouts copy order/unit/targets and
-fresh IDs with empty actual sets. Failed/stale saves preserve data/draft inputs.
-Existing timer/analysis and phone/media boundaries stay unchanged. Charts/PRs and
-account/sync remain later work; no further Q&A needed for this approved slice.
+Local494tests/26files,lint/build,guarded mobile sync and17 real browser cases
+(3.5minutes) pass. Fresh design review ready/no findings; fresh code review no
+significant findings, independently77tests/8files pass. Requested code reviewer
+gpt-6-astra, actual runtimeID unavailable. No production change after review.
 
-### Previous completed feature
+Hosted gates have BOTH PASSED on exact source4c1b519:
+- Browser run8: https://github.com/tanishhh2077/GymBro-AI/actions/runs/41983009261
+- Native run15: https://github.com/tanishhh2077/GymBro-AI/actions/runs/41983009299
 
-**Task15 complete:** manual active-workout rest timer (D-033), reviewed source
-`9eef2fb`, fast-forwarded/pushed to master. Final documentation adds no production
-change. Continue in original `GymBro AI` checkout on `feat/task8-safari-phone-test`,
-bringing current master into it with preserved history. Keep Task8 and Task4
-open/unmerged into master; their phone/bench acceptance is separate.
+Browser8 passes494shared checks/all17browser cases; native15 passes shared checks,
+Android/iOS compile and visible empty Home simulator startup. No package download
+or physical-device validation. Do not repeat implementation or fresh reviews.
 
-458tests/23files, lint/build, guarded mobile sync/verify, all14 local browser
-cases (2.8minutes), synthetic390/1280 visual inspection and fresh review pass.
-Reviewer independently passed15focused tests with no significant findings.
-[Hosted browser run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41977815775)
-passes458shared checks and14cases (3.4minutes). [Native run13](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41977815811)
-passes shared/Android/iOS compile,11-file bundle comparisons and visible iPhone
-simulator Home startup (iPhone17Pro/iOS26.4). Both use exact source `9eef2fb`.
-Startup was slow but passed; packages were not downloaded. No physical-device
-timer/video or background-alert validation. Duplicate master checks are not needed
-to establish the already-green source; report any actual new failures separately.
+Claude's next task: finish Step3 documentation/master and original Task8 preserved-
+history integration per D-018/D-019. The final handoff commit changes Markdown
+only after reviewed source4c1b519; local final494tests/lint/build also passed.
+Use authorized reviewed fast-forward/push master, then merge that master into
+original Task8 preserving histories and any original Task15 integration notes.
+Check git status first; only documented work is present. Verify merged non-Markdown
+source matches master and run required checks before green merge commit/push.
+Keep final docs
+consistent, verify merged source/checks, retain branches, remove clean temporary
+worktree. Native compile/startup is separate from physical-phone behavior.
 
-Timer: manual start/pause/resume/reset with30/60/90/120/180/300-second presets,
-initial90. Root keyed by active workout ID, navigation retained; successful
-finish/discard resets it while save failure preserves it. No storage schema,
-native API, analysis or network change. Session-only/reload reset and in-app-only
-completion are visible. Design/plan: `2026-11-04-rest-timer` in superpowers folders;
-review: `2026-11-05-rest-timer-code-review.md`. Physical iPhone/bench gates stay open.
+## Implemented behavior and data boundaries
 
-The user cancelled the temporary Claude handoff; Codex resumed without any
-intervening implementation. **Q8 accepted:** the user answered "A", then "Clear":
-guest logging with optional accounts for backup and syncing (D-031). Accounts and
-sync remain future work; no cloud implementation or media transfer is implied.
-**Q9 also accepted:** workout records only; no video uploads (D-032). The user
-confirmed "Clear bro now work"; build now and resume MCQs at Q10 later.
-When Q&A resumes, ask one MCQ at a time with a recommendation and brief reason.
-Do not treat a recommendation as an accepted choice. The Codex reminder was paused
-after the follow-up was fulfilled; no duplicate reminder or Claude task is active.
+Home keeps equal Start workout/Analyze video actions and now adds Manage routines;
+Routines also has its own navigation entry. Create/edit/delete named local plans,
+order exercises, add independently optional integer set/rep targets, explicit
+lb/kg. Starting copies fresh workout/entry IDs, order/unit/targets and EMPTY actual
+sets. Active/history snapshots never change when a template is edited/deleted.
+Targets are displayed separately; only actually logged sets count. An active
+workout blocks another routine start. Delete confirms; failed saves retain fields.
+The editor retains its opening revision even after reload and requires reopening
+a stale draft. Existing rest timer/analysis lifecycles remain independent.
 
-Read [PRODUCT_DIRECTION](PRODUCT_DIRECTION.md) for Q1-Q9. Product target: tracking
-and AI equally central; mixed levels; linked/standalone analysis; Home actions
-plus compact dashboard; full personal tracking/community deferred; bench-only
-AI at first public release; post-video now, live+post-video later. D-030 permits
-this bounded implementation. D-033 permits the timer; remaining sync design/local
-retention choices wait. No cloud/account service or video upload is implemented.
+Document schema2 uses the SAME IndexedDB database version1 (gymbro-workouts,
+library/current). Strict v1 reads change only the version digit in memory, with
+no writes/defaults/size growth, so exact1,000,000-character records stay readable.
+Optional routines means empty. Next explicit successful save persists v2 using
+atomic revision/final-size checks; unknown/corrupt/future data is never overwritten.
+Old app code must update/reload, not strip v2 fields. Routines<=100, exercises<=100,
+optional targetSets1-100 and targetReps1-1000; existing workout bounds unchanged.
+No runtime dependency, media/pose persistence, cloud/account/native-plugin change.
 
-## Implemented and verified
+Design, plan, schema review and code review are dated2026-11-05-saved-routines in
+docs/superpowers. Detailed command evidence/history is in STATUS. UI inspected
+390/1280, no overflow; four synthetic previews preserved in original ignored
+build/visual-review/task16. Owned loopback4183 server was identity-checked/stopped;
+unrelated servers untouched. Browser harness captures/uploads remain off.
 
-Manual workout start/resume, explicit lb/kg fixed per workout, free-name exercise
-entries, log/edit/remove sets, finish and reopen/delete history. IndexedDB uses
-validated versioned plain data, atomic revision checks and save-before-state
-updates. Unknown data/failed or uncertain saves preserve confirmed state and
-require appropriate recovery. Existing analysis remains an independent in-memory
-bench workflow. No media/pose persistence or cloud/account/social/live service.
-Charts/PRs, set-linked analysis and final styling remain future. Task16 routines
-are implemented above; these older Task14 evidence bullets remain historical.
+## Accepted direction and remaining work
 
-[Design](superpowers/specs/2026-11-04-workout-logging-design.md),
-[plan](superpowers/plans/2026-11-04-workout-logging.md),
-[code review](superpowers/specs/2026-11-04-workout-logging-code-review.md).
-Single Medium/P2 revision-size boundary issue fixed with exact-limit regression;
-no unresolved Task14 finding. Task14 code source `efa0c04`; timer changes are Task15.
+PRODUCT_DIRECTION records Q1-Q9. Tracking and AI equally central; mixed experience,
+linked/standalone analysis intended, Home actions plus compact dashboard, full
+personal tracking/community deferred, bench-only AI first release, post-video now
+and live later. Q8 accepts guest use plus optional accounts/sync; Q9 restricts sync
+to workout records, no video uploads. Accounts/sync are NOT implemented. Routines
+are now Task16; charts/PRs, set-linked persistence and final styling remain future.
+Q&A resumes at Q10 when requested; do not block approved routine work on it.
+The one-time Q&A reminder was fulfilled/paused; no duplicate/Claude task is active.
 
-- 448 tests/22files, lint/build and guarded mobile sync pass; 418modules,
-  11 verified shared files per platform.
-- [Browser run4](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437861)
-  passes448 shared checks and13 real browser cases (3.3minutes), including model,
-  navigation, logging/reload/history, two tabs and long names at390px. Chromium
-  156.0.8078.4/GPU delegate label/120 no-person samples, not a hardware benchmark.
-- [Native run11](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437881)
-  passes shared/Android/iOS compile and visible empty Home simulator startup.
-  This is not physical-device persistence/video validation. Packages not downloaded.
-- Actual production preview logged while offline after initial load, then
-  reconnect/reload/resume/finish retained values/units with no external/mutation
-  requests or page errors. Offline cold start/video inference remain unverified.
-- Empty Home visually inspected at390 and1280px, no overflow. Previews are kept
-  locally in ignored `build/visual-review/task14/` here, not uploaded or human data.
+Task15 manual rest timer is session-only, manual presets/start/pause/resume/reset,
+retained across screens, reset on reload/restart or successful finish/discard;
+completion in-app, no background alert. Task14 local logging/history and the
+standalone bench video/overlay/elbow observations remain. No rep/form verdict,
+medical claim, validated bench accuracy or complete release claim.
 
 ## Phone/video acceptance remains open
 
 User will provide hotspot/video later; do not ask again now. iPhone12ProMax,
 reported iOS26.5.2; no Android phone, paid Apple membership or owned Mac. Follow
-[phone plan](superpowers/plans/2026-11-04-phone-video-acceptance.md) only with user
-present: trusted private connection, re-detect address, ports5195/5196 bound only
-there. Campus Ethernet was Public; do not expose it or alter firewall/VPN/router.
-No LAN listener, phone transfer or Safari case has run. Simulator ZIP is not an
-installable iPhone app. No signing/payment/store release authorized.
+reviewed2026-11-04-phone-video-acceptance plan only with user present: trusted
+private connection, re-detect address, ports5195/5196 bound only there. Campus
+Ethernet was Public; no LAN exposure/firewall/VPN/router change. No physical
+Safari/native cases have run. Simulator ZIP is not an installable iPhone app.
 
-Ignored build/fixtures in this original checkout holds five non-human patterns
-and S07/S08 inputs/provenance, previously hash-checked. Human bench footage is not
-accepted yet. Treat offered video as private; permission/framing/encoding/real
-inference and manual lifter-landmark identity checks still required. Never upload
-or commit human footage, frames or pose traces. M1/accuracy remain unverified.
+Original ignored build/fixtures holds first-party patterns/S07/S08/provenance.
+Human bench footage is not accepted yet: private by default, permission/framing/
+codec/inference and manual lifter-landmark identity checks remain. Never upload or
+commit footage, frames or pose traces. M1 and phone performance remain unverified.
 
 ## Environment and Git
 
-Use process-local Node22.23.2 from %LOCALAPPDATA%/nvm/v22.23.2; never nvm use or
-change global Node20. Do not stop unrelated listener5173. Earlier5193 was absent
-at latest check; no action targeted it. Full tests/lint/build before each green
-commit, no attribution trailers, force pushes or branch deletion. Retain both
-Task8 and Task14 histories. GitHub default remains feat/gymbro-video-landmarks.
-Temporary feature worktrees are only for isolated development; continue in the
-original folder. Empty Home and synthetic Task15 timer previews are preserved
-locally in ignored build/visual-review; all feature branches remain. Owned Task15
-loopback4183 server was identity-checked and stopped; unrelated servers untouched.
-Markdown is the provider-neutral handoff.
+Use process-local Node22.23.2 from LOCALAPPDATA/nvm/v22.23.2, preserve global Node.
+Full tests/lint/build before green step commits, no attribution trailers/force
+pushes/branch deletion. Keep Task8/Task4 and feature histories. GitHub default
+still feat/gymbro-video-landmarks; no settings/signing/payment/publication changes.

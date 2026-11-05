@@ -15,6 +15,29 @@ feat/task16-saved-routines in isolated GymBro AI-task16 from master7d97ac6.
 Original Task8 checkout remains clean at0895f32 with completed Task15 integration;
 Task8/Task4 physical phone/bench gates remain open. No other agent code changes.
 
+### Transfer to Claude Code after Codex limit
+
+- User explicitly requests switching to Claude Code. Codex stops development;
+  this handoff is the only remaining Codex mutation. Work in Task16 sibling,
+  branch feat/task16-saved-routines, reviewed source4c1b519; original Task8 stays
+  clean at0895f32 and master stays7d97ac6. Do not merge/switch the original branch
+  blindly or delete the Task16 worktree before completing integration.
+- All local/source checks and fresh design/code reviews have passed. [Browser8](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41983009261)
+  and [native15](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41983009299)
+  BOTH succeed on exact4c1b519fa648a8956fc6e1bb606cb9cdc725fe12, including simulator
+  visible empty Home startup. No code fix or repeat full review is outstanding.
+- Fresh final494tests/26files,lint/build pass unchanged source; guarded sync and
+ 17local browser cases already pass. Only Markdown follows4c1b519. Claude next
+ completes Step3/master FF/push, original Task8 preserved-history merge/parity/
+ checks/commit/push, final records and clean worktree cleanup. Retain all branches.
+- Owned loopback4183 PID/command line was verified and only that server stopped.
+  Four synthetic editor/library previews were copied to original ignored
+  build/visual-review/task16; no human data uploaded. No listener/phone/media/
+  settings/signing action. Keep offered video private and phone gates separate.
+- Original Task8 STATUS contains an extra Task15 integration section not present
+  in master7d97ac6; preserve that historical record during the later Markdown merge.
+  No source conflict is expected, but verify rather than assume parity.
+
 - Locked process-local Node22.23.2 install:482packages,458baseline tests/23files,
   lint/build and owned loopback4183 health200 pass before implementation. Fresh
   Goldfish review:ready/no findings, actual runtime model unavailable, no checks

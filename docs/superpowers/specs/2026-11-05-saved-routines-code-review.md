@@ -41,3 +41,7 @@ changes retain the separately mounted timer and leave analysis/native lifecycle.
   implementer's responsibility, not certified by this code review.
 
 No unresolved blocker or deferred code defect. No fix required; no issue quota.
+
+Subsequent implementer evidence: exact reviewed source4c1b519 passes hosted
+browser8/native15, including visible simulator Home startup. This updates the
+evidence, not what the reviewer independently executed. Physical-device gates stay open.
