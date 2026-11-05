@@ -19,8 +19,10 @@ only the checksummed patterns. The runner accepts no human-video argument or
 environment path. Do not replace a pattern with a recording: integrity preflight
 will fail. Browser tests use `*.spec.ts`; `verify-fixtures.test.ts` runs in Vitest.
 
-Screenshots, videos and traces are off, output is not retained, and CI uploads
-no browser artifacts. Console runtime observations include only browser version,
+Screenshots, videos, traces and automatic page/ARIA snapshots are off. On failure
+Playwright can still create temporary error/source diagnostics; test output is
+removed afterward, while last-run metadata may remain. CI uploads no browser
+artifacts. Console runtime observations include only browser version,
 delegate and synthetic sample count. Do not enable captures or add human files
 to this harness. A future private-video workflow needs separate review.
 

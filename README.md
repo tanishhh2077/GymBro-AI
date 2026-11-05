@@ -113,7 +113,9 @@ This builds the shared app, copies it and the local model/WASM into both native
 projects, and verifies bundle identity/integrity; it does not compile an APK or
 iOS app. `npm run mobile:verify` checks existing copies without modifying them.
 `npm run build` also type-checks `capacitor.config.ts`, and `vite.config.ts` and
-`vitest.config.ts` with Node types only. The Capacitor config has no
+`vitest.config.ts` with Node types only. Playwright's config and browser-test
+sources have a separate type-check project with browser and Node types.
+The Capacitor config has no
 development-server URL.
 
 - `npm run mobile:assets`: regenerate platform icons/splash from the first-party

@@ -54,9 +54,9 @@ clip identity/status/pose/delegate/URL/processing state. No production global.
 root README/AGENTS, docs STATUS/HANDOFF/ARCHITECTURE, review record.
 
 - [x] Add bounded standard Ubuntu workflow on this feature branch and master for relevant source/config/assets; pinned existing actions, read-only token, no cache/uploads. Run clean install, shared checks, browser install and smoke suite. Document the exact local commands.
-- [ ] Validate configuration and full local checks, commit/push. Observe hosted job or record access/runner limitation without claiming success.
-- [ ] Fresh whole-branch critical review against spec; evaluate findings, fix supported defects with reproducing tests and rerun affected checks.
-- [ ] Update durable handoff with exact results, limitations, review disposition and next phone/video action. Commit/push and fast-forward reviewed master per D-018. Preserve pending Task 8 and Task 4 histories.
+- [x] Validate configuration and full local checks, commit/push. Observe hosted job or record access/runner limitation without claiming success.
+- [x] Fresh whole-branch critical review against spec; evaluate findings, fix supported defects with reproducing tests and rerun affected checks.
+- [x] Update durable handoff with exact results, limitations, review disposition and next phone/video action. Commit/push and fast-forward reviewed master per D-018. Preserve pending Task 8 and Task 4 histories.
 
 ## Execution record
 
@@ -64,4 +64,5 @@ root README/AGENTS, docs STATUS/HANDOFF/ARCHITECTURE, review record.
 - Author: Codex, current session model (exact runtime model identifier unavailable). Reviewers will record actual tool/model limits.
 - Pre-flight: Step 2 produces the smoke command/config and fixed assets consumed by Step 3 CI. CI must install the same pinned runner/browser and must not add artifact uploads. No interface contradiction found.
 - Fresh design review is ready, no blockers. Browser codec compatibility is an explicit execution condition; see the [review](../specs/2026-11-04-browser-smoke-review.md).
-- Step 2 complete: 391 unit/helper tests, lint, build, ten real browser cases (2.8 minutes), busy-port refusal. Windows browser 156.0.8078.4/GPU, 120 no-person samples. Initial selector encoding failure corrected; no application-source fix. Hosted browser compatibility remains to be proved.
+- Step 2 complete: 391 unit/helper tests, lint, build, ten real browser cases (2.8 minutes), busy-port refusal. Windows browser 156.0.8078.4/GPU, 120 no-person samples. Initial selector encoding failure corrected; no application-source fix.
+- Step 3 complete: `ec5395f` hosted run 41947939605 passed 391 tests/lint/build and ten real browser cases (3.1 minutes), same browser/GPU delegate label. Fresh read-only code review passed 6 helper cases, no code blocker; Low attachment wording corrected. Intentional empty-shell failures prove no page/media capture and no retained diagnostic under tracked cleanup. Reviews and limits are in the linked records. Final record integrates to master per D-018; check Git refs, retain both pending task branches.

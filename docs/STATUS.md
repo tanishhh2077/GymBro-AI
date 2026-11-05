@@ -10,7 +10,7 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 13 (D-029) is in progress on `feat/task13-browser-checks` from reviewed
+Task 13 (D-029) passes acceptance and review on `feat/task13-browser-checks` from reviewed
 master `1c44729`. It makes the existing non-human browser checks reproducible
 without merging unfinished Task 4. The user approved this step and said "Clear
 just start working". Hotspot/video will come later; no new user input is needed
@@ -79,6 +79,27 @@ for this bounded PC task. No human footage has been supplied or accepted.
   Relevant pushes on Task 13/master trigger it; no repository setting changed.
 - Local actionlint 1.7.12 accepts the workflow. Full local checks and the hosted
   job will be recorded after execution. Fresh whole-branch review is next.
+- `ec5395f` pushed; [browser run 1](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41947939605)
+  **passed** clean install, 391 tests/lint/build, browser installation and all
+  **10 browser cases in 3.1 minutes** on Ubuntu 24.04. Browser 156.0.8078.4,
+  GPU delegate label, 120 no-person samples; this does not establish physical
+  GPU hardware or phone performance. The last full local checks before that commit
+  again pass 391 tests/lint/build; no browser source changed since the ten-pass run.
+- Fresh read-only whole-branch Codex review (`gpt-6-astra` requested, exact served
+  identifier unavailable) independently passed 6 helper tests. No code blocker;
+  a focused follow-up identified Low wording about "no attachments". Corrected
+  guidance to distinguish transient error/source diagnostics from prohibited
+  page/media/pose captures. The author's initial probe overclassified a diagnostic
+  filename as a capture; inspecting its contents showed no page/media capture.
+  Corrected intentional-failure probes both pass: no page/media snapshot with
+  output preserved, and no diagnostic retained with tracked `preserveOutput:
+  'never'`. See the [review record](superpowers/specs/2026-11-04-browser-smoke-code-review.md).
+- Both design/code reviews and their supported dispositions are complete. No
+  code blocker or deferred finding remains. Task 13 is complete; D-018 integrates
+  the final reviewed branch to master after the final record's checks/push.
+  Task 8 must incorporate that master before its coordinated phone session.
+  Task 4 remains incomplete/unmerged; a human video is expected later, not yet
+  accepted. No private media, native sync or network/settings action occurred.
 
 ### Previous completed task
 

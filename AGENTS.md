@@ -101,7 +101,8 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
 - Development: `npm run dev`.
 - Use Node 22+ for mobile tooling (`.nvmrc`: 22.23.2). Preserve the user's global
   Node selection; on this Windows host select the installed version per process.
-- Build/type check: `npm run build` (`tsc -b`, mobile config check, then Vite).
+- Build/type check: `npm run build` (source, mobile, Node-tool and browser-test
+  configuration checks, then Vite).
 - Native copy/update: `npm run mobile:sync` builds and syncs both platforms;
   it is not native compilation. Branding: `npm run mobile:assets`.
 - `ios/` and `android/` have scoped guidance covering their generated native

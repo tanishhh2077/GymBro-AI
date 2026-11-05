@@ -4,7 +4,7 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 
 ## Current task and next action
 
-**Task 13: reproducible non-human browser checks** (D-029), on
+**Task 13 complete: reproducible non-human browser checks** (D-029), on
 `feat/task13-browser-checks` from reviewed master `1c44729`, in sibling worktree
 `GymBro AI-task13`. User approved the explanation and said "Clear just start
 working". Explain meaningful steps and proceed with routine PC implementation;
@@ -15,10 +15,20 @@ Read the [design](superpowers/specs/2026-11-04-browser-smoke-design.md) and
 on process-local Node 22.23.2: **385 tests / 17 files**, lint and build pass.
 Step 1 design review is ready with no blockers. Step 2 passes **391 tests / 18
 files**, lint/build and **10 browser cases** on pinned Chromium 156.0.8078.4/GPU
-(120 samples, no-person pattern). Next: hosted workflow and fresh code review.
+(120 samples, no-person pattern). [Hosted Ubuntu run 1](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41947939605)
+also passes 391 tests/lint/build and all **10 browser cases (3.1 minutes)** on
+the same browser/GPU delegate label. This is not a hardware/performance claim.
+Fresh code review and its one Low documentation correction are resolved; see
+the [review](superpowers/specs/2026-11-04-browser-smoke-code-review.md).
+Code source `ec5395f`; later commits record review/docs. D-018 integrates the
+reviewed branch into master; verify Git refs. Next: incorporate it into Task 8
+and resume the phone plan when the user returns with the trusted connection/video.
 No application behavior change, native sync, LAN listener or
 private-video processing. Task 4 stays incomplete and unmerged. Selected safe
-patterns/tests may be ported from `34538e4` with provenance.
+patterns/tests were ported from `34538e4` with provenance. Use
+`npx playwright install chromium` then `npm run test:browser`; only fixed patterns
+are accepted. Failure probes confirm page/media captures off and diagnostic
+cleanup. Last-run metadata may remain. No human inputs go into this harness.
 
 Claude's Tasks 10–12 are complete on master. A fresh Codex audit found no material
 defects (45 focused tests); this session also ran all 385 tests/lint/build in the
