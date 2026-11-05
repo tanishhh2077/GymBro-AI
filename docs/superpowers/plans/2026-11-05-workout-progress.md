@@ -65,7 +65,7 @@ The chart consumes the selected group's chronological workout records and unit.
 
 - [x] Fresh read-only whole-branch review against design/plan, resolve supported findings test-first.
 - [x] Read actual hosted browser/native results and record the earlier incident's latest evidence.
-- [ ] Final current docs, reviewed master fast-forward/push, original Task8 preserved-history merge and checks, retain branches and clean temporary worktree.
+- [x] Final current docs, reviewed master fast-forward/push, original Task8 preserved-history integration and checks, retain branches and clean temporary worktree.
 
 ## Execution record
 
@@ -97,3 +97,10 @@ compilation, and visible Home/View progress on iPhone17 Pro/iOS26.4 simulator.
 Concurrent master docs commit `b7e4b39` adds the user's
 phone-responsiveness requirement. Step3 preserves that history through a merge
 into the feature, retaining the compact handoff and the added requirement.
+
+Step3 integrated both concurrent master documentation commits, retaining the phone
+responsiveness requirement and lean-doc policy. Task17 is renumbered D-037.
+Master and original Task8 advanced to 3006feb. Original checkout passes 511 tests,
+lint, build, guarded sync and all 19 browser cases in 3.4 minutes. Master hosted
+browser 42127574129 and native 42127573785 pass. Runtime source remains 22d694b.
+The clean temporary tree is removed, previews retained and owned 4183 stopped.

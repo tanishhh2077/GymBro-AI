@@ -1,9 +1,9 @@
 # Implementation plans
 
-Current work is [Task17 workout progress](2026-11-05-workout-progress.md) under
+Completed work is [Task17 workout progress](2026-11-05-workout-progress.md) under
 D-037. Local checks pass 511 tests and 19 browser cases. Fresh design/code reviews
 found no significant issues. Hosted browser/native checks pass on source
-`22d694b`. Earlier browser-incident handling retains the user's repeat rule.
+`22d694b`, and the integrated master checks pass. Earlier browser-incident handling retains the user's repeat rule.
 
 Completed: [Task 16 saved routines](2026-11-05-saved-routines.md), approved by the
 user under D-034. Implementation, 494 tests, 17 browser cases, fresh design and

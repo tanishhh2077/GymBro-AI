@@ -10,81 +10,40 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task17 workout progress/records starts under D-037 after the user's "ok keep
-building the next things". Base11bb3e3, branch feat/task17-workout-progress in
-the isolated GymBro AI-task17 sibling. Original Task8 checkout is preserved.
-The source is saved completed workout history, with exact name/unit grouping
-and traceable actual-set records. Metric and chart definitions are builder
-choices in the separate design/plan. Implementation evidence follows.
-The old browser run remains at attempt1, with the manual rerun awaiting user
-action. Its fix remains conditional on an observed repeat.
+Task17 workout Progress and personal records are complete under D-037. Codex
+implemented the accepted tracking slice after the user said "ok keep building
+the next things". Reviewed source is 22d694b, integrated master source 3006feb.
 
-### Task17 Step1 foundation
-
-- Process-local node-v22.23.2 confirmed. Locked install482packages,494 baseline
-  tests/26files,lint/build and owned loopback4183 health200 pass before feature
-  behavior. Listener is127.0.0.1, PID116992 at the health check.
-- Fresh Goldfish design review is ready with empty findings. Actual runtime model
-  identifier unavailable. The review is source inspection. Dated design-review
-  record lists scope and subsequent runtime verification work.
-- Ten core failures observed against the empty implementation. All11 focused
-  tests then passed. Derivation covers exact names/units, duplicate entries,
-  source pairing/ties, zero/fractional/extreme values, immutable reads and1000
-  completed workouts. Full505tests/27files,lint/build pass. Source build has421
-  modules with the prior bundle because the UI consumer is Step2.
-
-### Task17 Step2 interface and review
-
-- Six new React cases first failed at the missing View progress entry. The
-  implementation then passed all six plus 13 surrounding App cases. Full checks
-  pass 511 tests in 28 files, lint and build under process-local Node 22.23.2.
-- Guarded mobile sync passes for both native projects with 11 shared web files
-  checked byte-for-byte. Build output has 424 modules, CSS `index-C75j78x9.css`,
-  JS `index-t36OqT5D.js` and `web-Da5vG2kf.js`.
-- Both new real-browser Progress cases pass. The full maintained suite passes
-  all 19 cases in 2.9 minutes in Chromium 156.0.8078.4. Real no-person inference
-  reported GPU and 120 samples. Progress inputs were synthetic manual records.
-- The previously failing keyboard file-chooser case passes locally in 770 ms.
-  GitHub still shows the original master run at attempt 1, with no user rerun.
-  Its cause remains unknown. No conditional incident fix has been made.
-- Four synthetic previews were inspected at 390 and 1280 px, including Home,
-  Progress and the zero-load single marker. No horizontal overflow was observed.
-  Images/script stay ignored under `build/visual-review/task17/` and are separate
-  from the capture-free browser-test harness.
-- Fresh whole-feature code review found no significant findings and independently
-  passed 86 tests in 7 files. Requested model gpt-6-astra, actual runtime ID
-  unavailable. Review scope/limits are in the dated code-review record.
-- No dependency, persisted schema, cloud service or media persistence changed.
-  Hosted browser/native verification and integration follow this green step.
-- The original checkout and master advanced concurrently to `b7e4b39`, adding
-  only the user's smooth/responsive phone requirement to HANDOFF. The new compact
-  handoff carries that requirement. Preserve this history during integration.
-
-### Task17 hosted checks and integration
-
-- Reviewed source `22d694b` passes
-  [browser run 42125223775](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42125223775).
-  Logs confirm 511 tests in 28 files, lint/build and all 19 real Chromium cases
-  in 5.9 minutes. Browser 156.0.8078.4, GPU, 120 synthetic no-person samples.
-  The two new Progress cases and earlier keyboard admission case all pass.
-- [Native run 42125223989](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42125223989)
-  passes all three jobs. Shared checks confirm 511 tests and guarded sync.
-  Android compiles successfully and the APK retains all 11 shared web files
-  byte-for-byte. iOS compiles successfully and the iPhone17 Pro/iOS26.4 simulator
-  startup screen-text check detects the actual Home and View progress interface.
-- Native artifacts remain in the workflow. No package was downloaded or installed
-  on a physical phone. The coordinator inspected logs, with synthetic browser
-  previews providing separate visual evidence.
-- The earlier master incident remains historical with unknown cause. Its case
-  passes in this hosted run in 1.3 seconds. No repeat-triggered fix is needed.
-- Concurrent master commit `b7e4b39` changes only HANDOFF. Its responsiveness
-  requirement is preserved while resolving the compact-handoff merge conflict.
-  Runtime source remains identical to reviewed/hosted `22d694b`.
-- The owned port4183 listener was stopped after checking PID/full command line.
-  Unrelated port5173 listeners remain. Synthetic previews/script were copied to
-  the original checkout and matching SHA-256 checked. A local-link check found
-  all 146 relative targets present across 22 changed Markdown files.
-- Master/original-checkout integration and final cleanup follow this record.
+- Home opens exact exercise/unit groups, heaviest and most-reps sets, per-weight
+  rep records, ordinal workout charts and source-history links. Actual completed
+  sets supply results. Reload/deletion recomputes them. The active timer survives.
+  Metric definitions, exact grouping and chart spacing are builder choices.
+- Core tests observed 10 RED failures and UI tests observed 6 before implementation.
+  Fresh design/code reviews found no significant issues. The code reviewer
+  independently passed 86 tests in 7 files, requested gpt-6-astra, runtime ID
+  unavailable. Dated design, plan and reviews contain detailed evidence.
+- Process-local Node 22.23.2. Original checkout passes 511 tests in 28 files,
+  lint, build, guarded mobile sync and all 19 Chromium 156.0.8078.4 cases in
+  3.4 minutes. GPU, 120 synthetic no-person samples. Build has 424 modules, CSS
+  index-C75j78x9, JS index-t36OqT5D and web-Da5vG2kf, 11 web files per platform.
+- [Feature browser](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42125223775)
+  and [feature native](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42125223989)
+  pass. Integrated master also passes
+  [browser 42127574129](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42127574129)
+  and [native 42127573785](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42127573785).
+  Logs confirm 511 tests, all 19 browser cases, Android/iOS compilation and visible
+  iPhone 17 Pro/iOS 26.4 Home/View progress startup. Artifacts stay in the workflows.
+- The old master keyboard-chooser incident has unknown cause. Its case passes in
+  both new hosted runs in 1.3 seconds. No repeat-triggered fix was made.
+- Synthetic UI previews were inspected at 390/1280 px with no overflow, including
+  a zero-load marker. They/script remain ignored in build/visual-review/task17.
+  The owned 4183 listener was identity-checked and stopped. All branches remain,
+  Task4 stays unmerged, and the clean temporary worktree was removed.
+- Concurrent master docs b7e4b39 and 967b82e are preserved, including phone-speed
+  expectations and D-036 lean documentation. Task17 was renumbered D-037.
+  Runtime source equals reviewed 22d694b. No dependency or persisted schema change.
+- Phone/human-video validation remains open. Next is the coordinated phone
+  session, Q10 when requested, or another user-approved bounded feature.
 
 ### Previous integrated state
 
