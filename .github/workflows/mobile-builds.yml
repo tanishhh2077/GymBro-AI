@@ -2,7 +2,7 @@ name: Mobile prototypes
 
 on:
   push:
-    branches: [feat/task6-mobile-app, master]
+    branches: [feat/task6-mobile-app, feat/task14-workout-logging, master]
     paths:
       - .github/workflows/mobile-builds.yml
       - src/**

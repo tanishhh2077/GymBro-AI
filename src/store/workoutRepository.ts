@@ -57,7 +57,9 @@ export function createWorkoutRepository(factory?: IDBFactory): WorkoutRepository
             read.onsuccess = () => {
               if (settled) return;
               try {
-                const current = read.result === undefined ? emptyWorkoutData() : validateWorkoutData(read.result);
+                let current: WorkoutData;
+                try { current = read.result === undefined ? emptyWorkoutData() : validateWorkoutData(read.result); }
+                catch { throw new WorkoutError('storage', 'Saved workout data could not be opened. Reload saved workouts; existing data has not been replaced.'); }
                 if (candidate) {
                   if (current.revision !== expectedRevision) throw new WorkoutError('conflict',
                     'Saved workouts changed in another tab. Reload saved workouts before editing.');
@@ -72,5 +74,7 @@ export function createWorkoutRepository(factory?: IDBFactory): WorkoutRepository
       } catch (error) { fail(error); }
     });
   }
-  return { load: () => operation(), save: (revision, next) => operation(revision, next) };
+  return { load: () => operation(), save: (revision, next) =>
+    Number.isSafeInteger(revision) && revision >= 0 ? operation(revision, next) :
+      Promise.reject(new WorkoutError('validation', 'The workout revision is invalid.')) };
 }

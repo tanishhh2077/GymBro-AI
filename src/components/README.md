@@ -1,5 +1,13 @@
 # Interface components
 
+Task 14: root App now owns provisional Home/Workout/Analyze navigation and keeps
+the native lifecycle registration mounted. `AnalysisWorkspace.tsx` contains the
+previous video UI. `WorkoutHome.tsx` presents equal entry actions, real counters
+and recent history; `WorkoutEditor.tsx` logs/edits manual sets with per-workout
+units and confirmations; `WorkoutHistory.tsx` reopens/deletes finished records.
+The repository commit completes before saved rows/notifications appear. Root
+storage errors/reload remain visible even when standalone analysis is open.
+
 - `ClipDropzone.tsx`: local file selection and drop area. It applies
   `validateSelection`, hands one file to `onSelect`, shows rejections in a named
   alert, blocks every input path while `disabled` (showing `disabledMessage`), and

@@ -6,12 +6,13 @@ import process from 'node:process';
 process.env.PLAYWRIGHT_NO_COPY_PROMPT = '1';
 
 export const test = base.extend({
-  page: async ({ page, baseURL }, run, testInfo) => {
+  page: async ({ page, context, baseURL }, run, testInfo) => {
     const origin = new URL(baseURL!).origin;
     const outgoing: string[] = [];
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
-    await page.route('**/*', (route) => {
+    context.on('page', other => other.on('pageerror', error => errors.push(error.message)));
+    await context.route('**/*', (route) => {
       const request = route.request();
       const url = new URL(request.url());
       if ((['http:', 'https:'].includes(url.protocol) && url.origin !== origin) ||
@@ -34,6 +35,11 @@ export const test = base.extend({
   },
 });
 export { expect };
+
+export async function openAnalysis(page: Page) {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Analyze video', exact: true }).click();
+}
 
 export async function expectNoPose(page: Page) {
   // Fail promptly on terminal error/false-positive output instead of waiting

@@ -1,4 +1,4 @@
-import { IDBFactory, IDBObjectStore } from 'fake-indexeddb';
+import { IDBFactory, IDBObjectStore, IDBDatabase } from 'fake-indexeddb';
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { emptyWorkoutData } from '@/core/workouts';
 import { createWorkoutRepository } from './workoutRepository';
@@ -46,8 +46,8 @@ describe('transactional workout repository', () => {
   it('never replaces an unknown stored schema on read or write', async () => {
     const future = { version: 99, private: 'sentinel' }; await raw(future);
     const repository = createWorkoutRepository(factory);
-    await expect(repository.load()).rejects.toBeTruthy();
-    await expect(repository.save(0, next())).rejects.toBeTruthy();
+    await expect(repository.load()).rejects.toMatchObject({ kind: 'storage' });
+    await expect(repository.save(0, next())).rejects.toMatchObject({ kind: 'storage' });
     expect(await raw()).toEqual(future);
   });
   it('rejects injected media fields without changing the saved record', async () => {
@@ -65,6 +65,17 @@ describe('transactional workout repository', () => {
     const repository = createWorkoutRepository(undefined);
     await expect(repository.load()).rejects.toMatchObject({ kind: 'storage' });
     await expect(repository.save(0, next())).rejects.toMatchObject({ kind: 'storage' });
+  });
+  it('handles an object-store creation failure without leaking the open request', async () => {
+    vi.spyOn(IDBDatabase.prototype, 'createObjectStore').mockImplementationOnce(() => {
+      throw new DOMException('schema quota', 'QuotaExceededError');
+    });
+    await expect(createWorkoutRepository(factory).load()).rejects.toMatchObject({ kind: 'storage' });
+  });
+  it.each([undefined, NaN, -1, 0.5])('rejects malformed expected revision %s', async revision => {
+    const repository = createWorkoutRepository(factory);
+    await expect(repository.save(revision as number, next())).rejects.toMatchObject({ kind: 'validation' });
+    expect(await raw()).toBeUndefined();
   });
   it('bounds a stalled open and closes a late connection', async () => {
     vi.useFakeTimers();

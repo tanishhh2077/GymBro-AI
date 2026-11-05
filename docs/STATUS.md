@@ -34,6 +34,36 @@ cloud/account or media persistence. Read PRODUCT_DIRECTION and the separate plan
 
 ### Previous completed work
 
+### Task 14 Home/log/history implementation (verification in progress)
+
+- Home has equal workout/video actions, real local workout/set counts and recent
+  history. Manual rep/weight logging supports fixed per-workout lb/kg, custom
+  entry names, edit/remove sets, resume after reload, finish and history deletion.
+  Destructive workout/exercise actions confirm. AI remains standalone bench only;
+  linked analysis, routines/timers/charts/PRs and final styling remain future work.
+- Existing video UI extracted to AnalysisWorkspace. Root retains native lifecycle;
+  browser checks enter analysis from Home and exercise navigation away/back.
+  Header/default empty Home still includes the native visual guard's independent
+  GymBro and Bench Press labels; actual native startup remains to be run.
+- UI RED: 5 tests failed on the original video-only App. New workflow/error/input
+  preservation/confirmation tests pass. Browser logging/resume/history and two-tab
+  conflict cases pass. A 390px/80-character-name case exposed fieldset/flex and
+  Home text overflow; reproduced and fixed with bounded/wrapping layout.
+- Stored-schema errors occurring after a prior load now require reload, distinct
+  from correctable input validation. A malformed undefined expected revision
+  cannot masquerade as a read. Two strengthened tests failed first, then passed.
+  Extra schema-creation failure characterization passes without a code change.
+- Full local browser rerun and shared/mobile checks are in progress. Initial run
+  passed all ten video cases plus two logging cases; the long-name case is fixed
+  and all three logging cases pass separately. No completion claim yet.
+- Shared verification now passes **447 tests / 22 files**, lint, build and
+  `mobile:sync`/`mobile:verify` (418 modules, 11 files per platform). Both workflows
+  pass local actionlint1.7.12 and now include this feature branch so native and
+  browser behavior can be verified before master integration. Full local browser
+  rerun, hosted execution and fresh code review remain pending.
+
+### Previous completed work (historical)
+
 Task 13 (D-029) passes acceptance and review on `feat/task13-browser-checks` from reviewed
 master `1c44729`. It makes the existing non-human browser checks reproducible
 without merging unfinished Task 4. The user approved this step and said "Clear

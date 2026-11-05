@@ -14,9 +14,14 @@ recommendation and reason. See [PRODUCT_DIRECTION](PRODUCT_DIRECTION.md), D-030,
 
 Clean Node 22.23.2 install/baseline: 391 tests, lint/build passed. New local
 transactional workout contracts/repository/store pass 46 focused tests and
-**437 total tests / 21 files**, lint/build. UI is not connected yet. No media/pose
+**437 total tests / 21 files**, lint/build at foundation commit `f03ffc2`.
+Home/editor/history UI is now connected. Current shared checks: **447 tests /
+22 files**, lint and guarded sync/build (418 modules, 11 files/platform) pass.
+Three real logging browser cases pass, including reload/history, two-tab conflict
+and long names at 390px. Full video+logging rerun/hosted/review are pending. No media/pose
 persistence, cloud/account/social/live feature, new AI lift or form claim.
 Units/navigation/storage defaults are builder choices pending further Q&A.
+Next: finish Step 3's full checks/browser/native proof and fresh code review.
 
 ## Open acceptance and preserved work
 

@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url';
-import { test, expect, sessionSnapshot, expectNoPose } from './app';
+import { test, expect, sessionSnapshot, expectNoPose, openAnalysis } from './app';
 
 const noPerson = fileURLToPath(new URL('../fixtures/no-person.mp4', import.meta.url));
 
@@ -9,7 +9,7 @@ test('real no-person inference stays replayable, releases URLs, and permits a fr
     const url = new URL(request.url());
     if (/\/(models|wasm)\//.test(url.pathname)) assets.add(url.pathname);
   });
-  await page.goto('/');
+  await openAnalysis(page);
   await page.locator('input[type=file]').setInputFiles(noPerson);
   await expect(page.getByRole('button', { name: 'Choose video' })).toBeDisabled();
   await expectNoPose(page);
@@ -23,6 +23,10 @@ test('real no-person inference stays replayable, releases URLs, and permits a fr
   expect(assets.has('/models/pose_landmarker_full.task')).toBe(true);
   expect([...assets].some((asset) => asset.endsWith('.wasm'))).toBe(true);
   await expect(page.locator('canvas')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Home', exact: true }).click();
+  await page.getByRole('button', { name: 'Analyze video', exact: true }).click();
+  await expectNoPose(page);
+  expect((await sessionSnapshot(page)).clips[0].id).toBe(first.id);
   await page.getByRole('button', { name: 'Play', exact: true }).click();
   await expect.poll(() => page.locator('video').evaluate((v) => (v as HTMLVideoElement).currentTime)).toBeGreaterThan(0);
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
@@ -46,12 +50,15 @@ test('real no-person inference stays replayable, releases URLs, and permits a fr
 });
 
 test('cancels a real processing job and admits another after cleanup', async ({ page }) => {
-  await page.goto('/');
+  await openAnalysis(page);
   await page.locator('input[type=file]').setInputFiles(noPerson);
   await expect(page.getByRole('button', { name: 'Choose video' })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Cancel processing and remove clip' })).toBeVisible();
   const first = (await sessionSnapshot(page)).clips[0];
   expect(first.status).toBe('processing');
+  await page.getByRole('button', { name: 'Home', exact: true }).click();
+  await page.getByRole('button', { name: 'Analyze video', exact: true }).click();
+  expect((await sessionSnapshot(page)).clips[0].id).toBe(first.id);
   await page.getByRole('button', { name: 'Cancel processing and remove clip' }).click();
   await expect(page.getByRole('button', { name: 'Choose video' })).toBeEnabled({ timeout: 70_000 });
   await expect.poll(async () => (await sessionSnapshot(page)).processingState).toBe('idle');
@@ -64,7 +71,7 @@ test('cancels a real processing job and admits another after cleanup', async ({ 
 });
 
 test('decodes and processes a native portrait source without calling it rotated-source coverage', async ({ page }) => {
-  await page.goto('/');
+  await openAnalysis(page);
   await page.locator('input[type=file]').setInputFiles(fileURLToPath(new URL('../fixtures/no-person-portrait.mp4', import.meta.url)));
   await expectNoPose(page);
   const pose = (await sessionSnapshot(page)).clips[0].pose;

@@ -48,8 +48,8 @@
 **Create:** `src/components/{AnalysisWorkspace,WorkoutHome,WorkoutEditor,WorkoutHistory}.tsx`, focused component tests, `tests/browser/workouts.spec.ts`.
 **Modify:** `src/App.tsx`, App tests if necessary, browser helper/input/no-person specs and both workflow branch triggers; docs.
 
-- [ ] Write failing UI/flow tests for Home actions, storage errors, valid/invalid sets and preservation on save failure, resume/finish/history and destructive confirmation.
-- [ ] Implement Home/log/history and extract analysis view; maintain root native lifecycle and media ownership. Add no unimplemented controls or fake data.
+- [x] Write failing UI/flow tests for Home actions, storage errors, valid/invalid sets and preservation on save failure, resume/finish/history and destructive confirmation.
+- [x] Implement Home/log/history and extract analysis view; maintain root native lifecycle and media ownership. Add no unimplemented controls or fake data.
 - [ ] Add/execute actual Chromium logging/reload/edit/history, simultaneous-tab conflicts and navigation through no-person processing. Existing ten cases still run.
 - [ ] Full tests/lint/build and guarded mobile sync/verify, local actionlint, visual inspection at desktop/390 width, commit/push to hosted workflows.
 - [ ] Read actual hosted results, obtain fresh critical whole-branch review, fix supported defects with reproducing tests, update all current docs and integrate reviewed master per D-018.
@@ -62,3 +62,4 @@
 - Scheduling: relative COUNT rules initially produced no future runs; a bounded one-time future occurrence was successfully created, automation id `resume-gymbro-ai-design-q-a`, about 23:28 Chicago. No repeated reminder was authorized.
 - Fresh design review ready; guardrails on transaction completion/reload ordering incorporated. Core RED 27/29 rejected-data tests, repository RED 7/8, store RED 8/8 against no-op scaffolds; no failing state committed. Plan/setup and state foundation are folded into one green commit because test-first work began before the plan-only commit.
 - Builder ruling: random IDs use crypto.getRandomValues instead of randomUUID so trusted HTTP LAN phone testing works; both are opaque identifiers, not user-facing choices. Storage errors require reload because a timeout cannot guarantee a write never committed.
+- Step3 UI: five App-flow tests RED -> GREEN; original native lifecycle tests remain green. Narrow/long-name browser test caught and fixed editor/Home overflow. Three logging browser cases pass; initial full run passed all ten video cases but exposed that layout issue, now fixed. Final full rerun is ongoing. 447 tests/lint/guarded sync pass, 418 modules/11 files per platform; actionlint accepts feature-triggered workflows.

@@ -1,138 +1,56 @@
-import { useEffect, useRef } from "react";
-import { Capacitor } from "@capacitor/core";
-import { App as NativeApp } from "@capacitor/app";
-import { AnimatePresence, motion } from "framer-motion";
-import { useSessionStore } from "@/store/useSessionStore";
-import { ANGLES, EXERCISES } from "@/core/exercises";
-import { ClipDropzone } from "@/components/ClipDropzone";
-import { VideoStage } from "@/components/VideoStage";
-import { ShieldIcon, TrashIcon } from "@/components/icons";
-import { connectNativeLifecycle } from "@/mobile/nativeLifecycle";
+import { useEffect, useRef, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { App as NativeApp } from '@capacitor/app';
+import { useStore } from 'zustand';
+import { useSessionStore } from '@/store/useSessionStore';
+import { workoutStore, type WorkoutStore } from '@/store/useWorkoutStore';
+import { connectNativeLifecycle } from '@/mobile/nativeLifecycle';
+import { AnalysisWorkspace } from '@/components/AnalysisWorkspace';
+import { WorkoutHome } from '@/components/WorkoutHome';
+import { WorkoutEditor } from '@/components/WorkoutEditor';
+import { WorkoutHistory } from '@/components/WorkoutHistory';
+import { ShieldIcon } from '@/components/icons';
 
-export default function App() {
+type View = 'home' | 'workout' | 'analysis' | 'history';
+export default function App({ workouts = workoutStore }: { workouts?: WorkoutStore } = {}) {
   useEffect(() => connectNativeLifecycle({
-    isNative: Capacitor.isNativePlatform(), app: NativeApp,
-    session: useSessionStore, document,
+    isNative: Capacitor.isNativePlatform(), app: NativeApp, session: useSessionStore, document,
   }), []);
-
-  const exercise = useSessionStore((s) => s.exercise);
-  const clips = useSessionStore((s) => s.clips);
-  const processingState = useSessionStore((s) => s.processingState);
-  const startClip = useSessionStore((s) => s.startClip);
-  const removeClip = useSessionStore((s) => s.removeClip);
-  const retainClipMedia = useSessionStore((s) => s.retainClipMedia);
-
-  const { name: exerciseName, accent } = EXERCISES[exercise];
-  const admissionBlocked = clips.length > 0 || processingState !== "idle";
-  const releasing = clips.length === 0 && processingState === "cancelling";
-  const addHeadingRef = useRef<HTMLHeadingElement>(null);
-
-  // The removed clip's section unmounts after its exit animation, taking the
-  // focused remove button with it; move keyboard focus somewhere that remains.
-  const handleRemove = (id: string) => {
-    removeClip(id);
-    addHeadingRef.current?.focus();
-  };
-
-  return (
-    <div className="app-safe-sides relative min-h-full">
-      <BackdropFX accent={accent} />
-      <Header />
-
-      <main className="app-safe-bottom mx-auto w-full max-w-5xl px-4 pt-6 sm:px-6">
-        <Hero />
-
-        <Section
-          step={1}
-          title="Add your bench press video"
-          subtitle="Film one set from the side, then choose the MP4 file."
-          headingRef={addHeadingRef}
-        >
-          <div className="mb-3 flex flex-wrap gap-2">
-            <span
-              className="chip text-xs font-semibold"
-              style={{ background: `${accent}1f`, color: accent }}
-            >
-              {exerciseName}
-            </span>
-            <span
-              className="chip text-xs font-semibold"
-              style={{ background: `${accent}1f`, color: accent }}
-            >
-              {ANGLES.side.name} view
-            </span>
-          </div>
-          <RecordingGuide />
-          <ClipDropzone
-            onSelect={startClip}
-            disabled={admissionBlocked}
-            disabledMessage={releasing ? "Releasing the previous clip…" : undefined}
-          />
-        </Section>
-
-        <AnimatePresence>
-          {clips.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-            >
-              <Section
-                step={2}
-                title="Pose overlay"
-                subtitle="Estimated landmarks drawn over your video during playback. Remove the clip to cancel or start over."
-              >
-                <div className="space-y-6">
-                  {clips.map((clip) => (
-                    <motion.div
-                      key={clip.id}
-                      layout
-                      initial={{ opacity: 0, scale: 0.98 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                    >
-                      <div className="mb-2 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="chip text-xs font-semibold"
-                            style={{
-                              background: `${accent}1f`,
-                              color: accent,
-                            }}
-                          >
-                            {exerciseName} · {ANGLES[clip.angle].name} view
-                          </span>
-                          <span className="max-w-[40vw] truncate text-xs text-slate-500">
-                            {clip.name}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemove(clip.id)}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-slate-400 transition-colors hover:bg-danger/15 hover:text-danger"
-                          aria-label={
-                            clip.status === "processing"
-                              ? "Cancel processing and remove clip"
-                              : "Remove clip"
-                          }
-                        >
-                          <TrashIcon width={16} />
-                        </button>
-                      </div>
-                      <VideoStage
-                        clip={clip}
-                        accent={accent}
-                        retainMedia={retainClipMedia}
-                      />
-                    </motion.div>
-                  ))}
-                </div>
-              </Section>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
-    </div>
-  );
+  useEffect(() => { void workouts.getState().load(); }, [workouts]);
+  const state = useStore(workouts);
+  const [view, setView] = useState<View>('home');
+  const [selected, setSelected] = useState<string | undefined>();
+  const [notice, setNotice] = useState('');
+  const main = useRef<HTMLElement>(null);
+  const previousView = useRef<View>('home');
+  useEffect(() => {
+    if (previousView.current !== view) main.current?.focus();
+    previousView.current = view;
+  }, [view]);
+  function navigate(next: View) { setView(next); setNotice(''); }
+  const available = state.loaded && !state.needsReload;
+  return <div className="app-safe-sides min-h-full">
+    <Header />
+    <nav aria-label="Main navigation" className="mx-auto flex w-full max-w-5xl gap-1 border-b border-white/10 px-4 py-2 sm:px-6">
+      {([['home', 'Home'], ['workout', 'Workout'], ['analysis', 'Analyze']] as const).map(([target, label]) =>
+        <button key={target} type="button" aria-current={view === target ? 'page' : undefined}
+          className={`rounded-lg px-4 py-2 text-sm font-semibold ${view === target ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}
+          onClick={() => navigate(target)}>{label}</button>)}
+    </nav>
+    <main ref={main} tabIndex={-1} className="app-safe-bottom mx-auto w-full max-w-5xl px-4 pt-6 outline-none sm:px-6">
+      <div className="mb-4 text-xs text-slate-400" role="status" aria-live="polite">{state.busy ? 'Saving or opening workouts…' : state.needsReload ? 'Workout storage needs a reload.' : state.loaded ? 'Logged sets are saved on this device' : ''}</div>
+      {state.error && <div role="alert" className="mb-5 rounded-xl border border-warn/30 bg-warn/10 p-4 text-sm text-warn">
+        <p>{state.error}</p>{state.needsReload && <button type="button" disabled={state.busy} className="mt-3 underline underline-offset-4" onClick={() => { void state.load(); }}>Reload saved workouts</button>}
+      </div>}
+      <div role="status" aria-live="polite" className={notice ? 'mb-4 text-sm text-accent' : undefined}>{notice}</div>
+      {view === 'home' && <WorkoutHome data={state.data} available={available} busy={state.busy}
+        onWorkout={() => navigate('workout')} onAnalyze={() => navigate('analysis')}
+        onHistory={id => { setSelected(id); navigate('history'); }} />}
+      {view === 'workout' && <WorkoutEditor store={workouts} onFinished={() => { setView('home'); setNotice('Workout saved.'); }} />}
+      {view === 'history' && <WorkoutHistory store={workouts} initialId={selected} />}
+      {view === 'analysis' && <AnalysisWorkspace />}
+    </main>
+  </div>;
 }
 
 function Header() {
@@ -171,106 +89,6 @@ function Logo() {
           strokeLinecap="round"
         />
       </svg>
-    </div>
-  );
-}
-
-function Hero() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="mb-8 mt-2"
-    >
-      <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
-        See your bench press pose,
-        <br />
-        <span className="text-gradient">sample by sample.</span>
-      </h1>
-      <p className="mt-3 max-w-xl text-sm text-slate-400 sm:text-base">
-        Choose a side-view video of one barbell bench press set. GymBro AI
-        estimates body landmarks in sampled frames and draws them over playback.
-        It does not count reps, track the bar, or judge your technique. The video
-        is processed on this device and is not uploaded.
-      </p>
-    </motion.div>
-  );
-}
-
-function RecordingGuide() {
-  return (
-    <div className="mb-4 rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 text-sm text-slate-300">
-      <div className="mb-1.5 font-semibold text-white">For the clearest overlay</div>
-      <ul className="list-disc space-y-1 pl-5 text-slate-400">
-        <li>Film from the side with the camera steady.</li>
-        <li>Keep your shoulders, elbows, and wrists in frame for the whole set.</li>
-        <li>
-          Keep the bar&apos;s path in frame so you can review it yourself; GymBro AI
-          does not track the bar.
-        </li>
-        <li>
-          Have only one lifter in view where possible; other people, such as a
-          spotter, can confuse the pose estimate.
-        </li>
-        <li>Use even, adequate light.</li>
-      </ul>
-      <p className="mt-2 text-xs text-slate-500">
-        Landmarks are estimates. They can be missing or wrong where body parts are
-        hidden, and a clear overlay is not a judgment of your form.
-      </p>
-    </div>
-  );
-}
-
-function Section({
-  step,
-  title,
-  subtitle,
-  headingRef,
-  children,
-}: {
-  step: number;
-  title: string;
-  subtitle: string;
-  /** Lets the page move keyboard focus to this heading. */
-  headingRef?: React.Ref<HTMLHeadingElement>;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="mb-10">
-      <div className="mb-4 flex items-start gap-3">
-        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 font-mono text-xs font-bold text-accent">
-          {step}
-        </span>
-        <div>
-          <h2
-            ref={headingRef}
-            tabIndex={headingRef ? -1 : undefined}
-            className="text-lg font-bold text-white focus:outline-none"
-          >
-            {title}
-          </h2>
-          <p className="text-sm text-slate-400">{subtitle}</p>
-        </div>
-      </div>
-      <div className="pl-0 sm:pl-10">{children}</div>
-    </section>
-  );
-}
-
-function BackdropFX({ accent }: { accent: string }) {
-  return (
-    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      <div className="absolute inset-0 bg-grid [background-size:44px_44px] opacity-[0.4]" />
-      <motion.div
-        animate={{ opacity: [0.25, 0.4, 0.25] }}
-        transition={{ duration: 8, repeat: Infinity }}
-        className="absolute -left-32 -top-32 h-96 w-96 rounded-full blur-3xl"
-        style={{ background: `${accent}22` }}
-      />
-      <div className="absolute -right-40 top-1/3 h-96 w-96 rounded-full bg-electric/10 blur-3xl" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-950" />
     </div>
   );
 }

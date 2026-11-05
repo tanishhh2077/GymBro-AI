@@ -19,6 +19,11 @@ only the checksummed patterns. The runner accepts no human-video argument or
 environment path. Do not replace a pattern with a recording: integrity preflight
 will fail. Browser tests use `*.spec.ts`; `verify-fixtures.test.ts` runs in Vitest.
 
+Task 14 adds synthetic manual workout values only: logging/edit/reload/finish/
+history/deletion, actual two-tab conflicts and long names at 390px. Analysis
+cases enter from Home; no-person cases also navigate away/back without losing
+the clip/job. These are isolated temporary browser contexts, never real user logs.
+
 Screenshots, videos, traces and automatic page/ARIA snapshots are off. On failure
 Playwright can still create temporary error/source diagnostics; test output is
 removed afterward, while last-run metadata may remain. CI uploads no browser
