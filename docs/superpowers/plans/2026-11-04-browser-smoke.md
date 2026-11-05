@@ -53,7 +53,7 @@ clip identity/status/pose/delegate/URL/processing state. No production global.
 **Files:** `.github/workflows/browser-checks.yml`, related local guidance/README,
 root README/AGENTS, docs STATUS/HANDOFF/ARCHITECTURE, review record.
 
-- [ ] Add bounded standard Ubuntu workflow on this feature branch and master for relevant source/config/assets; pinned existing actions, read-only token, no cache/uploads. Run clean install, shared checks, browser install and smoke suite. Document the exact local commands.
+- [x] Add bounded standard Ubuntu workflow on this feature branch and master for relevant source/config/assets; pinned existing actions, read-only token, no cache/uploads. Run clean install, shared checks, browser install and smoke suite. Document the exact local commands.
 - [ ] Validate configuration and full local checks, commit/push. Observe hosted job or record access/runner limitation without claiming success.
 - [ ] Fresh whole-branch critical review against spec; evaluate findings, fix supported defects with reproducing tests and rerun affected checks.
 - [ ] Update durable handoff with exact results, limitations, review disposition and next phone/video action. Commit/push and fast-forward reviewed master per D-018. Preserve pending Task 8 and Task 4 histories.

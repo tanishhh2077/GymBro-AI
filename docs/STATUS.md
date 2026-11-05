@@ -37,8 +37,6 @@ for this bounded PC task. No human footage has been supplied or accepted.
   explicit execution condition. Browser tooling has not been implemented yet. Exact served model
   identifier for this Codex session is unavailable.
 
-### Previous completed task
-
 ### Task 13 Step 2: fixed-pattern smoke suite
 
 - Exact development pin `@playwright/test` 1.64.1 adds three packages; runtime
@@ -71,6 +69,18 @@ for this bounded PC task. No human footage has been supplied or accepted.
   MediaPipe development sourcemap warnings remain; no vendor edits. Next: hosted
   workflow execution and fresh whole-branch code review. These results do not
   validate a human lifter, rotation metadata, Safari, native/offline or a phone.
+
+### Task 13 Step 3: hosted workflow (execution pending)
+
+- Added `browser-checks.yml`: standard Ubuntu 24.04, Node from `.nvmrc`, locked
+  install, unit tests/lint/build, pinned Chromium install and smoke command.
+  Reuses the existing exact checkout/setup-node action SHAs, read-only contents,
+  no persistent Git credentials/cache/artifact uploads, 25-minute job bound.
+  Relevant pushes on Task 13/master trigger it; no repository setting changed.
+- Local actionlint 1.7.12 accepts the workflow. Full local checks and the hosted
+  job will be recorded after execution. Fresh whole-branch review is next.
+
+### Previous completed task
 
 Task 12 (D-028, legacy code and template asset cleanup) is **complete**: built on
 `feat/task12-legacy-cleanup` from reviewed master `eaf87e1`, freshly reviewed and

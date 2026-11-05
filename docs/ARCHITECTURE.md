@@ -7,7 +7,7 @@ with actual media decoding and local MediaPipe, reading the existing dev store
 without adding production globals. Fixed first-party patterns in `tests/fixtures/`
 are gated by regular-file/length/SHA-256 preflight. Playwright owns loopback 4179
 with strict port/no reuse, one worker and no media captures or retained test
-output. The planned separate Ubuntu browser workflow uploads no artifacts. This adds
+output. The separate Ubuntu browser workflow uploads no artifacts. This adds
 development tooling only; hosted/local results belong in STATUS and establish
 neither production/native execution nor useful human landmarks.
 

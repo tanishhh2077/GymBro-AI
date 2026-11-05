@@ -1,4 +1,15 @@
-# Native prototype builds
+# Build checks
+
+`browser-checks.yml` runs unit tests, lint, build/type checks and real Chromium
+smoke against only five fixed, checksummed non-human H.264 patterns. It uses
+Node from `.nvmrc`, the locked Playwright runner and installed Chromium on
+standard Ubuntu 24.04, one worker, bounded runtime, read-only token and the
+existing pinned checkout/setup-node actions. It runs on Task 13/master pushes
+with relevant changes. No captures, caches, signing or artifact uploads.
+See [browser commands and limits](../../tests/browser/README.md). Hosted execution
+results belong in STATUS; this file's existence is not a passing run.
+
+## Native prototype builds
 
 `mobile-builds.yml` runs shared tests/lint/guarded sync, then compiles Android on
 Ubuntu 24.04 (Java 21, installed Android SDK) and iOS on macOS 26 (installed Xcode).

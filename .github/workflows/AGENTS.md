@@ -1,6 +1,11 @@
-# Mobile build workflow
+# Build workflows
 
 Inherit [automation guidance](../AGENTS.md).
+
+- `browser-checks.yml` owns only fixed-pattern browser smoke plus shared checks.
+  It must not load human media or upload any browser captures/logs/artifacts.
+  Its checks establish no-person browser behavior, not native or bench acceptance.
+- The remaining rules below govern `mobile-builds.yml` native jobs.
 
 - Run shared checks before native jobs. Regenerate ignored web/config/plugin
   copies from the locked dependencies, then enforce `mobile:verify`.
