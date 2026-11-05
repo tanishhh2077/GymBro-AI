@@ -10,10 +10,40 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task16 saved routines approved by the user (D-034). Branch
-feat/task16-saved-routines in isolated GymBro AI-task16 from master7d97ac6.
-Original Task8 checkout remains clean at0895f32 with completed Task15 integration;
-Task8/Task4 physical phone/bench gates remain open. No other agent code changes.
+Task 16 (saved routines, D-034) is **complete**. Its reviewed source `4c1b519`
+passed every local, review and hosted gate, and master is fast-forwarded from
+`7d97ac6` to this branch's final documentation commit. The original checkout's
+`feat/task8-safari-phone-test` branch receives that master through a merge commit
+that keeps both histories, and the temporary `GymBro AI-task16` worktree is then
+removed; that branch's records hold the outcome. Task 8 and Task 4 physical phone
+and bench gates remain open.
+
+### Task16 Step3 completion and master integration
+
+- Claude Code (Opus 5.5), 2026-11-05, in the `GymBro AI-task16` worktree on
+  `feat/task16-saved-routines` at `e996794`, Codex's Markdown-only handoff after
+  the reviewed source `4c1b519`. The tree was clean. No process ran from the
+  worktree, and the only listener was an unrelated project's Vite server on
+  `[::1]:5173`, so there was no owned server to stop.
+- `git diff --name-only 4c1b519 HEAD` lists Markdown files only, so the reviewed
+  source is exactly what reaches master; `7d97ac6` is an ancestor of the branch.
+- Under process-local Node 22.23.2 (confirmed with `node -v`): `npm ls --depth=0`
+  exit 0; **494 tests / 26 files** pass; lint exit 0; build exit 0 with 421 modules
+  and the reviewed bundle names `index-Ds3ylwAP.css`, `index-Bv_ujMEI.js` and
+  `web-Bh0Ubt_t.js`.
+- This commit changes documentation only: HANDOFF (rewritten in full sentences
+  with every earlier fact kept), this record, the plan's Step 3 checkbox (split so
+  master shows only the finished part), and the indexes. `docs/README.md` lacked
+  rows for Tasks 13–16 and PRODUCT_DIRECTION, and the specs index lacked Tasks 15
+  and 16; both now list them.
+- The four synthetic previews already matched their copies in the original
+  checkout's ignored `build/visual-review/task16/` (SHA-256 compared). The
+  worktree-only `preview.mjs` script and the Codex progress ledger
+  (`.superpowers/sdd/2026-11-05-saved-routines/progress.md`) were copied to the
+  same ignored paths in the original checkout, hashes matching, before removal.
+- Master fast-forwards to this commit and is pushed. Relative to `7d97ac6` the
+  push changes `src/**`, so it starts hosted browser and native runs on source
+  identical to `4c1b519`; the Task 8 branch's records note their results.
 
 ### Transfer to Claude Code after Codex limit
 

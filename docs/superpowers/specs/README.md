@@ -1,5 +1,16 @@
 # Feature designs
 
+[Saved workout routines](2026-11-05-saved-routines-design.md) defines completed
+Task 16 (D-034): local named routines with optional set/rep targets that start
+fresh workouts with no actual sets, stored as schema 2 in the same IndexedDB
+document. Its [design review](2026-11-05-saved-routines-design-review.md) found
+no findings and its [code review](2026-11-05-saved-routines-code-review.md) found
+no significant findings.
+
+[Manual rest timer](2026-11-04-rest-timer-design.md) defines completed Task 15
+(D-033): a session-only timer kept apart from saved workout and media data. See
+its [code review](2026-11-05-rest-timer-code-review.md).
+
 [Local workout logging/Home](2026-11-04-workout-logging-design.md) defines Task14,
 with accepted direction in PRODUCT_DIRECTION/D-030 and fresh design/code reviews.
 This slice is separate from the remaining tracking wishlist and live-analysis goal.

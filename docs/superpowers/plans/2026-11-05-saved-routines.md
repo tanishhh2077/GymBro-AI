@@ -55,7 +55,8 @@
 
 - [x] Fresh read-only whole-feature reviewer against design/plan/base; no significant finding, no fix required; record limits.
 - [x] Read actual hosted browser/native results, separately from local and physical-device evidence.
-- [ ] Complete current docs, reviewed fast-forward/push master; bring it into original Task8 checkout preserving histories and verify merged source/checks. Retain branches, close only owned servers and remove clean temporary worktree after preserving previews.
+- [x] Complete current docs, reviewed fast-forward/push master.
+- [ ] Bring master into the original Task8 checkout preserving histories and verify merged source/checks. Retain branches, close only owned servers and remove the clean temporary worktree after preserving previews. (Recorded on the Task8 branch.)
 
 ## Execution record
 
@@ -67,3 +68,4 @@
 - Step2 in progress:6 UI tests RED->GREEN;494tests/26files,lint/build/guarded sync pass. Three actual browser routine cases pass after correcting a test-only reload-before-save race with visible saved-state waits. Full17 suite/fresh code review pending; synthetic390/1280 editor/library visual checks pass with no overflow.
 - Step2 complete:17/17 actual Chromium cases pass3.5minutes, including all14 existing cases. Fresh read-only code reviewer independently77tests/8files and diff check pass; no significant findings, production unchanged afterward. Hosted/browser/native results follow the green UI commit.
 - Hosted browser8/native15 both succeed on exact4c1b519, including shared494tests and visible simulator startup. Final local494tests/lint/build pass. User now requests Claude Code transfer after Codex limit; Codex stops after handoff. Only final Step3 documentation/integration/cleanup remains; do not rebuild the feature or repeat fresh reviews.
+- Step 3 (Claude Code, Opus 5.5): the final local run of 494 tests in 26 files, lint and build (421 modules, reviewed bundle names) passes on the unchanged source; only Markdown follows `4c1b519`. The documents and indexes are complete, the previews are verified, and the preview script and progress ledger are copied to the original checkout's ignored paths. Master is fast-forwarded to this completion commit and pushed. The original Task 8 merge and the worktree removal follow on that branch.
