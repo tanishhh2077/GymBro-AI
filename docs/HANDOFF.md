@@ -2,6 +2,24 @@
 
 Updated 2026-11-05 (America/Chicago). Read root and scoped `AGENTS.md` files first.
 
+## Transfer to Codex (2026-11-05)
+
+The user moved the work from Claude Code to Codex. Claude Code (Opus 5.5) made no
+code change after Task 16; its last commits are documentation only. State at
+transfer:
+- `master` and `feat/task8-safari-phone-test` are the same commit; GitHub's
+  default branch is `master`. Work in this original checkout, on the Task 8
+  branch for phone records or on a new branch from `master` for new tasks.
+- Every task branch except Task 4 is fully inside master. Task 4 stays unmerged
+  by design (below). Merged branches are kept until the user agrees to delete them.
+- Open item 1: master's hosted browser run 41985529794 failed in one case,
+  `input-validation.spec.ts:53` (file chooser not seen within 10 seconds). The
+  user has not yet started the new run; when they do, read its result. A repeat
+  failure gets a test-first fix that first asserts the button keeps focus.
+- Open item 2: the phone session, with the user present. Open item 3: the Q&A at
+  Q10 or a newly approved feature. No implementation task is approved now.
+- Use process-local Node 22.23.2 and confirm `node -v` before checks.
+
 ## Current task and next action
 
 **Task 16, saved workout routines, is complete and integrated** ([D-034](DECISIONS.md#d-034-saved-workout-routines-with-fresh-actual-set-logging)).

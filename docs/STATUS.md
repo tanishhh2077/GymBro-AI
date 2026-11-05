@@ -27,6 +27,15 @@ implementation task remains; the next work needs the user (that log, the phone
 session, Q10, or a newly approved feature). Task 8 and Task 4 physical phone and
 bench gates remain open.
 
+### Transfer from Claude Code to Codex
+
+- 2026-11-05: the user asked to hand over to Codex. Claude Code (Opus 5.5)
+  stops here. Its session finished Task 16's Step 3 integration, merged Task 8
+  into master at the user's request, recorded the user's switch of the default
+  branch to `master`, and identified the failing case of master's browser run.
+  No new hosted run had been started by the user at transfer (latest run is still
+  41985529794). Working tree clean; `master` equals the Task 8 branch.
+
 ### Branch merges at the user's request
 
 - Claude Code (Opus 5.5), 2026-11-05. The user wrote "i think a lot of branches
