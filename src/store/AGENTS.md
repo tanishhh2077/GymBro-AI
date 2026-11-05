@@ -16,5 +16,9 @@ Inherit [source guidance](../AGENTS.md). Follow the
 - Clear stale errors, progress, and results when beginning a replacement job.
 - State is currently in memory on the device. Do not add storage, server transfer,
   accounts, or persistence implicitly; those boundaries remain deferred.
+- Exception D-030: the separate workout repository/store persists validated manual
+  workout records locally, with atomic revision checks and save-before-state
+  updates. Keep the pose session in memory; never persist clips, URLs or landmarks.
+  Failed reads/writes/conflicts must preserve existing data and offer recovery.
 - Retain missingness and quality information from processing rather than reducing
   it to a ready/error boolean or an arbitrary quality score.

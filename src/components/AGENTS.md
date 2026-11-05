@@ -18,3 +18,6 @@ Inherit [source guidance](../AGENTS.md). Follow the
 - Describe upload selection as local processing while that remains true.
 - Give controls accessible names, keyboard operation, and visible focus. Do not
   communicate status or uncertainty through color alone.
+- D-030 adds Home and manual workout logging/history. Logging names are separate
+  from the bench-only analysis scope. Keep storage failure, unsaved inputs, units,
+  confirmation for destructive workout actions, and actual saved status clear.

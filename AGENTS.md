@@ -47,6 +47,11 @@
   confidence, per-rep ROM or validated bench technique.
 - D-026 selects Task10's observed processing-time badge. One run's measured time
   is not a benchmark, rating or phone-performance validation.
+- D-030 now authorizes a bounded manual workout log, local IndexedDB persistence
+  of workout records, and Home navigation alongside the existing bench workflow.
+  Read PRODUCT_DIRECTION and its separate Task 14 design/plan. Earlier generic
+  fitness/persistence deferrals are superseded only for that slice. Do not persist
+  media/pose data or infer new analysis capabilities from logging exercise names.
 
 ## Independent judgment
 

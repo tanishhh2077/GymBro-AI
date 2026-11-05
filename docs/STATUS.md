@@ -10,6 +10,30 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task 14 is in progress: local manual workout logging/Home under D-030, from
+reviewed master `a524387`, with user authorization after Q1-Q7. Q&A resumes at
+Q8 in about an hour via a one-time scheduled thread follow-up. No live analysis,
+cloud/account or media persistence. Read PRODUCT_DIRECTION and the separate plan.
+
+### Task 14 setup and state foundation
+
+- Normal Git worktree used because native tool still references old `liftform`.
+  Clean Node22.23.2 install:481 packages; 391 tests/18files, lint/build pass.
+- Fresh read-only design review ready, no blockers. Current visual tokens,
+  per-workout unit selection, IndexedDB and provisional navigation are builder
+  choices; no more user questions needed for the bounded first slice.
+- Test-first data/repository/store behavior: reject malformed/future/media-bearing
+  records; atomic revision-checked writes, blocked/timeout failures and explicit
+  recovery; draft/log/edit/remove/finish/history. Test results will follow below.
+- State foundation is green: **46 focused tests**, **437 total / 21 files**, lint
+  and build pass (411 modules, unchanged app bundles because UI is not wired yet).
+  Includes real repository transactions against dev-only fake-indexeddb6.2.7,
+  stale-writer rejection, failed writes/unknown data preservation, late-open cleanup,
+  draft history lifecycle and load/save serialization. The simulator/browser
+  environment adapter is faked; actual browser/native persistence still awaits tests.
+
+### Previous completed work
+
 Task 13 (D-029) passes acceptance and review on `feat/task13-browser-checks` from reviewed
 master `1c44729`. It makes the existing non-human browser checks reproducible
 without merging unfinished Task 4. The user approved this step and said "Clear
