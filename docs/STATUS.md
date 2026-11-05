@@ -10,6 +10,35 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task 13 (D-029) is in progress on `feat/task13-browser-checks` from reviewed
+master `1c44729`. It makes the existing non-human browser checks reproducible
+without merging unfinished Task 4. The user approved this step and said "Clear
+just start working". Hotspot/video will come later; no new user input is needed
+for this bounded PC task. No human footage has been supplied or accepted.
+
+### Task 13 Step 1: audit, clean setup and plan
+
+- Codex inspected Claude's Tasks 10–12; a fresh read-only Codex reviewer found
+  no material defects and ran 45 focused tests. Task 8 `4a752dd` equals master
+  `1c44729` in all non-Markdown files; its eight prepared inputs match their
+  recorded bytes/hashes. Neither audit proves phone or positive-pose accuracy.
+- Native worktree creation rejected the renamed repo because this chat still
+  points to `liftform`. Standard Git created sibling `GymBro AI-task13`, branch
+  `feat/task13-browser-checks`; the original Task 8 checkout and existing ports
+  5173/5193 remain untouched. This is a managed-by-Git checkout, not an app-managed
+  worktree; use normal Git worktree cleanup when finished.
+- Process-local Node 22.23.2, clean `npm ci --no-audit --no-fund`: 478 packages.
+  Fresh **385 tests / 17 files**, lint and build exit 0; Vite 411 modules,
+  identical app bundles. Existing uuid/recharts deprecation notices and stale
+  Browserslist warning remain. No global Node change, native sync or LAN server.
+- Wrote the bounded [design](superpowers/specs/2026-11-04-browser-smoke-design.md)
+  and [plan](superpowers/plans/2026-11-04-browser-smoke.md). Fresh design review
+  is ready with no blockers; actual H.264 decoding on Windows/Ubuntu is an
+  explicit execution condition. Browser tooling has not been implemented yet. Exact served model
+  identifier for this Codex session is unavailable.
+
+### Previous completed task
+
 Task 12 (D-028, legacy code and template asset cleanup) is **complete**: built on
 `feat/task12-legacy-cleanup` from reviewed master `eaf87e1`, freshly reviewed and
 fast-forwarded to master; chosen by the builder

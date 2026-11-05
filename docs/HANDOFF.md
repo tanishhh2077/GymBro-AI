@@ -4,39 +4,34 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 
 ## Current task and next action
 
-**Task 12 (complete): remove unrendered legacy code and template assets**
-([D-028](DECISIONS.md#d-028-remove-unrendered-legacy-code-and-template-assets)), on
-`feat/task12-legacy-cleanup` from reviewed master `eaf87e1`. The user, still away,
-asked the builder to keep working toward completion without frequent questions;
-D-028 records this builder choice. It deletes `ExercisePicker.tsx`, `App.css`,
-Vite template images/SVGs and the unused score-bearing analysis types, and
-narrows the lift/view/source types and metadata to bench/side/upload. Nothing
-visible changes. Read the [plan](superpowers/plans/2026-11-04-legacy-cleanup.md);
-its checkboxes and Git show the latest step. Step 1 (D-028, plan) and Step 2
-(unreferenced files deleted, plus the picker-only lift icons; 383 tests, lint,
-guarded sync with 11 verified files per platform) and Step 3 (types/metadata
-narrowed, unused analysis types deleted, **385 tests / 17 files**) are done; next
-is Step 4: the browser check (screens match Task 10's) and fresh review (six Low
-documentation findings, fixed) are done, and master is fast-forwarded to the
-reviewed result. **Task 12 is complete.** Next: merge master into Task 8, then
-the phone session when the user is present. D-024 applies. One writer;
-reviewers read only.
+**Task 13: reproducible non-human browser checks** (D-029), on
+`feat/task13-browser-checks` from reviewed master `1c44729`, in sibling worktree
+`GymBro AI-task13`. User approved the explanation and said "Clear just start
+working". Explain meaningful steps and proceed with routine PC implementation;
+coordinate device/account/settings actions. One writer; reviewers read only.
 
-Task 11 (D-027, the build's Vite/Vitest config type-check) is complete on master
-`eaf87e1`; [native run7](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41936252985)
-for that commit passed all three jobs (shared checks, Android APK, iOS simulator
-build/startup); packages not downloaded (needs a signed-in account). Pushing
-Task 12 to master starts another run. Follow-up: `capacitor.config.ts` is still checked with the root DOM settings.
+Read the [design](superpowers/specs/2026-11-04-browser-smoke-design.md) and
+[plan](superpowers/plans/2026-11-04-browser-smoke.md). Fresh clean locked install
+on process-local Node 22.23.2: **385 tests / 17 files**, lint and build pass.
+Step 1 design review is ready with no blockers; next is the fixed-pattern Playwright suite and
+hosted checks. No application behavior change, native sync, LAN listener or
+private-video processing. Task 4 stays incomplete and unmerged. Selected safe
+patterns/tests may be ported from `34538e4` with provenance.
+
+Claude's Tasks 10–12 are complete on master. A fresh Codex audit found no material
+defects (45 focused tests); this session also ran all 385 tests/lint/build in the
+Task 8 checkout and in the new clean worktree. Follow-up: `capacitor.config.ts`
+is still checked with root DOM settings; separate future task if justified.
 
 ## Task 8 phone test (separate branch, waiting for the user)
 
-`feat/task8-safari-phone-test` at `398b5c0` has merged reviewed master three times
-(Task 9, Task 10's badge, Task 11's config check), each with a merge commit
-keeping both histories, and repeated 383 tests/lint/guarded sync. The user
+`feat/task8-safari-phone-test` at `4a752dd` has merged reviewed master four times
+(Tasks 9–12), each with a merge commit keeping both histories; its non-Markdown
+tree equals master `1c44729`. Its last checks were 385 tests/lint/guarded sync. The user
 reported **iOS 26.5.2**. Ignored `build/fixtures/` holds the five exported
 non-human fixtures, their README and three generated S07/S08 inputs
 (`zero-byte.mp4`, `corrupt.mp4`, `over-size.mp4`), all hash-checked against the
-phone plan. Task 8's own HANDOFF/STATUS hold the details. Task 12 must never delay
+phone plan. Task 8's own HANDOFF/STATUS hold the details. Task 13 must never delay
 the phone session.
 
 With the user present: agree a trusted private network (home Wi-Fi or Personal
@@ -54,9 +49,9 @@ reps or form verdicts. Summary availability is not accuracy confidence; observed
 extrema can include tracking errors and are not per-rep ROM or 3D anatomy.
 
 Capacitor 8.6.0/App 8.1.2 prototypes use appId `com.gymbroai.app`, version 0.1.0.
-[Master run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41913320712)
-(Task 10 source) compiled both platforms and passed its iOS simulator startup
-job; its packages were not downloaded. [Run5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
+[Master run8](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41938020495)
+(Task 12 source `1c44729`) passed shared checks, Android compilation and iOS
+simulator startup; packages were not downloaded. [Run5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
 verified visible iPhone 17 Pro/iOS 26.4 simulator startup, and its packages are
 in ignored `build/artifacts/run-5/` (Task 9 source, without the badge). The simulator
 ZIP cannot install on an iPhone; physical native workflow and offline inference
@@ -67,8 +62,9 @@ The user has an iPhone 12 Pro Max, no Android phone and no Apple Developer
 Program membership; temporary Mac access is unconfirmed. No paid services,
 signing setup, publication or human-video uploads.
 
-Task 4 remains at `feat/task4-browser-acceptance` / `34538e4`; licensed bench
-footage is still missing. The user cannot record one; do not ask again.
+Task 4 remains at `feat/task4-browser-acceptance` / `34538e4`. The user now expects
+to supply a video later; none has arrived. Permission/privacy, framing, encoding,
+real inference and manual lifter-landmark identity checks remain open.
 Do not merge the incomplete branch for tooling or call M1 bench acceptance done.
 
 ## Verification and Git

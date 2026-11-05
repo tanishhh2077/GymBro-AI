@@ -1,5 +1,9 @@
 # Feature designs
 
+[Non-human browser checks](2026-11-04-browser-smoke-design.md) defines Task 13
+(D-029), making real-decoder/no-person checks repeatable locally and in hosted
+CI while phone and bench acceptance wait. No private footage enters this suite.
+
 [Observed processing time](2026-11-04-processing-time-design.md) defines completed
 Task 10 (D-026): one completed run's admission-to-result time shown as a
 neutral badge. It is a single-device observation, not a benchmark.
