@@ -10,6 +10,31 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task17 workout progress/records starts under D-036 after the user's "ok keep
+building the next things". Base11bb3e3, branch feat/task17-workout-progress in
+the isolated GymBro AI-task17 sibling. Original Task8 checkout is preserved.
+The source is saved completed workout history, with exact name/unit grouping
+and traceable actual-set records. Metric and chart definitions are builder
+choices in the separate design/plan. Baseline and fresh design review follow.
+The old browser run remains at attempt1, with the manual rerun awaiting user
+action. Its fix remains conditional on an observed repeat.
+
+### Task17 Step1 foundation
+
+- Process-local node-v22.23.2 confirmed. Locked install482packages,494 baseline
+  tests/26files,lint/build and owned loopback4183 health200 pass before feature
+  behavior. Listener is127.0.0.1, PID116992 at the health check.
+- Fresh Goldfish design review is ready with empty findings. Actual runtime model
+  identifier unavailable. The review is source inspection. Dated design-review
+  record lists scope and subsequent runtime verification work.
+- Ten core failures observed against the empty implementation. All11 focused
+  tests then passed. Derivation covers exact names/units, duplicate entries,
+  source pairing/ties, zero/fractional/extreme values, immutable reads and1000
+  completed workouts. Full505tests/27files,lint/build pass. Source build has421
+  modules with the prior bundle because the UI consumer is Step2.
+
+### Previous integrated state
+
 Task 16 (saved routines, D-034) is **complete and integrated**. Its reviewed
 source `4c1b519` passed every local, review and hosted gate; master is
 fast-forwarded to `ac5e3fe`, Task 16's final documentation commit, and pushed.

@@ -8,6 +8,10 @@ targets. Document schema2 keeps routines optional to avoid growing legacy record
 on read. Actual sets stay separate from targets; copied plans have no live link
 to the saved routine, and IDs are fresh when starting each workout.
 
+`progress.ts` defines readonly derived RecordedSet and ExerciseProgress values.
+They carry actual source-set identity, unit groups and record/history arrays for
+the D-036 views. The workout library is the source for these derived results.
+
 `index.ts` defines pose observations, progress/results, session clips, and typed
 processing failure stages/kinds. The lift, view and source types hold only the
 supported `bench`, `side` and `upload` values; the legacy multi-lift and

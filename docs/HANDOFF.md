@@ -4,6 +4,19 @@ Updated 2026-11-05 (America/Chicago). Read root and scoped `AGENTS.md` files fir
 
 ## Transfer to Codex (2026-11-05)
 
+Current work has advanced to Task17 under D-036. The user said "ok keep building
+the next things" after the manual-rerun discussion. Codex selects workout
+progress/records from the accepted tracking roadmap. Worktree GymBro AI-task17,
+branch feat/task17-workout-progress, base11bb3e3. Original Task8 stays at that
+commit. Read the2026-11-05-workout-progress design/plan before implementation.
+Baseline494tests/lint/build/loopback health and fresh design review pass. Core
+aggregation is implemented with11focused tests passing after10observed failures.
+Full505tests/27files,lint/build pass. Step2 interface/browser work follows the
+green foundation commit. The user's repeat-failure rule
+for the earlier browser incident still applies. Phone/video requirements are in
+the existing sections below. This current authorization supersedes the older
+"no implementation task" handoff statements for the Task17 slice.
+
 The user moved the work from Claude Code to Codex. Claude Code (Opus 5.5) made no
 code change after Task 16; its last commits are documentation only. State at
 transfer:

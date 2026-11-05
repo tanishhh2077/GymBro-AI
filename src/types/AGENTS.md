@@ -4,6 +4,8 @@ Inherit [source guidance](../AGENTS.md). Follow the
 [product brief](../../docs/PRODUCT_BRIEF.md) and [decisions](../../docs/DECISIONS.md).
 
 - Keep contracts usable without React and explicit about their meaning.
+- D-036 progress contracts carry actual recorded set identity, numeric pairs and
+  exact unit groups through summaries and source-workout navigation.
 - Distinguish model observations, calculated measurements, and interpreted
   findings. A landmark position alone is not a finding about lifting form.
 - Specify units, media timestamps, coordinate systems, and provenance where

@@ -55,6 +55,10 @@
 
 ## Independent judgment
 
+- D-036 adds derived workout progress and personal records from completed actual
+  sets. Follow Task17's exact name/unit groups, source-linked metric definitions,
+  chronological workout order and deletion/reload behavior.
+
 - D-034 explicitly authorizes saved routine CRUD, exercise order/optional set-rep
   targets and starting fresh empty-set workouts. Follow the Task16 design/plan:
   preserve strict legacy data, atomic revisions and target/actual separation.

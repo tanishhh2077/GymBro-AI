@@ -20,6 +20,8 @@ with the approved amendments in [decisions](../docs/DECISIONS.md).
 - D-034 adds local saved routines and separate planned targets in document schema2.
   Preserve strict legacy reads without writes/size growth, atomic revision checks
   and actual-set counts. New routine workouts copy fresh IDs/order/unit/targets.
+- D-036 adds readonly progress views derived from validated completed history.
+  Keep exact name/unit groups and source-set identity with every record.
 - Keep uncertainty and missing observations visible through every layer. A
   rendered skeleton does not establish measurement accuracy or good lifting form.
 - The legacy multi-lift, multi-angle and score declarations were removed (D-028).

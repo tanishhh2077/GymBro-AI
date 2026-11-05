@@ -510,6 +510,24 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   git-ignored), because the development server can serve any file under the
   project folder, and during a phone test that server listens on the network.
 
+### D-036 Workout progress follows saved routines
+
+- After the handoff and discussion of the pending manual browser rerun, the user
+  said "ok keep building the next things". This directs further development
+  from the accepted Q5 charts/personal-bests roadmap while the rerun is pending.
+- Builder selects Task17, a Progress screen derived from saved completed workouts
+  with source-linked records and a per-workout heaviest-load chart.
+- Builder choices are exact stored exercise-name/unit groups, heaviest-set and
+  most-reps summaries, rep records at each logged load, deterministic ties,
+  evenly spaced workouts in finish order and20-row table pagination.
+- Recorded values provide the metrics. Existing local storage supplies the
+  validated history. D-035 retains its own design/per-view validation requirements.
+- The old file-chooser incident follows the user's repeat-failure condition.
+  Any supported repeat receives a reproducing test before a fix.
+- Follow the [design](superpowers/specs/2026-11-05-workout-progress-design.md) and
+  [plan](superpowers/plans/2026-11-05-workout-progress.md). Phone actions require
+  the user's presence and private recordings are kept outside the repository.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

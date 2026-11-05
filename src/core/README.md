@@ -7,6 +7,11 @@ Task16 extends strict validation to schema2 routines/target snapshots and accept
 strict legacy v1 with size-preserving/no-write normalization. `routines.test.ts`
 adds target/count/unknown-data/legacy boundaries; storage remains media-free.
 
+`workoutProgress.ts` derives manual tracking groups from completed actual sets
+under D-036. Exact exercise names/units define groups. Record ranking retains
+source IDs, numeric pairs and earliest stable ties. Its11 tests cover empty and
+zero data, duplicate entries, ordering, precision, deletion and1000 workouts.
+
 - `PoseEngine.ts`: MediaPipe coordinator. Runs one bounded job at a time:
   validates metadata before model work, owns a per-job detector, keeps only
   forward media times, copies and validates landmarks, and cleans up on every path.

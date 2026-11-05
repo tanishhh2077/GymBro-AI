@@ -1,5 +1,9 @@
 # Implementation plans
 
+Current work is [Task17 workout progress](2026-11-05-workout-progress.md) under
+D-036. Baseline and fresh design review pass. Core11 tests pass and full Step1
+checks follow. Earlier browser-incident handling retains the user's repeat rule.
+
 Completed: [Task 16 saved routines](2026-11-05-saved-routines.md), approved by the
 user under D-034. Implementation, 494 tests, 17 browser cases, fresh design and
 code reviews, and hosted browser run 8 and native run 15 pass on reviewed source
