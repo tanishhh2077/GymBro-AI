@@ -59,38 +59,41 @@ The chart consumes the selected group's chronological workout records and unit.
 
 - [x] React tests RED through normal entry points, then implement selection/cards/chart/tables/source navigation.
 - [x] Add synthetic real-browser flows, preserving the17 existing cases and guard rules.
-- [ ] Run full tests/lint/build/guarded sync/browser suite, inspect390/1280 UI, commit/push green implementation.
+- [x] Run full tests/lint/build/guarded sync/browser suite, inspect390/1280 UI, commit/push green implementation.
 
 ## Step3 review and integration
 
 - [x] Fresh read-only whole-branch review against design/plan, resolve supported findings test-first.
-- [ ] Read actual hosted browser/native results and record the earlier incident's latest evidence.
+- [x] Read actual hosted browser/native results and record the earlier incident's latest evidence.
 - [ ] Final current docs, reviewed master fast-forward/push, original Task8 preserved-history merge and checks, retain branches and clean temporary worktree.
 
 ## Execution record
 
-Codex implements inline with runtime model identifier unavailable. Existing
-managed-worktree attempts in this conversation reject the stale liftform metadata.
-The established Git sibling fallback creates GymBro AI-task17. Original Task8
-remains at11bb3e3. The user directs further building while their manual rerun is
-pending. Task17 metric definitions, exact grouping and ordinal chart spacing are
-explicit builder choices. Execution evidence follows.
+Codex implements inline. Runtime model identifier is unavailable. Managed
+worktree attempts rejected stale liftform metadata, so the established Git
+sibling fallback created GymBro AI-task17 from master `11bb3e3`. Metric
+definitions, exact grouping and ordinal chart spacing are explicit builder choices.
 
-Baseline passed494tests/26files,lint/build after a482-package locked install,
-with node-v22.23.2 confirmed. Owned loopback4183 returned200. Fresh Goldfish
-review is ready with empty findings. Core tests observed10 failures against the
-empty implementation before the aggregation code. Focused GREEN follows.
+Baseline passed 494 tests in 26 files, lint and build after a 482-package locked
+install. Node 22.23.2 was confirmed. Owned loopback 4183 returned 200. Fresh
+Goldfish review found no significant issues. Core tests observed 10 failures
+against the empty implementation. Step1 then passed all 11 focused cases and
+505 total tests in 27 files, lint and build. It is committed as `b8856df`.
 
-Step1 passes11 focused tests and505total tests/27files,lint/build. Fresh design
-review is ready with empty findings. Core aggregation retains source pairs and
-unit/name groups. Step2 creates the interface and real-browser evidence.
+Step2 observed six React failures for the missing Home entry. All six then passed
+with 13 surrounding App cases. Full checks pass 511 tests in 28 files, lint and
+guarded mobile sync. The build has 424 modules, CSS `index-C75j78x9`, JS
+`index-t36OqT5D` and `web-Da5vG2kf`. All 19 Chromium 156.0.8078.4 cases pass in
+2.9 minutes, including the earlier failing keyboard file-chooser case in 770 ms.
+The earlier hosted cause remains unknown. Four synthetic previews were inspected
+at 390/1280 px, including the zero-load marker, with no horizontal overflow.
+Fresh code review found no significant issues and independently passed 86 tests
+in 7 files. The dated review records its limits.
 
-Step2 observed six React failures for the missing Home entry before implementing
-Progress. All six then passed with13 surrounding App tests. Full511tests/28files,
-lint and guarded mobile sync pass. The build has424 modules, CSSindex-C75j78x9,
-JSindex-t36OqT5D and web-Da5vG2kf. All19 Chromium156.0.8078.4 browser cases pass
-in2.9minutes, including the previously failing keyboard file-chooser case in770ms.
-The earlier hosted failure's cause remains unknown. Four synthetic previews were
-inspected at390/1280px, including the zero-load marker. No horizontal overflow
-was observed. Fresh whole-feature code review found no significant findings and
-independently passed86tests/7files. The dated review records its limits.
+Step2 is committed and pushed as `22d694b`. Hosted browser `42125223775` and native
+`42125223989` pass. Browser logs confirm all 19 cases, including the earlier
+keyboard case in 1.3 seconds. Native logs confirm shared checks, Android and iOS
+compilation, and visible Home/View progress on iPhone17 Pro/iOS26.4 simulator.
+Concurrent master docs commit `b7e4b39` adds the user's
+phone-responsiveness requirement. Step3 preserves that history through a merge
+into the feature, retaining the compact handoff and the added requirement.

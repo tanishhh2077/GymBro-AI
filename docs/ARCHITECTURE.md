@@ -253,7 +253,7 @@ lexical source identity. Duplicate exercise entries share one workout chart poin
 
 Home opens `WorkoutProgress`. Its native SVG shows all completed-workout points,
 evenly spaced in finish order, with exact values and source links in tables.
-Tables initially show20 rows and reset paging on group/revision changes. Current
+Tables initially show 20 rows and reset paging on group/revision changes. Current
 history is the only source, so reload/deletion recomputes results. Derived stats
 add no persisted schema. Root navigation reuses saved-workout detail and retains
 the active-workout-keyed timer.

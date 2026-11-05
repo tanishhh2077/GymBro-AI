@@ -144,5 +144,5 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
 - Task16's current baseline is494tests/26files and17 browser cases. Schema2
   routines/targets preserve strict legacy data and actual logged-set semantics.
 - Task17 adds derived Progress and source-linked records. Its current local
-  checks pass511tests/28files and19 browser cases. Read STATUS for hosted and
+  checks pass 511 tests in 28 files and 19 browser cases. Read STATUS for hosted and
   physical-device evidence.

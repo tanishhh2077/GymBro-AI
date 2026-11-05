@@ -60,6 +60,32 @@ action. Its fix remains conditional on an observed repeat.
   only the user's smooth/responsive phone requirement to HANDOFF. The new compact
   handoff carries that requirement. Preserve this history during integration.
 
+### Task17 hosted checks and integration
+
+- Reviewed source `22d694b` passes
+  [browser run 42125223775](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42125223775).
+  Logs confirm 511 tests in 28 files, lint/build and all 19 real Chromium cases
+  in 5.9 minutes. Browser 156.0.8078.4, GPU, 120 synthetic no-person samples.
+  The two new Progress cases and earlier keyboard admission case all pass.
+- [Native run 42125223989](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42125223989)
+  passes all three jobs. Shared checks confirm 511 tests and guarded sync.
+  Android compiles successfully and the APK retains all 11 shared web files
+  byte-for-byte. iOS compiles successfully and the iPhone17 Pro/iOS26.4 simulator
+  startup screen-text check detects the actual Home and View progress interface.
+- Native artifacts remain in the workflow. No package was downloaded or installed
+  on a physical phone. The coordinator inspected logs, with synthetic browser
+  previews providing separate visual evidence.
+- The earlier master incident remains historical with unknown cause. Its case
+  passes in this hosted run in 1.3 seconds. No repeat-triggered fix is needed.
+- Concurrent master commit `b7e4b39` changes only HANDOFF. Its responsiveness
+  requirement is preserved while resolving the compact-handoff merge conflict.
+  Runtime source remains identical to reviewed/hosted `22d694b`.
+- The owned port4183 listener was stopped after checking PID/full command line.
+  Unrelated port5173 listeners remain. Synthetic previews/script were copied to
+  the original checkout and matching SHA-256 checked. A local-link check found
+  all 146 relative targets present across 22 changed Markdown files.
+- Master/original-checkout integration and final cleanup follow this record.
+
 ### Previous integrated state
 
 Task 16 (saved routines, D-034) is **complete and integrated**. Its reviewed

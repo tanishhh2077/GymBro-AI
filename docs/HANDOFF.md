@@ -14,17 +14,20 @@ No routine understanding checkpoint is pending.
   base `11bb3e3`. Original checkout `GymBro AI` is on
   `feat/task8-safari-phone-test`. It and master now include concurrent docs commit
   `b7e4b39`, which records the user's phone responsiveness requirement.
-- Step1 is committed and pushed as `b8856df`. The Progress interface, browser
-  cases and current documents form Step2, awaiting its green commit/push.
+- Step1 is committed and pushed as `b8856df`. Step2 is committed and pushed as
+  `22d694b`. Its hosted browser and native workflows pass.
 - Fresh design and whole-feature code reviews found no significant issues.
   The code reviewer independently passed 86 tests in 7 files. Read the dated
   workout-progress design, plan and review records in `docs/superpowers/`.
 - Latest local checks pass 511 tests in 28 files, lint, build, guarded mobile sync
   and all 19 Chromium browser cases. Synthetic previews were inspected at 390
   and 1280 px with no horizontal overflow, including a visible zero-load marker.
-- Next inspect the actual hosted browser/native results, update these records,
-  then fast-forward master and the original Task8 checkout while preserving all
-  branches. Check for concurrent user/Claude work before merging.
+- Hosted browser run 42125223775 passes all 19 cases. Native run 42125223989
+  passes shared checks, Android compilation and visible iOS simulator startup.
+  The iPhone17 Pro/iOS26.4 screen-text check detected Home and View progress.
+- Next fast-forward master and the original Task8 checkout, repeat original
+  checkout checks and remove the clean temporary worktree. Preserve all branches
+  and check for concurrent user/Claude work before integration.
 
 Task16 routines are already reviewed and integrated. Its source is `4c1b519`.
 Claude Code completed its integration, preserved Task8's history and handed over
@@ -63,7 +66,8 @@ file-chooser event timed out. The other 16 cases passed. Cause remains unknown.
 The user said they would start a rerun. The latest API check still shows attempt 1
 and no new master run. Apply a test-first fix only after an observed repeat,
 including an assertion that the button retains focus. Task17's local full run
-passed this case in 770 ms. That result does not establish the earlier cause.
+passed this case in 770 ms, and hosted run 42125223775 passed it in 1.3 seconds.
+The earlier cause remains unknown. The new source has passing browser evidence.
 
 ## Phone and private-video work
 
@@ -102,9 +106,9 @@ brief reason. It does not block currently authorized Task17 work.
 - GitHub default is master, changed by the user. Every older feature branch
   except Task4 is already inside master. Preserve all branches and Task4's
   incomplete history. No attribution trailers, force pushes or settings changes.
-- Current owned loopback preview is 127.0.0.1 port 4183 in Task17. Verify listener
-  identity before stopping it. Leave the unrelated `[::1]:5173` server alone.
+- The Task17 loopback preview on 127.0.0.1 port 4183 was stopped after verifying
+  its PID and full command line. The unrelated `[::1]:5173` server remains.
   The old 5193 server is absent.
-- Task17's synthetic previews/script are ignored under `build/visual-review/task17`.
-  Preserve them in the original checkout before removing the clean worktree.
+- Task17's synthetic previews/script are ignored under `build/visual-review/task17`
+  and copied to the original checkout, with matching preview SHA-256 verified.
   Previous task previews remain there. Browser-test captures/uploads stay off.
