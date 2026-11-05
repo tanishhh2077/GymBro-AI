@@ -1,6 +1,11 @@
 # Implementation plans
 
-Current: [Task14 local workout logging](2026-11-04-workout-logging.md), D-030.
+Completed: [Task15 manual rest timer](2026-11-04-rest-timer.md), D-033.458tests,
+14local/hosted browser cases,guarded sync,fresh review and native13 compile/visible
+simulator startup pass; reviewed source9eef2fb pushed to master. Q8/Q9 decisions
+are recorded; Q10 waits until Q&A resumes. Phone/bench acceptance stays separate.
+
+Completed: [Task14 local workout logging](2026-11-04-workout-logging.md), D-030.
 Implementation/local checks/review fix and final hosted browser/native checks
 pass. Codex resumed after the cancelled Claude handoff; final integration follows
 D-018. Read current HANDOFF for Q&A and remaining phone/bench acceptance.

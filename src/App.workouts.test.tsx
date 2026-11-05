@@ -18,7 +18,7 @@ beforeEach(() => {
   repository = createWorkoutRepository(new IDBFactory()); store = createWorkoutStore(repository);
   container = document.createElement('div'); document.body.append(container); root = createRoot(container);
 });
-afterEach(async () => { await act(async () => root.unmount()); document.body.replaceChildren(); vi.restoreAllMocks(); });
+afterEach(async () => { await act(async () => root.unmount()); document.body.replaceChildren(); vi.useRealTimers(); vi.restoreAllMocks(); });
 function idle() {
   if (!store.getState().busy) return Promise.resolve();
   return new Promise<void>(resolve => { const off = store.subscribe(s => { if (!s.busy) { off(); resolve(); } }); });
@@ -82,4 +82,28 @@ it('keeps analysis usable when saved workout data cannot be opened', async () =>
   await click('Analyze video');
   expect(container.querySelector('input[type=file]')).not.toBeNull();
   expect(container.textContent).toContain('could not be opened');
+});
+
+it('keeps the active workout timer through Home and Analyze navigation', async () => {
+  await render(); expect(container.querySelector('output[aria-label="Rest time remaining"]')).toBeNull();
+  await click('Start workout'); await fill('Workout name', 'Timer workout'); await submit('Start a workout');
+  vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+  await click('Start rest timer');
+  await act(async () => vi.advanceTimersByTime(5_000));
+  await click('Home'); expect(container.querySelector('output')?.textContent).toBe('1:25');
+  await click('Analyze'); expect(container.querySelector('output')?.textContent).toBe('1:25');
+  await click('Workout'); expect(container.querySelector('output')?.textContent).toBe('1:25');
+});
+it('removes the timer only after finish saves, then gives a new workout a fresh timer', async () => {
+  await draft(); await fill('Reps', '5'); await fill('Weight (kg)', '20'); await submit('Log a set for Bench press');
+  await click('Start rest timer');
+  vi.spyOn(repository, 'save').mockRejectedValueOnce(new WorkoutError('storage', 'Reload required'));
+  await click('Finish workout');
+  expect(container.querySelector('output[aria-label="Rest time remaining"]')).not.toBeNull();
+  await click('Reload saved workouts'); await click('Finish workout');
+  expect(container.querySelector('output[aria-label="Rest time remaining"]')).toBeNull();
+  await click('Start workout'); await fill('Workout name', 'Fresh workout'); await submit('Start a workout');
+  expect(container.querySelector('output')?.textContent).toBe('1:30'); expect(button('Start rest timer')).toBeTruthy();
+  vi.spyOn(window, 'confirm').mockReturnValue(true); await click('Discard workout');
+  expect(container.querySelector('output[aria-label="Rest time remaining"]')).toBeNull();
 });

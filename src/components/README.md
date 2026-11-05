@@ -8,6 +8,13 @@ units and confirmations; `WorkoutHistory.tsx` reopens/deletes finished records.
 The repository commit completes before saved rows/notifications appear. Root
 storage errors/reload remain visible even when standalone analysis is open.
 
+`WorkoutRestTimer.tsx` (Task15/D-033) mounts once per active workout ID in root
+App, so screen navigation retains it and successful finish/discard removes it.
+Manual presets/start/pause/resume/reset use a Date.now deadline, not callback
+counts. Interval/focus/visibility handlers clean up on pause/expiry/unmount.
+Session-only: reload/restart resets the timer; completion appears in-app without
+a background notification. No saved-workout schema, media or native API changes.
+
 - `ClipDropzone.tsx`: local file selection and drop area. It applies
   `validateSelection`, hands one file to `onSelect`, shows rejections in a named
   alert, blocks every input path while `disabled` (showing `disabledMessage`), and

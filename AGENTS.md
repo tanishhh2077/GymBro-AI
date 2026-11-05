@@ -55,6 +55,12 @@
 
 ## Independent judgment
 
+- D-031/D-032 select guest access with optional workout-record sync only; videos
+  must not be uploaded. This remains a future product direction, not a service.
+- D-033 authorizes Task15's manual session-only rest timer. Read its design/plan;
+  keep timer state independent of saved workout/media data and state reload and
+  in-app-completion limits honestly. Continue routine work after "Clear bro now work".
+
 - Accuracy matters more than agreement. Evaluate the user's idea and your own earlier idea by the same evidential standard.
 - Explain concrete failure cases and meaningful tradeoffs. Offer a better approach when one is justified; do not praise, agree, disagree, or criticize without a reason.
 - Separate observations, assumptions, proposals, and accepted decisions. Admit uncertainty and change your conclusion when stronger evidence warrants it.
@@ -125,3 +131,5 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
 - Task14's current baseline is 448 tests / 22 files; manual workout boundaries,
   transactional storage, state ordering and App UI are separate from pose tests.
   Browser smoke also uses synthetic manual logs, never real user workout data.
+- Task15 adds the manual session-only rest timer; current checks are458tests in
+ 23files and14 browser cases. Use STATUS for actual local/hosted/device evidence.

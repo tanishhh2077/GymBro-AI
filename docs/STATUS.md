@@ -1,6 +1,6 @@
 # Current project status
 
-Updated: 2026-11-04 (America/Chicago).
+Updated: 2026-11-05 (America/Chicago).
 
 For a new session in either Claude Code or Codex, start with [HANDOFF.md](HANDOFF.md).
 This file retains detailed evidence/history; the compact handoff avoids loading
@@ -9,6 +9,90 @@ usage, and these documents are the only handoff; see D-016 in
 [accepted decisions](DECISIONS.md).
 
 ## Current stage
+
+Task15 is complete: reviewed source `9eef2fb` has been fast-forwarded/pushed to
+master after all local/hosted gates passed. It started from reviewed `b09f79a` in
+isolated `GymBro AI-task15`, branch `feat/task15-rest-timer`.
+User answered Q9 A (workout-record sync only, no videos),
+then said "Clear bro now work"; D-032/D-033 and PRODUCT_DIRECTION preserve this.
+Builder selects the already requested manual rest timer as the next bounded
+tracking task. Q&A resumes at Q10 later; no routine confirmation stop.
+
+- Original Task8 checkout is clean at `52789b0`; no phone code was brought across.
+  Cherry-picking Q8 notes encountered only documentation conflicts; it was aborted
+  without keeping partial changes. The four current documentation files were
+  copied instead, preserving decisions/history and updating this branch's handoff.
+- Managed worktree creation already failed repeatedly in this session because
+  chat metadata points to the old `liftform` path. Normal Git sibling fallback
+  follows the existing worktree convention; no unrelated checkout/server changed.
+- Clean process-local Node22.23.2 install:482 packages,448 tests/22files, lint/build
+  pass. Vite4183 binds loopback only and responds200. No feature code written
+  before that baseline. Plan self-review maps all review-focus cases to tests.
+
+### Task15 implementation and fresh review
+
+- Eight component and two App integration cases RED against no-op/missing timer;
+  GREEN after the focused component/root placement,15/15 focused cases including
+  the five prior App cases. Deadline rather than callback counts, fresh
+  millisecond pause/resume, delayed visibility catch-up, expiry, reset, clock
+  display cap, StrictMode cleanup, navigation and failed/successful saves covered.
+- **458 tests / 23 files**, lint/build and guarded mobile sync/verify pass.
+ 419modules; CSS `index-BO4hmBeR.css`, JS `index-CGvMbNrr.js`,11 verified shared
+ files per platform. No dependency/storage-schema/native plugin changes.
+- New real Chromium timer case passes (1.1seconds): synthetic workout only,
+ controlled clock, navigation, pause/resume/deadline, completion/reload and390px.
+ The full14-case regression run also passes (2.8minutes); existing13 cases retained.
+ No-person runtime:Chromium156.0.8078.4/GPU delegate label/120samples. Harness
+ captures/uploads remain off. No physical GPU benchmark or positive-bench claim.
+- Separate local visual check uses synthetic UI only, not the acceptance harness:
+ screenshots at390/1280 inspected, no overflow; ignored build/visual-review/task15.
+ Chromium156.0.8078.4. No person/media/pose data or upload. Preview contexts closed;
+ owned loopback dev4183 remains for this work chunk (PID32624 at health check).
+- Fresh read-only Codex reviewer requested on gpt-6-astra, no inherited conversation;
+ actual runtime model ID not exposed. **No significant findings**; independently
+ 15focused tests/2files and diff check pass. Production unchanged after review.
+ See `2026-11-05-rest-timer-code-review.md` for limits/dispositions. No physical-
+ iPhone, background-alert or real-bench acceptance claim.
+
+### Original Task8 checkout integration of Task15
+
+- Original checkout clean at `52789b0`; merge master `7d97ac6` preserving both
+  histories, without merging Task4. Four conflicts are documentation only
+  (DECISIONS/HANDOFF/PRODUCT_DIRECTION/STATUS). Final feature records include the
+  original Task8/Q8 history, so explicit copies resolve them without source edits.
+- Non-Markdown files equal reviewed master exactly. Merged **458tests/23files**,
+  lint/build and guarded mobile sync/verify pass;419modules,11files per platform
+  with the exact reviewed bundle hashes. No production edits during resolution.
+- Temporary Task15 worktree's exact resolved sibling path and clean state were
+  verified before normal Git removal; all branches retained. Original checkout
+  is the only worktree. Both synthetic timer previews are retained in its ignored
+  build/visual-review/task15, with no private media/logs transferred or uploaded.
+- Task15 source9eef2fb/master final record7d97ac6 are complete. This preserved-
+  history Task8 merge carries Q8/Q9 and the timer into the user's usual checkout;
+  Task8/Task4 and physical-phone/bench acceptance remain open.
+
+### Task15 final hosted run details
+
+- Source `9eef2fbfd9aedada0478fbcc07d44c5609dfcc8d`, [browser run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41977815775):
+  success,458 tests/23files,lint/build,14 browser cases in3.4minutes.
+  Chromium156.0.8078.4/GPU delegate label/120no-person samples, not a benchmark.
+- [Native run13](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41977815811), same source:
+  success for shared/Android/iOS compile and visible simulator Home startup;
+  iPhone17Pro/iOS26.4,11 bundled shared files byte-identical. Startup took longer
+  than the other gates but passed without source/workflow changes. No live logs
+  were available before completion (404); that was not a failed build. Packages
+  were not downloaded; empty-shell startup is not native timer/video acceptance.
+- Fresh final local458tests/23files,lint/build pass, same419modules/bundle hashes.
+  No production edits after review. Master fast-forwarded/pushed to `9eef2fb`;
+  this completion record is documentation-only and follows onto master.
+- Owned Vite4183 listener PID/command line was verified before stopping only that
+  helper. Synthetic timer previews copied to original ignored build/visual-review/
+  task15. Next bring final master into original Task8 checkout, verify source
+  parity and merged checks, retain branches and remove the clean temporary tree.
+- Accounts/sync are planned, not implemented. Q10 waits until Q&A resumes; user
+  hotspot/video/device gates stay pending without another availability request.
+
+### Previous accepted state (Task14/Q8)
 
 Task 14 is complete and pushed to master `b09f79a`: manual local workout logging,
 Home and history alongside existing bench analysis. Task 8 is incorporating it

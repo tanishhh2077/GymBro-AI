@@ -208,6 +208,18 @@ Record the tested device, OS, runtime, model, delegate, clip characteristics, pr
 
 Python/NumPy may support evaluation or a later analysis implementation. FastAPI and PostgreSQL remain possible later services for demonstrated needs such as saved sessions. Saving measurements and retaining/uploading raw videos are separate privacy decisions. Do not introduce accounts, object storage, queues, or distributed infrastructure into milestone one.
 
+## Manual rest timer (Task15)
+
+`WorkoutRestTimer` is mounted by root App for the active workout, keyed by its
+ID and outside conditional screens. Its local React state stores an idle phase,
+a running Date.now finish time or paused milliseconds. Display updates use the
+clock rather than counting callbacks; focus/visibility events catch up delayed
+updates. Effects release intervals/listeners on pause/expiry/unmount. Completing
+or discarding the workout after a successful save unmounts it; failed saves keep
+the same timer. No persisted record/schema, media store or native plugin changes.
+Reload/restart resets this session-only timer; completion is in-app, not an OS
+notification. Default/presets are builder choices, not rest recommendations.
+
 ## Runtime reference sources
 
 These sources establish available platform capabilities, not GymBro AI's measured performance or approval for distribution:

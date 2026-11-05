@@ -9,6 +9,7 @@ import { AnalysisWorkspace } from '@/components/AnalysisWorkspace';
 import { WorkoutHome } from '@/components/WorkoutHome';
 import { WorkoutEditor } from '@/components/WorkoutEditor';
 import { WorkoutHistory } from '@/components/WorkoutHistory';
+import { WorkoutRestTimer } from '@/components/WorkoutRestTimer';
 import { ShieldIcon } from '@/components/icons';
 
 type View = 'home' | 'workout' | 'analysis' | 'history';
@@ -43,6 +44,7 @@ export default function App({ workouts = workoutStore }: { workouts?: WorkoutSto
         <p>{state.error}</p>{state.needsReload && <button type="button" disabled={state.busy} className="mt-3 underline underline-offset-4" onClick={() => { void state.load(); }}>Reload saved workouts</button>}
       </div>}
       <div role="status" aria-live="polite" className={notice ? 'mb-4 text-sm text-accent' : undefined}>{notice}</div>
+      {state.data.active && <WorkoutRestTimer key={state.data.active.id} />}
       {view === 'home' && <WorkoutHome data={state.data} available={available} busy={state.busy}
         onWorkout={() => navigate('workout')} onAnalyze={() => navigate('analysis')}
         onHistory={id => { setSelected(id); navigate('history'); }} />}

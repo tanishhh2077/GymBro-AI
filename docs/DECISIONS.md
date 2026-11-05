@@ -443,6 +443,30 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   is authorized by this answer. Existing media/privacy boundaries remain.
   Continue the product Q&A at Q9 before selecting a bounded implementation.
 
+### D-032: Sync workout records without uploading videos
+
+- User answered Q9 "A" (workout records only, no video uploads), then confirmed
+  "Clear bro now work" after the explanation. Future optional account backup/sync
+  from D-031 must exclude video files. Local video handling/retention and any
+  future sync of derived analysis require separate definitions, not an inference
+  from "workout records". Accounts/sync are still unimplemented.
+
+### D-033: Continue tracking development with a manual rest timer
+
+- After Q9 the user said "Clear bro now work". Together with Q5's accepted timer
+  wishlist and prior build authorization, this directs continued development;
+  resume questions at Q10 later, without routine understanding stops.
+- Builder selects Task15: a manual rest timer tied to the active workout, with
+  start/pause/resume/reset and preset durations. It survives screen navigation,
+  resets on reload/restart and when its workout finishes/discards, and displays
+  completion in-app. This limitation is explicit, not a native alarm guarantee.
+- Default90 seconds and presets30/60/90/120/180/300 are builder choices, not rest
+  recommendations. No persistence schema, external service, automatic set trigger,
+  sound, notification permission, phone/settings action or AI behavior changes.
+- See the [design](superpowers/specs/2026-11-04-rest-timer-design.md) and
+  [plan](superpowers/plans/2026-11-04-rest-timer.md). Phone/bench acceptance remains
+  open; Task8 and Task4 stay separate and unmerged.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

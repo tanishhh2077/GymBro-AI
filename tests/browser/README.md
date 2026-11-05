@@ -24,6 +24,11 @@ history/deletion, actual two-tab conflicts and long names at 390px. Analysis
 cases enter from Home; no-person cases also navigate away/back without losing
 the clip/job. These are isolated temporary browser contexts, never real user logs.
 
+Task15 adds a controlled-clock synthetic-workout timer flow: manual duration,
+pause/resume, deadline catch-up, navigation survival, visible completion, reload
+reset and narrow layout. The full suite now has14 cases. It uses no native clock
+or background-notification simulation and makes no physical-device timing claim.
+
 Screenshots, videos, traces and automatic page/ARIA snapshots are off. On failure
 Playwright can still create temporary error/source diagnostics; test output is
 removed afterward, while last-run metadata may remain. CI uploads no browser

@@ -21,3 +21,6 @@ Inherit [source guidance](../AGENTS.md). Follow the
 - D-030 adds Home and manual workout logging/history. Logging names are separate
   from the bench-only analysis scope. Keep storage failure, unsaved inputs, units,
   confirmation for destructive workout actions, and actual saved status clear.
+- D-033 adds an active-workout-ID-keyed, root-mounted manual rest timer. Retain
+  time across navigation, use clock deadlines, release handlers and state the
+  reload/in-app-completion limits. Do not imply background notifications.
