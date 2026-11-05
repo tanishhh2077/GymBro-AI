@@ -41,14 +41,14 @@
 **Modify:** `src/App.tsx`, `src/App.workouts.test.tsx`, `tests/browser/workouts.spec.ts`, relevant README/AGENTS and workflow feature-branch triggers.
 **Interface:** export `WorkoutRestTimer(): JSX.Element`; App renders it only for `state.data.active`, key that workout's ID. Component owns timer state/cleanup, not workout writes.
 
-- [ ] Write focused component and App tests, observe failures for the missing behavior.
-- [ ] Implement component and root placement; verify focused tests and all existing448 cases.
-- [ ] Add real Chromium synthetic flow using its clock; run14-case full browser suite and inspect390px layout.
-- [ ] Full tests/lint/build, guarded mobile sync/verify; update docs, commit/push green implementation.
+- [x] Write focused component and App tests, observe failures for the missing behavior.
+- [x] Implement component and root placement; verify focused tests and all existing448 cases.
+- [x] Add real Chromium synthetic flow using its clock; run14-case full browser suite and inspect390px layout.
+- [x] Full tests/lint/build, guarded mobile sync/verify; update docs, commit/push green implementation.
 
 ## Step3: fresh review and integration
 
-- [ ] Fresh reviewer reads branch/spec/plan and surrounding code, read-only, no inherited conversation. Fix supported defects with reproducing RED/GREEN tests.
+- [x] Fresh reviewer reads branch/spec/plan and surrounding code, read-only, no inherited conversation. No significant finding; no fix required.
 - [ ] Read actual hosted browser/native checks separately from local evidence. Do not claim physical-phone/bench validation.
 - [ ] Update all changed facts; reviewed fast-forward/push master and preserve Task8 history when bringing it into original checkout. Retain branches.
 
@@ -58,3 +58,5 @@
 - Plan self-review: component owns only time state; App owns workout identity; existing saved-record contract stays unchanged. Tests cover each listed Review Focus; no material unresolved decision.
 - Q8 documentation cherry-pick hit three Markdown conflicts and was aborted; carried only current documentation via explicit copies, without phone branch code.
 - Ruling: first timer is session-only, not another storage schema — keeps the bounded feature independent of saved workout recovery/sync; users must restart it after reload, stated in UI.
+- Step2:8 component and2 new App cases RED for missing behavior -> GREEN (15 focused);458 total tests/23files,lint/build,guarded sync pass. New browser timer case passes; full14-case run/review pending. Synthetic local visuals inspected390/1280 with no overflow. No production change after these checks.
+- Final Step2 evidence:14/14 actual Chromium cases pass in2.8minutes (156.0.8078.4/GPU delegate label/120no-person samples). Fresh Codex reviewer, requested gpt-6-astra, exact runtimeID unavailable:15focused tests pass and no significant finding. Limits/dispositions are in the dated review. Hosted checks/master integration pending.

@@ -1,5 +1,38 @@
 import { test, expect } from './app';
 
+test('manual rest timer survives navigation, catches up and resets on reload', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const epoch = Date.UTC(2026, 10, 4, 18);
+  await page.clock.install({ time: epoch });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await page.getByLabel('Workout name', { exact: true }).fill('Synthetic timer workout');
+  await page.getByRole('button', { name: 'Start workout', exact: true }).click();
+  const time = page.getByLabel('Rest time remaining', { exact: true });
+  await expect(time).toHaveText('1:30');
+  await page.clock.pauseAt(epoch + 60_000);
+  await page.getByLabel('Rest duration', { exact: true }).selectOption('30');
+  await page.getByRole('button', { name: 'Start rest timer', exact: true }).click();
+  await page.clock.fastForward(5_000);
+  await expect(time).toHaveText('0:25');
+  await page.getByRole('button', { name: 'Home', exact: true }).click();
+  await page.getByRole('button', { name: 'Analyze', exact: true }).click();
+  await expect(time).toHaveText('0:25');
+  await page.getByRole('button', { name: 'Pause timer', exact: true }).click();
+  await page.clock.fastForward(60_000); await expect(time).toHaveText('0:25');
+  await page.getByRole('button', { name: 'Resume timer', exact: true }).click();
+  await page.clock.fastForward(25_000); await expect(time).toHaveText('0:00');
+  await expect(page.getByRole('status').filter({ hasText: 'Rest complete.' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('button', { name: 'Start rest timer', exact: true }).click();
+  await page.reload(); await expect(time).toHaveText('1:30');
+  await page.getByRole('button', { name: 'Resume workout', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Synthetic timer workout', exact: true })).toBeVisible();
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: 'Discard workout', exact: true }).click();
+  await expect(time).toHaveCount(0);
+});
+
 test('saves, edits, resumes and reopens a local workout with its original units', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');

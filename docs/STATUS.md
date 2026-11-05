@@ -1,6 +1,6 @@
 # Current project status
 
-Updated: 2026-11-04 (America/Chicago).
+Updated: 2026-11-05 (America/Chicago).
 
 For a new session in either Claude Code or Codex, start with [HANDOFF.md](HANDOFF.md).
 This file retains detailed evidence/history; the compact handoff avoids loading
@@ -26,6 +26,31 @@ tracking task. Q&A resumes at Q10 later; no routine confirmation stop.
 - Clean process-local Node22.23.2 install:482 packages,448 tests/22files, lint/build
   pass. Vite4183 binds loopback only and responds200. No feature code written
   before that baseline. Plan self-review maps all review-focus cases to tests.
+
+### Task15 implementation and fresh review
+
+- Eight component and two App integration cases RED against no-op/missing timer;
+  GREEN after the focused component/root placement,15/15 focused cases including
+  the five prior App cases. Deadline rather than callback counts, fresh
+  millisecond pause/resume, delayed visibility catch-up, expiry, reset, clock
+  display cap, StrictMode cleanup, navigation and failed/successful saves covered.
+- **458 tests / 23 files**, lint/build and guarded mobile sync/verify pass.
+ 419modules; CSS `index-BO4hmBeR.css`, JS `index-CGvMbNrr.js`,11 verified shared
+ files per platform. No dependency/storage-schema/native plugin changes.
+- New real Chromium timer case passes (1.1seconds): synthetic workout only,
+ controlled clock, navigation, pause/resume/deadline, completion/reload and390px.
+ The full14-case regression run also passes (2.8minutes); existing13 cases retained.
+ No-person runtime:Chromium156.0.8078.4/GPU delegate label/120samples. Harness
+ captures/uploads remain off. No physical GPU benchmark or positive-bench claim.
+- Separate local visual check uses synthetic UI only, not the acceptance harness:
+ screenshots at390/1280 inspected, no overflow; ignored build/visual-review/task15.
+ Chromium156.0.8078.4. No person/media/pose data or upload. Preview contexts closed;
+ owned loopback dev4183 remains for this work chunk (PID32624 at health check).
+- Fresh read-only Codex reviewer requested on gpt-6-astra, no inherited conversation;
+ actual runtime model ID not exposed. **No significant findings**; independently
+ 15focused tests/2files and diff check pass. Production unchanged after review.
+ See `2026-11-05-rest-timer-code-review.md` for limits/dispositions. Hosted results
+ pending; no physical-iPhone, background-alert or real-bench acceptance claim.
 
 ### Previous accepted state (Task14/Q8)
 

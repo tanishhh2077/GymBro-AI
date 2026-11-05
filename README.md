@@ -10,8 +10,12 @@ side-view barbell bench-press video** for analysis.
 The workout log supports per-workout lb/kg, manual exercises/sets/reps/weights,
 editing, reload/resume, finished history and explicit deletion. Records stay in
 local IndexedDB; clearing app/browser data removes them. There is no cloud backup
-or account sync. Routines, timers, personal bests/charts, set-linked analysis and
-live analysis remain future work. Accepted Q&A is in [PRODUCT_DIRECTION](docs/PRODUCT_DIRECTION.md).
+or account sync. An active workout also has a manual rest timer with duration
+choices, pause/resume/reset and in-app completion. It stays across screen changes
+but resets on reload/restart; no background alert. Routines, personal bests/charts,
+set-linked analysis and live analysis remain future work. Accepted Q&A selects
+guest access with optional workout-record sync only, excluding videos; those
+services are not built. See [PRODUCT_DIRECTION](docs/PRODUCT_DIRECTION.md).
 
 The existing browser prototype contains local video selection, MediaPipe pose
 estimation, and a skeleton overlay with playback controls. Repetition detection,
