@@ -19,6 +19,12 @@ transfer:
 - Open item 2: the phone session, with the user present. Open item 3: the Q&A at
   Q10 or a newly approved feature. No implementation task is approved now.
 - Use process-local Node 22.23.2 and confirm `node -v` before checks.
+- New direction, not built: [D-035](DECISIONS.md#d-035-bench-analysis-should-work-from-any-camera-view-direction-not-built).
+  The user wants bench analysis from any view (top, side, diagonal), judged in
+  that view's frame, with mistakes pointed out; videos stay at most one minute.
+  It needs its own design and per-view validation before any code. The user now
+  has bench videos; they live in a private folder **outside** this repository
+  and are never committed or uploaded.
 
 ## Current task and next action
 

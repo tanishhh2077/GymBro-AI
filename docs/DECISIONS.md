@@ -488,6 +488,28 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   implementation without routine understanding stops. Real device/media/account
   settings remain coordinated; Task8/Task4 and physical-bench acceptance stay open.
 
+### D-035: Bench analysis should work from any camera view (direction, not built)
+
+- On 2026-11-05 the user said the bench analysis must not be limited to a side
+  view: a top view, side view, diagonal top view or other angle may be given, and
+  the model should judge the lift in that view's own frame of reference and point
+  out what is being done wrong. The user agreed that a video stays at most one
+  minute long (the existing 60-second limit).
+- This changes the direction set by D-001/D-014 (one standardized side view). It
+  is accepted as the product goal, but nothing is implemented: the current app,
+  its guidance and the phone test plan still describe the side view until a
+  separately approved design changes them.
+- Constraints that still apply (D-002): a form finding must name the view it came
+  from, its supporting measurements, timestamps and uncertainty, and the app must
+  abstain when the view is unclear or a measurement cannot be seen from it. The
+  pose model gives 2D image positions; what each view can and cannot show (a top
+  view hides elbow and bar heights, for example) must be defined and validated
+  with permitted footage per view before any finding is shown. No unvalidated
+  coach-grade, medical or perfect-form claim.
+- The user's own videos stay outside the repository folder (not merely
+  git-ignored), because the development server can serve any file under the
+  project folder, and during a phone test that server listens on the network.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
