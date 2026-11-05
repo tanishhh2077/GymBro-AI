@@ -10,12 +10,41 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 14 is in progress: local manual workout logging/Home under D-030, from
+Task 14 passes acceptance and review: local manual workout logging/Home under D-030, from
 reviewed master `a524387`, with user authorization after Q1-Q7. Q&A resumes at
 Q8 in about an hour via a one-time scheduled thread follow-up. No live analysis,
 cloud/account or media persistence. Read PRODUCT_DIRECTION and the separate plan.
 
-### Provider transfer to Claude Code
+### Codex resumption after cancelled provider transfer
+
+- User cancelled the Claude handoff and requested continued Codex work. Checkout
+  was clean at `6fbd348` on `feat/task14-workout-logging`; no intervening source
+  changes. Codex Q&A automation restored for the original23:28 Chicago time.
+- Final-source browser run4 (`41972437861`, `efa0c04`) passed. Native run11
+  (`41972437881`) has shared/Android checks passed and iOS compile passed, with
+  simulator startup still running. Do not mark Task14 complete or advance master
+  before that final native gate resolves.
+
+### Task 14 final-source acceptance
+
+- [Browser run4](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437861)
+  on `efa0c04` passed 448 tests/lint/build and all13 browser cases in3.3minutes.
+  Chromium156.0.8078.4, GPU delegate label,120 no-person samples; no hardware or
+  physical-phone performance claim.
+- [Native run11](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437881)
+  passed shared checks, Android debug compile and iOS compile/visible simulator
+  startup. This validates the new empty Home shell, not native workout/video
+  behavior on physical devices. Packages not downloaded.
+- Additional actual production-bundle check: own loopback preview4182, Chromium
+  156.0.8078.4, fresh context with synthetic log only. After initial load, disable
+  networking, start/log a workout, reconnect/reload/resume/finish; stored values
+  and kg remain. No external/mutation requests or uncaught page errors. No offline
+  cold-start or video-inference claim. Owned preview/browser closed afterward.
+- All review findings resolved; final record/master integration follow D-018.
+  At the latest listener check only unrelated5173 remained; the previously observed
+  original5193 listener was absent. No action targeted that original process.
+
+### Cancelled handoff record (historical)
 
 - User explicitly requested handoff after hitting the Codex subscription limit.
   Codex stops feature work; continue the clean `GymBro AI-task14` worktree on

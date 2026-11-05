@@ -22,6 +22,9 @@ Resume at Q8, one MCQ at a time. More design/product choices remain open.
 At the user's subsequent Codex-limit handoff to Claude, this automation was
 paused so it consumes no further Codex usage. Claude resumes questions when the
 user is available; no automatic Claude reminder has been created.
+The user then cancelled that handoff ("False alarm, continue working where you
+left off"). Codex resumed the unchanged task and restored the original one-time
+Q&A follow-up; the seven accepted answers and remaining scope are unchanged.
 
 ## Bounded next implementation
 

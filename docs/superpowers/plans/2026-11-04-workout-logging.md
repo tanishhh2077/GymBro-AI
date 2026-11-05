@@ -50,9 +50,9 @@
 
 - [x] Write failing UI/flow tests for Home actions, storage errors, valid/invalid sets and preservation on save failure, resume/finish/history and destructive confirmation.
 - [x] Implement Home/log/history and extract analysis view; maintain root native lifecycle and media ownership. Add no unimplemented controls or fake data.
-- [ ] Add/execute actual Chromium logging/reload/edit/history, simultaneous-tab conflicts and navigation through no-person processing. Existing ten cases still run.
-- [ ] Full tests/lint/build and guarded mobile sync/verify, local actionlint, visual inspection at desktop/390 width, commit/push to hosted workflows.
-- [ ] Read actual hosted results, obtain fresh critical whole-branch review, fix supported defects with reproducing tests, update all current docs and integrate reviewed master per D-018.
+- [x] Add/execute actual Chromium logging/reload/edit/history, simultaneous-tab conflicts and navigation through no-person processing. Existing ten cases still run.
+- [x] Full tests/lint/build and guarded mobile sync/verify, local actionlint, visual inspection at desktop/390 width, commit/push to hosted workflows.
+- [x] Read actual hosted results, obtain fresh critical whole-branch review, fix supported defects with reproducing tests, update all current docs and integrate reviewed master per D-018.
 
 ## Execution record
 
@@ -64,3 +64,5 @@
 - Builder ruling: random IDs use crypto.getRandomValues instead of randomUUID so trusted HTTP LAN phone testing works; both are opaque identifiers, not user-facing choices. Storage errors require reload because a timeout cannot guarantee a write never committed.
 - Step3 UI: five App-flow tests RED -> GREEN; original native lifecycle tests remain green. Narrow/long-name browser test caught and fixed editor/Home overflow. Three logging browser cases pass; initial full run passed all ten video cases but exposed that layout issue, now fixed. Final full rerun is ongoing. 447 tests/lint/guarded sync pass, 418 modules/11 files per platform; actionlint accepts feature-triggered workflows.
 - Full rerun passed13/13 (3.5 minutes). Fresh critical review ran58 focused tests, found one Medium revision/size rollover defect. Exact-limit regression RED -> final-snapshot validation -> GREEN;448 total tests/lint/guarded sync pass. No unresolved code finding. Hosted final-source results remain required before master integration.
+- Temporary provider transfer recorded in `6fbd348` was cancelled by the user; Codex resumed unchanged source. Final browser run4 passed on `efa0c04`; native run11 awaits iOS simulator startup after shared/Android/compile success. One-time Q&A restored to original time.
+- Final native run11 also passed iOS visible startup. Browser run4:448 shared tests and13 browser cases (3.3minutes). Additional production preview confirmed logging after initial load with networking disabled and subsequent reconnect/reload/resume/finish; no cold-start/video-offline claim. Review complete; integrate final record per D-018, retain all branches and pending phone/bench gates.

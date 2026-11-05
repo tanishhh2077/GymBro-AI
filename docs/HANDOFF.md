@@ -4,14 +4,14 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS first.
 
 ## Current task
 
-**Provider handoff: user hit the Codex subscription limit and explicitly asked
-Claude Code to take over. Codex is stopping development after this handoff.**
-Continue in this `GymBro AI-task14` worktree, not the original phone checkout.
-The Codex Q&A automation `resume-gymbro-ai-design-q-a` is PAUSED to avoid further
-Codex usage; Claude should resume Q8 when the user is available, not assume a
-Claude-side reminder has been scheduled.
+**Codex resumed:** the user cancelled the temporary Claude handoff ("False alarm,
+continue working where you left off"). Continue this `GymBro AI-task14` worktree,
+not the original phone checkout. No Claude implementation occurred in between;
+the checkout was clean at `6fbd348`. The one-time Codex Q&A follow-up is restored
+for the original approximately23:28 Chicago time. Resume at Q8, one MCQ with a
+recommendation and brief reason; do not duplicate answers already provided.
 
-Task 14, local workout logging/Home, on `feat/task14-workout-logging` in the
+Task 14, local workout logging/Home, **passes acceptance and review**, on `feat/task14-workout-logging` in the
 isolated `GymBro AI-task14` checkout from reviewed master `a524387`. User answered
 seven MCQs and explicitly authorized building while busy; no more questions
 until the user is available (originally around 23:28 Chicago). Resume at Q8, MCQ with a
@@ -29,16 +29,21 @@ navigation away/back, reload/history, two-tab conflict and long names at390px.
 Fresh review's Medium size/revision boundary bug is fixed with a RED/GREEN
 regression in `efa0c04`; 448 tests/lint/guarded sync pass on that source. The full
 local browser suite was not repeated after this one-line boundary fix. Final
-hosted verification is pending:
+hosted verification is complete:
 
 - [Browser run4](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437861)
 - [Native run11](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437881)
 
-Both were in progress at provider transfer, source `efa0c04`. Prior run3/native10
+Browser run4 passed **448 tests/lint/build and 13 browser cases (3.3 minutes)**
+on source `efa0c04`; native run11 passed shared checks, Android compilation,
+and iOS compile/visible simulator startup.
+Both were in progress at the cancelled provider transfer. Prior run3/native10
 were cancelled by normal superseding workflow concurrency, not failures. Fresh
-design/code reviews are complete; no unresolved finding. **Next: inspect final
-hosted results, fix supported failures if any, record actual outcomes, then
-integrate reviewed master per D-018 and incorporate it into Task8 preserving
+design/code reviews are complete; no unresolved finding. A separate production
+preview check started/logged while offline after initial load, then reconnected,
+reloaded/resumed/finished with units/values intact and no external/mutation
+requests or page errors. This does not establish offline cold startup or video
+inference. **Next: integrate reviewed master per D-018 and incorporate it into Task8 preserving
 history. Do not reimplement finished work or repeat a full review without a new
 material change.** No media/pose
 persistence, cloud/account/social/live feature, new AI lift or form claim.
