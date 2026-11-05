@@ -51,7 +51,8 @@ Safari checks first and keeps installed-native/bench gates separate. Its Step 1
 is in progress as Task 8 on `feat/task8-safari-phone-test`: baseline and verified
 fixture export, seven desktop runtime preflight cases, generated S07/S08 inputs
 and every reviewed master merge through Task 16 pass. The user reported iOS 26.5.2; private-network setup still needs their
-coordination.
+coordination. At the user's request, master was fast-forwarded to this branch on
+2026-11-05; that merge is not phone acceptance.
 No Safari/physical-phone cases have run. D-024 waives routine understanding
 stops, not actual device/settings actions.
 

@@ -20,9 +20,11 @@ are pinned to exact release commits. No paid runner or Apple signing is used.
 Pushes to `feat/task6-mobile-app` or `master` trigger builds when relevant code,
 assets or build configuration change; Task14/Task15/Task16 feature pushes also trigger
 the same checks. Markdown-only changes do not. Manual
-dispatch is defined, but GitHub's UI requires the workflow on the repository's
-default branch. That default is still `feat/gymbro-video-landmarks`; this workflow
-does not change repository settings. Feature-branch pushes work independently.
+dispatch is defined. GitHub's UI offers it only for workflows on the repository's
+default branch; that default is still `feat/gymbro-video-landmarks`, which was
+fast-forwarded to master on 2026-11-05, so the Actions page should now offer it
+(not yet tried). This workflow does not change repository settings.
+Feature-branch pushes work independently.
 
 Artifacts, retained one day:
 

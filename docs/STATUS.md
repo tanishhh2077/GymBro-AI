@@ -16,13 +16,42 @@ fast-forwarded to `ac5e3fe`, Task 16's final documentation commit, and pushed.
 This original checkout's `feat/task8-safari-phone-test` branch merged that master
 with a merge commit that keeps both histories, and the temporary
 `GymBro AI-task16` worktree has been removed, so this checkout is the only
-worktree. One hosted browser run on master (41985529794, identical source)
+worktree. At the user's request, master was then fast-forwarded to this branch
+and the old default branch to master; Task 4 stays unmerged (see "Branch merges
+at the user's request"). One hosted browser run on master (41985529794, identical source)
 failed for a reason not yet visible, because its log needs a signed-in admin
 account; the same suite passes locally and passed in hosted run 8, and the failure
 stays open until the user reads the log or re-runs the job. No approved
 implementation task remains; the next work needs the user (that log, the phone
 session, Q10, or a newly approved feature). Task 8 and Task 4 physical phone and
 bench gates remain open.
+
+### Branch merges at the user's request
+
+- Claude Code (Opus 5.5), 2026-11-05. The user wrote "i think a lot of branches
+  are waiting to be merged, merge them". After `git fetch --prune`, a comparison
+  of every remote branch with `origin/master` showed that Tasks 3, 5, 6, 7 and
+  9–16 have no commit missing from master. Each is ahead of the old default
+  branch `feat/gymbro-video-landmarks` (`03185f5`), which itself was 52 commits
+  behind master and contained in it; that is why GitHub showed them as unmerged.
+- `feat/task8-safari-phone-test` was 18 commits ahead of master and 0 behind,
+  differing only in Markdown. Master is fast-forwarded to this record's commit
+  and pushed. Merging is not phone acceptance; the Safari cases remain open.
+- `feat/gymbro-video-landmarks` is fast-forwarded to master and pushed, without
+  changing the default-branch setting. Neither workflow has a schedule trigger,
+  and neither lists that branch for pushes, so the move starts no run. Both
+  workflows declare `workflow_dispatch`, which GitHub's Actions page offers only
+  for workflows on the default branch; it should now be available (not tried).
+- `feat/task4-browser-acceptance` (`34538e4`) is 3 commits ahead and 48 behind.
+  An in-memory `git merge-tree` trial conflicts in 16 files: AGENTS, README,
+  ARCHITECTURE, DECISIONS, HANDOFF, STATUS, the plans index, `eslint.config.js`,
+  `package.json`, `package-lock.json`, `playwright.config.ts`, `vitest.config.ts`
+  and the `tests/` and `tests/fixtures/` guides. Task 13's maintained
+  `tests/browser/` suite superseded its `tests/e2e/` cases; its unique human
+  bench-video gate (`benchFixture.ts`, `video-analysis.spec.ts`) waits for
+  licensed footage. Following the user's earlier instruction not to merge the
+  incomplete Task 4, it stays unmerged; nothing was written to that branch.
+- No branch was deleted.
 
 ### Original Task8 checkout integration of Task16
 

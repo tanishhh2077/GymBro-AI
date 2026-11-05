@@ -13,7 +13,7 @@ its five-hour limit, the user moved the work to Claude Code, and Claude Code
 changes Markdown only.
 
 - Master was fast-forwarded from `7d97ac6` to `ac5e3fe`, Task 16's final
-  documentation commit, and pushed. No Task 8 or Task 4 commit entered master.
+  documentation commit, and pushed.
 - This original checkout (`GymBro AI`, branch `feat/task8-safari-phone-test`)
   merged that master with a merge commit, keeping both histories and this
   branch's Task 15 integration record. Every non-Markdown file equals master, and
@@ -25,6 +25,25 @@ changes Markdown only.
   This original checkout is again the only worktree, and every branch is kept
   locally and on GitHub. Continue in this folder; temporary worktrees are only for
   isolated feature development.
+
+**Branches merged at the user's request (2026-11-05).** The user asked to merge
+the branches waiting to be merged. Only two branches held commits that master
+lacked. Every other task branch (Tasks 3, 5–7 and 9–16) was already fully inside
+master; those branches only looked unmerged because GitHub compares each branch
+with its old default branch, which was 52 commits behind.
+- Master was fast-forwarded to this branch, so it now also carries the reviewed
+  phone-plan amendments and the Task 8 records; the two differed only in
+  Markdown. This is not phone acceptance: Task 8's Safari cases have not run,
+  and the phone session continues on this branch.
+- The old default branch `feat/gymbro-video-landmarks` was fast-forwarded to
+  master. The default-branch setting itself is unchanged; switching it to
+  `master` remains the user's choice.
+- Task 4 (`feat/task4-browser-acceptance`) stays unmerged. A trial merge
+  conflicts in 16 files, including `package.json`, the lockfile and the test
+  configuration, because Task 13 later rebuilt the same browser-test area. Its
+  remaining unique part, the human bench-video gate, waits for licensed footage
+  and would be moved into `tests/browser/` by a new, separately approved task.
+- The fully merged branches are kept; deleting them needs the user's agreement.
 
 **Open hosted failure, first:** master's push started a hosted browser run that
 **failed** (details under Task 16 evidence). Its log needs a signed-in account
@@ -164,9 +183,10 @@ and no validated bench-accuracy claim, and it is not a complete release.
   development server on port 5193 is no longer running.
 - Run the full tests, lint and build before each green step commit. No
   attribution trailers, force pushes or branch deletion.
-- Keep the Task 8, Task 4 and feature-branch histories. The GitHub default branch
-  is still `feat/gymbro-video-landmarks`. Make no settings, signing, payment or
-  publication change.
+- Keep the Task 8, Task 4 and feature-branch histories. GitHub's default-branch
+  setting is still `feat/gymbro-video-landmarks`, which now points at master's
+  commit; switching the setting to `master` is the user's choice. Make no
+  settings, signing, payment or publication change.
 - Synthetic previews from Tasks 14, 15 and 16 are kept only in this checkout's
   ignored `build/visual-review/` folder; none are uploaded or contain human data.
   Markdown is the provider-neutral handoff.
