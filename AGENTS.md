@@ -55,6 +55,10 @@
 
 ## Independent judgment
 
+- D-034 explicitly authorizes saved routine CRUD, exercise order/optional set-rep
+  targets and starting fresh empty-set workouts. Follow the Task16 design/plan:
+  preserve strict legacy data, atomic revisions and target/actual separation.
+
 - D-031/D-032 select guest access with optional workout-record sync only; videos
   must not be uploaded. This remains a future product direction, not a service.
 - D-033 authorizes Task15's manual session-only rest timer. Read its design/plan;

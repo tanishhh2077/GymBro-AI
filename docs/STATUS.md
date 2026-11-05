@@ -10,6 +10,38 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task16 saved routines approved by the user (D-034). Branch
+feat/task16-saved-routines in isolated GymBro AI-task16 from master7d97ac6.
+Original Task8 checkout remains clean at0895f32 with completed Task15 integration;
+Task8/Task4 physical phone/bench gates remain open. No other agent code changes.
+
+- Locked process-local Node22.23.2 install:482packages,458baseline tests/23files,
+  lint/build and owned loopback4183 health200 pass before implementation. Fresh
+  Goldfish review:ready/no findings, actual runtime model unavailable, no checks
+  executed by reviewer; dated design-review record states its exact scope.
+- Design/plan dated2026-11-05 specify version2 with strict no-write v1 normalization,
+  optional routine key preserving legacy exact-size records, fresh empty-set
+  snapshots, expected-revision editor guards and actual/target separation.
+- Existing managed-worktree failure on stale liftform metadata is unchanged;
+  normal Git sibling fallback is used, following prior task convention. No global
+  Node/settings/user servers/private media changed.
+
+### Task16 Step1 schema/store foundation
+
+-16 failing cases observed for unsupported v2/migration/actions;82focused cases
+  GREEN after validated contracts/store actions.30 new tests total, including
+  legacy read-without-write/first explicit save/failure and exact1,000,000-char
+  record preservation. Strict v1 rejects new fields; v2 separates targets/actuals.
+- **488tests/25files**,lint/build pass. Initial build caught test-only Object.hasOwn
+  requiring ES2022; replaced with existing ES2020-compatible prototype call,
+  preserving target/runtime. No config or dependency changes.419modules.
+- No writes on normalization, no added empty-routines default, atomic revision
+  and final-size checks unchanged. Template actions preserve snapshots and reject
+  stale editor revisions even after reload. UI/browser/mobile checks are Step2;
+  no completed routine interface or physical-device claim at this step.
+
+### Previous completed feature (Task15)
+
 Task15 is complete: reviewed source `9eef2fb` has been fast-forwarded/pushed to
 master after all local/hosted gates passed. It started from reviewed `b09f79a` in
 isolated `GymBro AI-task15`, branch `feat/task15-rest-timer`.

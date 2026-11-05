@@ -3,6 +3,10 @@
 `workout.ts` defines separate manual workout entries, explicit lb/kg units,
 millisecond dates, active/completed records and version/revision metadata. These
 are locally persisted under D-030; they contain no pose/media handles or findings.
+Task16/D-034 adds RoutineInput/WorkoutRoutine and independently optional set/rep
+targets. Document schema2 keeps routines optional to avoid growing legacy records
+on read. Actual sets stay separate from targets; copied plans have no live link
+to the saved routine, and IDs are fresh when starting each workout.
 
 `index.ts` defines pose observations, progress/results, session clips, and typed
 processing failure stages/kinds. The lift, view and source types hold only the

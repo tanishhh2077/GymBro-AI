@@ -3,6 +3,9 @@
 `workouts.ts` separately validates Task 14's manual workout schema, units, bounds,
 IDs and media-free storage shape. It does not derive anything from pose data.
 `workouts.test.ts` has 29 boundary cases; see D-030 and the tracking design.
+Task16 extends strict validation to schema2 routines/target snapshots and accepts
+strict legacy v1 with size-preserving/no-write normalization. `routines.test.ts`
+adds target/count/unknown-data/legacy boundaries; storage remains media-free.
 
 - `PoseEngine.ts`: MediaPipe coordinator. Runs one bounded job at a time:
   validates metadata before model work, owns a per-job detector, keeps only

@@ -4,6 +4,25 @@ Updated2026-11-05 America/Chicago. Read root/scoped AGENTS first.
 
 ## Current state and next action
 
+**Task16 in progress:** user approved all three proposed routine features with
+"Yes create all of that" (D-034). Isolated sibling GymBro AI-task16, branch
+feat/task16-saved-routines, from reviewed master7d97ac6. Original checkout remains
+Task8 at0895f32, clean; its Task15 merge already passed458tests/lint/guarded sync.
+No Task8/Task4 merge into master. Read saved-routines design/plan dated2026-11-05.
+Fresh locked install482packages,458baseline tests/lint/build/loopback4183 health
+and independent Goldfish review pass. Schema2 normalization and routine actions
+now pass488tests/25files,lint/build;16 unsupported-behavior failures observed
+before implementation,82focused tests green. Next implement routine UI/browser
+Step2 test-first; no routine UI yet. No new dependencies/services.
+
+Legacy v1 reads must not write or grow the JSON at its exact1,000,000-char cap.
+Optional routines key/target metadata; new workouts copy order/unit/targets and
+fresh IDs with empty actual sets. Failed/stale saves preserve data/draft inputs.
+Existing timer/analysis and phone/media boundaries stay unchanged. Charts/PRs and
+account/sync remain later work; no further Q&A needed for this approved slice.
+
+### Previous completed feature
+
 **Task15 complete:** manual active-workout rest timer (D-033), reviewed source
 `9eef2fb`, fast-forwarded/pushed to master. Final documentation adds no production
 change. Continue in original `GymBro AI` checkout on `feat/task8-safari-phone-test`,

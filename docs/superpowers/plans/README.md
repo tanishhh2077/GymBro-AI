@@ -1,5 +1,9 @@
 # Implementation plans
 
+Current: [Task16 saved routines](2026-11-05-saved-routines.md), explicitly approved
+by the user under D-034. Fresh schema review and488-test/lint/build foundation
+pass; Step2 routine UI/browser work follows. No dependency or account service.
+
 Completed: [Task15 manual rest timer](2026-11-04-rest-timer.md), D-033.458tests,
 14local/hosted browser cases,guarded sync,fresh review and native13 compile/visible
 simulator startup pass; reviewed source9eef2fb pushed to master. Q8/Q9 decisions

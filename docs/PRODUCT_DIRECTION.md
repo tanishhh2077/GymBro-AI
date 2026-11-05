@@ -56,3 +56,10 @@ Builder defaults: 90 seconds initially; 30/60/90/120/180/300-second choices; man
 start/pause/resume/reset; retained between screens for the active workout only.
 No automatic start, reload persistence, sound or background notifications in this
 slice. The limit is visible in the UI. Remaining preferences stay open.
+
+After Task15 completion, the user explicitly approved the proposed saved-routine
+features with "Yes create all of that" (D-034): create/edit/delete, ordered
+exercises, optional set/rep targets and a fresh workout with zero completed sets.
+Task16 implements that local slice; targets stay separate from actual logged work.
+Charts/personal bests follow later. This approval is not a Q10 MCQ answer; Q&A
+still resumes at Q10 when requested, without blocking approved routine work.
