@@ -17,10 +17,12 @@ Only HANDOFF/STATUS conflict; this record retains both branches' evidence and
 HANDOFF identifies current Q&A/phone prerequisites. Local merge checks follow.
 
 The temporary Claude transfer was cancelled; Codex resumed the unchanged task.
-At about23:29 Chicago, Q8 was presented as an MCQ with recommendation: guest
-logging/optional sync versus local-only versus account-required. Await the actual
-answer; no cloud/account implementation is authorized by the question. The
-one-time Codex automation is paused after fulfilling its purpose to avoid repeats.
+Q8 is now accepted: user answered "A", then "Clear", selecting guest logging
+with optional accounts for backup and syncing (D-031). This is a future product
+requirement; accounts/sync are not implemented and sync/media scope is undecided.
+Accepted decisions, PRODUCT_DIRECTION and HANDOFF now preserve the answer for
+both providers. No application or service changes. Continue Q9 one MCQ at a time.
+The one-time Codex automation remains paused after fulfilling its purpose.
 
 ### Task 8 merge of reviewed master (Task 14)
 

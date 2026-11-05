@@ -13,18 +13,18 @@ files equal reviewed master. Keep Task8 open/unmerged into master until
 its own phone acceptance resolves. Task4 is incomplete/unmerged too.
 
 The user cancelled the temporary Claude handoff; Codex resumed without any
-intervening implementation. **Q&A has resumed:** question8 was presented around
-23:29 Chicago as an MCQ: guest logging+optional account sync (recommended),
-local-only, or account required. Await the actual answer, then continue Q9 onward
-one MCQ at a time, marking a recommendation and brief reason. Do not treat a
-recommendation as an accepted choice. The one-time Codex reminder was paused
+intervening implementation. **Q8 accepted:** the user answered "A", then "Clear":
+guest logging with optional accounts for backup and syncing (D-031). Accounts and
+sync remain future work; no cloud implementation or media transfer is implied.
+Continue Q9 onward one MCQ at a time, marking a recommendation and brief reason.
+Do not treat a recommendation as an accepted choice. The Codex reminder was paused
 after the follow-up was fulfilled; no duplicate reminder or Claude task is active.
 
-Read [PRODUCT_DIRECTION](PRODUCT_DIRECTION.md) for Q1-Q7. Product target: tracking
+Read [PRODUCT_DIRECTION](PRODUCT_DIRECTION.md) for Q1-Q8. Product target: tracking
 and AI equally central; mixed levels; linked/standalone analysis; Home actions
 plus compact dashboard; full personal tracking/community deferred; bench-only
 AI at first public release; post-video now, live+post-video later. D-030 permits
-this bounded implementation; remaining design/account/retention decisions wait.
+this bounded implementation; sync scope and remaining design/retention decisions wait.
 
 ## Implemented and verified
 

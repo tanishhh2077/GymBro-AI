@@ -429,6 +429,20 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   [plan](superpowers/plans/2026-11-04-workout-logging.md). Task 8 and bench M1 stay
   open; actual phone/network/settings/media actions remain coordinated.
 
+### D-031: Guest use with optional accounts for backup and syncing
+
+- In the resumed Q&A the user answered Q8 "A", selecting guest logging with
+  optional account sync, then confirmed "Clear" after the explanation. Sign-up
+  must not block a first workout; users may choose an account for backup and
+  syncing later.
+- This accepts a product direction, not a claim of working accounts or sync.
+  The current app still stores workout records locally with no account or
+  server transfer. What sync includes, guest-data migration, conflicts,
+  authentication and the service design still need explicit definitions.
+- No cloud provider, paid service, account/settings action, or human-media upload
+  is authorized by this answer. Existing media/privacy boundaries remain.
+  Continue the product Q&A at Q9 before selecting a bounded implementation.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
@@ -439,4 +453,7 @@ The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md]
 - The available first phone is recorded in D-023; its OS and actual Safari/native
   acceptance remain to be established. A broader supported-device matrix is unverified.
 - Exact measurement definitions, quality thresholds, evaluation references, and dataset methodology belong to later bounded specifications.
-- Backend processing, accounts, video retention, database deployment, custom training, and multi-camera work remain unapproved future work.
+- D-031 accepts guest use with optional accounts/sync as a future product
+  direction; implementation and service/data boundaries remain undefined.
+  Backend video processing, video retention, database deployment, custom
+  training and multi-camera work remain unapproved future work.
