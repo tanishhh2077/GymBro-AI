@@ -55,6 +55,10 @@
 
 ## Independent judgment
 
+- D-034 explicitly authorizes saved routine CRUD, exercise order/optional set-rep
+  targets and starting fresh empty-set workouts. Follow the Task16 design/plan:
+  preserve strict legacy data, atomic revisions and target/actual separation.
+
 - D-031/D-032 select guest access with optional workout-record sync only; videos
   must not be uploaded. This remains a future product direction, not a service.
 - D-033 authorizes Task15's manual session-only rest timer. Read its design/plan;
@@ -128,8 +132,10 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
   `npx playwright install chromium`. Read `tests/AGENTS.md` and scoped guidance.
   No human inputs/captures/uploads. Task 4's separate branch still owns its
   incomplete human-fixture/bench-acceptance tooling; do not merge it for tests.
-- Task14's current baseline is 448 tests / 22 files; manual workout boundaries,
+- Task14's baseline was 448 tests / 22 files; manual workout boundaries,
   transactional storage, state ordering and App UI are separate from pose tests.
   Browser smoke also uses synthetic manual logs, never real user workout data.
-- Task15 adds the manual session-only rest timer; current checks are458tests in
- 23files and14 browser cases. Use STATUS for actual local/hosted/device evidence.
+- Task15 added the manual session-only rest timer at 458 tests in 23 files and
+  14 browser cases. Use STATUS for actual local/hosted/device evidence.
+- Task16's current baseline is494tests/26files and17 browser cases. Schema2
+  routines/targets preserve strict legacy data and actual logged-set semantics.

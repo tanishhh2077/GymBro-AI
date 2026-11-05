@@ -18,3 +18,5 @@ Inherit [source guidance](../AGENTS.md). Follow the
   change application types as part of documentation-only work.
 - Keep later persistence and API contracts separate from browser object URLs and
   other temporary runtime handles.
+- D-034 permits schema2 routine contracts and optional planned set/rep targets.
+  Never represent a target as a logged set or a live link to workout history.

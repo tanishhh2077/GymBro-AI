@@ -467,6 +467,26 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   [plan](superpowers/plans/2026-11-04-rest-timer.md). Phone/bench acceptance remains
   open; Task8 and Task4 stay separate and unmerged.
 
+### D-034: Saved workout routines with fresh actual-set logging
+
+- The builder proposed: create/edit/delete routines, save exercise order and
+  optional set/rep targets, and start a fresh workout from a routine with only
+  sets actually logged counted as complete. The user replied "Yes create all of
+  that". This explicitly authorizes those routine features. Charts/personal
+  bests were proposed as following this slice; they are not implemented here.
+- Builder selects Task16: local routines in the validated workout library,
+  immutable target snapshots on starting a new workout, explicit per-routine
+  lb/kg and independently optional integer targets. No automatic set completion,
+  copied historical loads, account/cloud/native/media or AI-scope changes.
+- Schema2 normalization accepts strict legacy records without writing on load;
+  preserving existing data, size limits and atomic revision protection is required.
+  Optional root routines and target bounds are builder choices in the separate
+  [design](superpowers/specs/2026-11-05-saved-routines-design.md) and
+  [plan](superpowers/plans/2026-11-05-saved-routines.md).
+- User approval of the concrete feature and prior "Clear bro now work" direct
+  implementation without routine understanding stops. Real device/media/account
+  settings remain coordinated; Task8/Task4 and physical-bench acceptance stay open.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

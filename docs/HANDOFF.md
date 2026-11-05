@@ -1,111 +1,172 @@
 # GymBro AI: current handoff
 
-Updated2026-11-05 America/Chicago. Read root/scoped AGENTS first.
+Updated 2026-11-05 (America/Chicago). Read root and scoped `AGENTS.md` files first.
 
-## Current state and next action
+## Current task and next action
 
-**Task15 complete:** manual active-workout rest timer (D-033), reviewed source
-`9eef2fb`, fast-forwarded/pushed to master. Final documentation adds no production
-change. Original `GymBro AI` checkout on `feat/task8-safari-phone-test` includes
-master `7d97ac6` with preserved history. Four documentation conflicts were resolved
-using the final feature record, which includes the prior phone/Q8 history. Source
-parity with reviewed master and merged458tests/lint/build/guarded sync all pass.
-Keep Task8 and Task4
-open/unmerged into master; their phone/bench acceptance is separate.
+**Task 16, saved workout routines, is complete and integrated** ([D-034](DECISIONS.md#d-034-saved-workout-routines-with-fresh-actual-set-logging)).
+The user approved the three proposed routine features with "Yes create all of
+that". Codex built and reviewed the feature on `feat/task16-saved-routines` in a
+temporary sibling worktree, starting from master `7d97ac6`. Codex then reached
+its five-hour limit, the user moved the work to Claude Code, and Claude Code
+(Opus 5.5) finished Step 3. The reviewed source is `4c1b519`; every later commit
+changes Markdown only.
 
-458tests/23files, lint/build, guarded mobile sync/verify, all14 local browser
-cases (2.8minutes), synthetic390/1280 visual inspection and fresh review pass.
-Reviewer independently passed15focused tests with no significant findings.
-[Hosted browser run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41977815775)
-passes458shared checks and14cases (3.4minutes). [Native run13](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41977815811)
-passes shared/Android/iOS compile,11-file bundle comparisons and visible iPhone
-simulator Home startup (iPhone17Pro/iOS26.4). Both use exact source `9eef2fb`.
-Startup was slow but passed; packages were not downloaded. No physical-device
-timer/video or background-alert validation. Duplicate master checks are not needed
-to establish the already-green source; report any actual new failures separately.
+- Master was fast-forwarded from `7d97ac6` to `ac5e3fe`, Task 16's final
+  documentation commit, and pushed. No Task 8 or Task 4 commit entered master.
+- This original checkout (`GymBro AI`, branch `feat/task8-safari-phone-test`)
+  merged that master with a merge commit, keeping both histories and this
+  branch's Task 15 integration record. Every non-Markdown file equals master, and
+  the merged checks pass: 494 tests in 26 files, lint, the build with the reviewed
+  bundle names, the guarded mobile sync and all 17 local browser cases. One
+  hosted browser run on master failed afterwards; see below.
+- The clean temporary `GymBro AI-task16` worktree was removed with a normal Git
+  removal, after its previews, preview script and progress ledger were kept here.
+  This original checkout is again the only worktree, and every branch is kept
+  locally and on GitHub. Continue in this folder; temporary worktrees are only for
+  isolated feature development.
 
-Timer: manual start/pause/resume/reset with30/60/90/120/180/300-second presets,
-initial90. Root keyed by active workout ID, navigation retained; successful
-finish/discard resets it while save failure preserves it. No storage schema,
-native API, analysis or network change. Session-only/reload reset and in-app-only
-completion are visible. Design/plan: `2026-11-04-rest-timer` in superpowers folders;
-review: `2026-11-05-rest-timer-code-review.md`. Physical iPhone/bench gates stay open.
+**Open hosted failure, first:** master's push started a hosted browser run that
+**failed** (details under Task 16 evidence). Its log needs a signed-in account
+with admin rights, so the failing case is unknown. The user should open
+[that run](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41985529794) while signed in, or re-run its job, before more feature
+work; a real failing case then gets a test-first fix. Do not call it a flake
+without that evidence.
 
-The user cancelled the temporary Claude handoff; Codex resumed without any
-intervening implementation. **Q8 accepted:** the user answered "A", then "Clear":
-guest logging with optional accounts for backup and syncing (D-031). Accounts and
-sync remain future work; no cloud implementation or media transfer is implied.
-**Q9 also accepted:** workout records only; no video uploads (D-032). The user
-confirmed "Clear bro now work"; build now and resume MCQs at Q10 later.
-When Q&A resumes, ask one MCQ at a time with a recommendation and brief reason.
-Do not treat a recommendation as an accepted choice. The Codex reminder was paused
-after the follow-up was fulfilled; no duplicate reminder or Claude task is active.
+**Next action:** no approved implementation task remains. The next work needs the
+user: the phone session (below), the product Q&A, which resumes at question Q10
+when the user asks, or approval for a further feature such as charts and personal
+records, set-linked persistence or final styling. D-024 applies: explain each step
+and proceed, without routine "Is this clear?" stops; no teaching checkpoint is
+pending. When the Q&A resumes, ask one multiple-choice question at a time, each
+with a recommendation and a brief reason, and never treat a recommendation as the
+user's choice.
 
-Read [PRODUCT_DIRECTION](PRODUCT_DIRECTION.md) for Q1-Q9. Product target: tracking
-and AI equally central; mixed levels; linked/standalone analysis; Home actions
-plus compact dashboard; full personal tracking/community deferred; bench-only
-AI at first public release; post-video now, live+post-video later. D-030 permits
-this bounded implementation. D-033 permits the timer; remaining sync design/local
-retention choices wait. No cloud/account service or video upload is implemented.
+## Task 16 evidence
 
-## Implemented and verified
+- Local checks on the reviewed source: 494 tests in 26 files, lint, build, the
+  guarded mobile sync and all 17 real-browser cases (3.5 minutes) pass. Claude
+  Code repeated tests, lint and build on the final branch and on this merged
+  checkout under Node 22.23.2: 494 tests, 421 modules and the reviewed bundle names.
+- A fresh design review found the design ready, with no findings. A fresh code
+  review found no significant findings and independently passed 77 tests in 8
+  files. The requested reviewer model was gpt-6-astra; its actual runtime ID was
+  not exposed. No production code changed after review.
+- Hosted checks passed on the exact source `4c1b519`:
+  [browser run 8](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41983009261)
+  (494 shared tests and all 17 browser cases) and
+  [native run 15](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41983009299)
+  (shared checks, Android and iOS compilation, and a visible empty Home screen at
+  iOS simulator startup). No packages were downloaded, and nothing ran on a
+  physical device.
+- Master's push started two hosted runs on source identical to `4c1b519`.
+  [Native run 41985529764](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41985529764) passed its shared checks, the Android APK
+  and iOS simulator build and startup. **[Browser run 41985529794](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41985529794) failed**
+  in its `npm run test:browser` step after 352 seconds, although its unit tests,
+  lint and build passed. The same source passed hosted browser run 8 (256 seconds)
+  and, on this merged checkout, a local run of all 17 browser cases (4.3 minutes).
+  The cause is unknown until someone signed in reads the log; see the open
+  failure above.
+- The design, plan, design review and code review are the dated
+  `2026-11-05-saved-routines` files in `docs/superpowers/`. Detailed command
+  evidence is in STATUS.
+- The routine editor and library were inspected at 390 and 1280 px wide with no
+  horizontal overflow. Four synthetic previews and the script that drew them are
+  kept in this checkout's ignored `build/visual-review/task16/`. Browser test
+  captures and uploads remain off. Codex verified and stopped only its own
+  loopback server on port 4183; unrelated servers were left running.
 
-Manual workout start/resume, explicit lb/kg fixed per workout, free-name exercise
-entries, log/edit/remove sets, finish and reopen/delete history. IndexedDB uses
-validated versioned plain data, atomic revision checks and save-before-state
-updates. Unknown data/failed or uncertain saves preserve confirmed state and
-require appropriate recovery. Existing analysis remains an independent in-memory
-bench workflow. No media/pose persistence or cloud/account/social/live service.
-Routines, charts/PRs, set-linked analysis and final styling remain future.
+## Implemented behavior and data boundaries
 
-[Design](superpowers/specs/2026-11-04-workout-logging-design.md),
-[plan](superpowers/plans/2026-11-04-workout-logging.md),
-[code review](superpowers/specs/2026-11-04-workout-logging-code-review.md).
-Single Medium/P2 revision-size boundary issue fixed with exact-limit regression;
-no unresolved Task14 finding. Task14 code source `efa0c04`; timer changes are Task15.
+- Home keeps its two equal actions, Start workout and Analyze video, and adds
+  Manage routines; Routines also has its own navigation entry.
+- A routine is a named local plan. The user can create, edit and delete routines,
+  order their exercises, give each exercise an optional whole-number target for
+  sets and for reps (each independent of the other), and choose lb or kg
+  explicitly.
+- Starting a routine creates a new workout with fresh workout and entry IDs. It
+  copies the exercise order, unit and targets, and no actual sets. Editing or
+  deleting the routine later never changes an active workout or history. Targets
+  are shown separately; only sets the user actually logs count.
+- An active workout blocks starting another routine. Deleting asks for
+  confirmation. A failed save keeps the typed fields.
+- The editor remembers the library revision it opened with, even across a reload,
+  and refuses to save a stale draft; the user must reopen the routine. The rest
+  timer and the video-analysis lifecycle stay independent of routines.
+- Storage uses document schema 2 in the same IndexedDB database at version 1
+  (`gymbro-workouts`, record `library/current`). Reading strict schema-1 data
+  changes only the version number in memory, with no write, no added default and
+  no size growth, so records at exactly 1,000,000 characters stay readable.
+  A missing routines list means "no routines".
+- The next explicit successful save writes schema 2 with the atomic revision and
+  final-size checks. Unknown, corrupt or future-version data is never
+  overwritten. Older app code must update or reload; it must not strip schema-2
+  fields.
+- Limits: at most 100 routines and 100 exercises per routine; optional target
+  sets 1–100 and target reps 1–1000. Existing workout limits are unchanged.
+- No runtime dependency, media or pose persistence, cloud service, account or
+  native plugin was added.
 
-- 448 tests/22files, lint/build and guarded mobile sync pass; 418modules,
-  11 verified shared files per platform.
-- [Browser run4](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437861)
-  passes448 shared checks and13 real browser cases (3.3minutes), including model,
-  navigation, logging/reload/history, two tabs and long names at390px. Chromium
-  156.0.8078.4/GPU delegate label/120 no-person samples, not a hardware benchmark.
-- [Native run11](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437881)
-  passes shared/Android/iOS compile and visible empty Home simulator startup.
-  This is not physical-device persistence/video validation. Packages not downloaded.
-- Actual production preview logged while offline after initial load, then
-  reconnect/reload/resume/finish retained values/units with no external/mutation
-  requests or page errors. Offline cold start/video inference remain unverified.
-- Empty Home visually inspected at390 and1280px, no overflow. Previews are kept
-  locally in ignored `build/visual-review/task14/` here, not uploaded or human data.
+## Accepted direction and remaining work
 
-## Phone/video acceptance remains open
+PRODUCT_DIRECTION records the answers to questions Q1–Q9:
+- Tracking and AI analysis are equally central, in a mixed experience.
+- Linked and standalone video analysis are both intended.
+- Home has the main actions plus a compact dashboard.
+- Full personal tracking and community features are deferred.
+- The first AI release covers bench press only. Post-video analysis comes now;
+  live analysis later.
+- Q8 accepts guest use plus optional accounts and sync. Q9 limits sync to workout
+  records: videos are never uploaded. Accounts and sync are **not** implemented.
 
-User will provide hotspot/video later; do not ask again now. iPhone12ProMax,
-reported iOS26.5.2; no Android phone, paid Apple membership or owned Mac. Follow
-[phone plan](superpowers/plans/2026-11-04-phone-video-acceptance.md) only with user
-present: trusted private connection, re-detect address, ports5195/5196 bound only
-there. Campus Ethernet was Public; do not expose it or alter firewall/VPN/router.
-No LAN listener, phone transfer or Safari case has run. Simulator ZIP is not an
-installable iPhone app. No signing/payment/store release authorized.
+Routines were Task 16. Charts and personal records, set-linked persistence and
+final styling remain future work. The Q&A resumes at Q10 when the user asks; it
+does not block approved work. The one-time Q&A reminder was fulfilled and then
+paused; no duplicate reminder or Claude task is active.
 
-Ignored build/fixtures in this original checkout holds five non-human patterns
-and S07/S08 inputs/provenance, previously hash-checked. Human bench footage is not
-accepted yet. Treat offered video as private; permission/framing/encoding/real
-inference and manual lifter-landmark identity checks still required. Never upload
-or commit human footage, frames or pose traces. M1/accuracy remain unverified.
+Task 15's manual rest timer lasts for the session only. It offers presets of 30,
+60, 90, 120, 180 and 300 seconds (90 at first) and start, pause, resume and reset,
+survives screen changes, and resets on reload, app restart, or a successful finish
+or discard; a failed save keeps it. It announces completion inside the app only,
+with no background alert. Task 14's local logging and history remain: browser run
+4 and native run 11 passed for it, and an offline check after the first load kept
+values and units (an offline cold start and offline video inference remain
+unverified; details in STATUS). The standalone bench video overlay and elbow
+observations also remain. GymBro AI makes no rep or form verdict, no medical claim
+and no validated bench-accuracy claim, and it is not a complete release.
+
+## Phone and video acceptance remains open
+
+- The user will provide a hotspot and a video later; do not ask again now.
+- Devices: iPhone 12 Pro Max, reported as iOS 26.5.2. There is no Android phone,
+  no paid Apple Developer membership and no owned Mac.
+- Follow the reviewed [phone plan](superpowers/plans/2026-11-04-phone-video-acceptance.md)
+  only with the user present: agree a trusted private connection, re-detect the
+  PC's address, and bind ports 5195 and 5196 only to that address. The campus
+  Ethernet was a Public network. Make no LAN exposure, firewall, VPN or router
+  change.
+- No LAN listener, phone transfer, physical Safari case or native case has run.
+  The simulator ZIP is not an app that can be installed on an iPhone. No signing,
+  payment or store release is authorized.
+- This checkout's ignored `build/fixtures/` holds the five first-party non-human
+  test patterns, the S07/S08 inputs and their provenance, previously hash-checked.
+- Human bench footage is not accepted yet. Treat any offered video as private; the
+  permission, framing, encoding and real-inference checks and a manual check that
+  the landmarks belong to the lifter all remain. Never upload or commit footage,
+  frames or pose traces. Milestone one and phone performance remain unverified.
 
 ## Environment and Git
 
-Use process-local Node22.23.2 from %LOCALAPPDATA%/nvm/v22.23.2; never nvm use or
-change global Node20. Do not stop unrelated listener5173. Earlier5193 was absent
-at latest check; no action targeted it. Full tests/lint/build before each green
-commit, no attribution trailers, force pushes or branch deletion. Retain both
-Task8 and Task14 histories. GitHub default remains feat/gymbro-video-landmarks.
-Temporary feature worktrees are only for isolated development; continue in the
-original folder. Empty Home and synthetic Task15 timer previews are preserved
-locally in ignored build/visual-review; all feature branches remain. Owned Task15
-loopback4183 server was identity-checked and stopped; unrelated servers untouched.
-The clean Task15 worktree was removed after validating its exact sibling path
-and preserving both previews here. Original checkout is the only worktree.
-Markdown is the provider-neutral handoff.
+- Use process-local Node 22.23.2 from `%LOCALAPPDATA%\nvm\v22.23.2` (prepend
+  `$env:NVM_HOME\v22.23.2` to `PATH` and confirm `node -v`); never run `nvm use`
+  or change the global Node 20.
+- Leave the unrelated project's listener on `[::1]:5173` alone; the old GymBro
+  development server on port 5193 is no longer running.
+- Run the full tests, lint and build before each green step commit. No
+  attribution trailers, force pushes or branch deletion.
+- Keep the Task 8, Task 4 and feature-branch histories. The GitHub default branch
+  is still `feat/gymbro-video-landmarks`. Make no settings, signing, payment or
+  publication change.
+- Synthetic previews from Tasks 14, 15 and 16 are kept only in this checkout's
+  ignored `build/visual-review/` folder; none are uploaded or contain human data.
+  Markdown is the provider-neutral handoff.

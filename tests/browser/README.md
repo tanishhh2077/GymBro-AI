@@ -26,8 +26,13 @@ the clip/job. These are isolated temporary browser contexts, never real user log
 
 Task15 adds a controlled-clock synthetic-workout timer flow: manual duration,
 pause/resume, deadline catch-up, navigation survival, visible completion, reload
-reset and narrow layout. The full suite now has14 cases. It uses no native clock
+reset and narrow layout. Task15 brings the suite to14 cases. It uses no native clock
 or background-notification simulation and makes no physical-device timing claim.
+
+Task16 brings the maintained suite to17 cases: routine CRUD/order/targets and
+fresh actual-set history, native IndexedDB v1 read-without-write/first v2 save,
+and two-tab stale-editor recovery. Use synthetic workout values only. Await save
+confirmation before reload; a click is not proof that its async write finished.
 
 Screenshots, videos, traces and automatic page/ARIA snapshots are off. On failure
 Playwright can still create temporary error/source diagnostics; test output is

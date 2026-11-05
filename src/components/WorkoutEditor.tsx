@@ -60,6 +60,11 @@ function ExerciseEditor({ exercise, unit, store }: { exercise: WorkoutExercise; 
       <button type="button" className="shrink-0 text-sm text-slate-400 underline underline-offset-4" aria-label={`Remove exercise ${exercise.name}`} onClick={async () => {
         if (window.confirm(`Remove ${exercise.name} and its logged sets?`)) await state.removeExercise(exercise.id);
       }}>Remove</button></div>
+    {(exercise.targetSets !== undefined || exercise.targetReps !== undefined) && <p className="mb-4 text-sm text-slate-400">
+      <span className="text-accent">Planned target: {exercise.targetSets !== undefined ? `${exercise.targetSets} sets` : ''}
+        {exercise.targetSets !== undefined && exercise.targetReps !== undefined ? ' · ' : ''}
+        {exercise.targetReps !== undefined ? `${exercise.targetReps} reps per set` : ''}.</span> Log actual sets below.
+    </p>}
     {exercise.sets.length > 0 && <div className="mb-4 overflow-x-auto"><table className="w-full text-left text-sm">
       <caption className="sr-only">Logged sets for {exercise.name}</caption><thead className="text-slate-400"><tr><th className="py-2">Set</th><th>Reps</th><th>Weight</th><th><span className="sr-only">Actions</span></th></tr></thead>
       <tbody className="divide-y divide-white/10">{exercise.sets.map((set, index) => <tr key={set.id}>

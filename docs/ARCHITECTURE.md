@@ -208,6 +208,26 @@ Record the tested device, OS, runtime, model, delegate, clip characteristics, pr
 
 Python/NumPy may support evaluation or a later analysis implementation. FastAPI and PostgreSQL remain possible later services for demonstrated needs such as saved sessions. Saving measurements and retaining/uploading raw videos are separate privacy decisions. Do not introduce accounts, object storage, queues, or distributed infrastructure into milestone one.
 
+## Saved routines and library schema2 (Task16)
+
+The same local IndexedDB document/revision now includes optional routines.
+Database version remains1; document schema is2. Strict v1 records normalize in
+memory by replacing only the version digit, without writing or adding an empty
+array. This preserves exact-cap legacy records. The next explicit successful
+transaction writes v2, still using final-size validation and atomic revision
+comparison. Unknown/future/corrupt records remain untouched and block editing.
+
+Routines hold name/unit/ordered definitions and independently optional set/rep
+targets; actual completed sets never live in a template. Starting copies fresh
+IDs/order/unit/targets into a new empty-set active workout, with no live template
+reference. Existing active/history data therefore survive template edits/deletion.
+Whole-routine edits carry the revision captured with their source record at open;
+reload does not legitimize an old editor draft. The repository catches concurrent
+changes during a save. React adds Routines/library/editor plus Home access; active
+workouts display planned guidance separately from actual rows/counts. No media,
+account/cloud/native service or dependency changes. Old binaries reject schema2
+and require an app update/reload; do not silently strip new fields for old code.
+
 ## Manual rest timer (Task15)
 
 `WorkoutRestTimer` is mounted by root App for the active workout, keyed by its

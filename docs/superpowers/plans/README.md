@@ -1,5 +1,12 @@
 # Implementation plans
 
+Completed: [Task 16 saved routines](2026-11-05-saved-routines.md), approved by the
+user under D-034. Implementation, 494 tests, 17 browser cases, fresh design and
+code reviews, and hosted browser run 8 and native run 15 pass on reviewed source
+`4c1b519`; master is fast-forwarded to the final documentation commit. The
+original Task 8 checkout's merge and the temporary worktree's removal are recorded
+on `feat/task8-safari-phone-test`. No dependency or account service.
+
 Completed: [Task15 manual rest timer](2026-11-04-rest-timer.md), D-033.458tests,
 14local/hosted browser cases,guarded sync,fresh review and native13 compile/visible
 simulator startup pass; reviewed source9eef2fb pushed to master. Q8/Q9 decisions
@@ -43,7 +50,7 @@ iPhone12ProMax, no Android phone or paid Apple membership. It proposes free
 Safari checks first and keeps installed-native/bench gates separate. Its Step 1
 is in progress as Task 8 on `feat/task8-safari-phone-test`: baseline and verified
 fixture export, seven desktop runtime preflight cases, generated S07/S08 inputs
-and the Task 9, 10 and 11 master merges pass. The user reported iOS 26.5.2; private-network setup still needs their
+and every reviewed master merge through Task 16 pass. The user reported iOS 26.5.2; private-network setup still needs their
 coordination.
 No Safari/physical-phone cases have run. D-024 waives routine understanding
 stops, not actual device/settings actions.

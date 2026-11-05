@@ -5,11 +5,11 @@ function workout(finishedAt: number | null = null) {
   return { id: 'workout-1', name: 'Upper body', unit: 'kg', startedAt: 1000, finishedAt,
     exercises: [{ id: 'exercise-1', name: 'Bench press', sets: [{ id: 'set-1', reps: 8, weight: 60.5 }] }] };
 }
-const document = () => ({ version: 1, revision: 0, active: workout(), history: [] });
+const document = () => ({ version: 2, revision: 0, active: workout(), history: [] });
 
 describe('workout storage boundary', () => {
   it('starts empty without fabricating workouts', () => {
-    expect(emptyWorkoutData()).toEqual({ version: 1, revision: 0, active: null, history: [] });
+    expect(emptyWorkoutData()).toEqual({ version: 2, revision: 0, active: null, history: [] });
     expect(validateWorkoutData(emptyWorkoutData())).toEqual(emptyWorkoutData());
   });
   it('accepts fractional loads, zero added load and explicit units', () => {
@@ -24,7 +24,7 @@ describe('workout storage boundary', () => {
       history: [{ ...workout(2000), exercises: [] }] })).toThrow();
   });
   const invalid = [
-    ['future schema', () => ({ ...document(), version: 2 })],
+    ['future schema', () => ({ ...document(), version: 3 })],
     ['negative revision', () => ({ ...document(), revision: -1 })],
     ['unknown media fields', () => ({ ...document(), video: 'blob:private' })],
     ['missing history', () => ({ version: 1, revision: 0, active: null })],

@@ -7,6 +7,7 @@ Read only the relevant sections of the longer records after that.
 | --- | --- |
 | [PRODUCT_BRIEF.md](PRODUCT_BRIEF.md) | Original user brief; preserve unchanged |
 | [DECISIONS.md](DECISIONS.md) | Accepted amendments, including identity and bench scope |
+| [PRODUCT_DIRECTION.md](PRODUCT_DIRECTION.md) | The user's product Q&A answers (Q1–Q9) and the remaining roadmap; not a claim that features exist |
 | [spec.md](../spec.md) | Current milestone contract and acceptance |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Existing system and intended boundaries |
 | [WORKFLOW.md](WORKFLOW.md) | Teaching, independent review, and tool handoffs |
@@ -19,6 +20,10 @@ Read only the relevant sections of the longer records after that.
 | [Observed processing time](superpowers/plans/2026-11-04-processing-time.md) | Completed Task 10 (D-026): one run's admission-to-result time badge |
 | [Legacy cleanup](superpowers/plans/2026-11-04-legacy-cleanup.md) | Completed Task 12 (D-028): remove unrendered legacy code, unused analysis types and template assets |
 | [Config type-check](superpowers/plans/2026-11-04-config-typecheck.md) | Completed Task 11 (D-027): build checks the Vite/Vitest config files; template config removed |
+| [Browser checks](superpowers/plans/2026-11-04-browser-smoke.md) | Completed Task 13 (D-029): repeatable non-human Chromium checks, locally and hosted |
+| [Workout logging](superpowers/plans/2026-11-04-workout-logging.md) | Completed Task 14 (D-030): Home, local manual workout log and history in IndexedDB |
+| [Rest timer](superpowers/plans/2026-11-04-rest-timer.md) | Completed Task 15 (D-033): manual, session-only rest timer |
+| [Saved routines](superpowers/plans/2026-11-05-saved-routines.md) | Completed Task 16 (D-034): local routines with optional targets that start fresh workouts |
 
 Follow [documentation rules](AGENTS.md). Update the compact handoff after a work
 chunk; keep historical evidence in STATUS instead of copying it into every file.

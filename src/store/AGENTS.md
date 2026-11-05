@@ -20,5 +20,9 @@ Inherit [source guidance](../AGENTS.md). Follow the
   workout records locally, with atomic revision checks and save-before-state
   updates. Keep the pose session in memory; never persist clips, URLs or landmarks.
   Failed reads/writes/conflicts must preserve existing data and offer recovery.
+- D-034 extends the same local document to schema2 routines. Never write during
+  legacy normalization or add defaults that exceed the old size cap. Whole-
+  routine editors retain their opening revision; starts copy fresh IDs/empty
+  actual sets, with targets and units independent of later template edits.
 - Retain missingness and quality information from processing rather than reducing
   it to a ready/error boolean or an arbitrary quality score.

@@ -1,6 +1,11 @@
 export type WeightUnit = 'lb' | 'kg';
 export interface WorkoutSet { readonly id: string; readonly reps: number; readonly weight: number }
-export interface WorkoutExercise { readonly id: string; readonly name: string; readonly sets: readonly WorkoutSet[] }
+export interface RoutineTargets { readonly targetSets?: number; readonly targetReps?: number }
+export interface RoutineExerciseInput extends RoutineTargets { readonly name: string }
+export interface RoutineExercise extends RoutineExerciseInput { readonly id: string }
+export interface RoutineInput { readonly name: string; readonly unit: WeightUnit; readonly exercises: readonly RoutineExerciseInput[] }
+export interface WorkoutRoutine extends RoutineInput { readonly id: string; readonly exercises: readonly RoutineExercise[] }
+export interface WorkoutExercise extends RoutineTargets { readonly id: string; readonly name: string; readonly sets: readonly WorkoutSet[] }
 export interface Workout {
   readonly id: string;
   readonly name: string;
@@ -11,9 +16,11 @@ export interface Workout {
   readonly exercises: readonly WorkoutExercise[];
 }
 export interface WorkoutData {
-  readonly version: 1;
+  readonly version: 2;
   readonly revision: number;
   readonly active: Workout | null;
   readonly history: readonly Workout[];
+  /** Omitted when upgrading legacy data so exact-cap records do not grow on read. */
+  readonly routines?: readonly WorkoutRoutine[];
 }
 export type WorkoutResult = { ok: true } | { ok: false; message: string };

@@ -10,6 +10,176 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task 16 (saved routines, D-034) is **complete and integrated**. Its reviewed
+source `4c1b519` passed every local, review and hosted gate; master is
+fast-forwarded to `ac5e3fe`, Task 16's final documentation commit, and pushed.
+This original checkout's `feat/task8-safari-phone-test` branch merged that master
+with a merge commit that keeps both histories, and the temporary
+`GymBro AI-task16` worktree has been removed, so this checkout is the only
+worktree. One hosted browser run on master (41985529794, identical source)
+failed for a reason not yet visible, because its log needs a signed-in admin
+account; the same suite passes locally and passed in hosted run 8, and the failure
+stays open until the user reads the log or re-runs the job. No approved
+implementation task remains; the next work needs the user (that log, the phone
+session, Q10, or a newly approved feature). Task 8 and Task 4 physical phone and
+bench gates remain open.
+
+### Original Task8 checkout integration of Task16
+
+- Claude Code (Opus 5.5), 2026-11-05, under process-local Node 22.23.2 (confirmed
+  with `node -v`). The original checkout was clean on
+  `feat/task8-safari-phone-test` at `0895f32`, which already contained master
+  `7d97ac6`. Merged master `ac5e3fe` with `git merge --no-ff`: no rebase, force
+  push or Task 4 merge.
+- Git merged every file except `AGENTS.md` and `HANDOFF.md`. `AGENTS.md` keeps
+  this branch's Task 15 test-count note in the past tense, followed by master's
+  current Task 16 baseline. HANDOFF combines master's current record with this
+  branch's own facts (the Q&A asking rule, the original-folder and preview notes,
+  the unrelated listener and the phone limits).
+- STATUS merged automatically. A line-by-line check found every non-blank line of
+  both sides present except one heading: master's "Task15 final hosted acceptance
+  and integration" section has a body identical to this branch's "Task15 final
+  hosted run details" section, so the two merged under this branch's heading. This
+  branch's "Original Task8 checkout integration of Task15" record is kept. The
+  phone plan keeps this branch's amendments, and the plans index keeps its Task 8
+  notes, with the stale "Task 9, 10 and 11 master merges" phrase corrected.
+- Every non-Markdown file equals master (`git diff master -- . ":!*.md"` is
+  empty). `npm ls --depth=0` exit 0; **494 tests / 26 files** pass; lint exit 0;
+  `npm run mobile:sync` exit 0 with 421 modules, the reviewed bundle names
+  `index-Ds3ylwAP.css`, `index-Bv_ujMEI.js` and `web-Bh0Ubt_t.js`, and 11 verified
+  shared files per platform. After the hosted failure below, the 17-case browser
+  suite was run here too: `npm run test:browser` exit 0, **17 passed (4.3 minutes)**,
+  on Playwright's own loopback server at `127.0.0.1:4179`, which was free before
+  and released afterwards. Its only warnings were the known missing MediaPipe
+  source map and a NO_COLOR notice.
+- Worktree removal: `git worktree list` named exactly the sibling folder
+  `GymBro AI-task16`, next to this checkout, on `feat/task16-saved-routines`. Its `git status --porcelain` was empty, the branch
+  matched `origin/feat/task16-saved-routines` at `ac5e3fe`, and no process used the
+  folder. Before removal, its four previews were confirmed identical (SHA-256) to
+  the copies in this checkout's ignored `build/visual-review/task16/`, and its
+  `preview.mjs` and Codex progress ledger were copied to the same ignored paths
+  here. `git worktree remove` (without `--force`) exit 0 and the folder is gone.
+  Every local and remote branch is kept.
+- Hosted runs started by the master push, on source identical to `4c1b519`:
+  [native run 41985529764](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41985529764) **success** (shared checks, Android debug
+  APK, iOS simulator build and startup; packages not downloaded).
+  [Browser run 41985529794](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41985529794) **failure**, attempt 1: checkout,
+  `npm ci`, `npm test`, lint, build and the Playwright browser install passed;
+  step 9, `npm run test:browser`, failed after 352 seconds. Its only annotation is
+  "Process completed with exit code 1", the check run has no output text, and
+  the job-log API answers 403 "Must have admin rights to Repository". No
+  credentials were added, so the failing case is unknown.
+- Comparison: hosted browser run 8 passed the same source in 256 seconds (06:49
+  UTC), Task 15's master browser run passed in 326 seconds, and this failed run
+  (07:11 UTC) also took longer in `npm ci` (7 s against 5 s) and the browser
+  install (48 s against 25 s). The suite uses one worker, no retries, 10-second
+  action and expect timeouts and a 360-second test timeout; 352 seconds in total
+  means no case reached the 360-second limit. The browser tests read only
+  `tests/fixtures/*.mp4` with hashes fixed in `verify-fixtures.ts`, never the
+  documents, so the local 17/17 run is a fair comparison. A slower runner
+  meeting a 10-second wait is one possible cause; it is unconfirmed. Treat the
+  failure as open until the user reads the log while signed in or re-runs the
+  job; a real failing case gets a test-first fix.
+
+### Task16 Step3 completion and master integration
+
+- Claude Code (Opus 5.5), 2026-11-05, in the `GymBro AI-task16` worktree on
+  `feat/task16-saved-routines` at `e996794`, Codex's Markdown-only handoff after
+  the reviewed source `4c1b519`. The tree was clean. No process ran from the
+  worktree, and the only listener was an unrelated project's Vite server on
+  `[::1]:5173`, so there was no owned server to stop.
+- `git diff --name-only 4c1b519 HEAD` lists Markdown files only, so the reviewed
+  source is exactly what reaches master; `7d97ac6` is an ancestor of the branch.
+- Under process-local Node 22.23.2 (confirmed with `node -v`): `npm ls --depth=0`
+  exit 0; **494 tests / 26 files** pass; lint exit 0; build exit 0 with 421 modules
+  and the reviewed bundle names `index-Ds3ylwAP.css`, `index-Bv_ujMEI.js` and
+  `web-Bh0Ubt_t.js`.
+- This commit changes documentation only: HANDOFF (rewritten in full sentences
+  with every earlier fact kept), this record, the plan's Step 3 checkbox (split so
+  master shows only the finished part), and the indexes. `docs/README.md` lacked
+  rows for Tasks 13–16 and PRODUCT_DIRECTION, and the specs index lacked Tasks 15
+  and 16; both now list them.
+- The four synthetic previews already matched their copies in the original
+  checkout's ignored `build/visual-review/task16/` (SHA-256 compared). The
+  worktree-only `preview.mjs` script and the Codex progress ledger
+  (`.superpowers/sdd/2026-11-05-saved-routines/progress.md`) were copied to the
+  same ignored paths in the original checkout, hashes matching, before removal.
+- Master fast-forwards to this commit and is pushed. Relative to `7d97ac6` the
+  push changes `src/**`, so it starts hosted browser and native runs on source
+  identical to `4c1b519`; the Task 8 branch's records note their results.
+
+### Transfer to Claude Code after Codex limit
+
+- User explicitly requests switching to Claude Code. Codex stops development;
+  this handoff is the only remaining Codex mutation. Work in Task16 sibling,
+  branch feat/task16-saved-routines, reviewed source4c1b519; original Task8 stays
+  clean at0895f32 and master stays7d97ac6. Do not merge/switch the original branch
+  blindly or delete the Task16 worktree before completing integration.
+- All local/source checks and fresh design/code reviews have passed. [Browser8](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41983009261)
+  and [native15](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41983009299)
+  BOTH succeed on exact4c1b519fa648a8956fc6e1bb606cb9cdc725fe12, including simulator
+  visible empty Home startup. No code fix or repeat full review is outstanding.
+- Fresh final494tests/26files,lint/build pass unchanged source; guarded sync and
+ 17local browser cases already pass. Only Markdown follows4c1b519. Claude next
+ completes Step3/master FF/push, original Task8 preserved-history merge/parity/
+ checks/commit/push, final records and clean worktree cleanup. Retain all branches.
+- Owned loopback4183 PID/command line was verified and only that server stopped.
+  Four synthetic editor/library previews were copied to original ignored
+  build/visual-review/task16; no human data uploaded. No listener/phone/media/
+  settings/signing action. Keep offered video private and phone gates separate.
+- Original Task8 STATUS contains an extra Task15 integration section not present
+  in master7d97ac6; preserve that historical record during the later Markdown merge.
+  No source conflict is expected, but verify rather than assume parity.
+
+- Locked process-local Node22.23.2 install:482packages,458baseline tests/23files,
+  lint/build and owned loopback4183 health200 pass before implementation. Fresh
+  Goldfish review:ready/no findings, actual runtime model unavailable, no checks
+  executed by reviewer; dated design-review record states its exact scope.
+- Design/plan dated2026-11-05 specify version2 with strict no-write v1 normalization,
+  optional routine key preserving legacy exact-size records, fresh empty-set
+  snapshots, expected-revision editor guards and actual/target separation.
+- Existing managed-worktree failure on stale liftform metadata is unchanged;
+  normal Git sibling fallback is used, following prior task convention. No global
+  Node/settings/user servers/private media changed.
+
+### Task16 Step1 schema/store foundation
+
+-16 failing cases observed for unsupported v2/migration/actions;82focused cases
+  GREEN after validated contracts/store actions.30 new tests total, including
+  legacy read-without-write/first explicit save/failure and exact1,000,000-char
+  record preservation. Strict v1 rejects new fields; v2 separates targets/actuals.
+- **488tests/25files**,lint/build pass. Initial build caught test-only Object.hasOwn
+  requiring ES2022; replaced with existing ES2020-compatible prototype call,
+  preserving target/runtime. No config or dependency changes.419modules.
+- No writes on normalization, no added empty-routines default, atomic revision
+  and final-size checks unchanged. Template actions preserve snapshots and reject
+  stale editor revisions even after reload. UI/browser/mobile checks are Step2;
+  no completed routine interface or physical-device claim at this step.
+
+### Task16 Step2 interface and browser evidence
+
+- Six React App flow tests RED (missing Routines) ->GREEN after implementation;
+ 13focused App cases including prior7 workout cases pass. Create/edit/reorder,
+ independent optional targets, fresh empty actual sets/counts, failed inputs,
+ stale reload/reopen, confirmed delete and active timer/snapshot retention covered.
+- **494tests/26files**,lint/build/guarded sync pass;421modules,11 shared files per
+ platform. CSS index-Ds3ylwAP.css, JS index-Bv_ujMEI.js, web-Bh0Ubt_t.js.
+- Three actual Chromium routine cases pass (6.6seconds): CRUD/order/targets/fresh
+ starts/history, native IndexedDB v1 read-without-write then first v2 save, two
+ tabs/stale editor after reload. First CRUD test reloaded before async save
+ completion; explicit saved-heading waits fix the test race, no production change.
+- Synthetic editor/library UI inspected at390/1280 with no overflow; previews in
+ ignored build/visual-review/task16. Chromium156.0.8078.4. Separate visual script,
+ not harness captures. No human media/logs/frames/pose or uploads.
+- Full17-case suite passes in3.5minutes:Chromium156.0.8078.4/GPU delegate label/
+ 120no-person samples, not a hardware benchmark or human-bench validation.
+- Fresh read-only Codex reviewer (requested gpt-6-astra, runtimeID unavailable)
+ independently passed77tests/8files and diff check with **no significant findings**.
+ Production unchanged after review. Dated review includes limits/dispositions.
+ Hosted/native and physical-device behavior remain separate pending checks.
+
+### Previous Task15 evidence
+
 Task15 is complete: reviewed source `9eef2fb` has been fast-forwarded/pushed to
 master after all local/hosted gates passed. It started from reviewed `b09f79a` in
 isolated `GymBro AI-task15`, branch `feat/task15-rest-timer`.

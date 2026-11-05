@@ -7,6 +7,14 @@ conflicts and uncertain errors require explicit recovery. Media/session data bel
 stay in memory. The new store's tests cover draft/edit/finish/history and ordering;
 repository tests exercise actual transaction code with the missing API adapted.
 
+Task16/D-034 extends that same document/revision with local routines. Schema2
+reads strict v1 without writing, adding defaults or increasing legacy JSON size;
+the next explicit successful save persists v2. Optional routines/target metadata
+remain plain data. Create/update/delete/start use the existing atomic repository;
+whole-routine edits retain their opening revision after reload. A start copies
+order/unit/targets into fresh IDs with empty actual sets. Routine changes never
+rewrite the active workout/history; media stays in memory.
+
 `useSessionStore.ts` exports `createSessionStore(deps)` and the app's single
 `useSessionStore`. The store holds at most one clip and owns its whole lifecycle:
 

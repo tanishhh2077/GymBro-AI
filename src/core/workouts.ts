@@ -5,15 +5,16 @@ export class WorkoutError extends Error {
     super(message); this.name = 'WorkoutError';
   }
 }
-export function emptyWorkoutData(): WorkoutData { return { version: 1, revision: 0, active: null, history: [] }; }
+export function emptyWorkoutData(): WorkoutData { return { version: 2, revision: 0, active: null, history: [] }; }
 
 function requireValue(condition: unknown, message = 'Saved workout data is invalid or exceeds the supported limits.'): asserts condition {
   if (!condition) throw new WorkoutError('validation', message);
 }
-function record(value: unknown, keys: string[]): Record<string, unknown> {
+function record(value: unknown, keys: string[], optional: string[] = []): Record<string, unknown> {
   requireValue(value !== null && typeof value === 'object' && !Array.isArray(value));
   const item = value as Record<string, unknown>;
-  requireValue(Object.keys(item).length === keys.length && keys.every(key => Object.prototype.hasOwnProperty.call(item, key)));
+  requireValue(Object.keys(item).every(key => keys.includes(key) || optional.includes(key)) &&
+    keys.every(key => Object.prototype.hasOwnProperty.call(item, key)));
   return item;
 }
 function name(value: unknown) {
@@ -28,7 +29,14 @@ export function validateSetValues(reps: number, weight: number): void {
   requireValue(Number.isInteger(reps) && reps >= 1 && reps <= 1000, 'Enter whole-number reps from 1 to 1000.');
   requireValue(Number.isFinite(weight) && weight >= 0 && weight <= 10000, 'Enter a weight from 0 to 10000. Use 0 for no added load.');
 }
-function workout(value: unknown, complete: boolean, ids: Set<string>) {
+function targets(item: Record<string, unknown>) {
+  for (const [key, max] of [['targetSets', 100], ['targetReps', 1000]] as const) {
+    if (Object.prototype.hasOwnProperty.call(item, key)) requireValue(typeof item[key] === 'number' &&
+      Number.isInteger(item[key]) && item[key] >= 1 && item[key] <= max,
+    `Enter a whole-number ${key === 'targetSets' ? 'set' : 'rep'} target from 1 to ${max}, or leave it blank.`);
+  }
+}
+function workout(value: unknown, complete: boolean, ids: Set<string>, allowTargets: boolean) {
   const item = record(value, ['id', 'name', 'unit', 'startedAt', 'finishedAt', 'exercises']);
   identifier(item.id, ids); name(item.name); timestamp(item.startedAt);
   requireValue(item.unit === 'lb' || item.unit === 'kg');
@@ -39,8 +47,9 @@ function workout(value: unknown, complete: boolean, ids: Set<string>) {
   requireValue(Array.isArray(item.exercises) && item.exercises.length <= 100 && (!complete || item.exercises.length > 0));
   const entries = new Set<string>();
   for (const value of item.exercises) {
-    const exercise = record(value, ['id', 'name', 'sets']);
+    const exercise = record(value, ['id', 'name', 'sets'], allowTargets ? ['targetSets', 'targetReps'] : []);
     identifier(exercise.id, entries); name(exercise.name);
+    targets(exercise);
     requireValue(Array.isArray(exercise.sets) && exercise.sets.length <= 100 && (!complete || exercise.sets.length > 0));
     for (const value of exercise.sets) {
       const set = record(value, ['id', 'reps', 'weight']); identifier(set.id, entries);
@@ -51,12 +60,30 @@ function workout(value: unknown, complete: boolean, ids: Set<string>) {
 }
 /** Reject unknown fields as well as bad values; media/pose objects never cross this boundary. */
 export function validateWorkoutData(value: unknown): WorkoutData {
-  const item = record(value, ['version', 'revision', 'active', 'history']);
-  requireValue(item.version === 1 && typeof item.revision === 'number' && Number.isSafeInteger(item.revision) && item.revision >= 0);
+  const version2 = value !== null && typeof value === 'object' && (value as Record<string, unknown>).version === 2;
+  const item = record(value, ['version', 'revision', 'active', 'history'], version2 ? ['routines'] : []);
+  requireValue((item.version === 1 || item.version === 2) && typeof item.revision === 'number' && Number.isSafeInteger(item.revision) && item.revision >= 0);
   requireValue(Array.isArray(item.history) && item.history.length <= 1000);
   const ids = new Set<string>();
-  if (item.active !== null) workout(item.active, false, ids);
-  for (const value of item.history) workout(value, true, ids);
+  if (item.active !== null) workout(item.active, false, ids, version2);
+  for (const value of item.history) workout(value, true, ids, version2);
+  if (Object.prototype.hasOwnProperty.call(item, 'routines')) {
+    requireValue(Array.isArray(item.routines) && item.routines.length <= 100, 'Save up to 100 routines on this device.');
+    const routineIds = new Set<string>();
+    for (const value of item.routines) {
+      const routine = record(value, ['id', 'name', 'unit', 'exercises']);
+      identifier(routine.id, routineIds); name(routine.name);
+      requireValue(routine.unit === 'lb' || routine.unit === 'kg');
+      requireValue(Array.isArray(routine.exercises) && routine.exercises.length >= 1 && routine.exercises.length <= 100,
+        'Add 1 to 100 named exercises to each routine.');
+      const exerciseIds = new Set<string>();
+      for (const value of routine.exercises) {
+        const exercise = record(value, ['id', 'name'], ['targetSets', 'targetReps']);
+        identifier(exercise.id, exerciseIds); name(exercise.name); targets(exercise);
+      }
+    }
+  }
   requireValue(JSON.stringify(value).length <= 1_000_000);
-  return value as WorkoutData;
+  // No defaults or writes: a valid legacy record at the size cap stays readable.
+  return (item.version === 1 ? { ...item, version: 2 } : value) as WorkoutData;
 }

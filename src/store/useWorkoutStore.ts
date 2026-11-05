@@ -1,6 +1,6 @@
 import { createStore } from 'zustand/vanilla';
 import { emptyWorkoutData, validateSetValues, validateWorkoutData, WorkoutError } from '@/core/workouts';
-import type { WeightUnit, Workout, WorkoutData, WorkoutExercise, WorkoutResult } from '@/types/workout';
+import type { RoutineInput, WeightUnit, Workout, WorkoutData, WorkoutExercise, WorkoutResult, WorkoutRoutine } from '@/types/workout';
 import { createWorkoutRepository, type WorkoutRepository } from './workoutRepository';
 interface WorkoutDeps { id: () => string; now: () => number }
 export interface WorkoutState {
@@ -15,6 +15,10 @@ export interface WorkoutState {
   finishWorkout: () => Promise<WorkoutResult>;
   discardWorkout: () => Promise<WorkoutResult>;
   deleteWorkout: (id: string) => Promise<WorkoutResult>;
+  createRoutine: (input: RoutineInput) => Promise<WorkoutResult>;
+  updateRoutine: (id: string, expectedRevision: number, input: RoutineInput) => Promise<WorkoutResult>;
+  deleteRoutine: (id: string) => Promise<WorkoutResult>;
+  startRoutine: (id: string) => Promise<WorkoutResult>;
 }
 const browserDeps: WorkoutDeps = {
   // getRandomValues also works on the trusted HTTP LAN used for phone testing.
@@ -37,6 +41,15 @@ function editExercise(data: WorkoutData, id: string, change: (value: WorkoutExer
   return { ...data, active: { ...draft, exercises: draft.exercises.map(e => e.id === id ? change(e) : e) } };
 }
 export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutDeps = browserDeps) {
+  function preparedRoutine(id: string, input: RoutineInput): WorkoutRoutine {
+    if (!Array.isArray(input.exercises) || !input.exercises.length || input.exercises.length > 100) invalid('Add 1 to 100 named exercises to each routine.');
+    return { ...input, id, name: cleanName(input.name), exercises: input.exercises.map(e => ({ ...e, id: deps.id(), name: cleanName(e.name) })) };
+  }
+  function routine(data: WorkoutData, id: string): WorkoutRoutine {
+    const found = data.routines?.find(r => r.id === id);
+    if (!found) invalid('This routine is no longer available. Reopen routines to continue.');
+    return found;
+  }
   return createStore<WorkoutState>()((set, get) => {
     let loading: Promise<WorkoutResult> | null = null;
     const blocked = (message: string): WorkoutResult => ({ ok: false, message });
@@ -118,6 +131,26 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
       deleteWorkout: id => commit(data => {
         if (!data.history.some(w => w.id === id)) invalid('This saved workout is no longer available.');
         return { ...data, history: data.history.filter(w => w.id !== id) };
+      }),
+      createRoutine: input => commit(data => {
+        if ((data.routines?.length ?? 0) >= 100) invalid('You already have 100 routines. Delete one before adding another.');
+        return { ...data, routines: [...(data.routines ?? []), preparedRoutine(deps.id(), input)] };
+      }),
+      updateRoutine: (id, expectedRevision, input) => commit(data => {
+        if (data.revision !== expectedRevision) invalid('Saved workouts or routines changed. Reopen this routine before saving your edits.');
+        routine(data, id);
+        const updated = preparedRoutine(id, input);
+        return { ...data, routines: data.routines!.map(r => r.id === id ? updated : r) };
+      }),
+      deleteRoutine: id => commit(data => {
+        routine(data, id);
+        return { ...data, routines: data.routines!.filter(r => r.id !== id) };
+      }),
+      startRoutine: id => commit(data => {
+        if (data.active) invalid('Finish or discard the active workout before starting another routine.');
+        const source = routine(data, id);
+        return { ...data, active: { id: deps.id(), name: source.name, unit: source.unit, startedAt: deps.now(), finishedAt: null,
+          exercises: source.exercises.map(e => ({ ...e, id: deps.id(), sets: [] })) } };
       }),
     };
   });
