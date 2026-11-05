@@ -68,8 +68,11 @@ startup. Packages were not downloaded. Ignored `build/artifacts/run-5/` contains
 older Task 9 packages, without the processing badge. Task 13 changes tooling,
 not app/native sources; later master workflows are separate evidence. Pushing
 Task 8 does not trigger these workflows; do not change repository settings.
-Master browser run 2 (`41948751190`) and native run 9 (`41948751280`) for
-`a524387` are in progress; run 1 above is the completed browser evidence.
+[Master browser run 2](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41948751190)
+for `a524387` also passed: 391 tests/lint/build and 10 browser cases in 5.6 minutes,
+same browser/GPU delegate label/120 no-person samples. Native run 9 (`41948751280`)
+has passed shared checks and Android compilation; iOS simulator startup is still
+running. Do not report the whole native run as passed yet.
 
 ## Video and product boundaries
 
@@ -84,6 +87,14 @@ synchronized overlay/player, image-space elbow traces/summary and observed
 processing-time badge. No backend, accounts, persistence, reps or form verdicts.
 Sample counts are availability, not confidence; extrema are not per-rep ROM or
 measured 3D anatomy. Safari success will not prove native or bench accuracy.
+
+## Later product-design discussion
+
+The user mentioned Hevy as a future direction and wants a detailed Q&A about
+features and appearance (roughly 15-30 questions if useful). They explicitly
+deferred that conversation: focus on the current validation task first. The
+meaning of the Hevy reference, feature selection and visual direction remain
+open; clarify them during that later discussion before implementation.
 
 ## Environment and Git
 

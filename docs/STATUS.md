@@ -19,6 +19,24 @@ user will bring a trusted hotspot connection and video later; neither is ready
 for acceptance now. No LAN listener, phone transfer, Safari case or human-video
 processing has run. Local merge verification passes as recorded below.
 
+The user has deferred a detailed future Q&A about Hevy, features and app
+appearance (15-30 questions if useful) until after the current task. Recorded in
+HANDOFF for provider continuity; no new feature/integration/design is specified.
+
+### Post-merge automated checks
+
+- [Master browser run 2](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41948751190),
+  source `a524387`, completed successfully: 391 tests, lint/build and all 10
+  real-browser cases in 5.6 minutes. Logs record browser 156.0.8078.4/GPU delegate
+  label/120 no-person samples. Timing varies across hosts/runs; no phone or
+  physical-GPU performance claim.
+- Native run 9 (`41948751280`) passed shared checks and Android compilation.
+  Its iOS simulator startup step is in progress; whole-run success is unverified.
+- Documentation-only follow-up: recorded the user's deferred Hevy/design Q&A.
+  Fresh process-local Node 22.23.2 checks: 391 tests / 18 files, lint/build pass,
+  411 modules and unchanged app bundles. No phone, network/settings or human-media
+  action. Keep the current validation gates open until actual evidence arrives.
+
 ### Task 8 merge of reviewed master (Task 13)
 
 - Codex, 2026-11-04. Master `a524387` includes fresh design/code review and
