@@ -203,7 +203,8 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
 - On 2026-11-03 `master` was pushed to GitHub for the first time, still at the
   scaffold commit. GitHub's default branch is still the feature branch; the user
   changes it under Settings > General > Default branch once `master` holds the
-  reviewed work, because no GitHub CLI or token is available to agents.
+  reviewed work, because no GitHub CLI or token is available to agents. The user
+  made that switch on 2026-11-05; the default branch is now `master`.
 
 ### D-020: Continue independent work when a prerequisite is blocked
 

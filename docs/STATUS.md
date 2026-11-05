@@ -17,8 +17,9 @@ This original checkout's `feat/task8-safari-phone-test` branch merged that maste
 with a merge commit that keeps both histories, and the temporary
 `GymBro AI-task16` worktree has been removed, so this checkout is the only
 worktree. At the user's request, master was then fast-forwarded to this branch
-and the old default branch to master; Task 4 stays unmerged (see "Branch merges
-at the user's request"). One hosted browser run on master (41985529794, identical source)
+and the old default branch to master, and the user switched GitHub's default
+branch to `master`; Task 4 stays unmerged (see "Branch merges at the user's
+request"). One hosted browser run on master (41985529794, identical source)
 failed for a reason not yet visible, because its log needs a signed-in admin
 account; the same suite passes locally and passed in hosted run 8, and the failure
 stays open until the user reads the log or re-runs the job. No approved
@@ -42,6 +43,15 @@ bench gates remain open.
   and neither lists that branch for pushes, so the move starts no run. Both
   workflows declare `workflow_dispatch`, which GitHub's Actions page offers only
   for workflows on the default branch; it should now be available (not tried).
+- The user then asked the agent to switch GitHub's default branch to `master`.
+  No GitHub CLI or token is available and stored Git credentials were not used,
+  so the agent tried the user's signed-in browser through the Claude in Chrome
+  extension. The settings page opened, but seven later extension actions failed
+  with "Couldn't determine which page this action targets", so the agent
+  stopped before clicking anything; GitHub's API still reported the old default.
+  The user made the switch; the public API now reports `default_branch: master`,
+  and `git remote set-head origin -a` moved this clone's `origin/HEAD` to
+  `origin/master`. The extension could not close the tab it had opened.
 - `feat/task4-browser-acceptance` (`34538e4`) is 3 commits ahead and 48 behind.
   An in-memory `git merge-tree` trial conflicts in 16 files: AGENTS, README,
   ARCHITECTURE, DECISIONS, HANDOFF, STATUS, the plans index, `eslint.config.js`,

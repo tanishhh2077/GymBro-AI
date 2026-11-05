@@ -36,8 +36,10 @@ with its old default branch, which was 52 commits behind.
   Markdown. This is not phone acceptance: Task 8's Safari cases have not run,
   and the phone session continues on this branch.
 - The old default branch `feat/gymbro-video-landmarks` was fast-forwarded to
-  master. The default-branch setting itself is unchanged; switching it to
-  `master` remains the user's choice.
+  master. The user then switched GitHub's default branch to `master` themselves
+  (the agent's browser attempt failed before changing anything); GitHub's API
+  confirms `default_branch: master`. The old branch is now an ordinary branch at
+  master's commit, kept until the user agrees to delete it.
 - Task 4 (`feat/task4-browser-acceptance`) stays unmerged. A trial merge
   conflicts in 16 files, including `package.json`, the lockfile and the test
   configuration, because Task 13 later rebuilt the same browser-test area. Its
@@ -183,10 +185,9 @@ and no validated bench-accuracy claim, and it is not a complete release.
   development server on port 5193 is no longer running.
 - Run the full tests, lint and build before each green step commit. No
   attribution trailers, force pushes or branch deletion.
-- Keep the Task 8, Task 4 and feature-branch histories. GitHub's default-branch
-  setting is still `feat/gymbro-video-landmarks`, which now points at master's
-  commit; switching the setting to `master` is the user's choice. Make no
-  settings, signing, payment or publication change.
+- Keep the Task 8, Task 4 and feature-branch histories. GitHub's default branch
+  is `master` (switched by the user on 2026-11-05). Make no other settings,
+  signing, payment or publication change unless the user asks.
 - Synthetic previews from Tasks 14, 15 and 16 are kept only in this checkout's
   ignored `build/visual-review/` folder; none are uploaded or contain human data.
   Markdown is the provider-neutral handoff.
