@@ -11,15 +11,16 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 waives routine "Is this clear?" stops, but every phone, account, network or
 settings action is coordinated with the user. Do not merge Task 4.
 
-The branch has merged reviewed master three times with merge commits that keep
+The branch has merged reviewed master four times with merge commits that keep
 both published histories: `3209025` (Task 9), `aec3cb2` (Task 10, the
-processing-time badge, D-026) and `eaf87e1` (Task 11, D-027: the build also
-type-checks the Vite/Vitest config files; no application code change). Its
-non-Markdown files equal master, so those tasks' fresh reviews cover the merged
-code; native run6 covers Task 10's source. Under process-local Node 22.23.2:
-**383 tests / 16 files**, lint and guarded `mobile:sync` (build, 411 modules,
-13 verified files per platform) pass. Details are in STATUS, "Task 8 merge of
-reviewed master (Task 11)".
+processing-time badge, D-026), `eaf87e1` (Task 11, D-027: the build also
+type-checks the Vite/Vitest config files) and `1c44729` (Task 12, D-028: unrendered
+legacy code, unused analysis types and template assets removed; screens
+unchanged). Its non-Markdown files equal master, so those tasks' fresh reviews
+cover the merged code; native run7 passed for Task 11's source. Under
+process-local Node 22.23.2: **385 tests / 17 files**, lint and guarded
+`mobile:sync` (build, 411 modules, 11 verified shared files per platform) pass.
+Details are in STATUS, "Task 8 merge of reviewed master (Task 12)".
 
 During the phone session, a completed clip shows "Processing took N seconds on
 this device"; record it as the plan's elapsed-time observation (one run; whether
@@ -62,9 +63,10 @@ verdicts. Summary availability is not accuracy confidence; observed extrema can
 include tracking errors and are not per-rep ROM or 3D anatomy.
 
 Capacitor 8.6.0/App 8.1.2 prototypes use appId `com.gymbroai.app`, version 0.1.0.
-[Master run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41913320712)
-(Task 10 source) compiled both platforms and passed its iOS simulator startup
-job; its packages were not downloaded (that needs a signed-in account).
+[Master run7](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41936252985)
+(Task 11 source `eaf87e1`) and run6 (Task 10 source) compiled both platforms and
+passed their iOS simulator startup jobs; their packages were not downloaded (that
+needs a signed-in account). Master `1c44729` (Task 12) started a further run.
 [Run5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
 verified visible iPhone 17 Pro/iOS 26.4 simulator startup with Xcode 26.6/17F113;
 its packages are in ignored `build/artifacts/run-5/` (Task 9 source, no badge).

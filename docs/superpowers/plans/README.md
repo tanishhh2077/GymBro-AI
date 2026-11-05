@@ -1,10 +1,15 @@
 # Implementation plans
 
-Latest completed feature: [Task 11 config type-check](2026-11-04-config-typecheck.md)
+Latest completed feature: [Task 12 legacy cleanup](2026-11-04-legacy-cleanup.md)
+under D-028: unrendered legacy code, unused analysis types and template assets
+removed; screens unchanged. All 4 steps, 385 tests and a fresh review pass;
+fast-forwarded to master.
+
+Preceding feature: [Task 11 config type-check](2026-11-04-config-typecheck.md)
 under D-027. The build checks `vite.config.ts`/`vitest.config.ts` with Node types
 and the unused template `tsconfig.app.json` is deleted; no application source
 changes. All 3 steps, 383 tests and a fresh review pass; fast-forwarded to master.
-Task 8's branch has merged this master (`eaf87e1`) with a merge commit.
+Task 8's branch has merged this master (`eaf87e1`) and later `1c44729` with merge commits.
 
 Preceding feature: [Task 10 observed processing time](2026-11-04-processing-time.md)
 under D-026: one completed run's measured time, not a benchmark. All 3 steps,

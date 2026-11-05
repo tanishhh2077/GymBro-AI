@@ -18,7 +18,7 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
 - Findings must be traceable to observations, measurements, and video time. Decline unsupported conclusions.
 - No invented metrics, arbitrary numeric form scores, LLM-invented technique feedback, medical claims, or claims of verified 3D biomechanics.
 - Pose coverage and model visibility have narrower meanings than accuracy or movement quality.
-- This supersedes legacy required score fields and comments that imply view-invariant measured biomechanics. Those types remain unchanged until an approved implementation task revises them.
+- This supersedes legacy required score fields and comments that imply view-invariant measured biomechanics. Those types remain unchanged until an approved implementation task revises them. (D-028 removed them on 2026-11-04.)
 
 ### D-003: On-device processing for the first milestone
 
@@ -360,6 +360,31 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   Task 8 and Task 4 stay open and unmerged. The other D-017 deferrals (template
   assets, `src/core/` subfolders) stay deferred.
 - See the [plan](superpowers/plans/2026-11-04-config-typecheck.md).
+
+### D-028: Remove unrendered legacy code and template assets
+
+- On 2026-11-04, under the same request as D-027 ("just do the stuff that you
+  can to achieve completion of the project"), the builder selected Task 12: the
+  scope cleanup D-001, D-002 and D-017 left for an approved task.
+- Delete files nothing imports or links: `src/components/ExercisePicker.tsx`,
+  `src/App.css`, the Vite template images in `src/assets/` (`hero.png`,
+  `react.svg`, `vite.svg`) and the template SVGs in `public/` (`favicon.svg`, a
+  Vite logo, and `icons.svg`, social-media icons). Vite copied the two public
+  SVGs into every build and both native copies although no page used them.
+- Remove the unused analysis types (`Rep`, `FormFlag`, `ClipAnalysis`,
+  `SessionReport`, `ExerciseAnalyzer` and their helpers), which carry the
+  arbitrary `score`/`overallScore` fields and view-invariant comments D-002
+  supersedes. Narrow `Exercise` to `"bench"`, `CameraAngle` to `"side"` and
+  `ClipSource` to `"upload"`, the only values the app produces, and keep only the
+  bench/side names and accent in `src/core/exercises.ts`; the squat/deadlift and
+  front/45° entries and every tagline/focus/description claim measurements the
+  app does not make. Future analysis contracts get their own design.
+- The rendered interface, store behavior, model/runtime, dependencies and native
+  configuration do not change; existing tests that render the names and accent
+  must keep passing. Git history keeps every deleted file. The app still has no
+  favicon (the browser's `favicon.ico` request returns 404); adding a GymBro icon
+  is a separate visible change.
+- See the [plan](superpowers/plans/2026-11-04-legacy-cleanup.md).
 
 ## Specification-author defaults and later acceptance
 

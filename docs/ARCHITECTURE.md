@@ -41,7 +41,7 @@ spec.md                Current milestone contract and acceptance criteria
 docs/                  Brief, decisions, handoff, status, architecture, workflow, reviews
 docs/superpowers/plans/  Active implementation plan and its progress checkboxes
 src/                   Application source (ownership table below)
-public/                Files served unchanged: pose model, MediaPipe runtime, SVGs; no Markdown
+public/                Files served unchanged: pose model and MediaPipe runtime; no Markdown
 ios/, android/         Native Capacitor wrappers; scoped root guidance covers generated subdirectories
 resources/             First-party vector branding source for native icons/splash screens
 capacitor.config.ts    Native identity, local dist webDir and system-bar configuration
@@ -87,7 +87,6 @@ environment values; MainActivity enables edge-to-edge rendering.
 | --- | --- |
 | `src/App.tsx` | Page composition: fixed Bench Press / Side view labels, recording guidance, honest scope copy, the dropzone (disabled while a clip is loaded or `processingState` is not `idle`, reading "Releasing the previous clip…" while a removed clip is still being released), and the clip list with a remove/cancel button that moves keyboard focus to the "Add your bench press video" heading |
 | `src/components/ClipDropzone.tsx` | `onSelect`/`disabled`/`disabledMessage` props; runs `validateSelection` on chosen or dropped files (so multiple-file drops are rejected), hands one file to `onSelect`, and shows a rejection in a named `role="alert"`; a "Choose video" button is the keyboard path. While mounted it claims file drags anywhere on the page, so the browser never opens a dropped file and unloads the app |
-| `src/components/ExercisePicker.tsx` | Legacy multi-exercise/view choice; no longer rendered, file retained |
 | `src/store/useSessionStore.ts` | `createSessionStore` factory and the app's `useSessionStore`: at most one clip, admission via `validateSelection`, one owned job per clip, `processingState` (`idle`/`processing`/`cancelling`), leased object URLs (see "Session ownership" below), and an injected monotonic clock for the observed `processingMs` (D-026) |
 | `src/core/PoseEngine.ts` | One processing job at a time: metadata validation before model work, bounded initialization, per-job detector, sampling, observation validation and copying, progress, coverage, and cleanup |
 | `src/core/video.ts` | Bounded metadata reading, one-attempt unknown-duration recovery, and frame-ready seeking on a video element the caller owns |
@@ -99,9 +98,9 @@ environment values; MainActivity enables edge-to-edge rendering.
 | `src/components/SkeletonOverlay.tsx` | Uses `poseDisplay` at video time; follows the actual video box, projects into contain content, applies DPR once, clears unavailable data, redraws on paused media/layout events, and owns RAF only during playback |
 | `src/components/poseDisplay.ts` | Pure display calculations: exact observations, bounded interpolation/endpoint holds, drawing eligibility, and centered CSS-pixel video content; used by the overlay without modifying raw observations |
 | `src/core/landmarks.ts` | Landmark indices, the 33-landmark count, and skeleton topology |
-| `src/core/math.ts` | Geometry/signal helpers; no implemented exercise analyzer consumes them yet |
-| `src/core/exercises.ts` | Legacy multi-exercise and camera-angle metadata; the UI shows only the bench and side-view names and accent, because the taglines/descriptions claim unimplemented measurements |
-| `src/types/index.ts` | Shared data shapes, failure kinds/stages; includes provisional future-analysis types |
+| `src/core/math.ts` | Geometry/signal helpers; `elbowAngles.ts` uses `angleAt` on 2D image-pixel points, and the other helpers have no consumer yet |
+| `src/core/exercises.ts` | Display names and accent for the one supported lift and view (Bench Press, Side); no taglines or measurement claims (D-028) |
+| `src/types/index.ts` | Shared data shapes, failure kinds/stages; bench/side/upload only, no analysis or score types (D-028) |
 | `public/models/`, `public/wasm/` | Bundled pose model and the MediaPipe runtime, byte-identical to the pinned `@mediapipe/tasks-vision` 0.10.35 package |
 
 ## Pose engine lifecycle
@@ -109,7 +108,7 @@ environment values; MainActivity enables edge-to-edge rendering.
 Task 5 adds `src/core/elbowAngles.ts` as a separate deterministic measurement
 layer: versioned image-pixel angle estimates, per-side abstention, real media
 times/observation indices, gap-separated lines and measured-sample navigation.
-It does not use inferred model z/world coordinates or legacy score/flag types.
+It does not use inferred model z/world coordinates; the legacy score/flag types were removed (D-028).
 Its 40 geometry tests are synthetic; real bench/anatomical validity is unverified.
 Task9's `src/core/elbowSummary.ts` aggregates that series into per-side sample
 availability and earliest raw extrema. `ElbowSummaryPanel.tsx` links extremes to
@@ -159,7 +158,7 @@ Still open, owned by later tasks:
 - Coverage badges now explicitly say sampling target and percentage of sampled positions with a pose, using neutral styling. They do not describe source FPS or technique quality.
 - The interface was checked in a real Chromium browser on 2026-11-03 (Task 2 Step 7, recorded in STATUS) with rejected inputs, an undecodable file, and a synthetic decodable clip without a person. No bench-press video has been processed, so overlay alignment and landmark quality remain unverified (Task 4).
 - The overlay now preserves missing observations and bounded display gaps through `poseDisplay.ts`. Simulated component tests verify canvas calls and cleanup; real-media timing, anatomical alignment, and actual screen-reader announcements remain unverified (Task 4).
-- The UI no longer offers other exercises or views, and its copy describes pose visualization only. Legacy code remains but is not rendered: `ExercisePicker.tsx`, the squat/deadlift and front/45° metadata, and future analysis types that imply analyzers, view-invariant biomechanics, and numeric scores. Unreferenced Vite template assets remain in `src/assets/` and `public/`.
+- The UI no longer offers other exercises or views, and its copy describes pose visualization only. Task 12 (D-028) deleted the unrendered `ExercisePicker.tsx` with its lift icons, `App.css` and the unreferenced Vite template assets in `src/assets/` and `public/`. Its Step 3 removed the squat/deadlift and front/45° metadata and the unused analysis types that implied analyzers, view-invariant biomechanics and numeric scores; `Exercise`, `CameraAngle` and `ClipSource` now hold only `bench`, `side` and `upload`. `math.ts` gap filling still has no consumer.
 
 [STATUS.md](STATUS.md) tracks verification evidence for these items.
 

@@ -11,14 +11,138 @@ usage, and these documents are the only handoff; see D-016 in
 ## Current stage
 
 Task 8 (the phone plan's free Safari slice) is ready for the phone session on
-`feat/task8-safari-phone-test`. It has merged reviewed master three times, each
+`feat/task8-safari-phone-test`. It has merged reviewed master four times, each
 with a merge commit keeping both published histories: Task 9, Task 10 (the
-processing-time badge) and now `eaf87e1` (Task 11, the build configuration
-type-check, which changes no application code). The merged non-Markdown files
-equal master and the whole tests/lint/guarded sync pass. The user reported **iOS
-26.5.2**. Phone testing still needs the user for a trusted private connection
-between the iPhone and the PC. No LAN listener, phone transfer or Safari case has
-run. Safari, installed-native and real-bench acceptance remain unverified.
+processing-time badge), Task 11 (build configuration type-check) and now
+`1c44729` (Task 12, legacy code and template asset cleanup; screens unchanged).
+The merged non-Markdown files equal master and the whole tests/lint/guarded sync
+pass. The user reported **iOS 26.5.2**. Phone testing still needs the user for a
+trusted private connection between the iPhone and the PC. No LAN listener, phone
+transfer or Safari case has run. Safari, installed-native and real-bench
+acceptance remain unverified.
+
+### Task 8 merge of reviewed master (Task 12)
+
+- Claude Code (Opus 5.5), 2026-11-04, under Node 22.23.2 (confirmed with
+  `node -v`). `origin/master` was `1c44729` (Task 12 complete, fresh review
+  resolved) and the Task 8 remote `398b5c0`. Merged with `git merge --no-ff
+  master`: no rebase or force push; Task 4 not merged.
+- Git merged every file except `HANDOFF.md` and `STATUS.md`. This file keeps every
+  section from both branches, newest first (master's repeated Task 11 record
+  heading appears once); HANDOFF keeps the phone session as the next action.
+- Every non-Markdown path equals master `1c44729`, so Task 12's fresh review
+  covers the merged code. **385 tests / 17 files** pass; lint exit 0;
+  `npm run mobile:sync` exit 0 (411 modules; iOS and Android 11 shared files each
+  verified). The phone session's screens match Task 10's; the built site no
+  longer ships the two unused template SVGs.
+
+### Task 12 record: legacy code and template asset cleanup, completed on master
+
+Task 12 (D-028, legacy code and template asset cleanup) is **complete**: built on
+`feat/task12-legacy-cleanup` from reviewed master `eaf87e1`, freshly reviewed and
+fast-forwarded to master; chosen by the builder
+under the user's request for continued work toward completion. Task 11 (D-027,
+build configuration type-check) is complete on master; native run7
+(41936252985, source `eaf87e1`) passed all three jobs. Task 8's phone test waits
+for the user on its own branch (`398b5c0`: master `eaf87e1` merged, iOS 26.5.2
+reported, S07/S08 inputs generated and reviewed); its branch records hold the
+details. Safari, installed-native and real-bench acceptance remain unverified.
+
+### Task 12 Step 1 decision and plan
+
+- Claude Code (Opus 5.5), 2026-11-04. Branch created from `master` at `eaf87e1`,
+  matching `origin/master`. Package files unchanged; no reinstall.
+- Measured with `git grep` before any change: no importer of
+  `ExercisePicker.tsx`; `EXERCISE_LIST`/`ANGLE_LIST` used only by it; no reference
+  to `App.css`, `src/assets/{hero.png,react.svg,vite.svg}`, `public/favicon.svg`
+  (a Vite logo) or `public/icons.svg` (social-media icons) from source, HTML, CSS
+  or scripts; the analysis types after `ClipStatus` have no user outside
+  `src/types/index.ts`. The store fixes bench/side/upload.
+- Recorded D-028 and the [plan](superpowers/plans/2026-11-04-legacy-cleanup.md)
+  (design section inside); updated HANDOFF and the docs/plans indexes.
+- Step 1 checks under Node 22.23.2 (confirmed with `node -v`): 383 tests / 16
+  files, lint and build (411 modules) exit 0; 63 relative links resolve.
+
+### Task 12 Step 2 unreferenced files deleted
+
+- Claude Code (Opus 5.5), 2026-11-04, Node 22.23.2 confirmed with `node -v`.
+- Deleted `src/components/ExercisePicker.tsx`, `src/App.css`,
+  `src/assets/{hero.png,react.svg,vite.svg}`, `public/{favicon.svg,icons.svg}`,
+  `EXERCISE_LIST`/`ANGLE_LIST` in `src/core/exercises.ts`, and the
+  `SquatIcon`/`DeadliftIcon`/`BenchIcon` components in `src/components/icons.tsx`,
+  which only the picker imported (a small extension of the plan's file list,
+  recorded in the plan). No test needed changing: deleting unused code has no
+  behavior to observe, so the evidence is the type-check, the unchanged suites and
+  the build output.
+- **383 tests / 16 files** pass unchanged; lint exit 0; `npm run mobile:sync` exit
+  0 with Vite still transforming **411 modules** (the deleted files were never
+  imported). `dist/` dropped from 13 to 11 files (no SVG); the verifier now
+  reports 11 shared files per platform, and each native copy holds 13 files
+  (those 11 plus Capacitor's two permitted empty Cordova stubs), with no SVG.
+- `git grep` finds no remaining reference to any deleted file or export outside
+  the decision/plan/status records and the HANDOFF description.
+
+### Task 12 Step 3 contracts narrowed
+
+- Claude Code (Opus 5.5), 2026-11-04, Node 22.23.2 confirmed with `node -v`.
+- RED: new `src/core/exercises.test.ts` (2 cases) failed because `EXERCISES` still
+  had squat/deadlift entries with tagline/focus fields and `ANGLES` still had
+  front/45° entries with descriptions.
+- GREEN: `EXERCISES` = `{ bench: { id, name: "Bench Press", accent: "#f472b6" } }`,
+  `ANGLES` = `{ side: { id, name: "Side" } }`; `Exercise = "bench"`,
+  `CameraAngle = "side"`, `ClipSource = "upload"`. Deleted the unused `RepPhase`,
+  `MetricSample`, `FlagSeverity`, `FormFlag`, `Rep`, `ClipAnalysis`,
+  `AngleCapabilities`, `MetricDisagreement`, `SessionReport`, `ExerciseAnalyzer`
+  and `AnalyzerInput`. Rewrote the header and `WorldLandmark` comments (inferred
+  model estimate, unused by measurements) and removed `App.tsx`'s now-stale
+  tagline comment.
+- **385 tests / 17 files** pass with no existing test file changed (the App and
+  VideoStage tests render the names and accent); lint exit 0; `npm run mobile:sync`
+  exit 0 (411 modules; 11 verified files per platform). The built JavaScript no
+  longer contains "Back Squat", "Deadlift", "knee cave" or "Bar path"; it still
+  contains "Bench Press" and `#f472b6`. Type/core/architecture guides, AGENTS and
+  README counts updated; D-002 notes the removal.
+
+### Task 12 Step 4 browser check
+
+- Production preview bound to `127.0.0.1:5194` only (Playwright Chromium; the
+  ignored `build/fixtures/no-person.mp4` copied into ignored `.playwright-mcp/`).
+  Chips read exactly "On-device processing", "Bench Press", "Side view",
+  "Bench Press · Side view", "GPU", "Sampling target: 30 samples/s", "0% of
+  sampled positions with a pose", "Processing took 2.9 seconds on this device".
+  The 1280-px screenshot matches Task 10's `build/task10-wide.png`; no horizontal
+  overflow at 1280 or 390 px (`build/task12-wide.png`, `build/task12-narrow.png`,
+  ignored).
+- Requests: only the page, its JS/CSS, the clip's object URL and the local
+  runtime/model. Console: the pre-existing `favicon.ico` 404 and MediaPipe start-up
+  logs only. The CSS file hash changed because Tailwind no longer generates the
+  deleted picker's classes; the rendered screens are unchanged.
+- The server was stopped and port 5194 confirmed free; `[::1]:5173` and
+  `127.0.0.1:5193` were left running.
+
+### Task 12 Step 4 fresh review
+
+- Fresh read-only review (Claude Code subagent, Opus 5.5, no builder
+  conversation) of D-028, the plan and `eaf87e1..86a71b0`, under Node 22.23.2:
+  385 tests / 17 files, lint and build (411 modules) exit 0. Whole-repository
+  `git grep` for every deleted path/export/type found only records of the
+  removal; Tailwind scans only `index.html` and `src/**/*.{ts,tsx}`; no tracked
+  native file, CI step, verifier or `resources/logo.svg` input refers to a
+  deleted file. It rebuilt master from `git archive` and compared CSS: only 15
+  picker-only utility rules disappeared, and no remaining class name is built
+  from fragments. No persisted data can carry other lift/view/source values. The
+  new test fails on the old metadata; the `WorldLandmark` comment is accurate.
+- No Blocker/High/Medium. Six Low documentation findings, all fixed: README and
+  ARCHITECTURE's types row no longer describe deleted analysis types;
+  ARCHITECTURE's layout no longer lists SVGs in `public/`; `src/AGENTS.md` and
+  `src/components/AGENTS.md` no longer describe removed declarations/choices;
+  HANDOFF is current; and the `src/core/math.ts` header (outside D-028's literal
+  scope, comment-only) no longer claims analyzer use or view invariance.
+- One review statement was wrong and was caught before commit: it said nothing
+  imports `math.ts`, but `elbowAngles.ts` imports `angleAt` (applied to 2D
+  image-pixel points). The new header says so; only the other helpers lack a
+  consumer. Rechecked under Node 22.23.2: 385 tests / 17 files, lint and
+  `npm run mobile:sync` (411 modules, 11 verified files per platform) pass.
 
 ### Task 8 merge of reviewed master (Task 11)
 

@@ -16,8 +16,8 @@ with the approved amendments in [decisions](../docs/DECISIONS.md).
   consult the mobile design/plan before native integration work.
 - Keep uncertainty and missing observations visible through every layer. A
   rendered skeleton does not establish measurement accuracy or good lifting form.
-- Existing multi-lift, multi-angle, and score declarations are legacy scaffolding,
-  not permission to activate features beyond the agreed milestone.
+- The legacy multi-lift, multi-angle and score declarations were removed (D-028).
+  Do not reintroduce them without an accepted decision beyond the agreed milestone.
 - Put concise local `AGENTS.md` guidance in each new authored source directory.
   Do not add guidance inside dependencies, build output, or generated caches.
 - Task 5 adds a separate, explicitly limited image-space measurement layer under

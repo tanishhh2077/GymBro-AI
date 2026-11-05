@@ -1,19 +1,18 @@
 /**
  * Core domain types for GymBro AI.
  *
- * These are intentionally framework-agnostic so the analysis layer
- * (PoseEngine, analyzers, fusion) can be tested and reasoned about
- * independently of React.
+ * These are framework-agnostic so the pose pipeline and measurements can be
+ * tested without React.
  */
 
-/** The three lifts we analyze. */
-export type Exercise = "squat" | "deadlift" | "bench";
+/** The one supported lift (D-014). Another lift needs its own decision. */
+export type Exercise = "bench";
 
-/** Camera angle the clip was filmed from. */
-export type CameraAngle = "front" | "side" | "45";
+/** The one supported camera view: a standardized side view. */
+export type CameraAngle = "side";
 
-/** How a clip was added to a session. */
-export type ClipSource = "upload" | "record";
+/** How a clip was added: a local file upload; there is no in-app recording. */
+export type ClipSource = "upload";
 
 /** Processing stage attached to a recoverable pipeline failure. */
 export type ProcessingStage = "metadata" | "initialization" | "seek" | "processing";
@@ -41,8 +40,9 @@ export interface NormalizedLandmark {
 }
 
 /**
- * A single 3D landmark in real-world metric space (meters), with the origin
- * at the subject's hip center. Used for robust, view-invariant angle math.
+ * The model's inferred 3D landmark estimate in meters, centred between the hips.
+ * It is a model output, not measured ground-truth biomechanics, and current
+ * measurements do not use it.
  */
 export interface WorldLandmark {
   x: number;
@@ -132,116 +132,3 @@ export type ClipStatus =
   | "ready"
   | "no-pose"
   | "error";
-
-/** Phase of a rep at a given moment. */
-export type RepPhase = "eccentric" | "concentric";
-
-/**
- * A measured angle/metric sample over time, used for charts.
- */
-export interface MetricSample {
-  time: number;
-  value: number;
-}
-
-/** Severity for a detected form issue. */
-export type FlagSeverity = "info" | "minor" | "major";
-
-/**
- * A single form observation, written in plain language, attributed to the
- * camera angle that detected it, with a one-line fix.
- */
-export interface FormFlag {
-  id: string;
-  label: string;
-  detail: string;
-  fix: string;
-  severity: FlagSeverity;
-  /** Camera angle whose footage produced this flag. */
-  detectedFrom: CameraAngle;
-  /** Which metric/joint produced it (for transparency). */
-  metric: string;
-}
-
-/** A single detected repetition with its metrics. */
-export interface Rep {
-  index: number;
-  /** Seconds. */
-  startTime: number;
-  bottomTime: number;
-  endTime: number;
-  eccentricDuration: number;
-  concentricDuration: number;
-  /** Primary range-of-motion metric in degrees (exercise dependent). */
-  romDegrees: number;
-  /** Map of named metrics to their value for this rep. */
-  metrics: Record<string, number>;
-  flags: FormFlag[];
-  /** Per-rep angle traces for charts, keyed by series name. */
-  series: Record<string, MetricSample[]>;
-}
-
-/** Output of a single analyzer on a single clip. */
-export interface ClipAnalysis {
-  clipId: string;
-  exercise: Exercise;
-  angle: CameraAngle;
-  reps: Rep[];
-  flags: FormFlag[];
-  /** 0..100 form score for this clip alone. */
-  score: number;
-  /** Continuous primary-angle trace for the whole clip (for timeline). */
-  primarySeries: MetricSample[];
-  primarySeriesLabel: string;
-  /** Cues this angle can/cannot provide, for UI transparency. */
-  capabilities: AngleCapabilities;
-  notes: string[];
-}
-
-/** What a given camera angle can and cannot tell us for an exercise. */
-export interface AngleCapabilities {
-  can: string[];
-  cannot: string[];
-}
-
-/** When multiple angles disagree on a metric, we surface it explicitly. */
-export interface MetricDisagreement {
-  metric: string;
-  label: string;
-  values: { angle: CameraAngle; value: number; unit: string }[];
-  spread: number;
-  note: string;
-}
-
-/** The unified, multi-angle session report. */
-export interface SessionReport {
-  exercise: Exercise;
-  overallScore: number;
-  repCount: number;
-  /** The merged, de-duplicated, prioritized flags. */
-  flags: FormFlag[];
-  /** Per-clip analyses that fed the report. */
-  perClip: ClipAnalysis[];
-  /** Representative reps merged across angles. */
-  reps: Rep[];
-  disagreements: MetricDisagreement[];
-  /** Plain-language summary lines. */
-  summary: string[];
-}
-
-/**
- * The interface every per-exercise analyzer implements. Keeping a single
- * shape lets MultiAngleFusion treat squat/deadlift/bench uniformly.
- */
-export interface ExerciseAnalyzer {
-  exercise: Exercise;
-  analyze(input: AnalyzerInput): ClipAnalysis;
-  /** Static description of per-angle capabilities. */
-  capabilitiesFor(angle: CameraAngle): AngleCapabilities;
-}
-
-export interface AnalyzerInput {
-  clipId: string;
-  angle: CameraAngle;
-  pose: PoseResult;
-}

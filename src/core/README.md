@@ -10,8 +10,9 @@
   before any URL or model work. Called by the store's `startClip`.
 - `video.test.ts` (58 cases), `PoseEngine.test.ts` (55), and `clipPolicy.test.ts`
   (22): all pass as of 2026-11-03, using simulated media and a mocked MediaPipe SDK.
-- `landmarks.ts`, `math.ts`, `exercises.ts`: topology, provisional math, and
-  legacy multi-exercise metadata.
+- `landmarks.ts`, `math.ts`: topology and provisional math.
+- `exercises.ts`: display names and accent for the one supported lift and view
+  (bench press, side); `exercises.test.ts` (2 cases) keeps it to those entries.
 - `elbowAngles.ts`: Task 5 image-pixel shoulder/elbow/wrist estimates, explicit
   per-side unavailable reasons, raw observation selection, gap-separated segments,
   and sample navigation. Forty synthetic-geometry cases verify the calculations;

@@ -5,8 +5,8 @@ Inherit [source guidance](../AGENTS.md). Follow the
 
 - Components present inputs and results; keep pose processing and measurement
   algorithms outside React rendering and event handlers.
-- Present the active side-view bench-press milestone honestly. Existing exercise
-  and angle choices do not establish implemented analysis capabilities.
+- Present the active side-view bench-press milestone honestly. Do not add
+  exercise or view choices that imply unimplemented analysis capabilities.
 - Align overlays with the video's displayed image, accounting for aspect ratio,
   letterboxing, resizing, and orientation. Use media time when playing or seeking.
 - Clear stale overlays when clips change or observations are unavailable. Treat

@@ -79,10 +79,10 @@ and time contracts are maintained in one place:
 holds media and pose processing, `src/components/` the React interface,
 `src/store/` session state, and `src/types/` shared data contracts.
 
-The pose engine and geometry helpers are separate from React. Types for future
-analyzers and multi-angle reports exist in `src/types/index.ts`, but the analyzers
-and fusion are not implemented. These provisional types include legacy score
-fields and will need revision before evidence-backed findings are built.
+The pose engine and geometry helpers are separate from React. `src/types/index.ts`
+holds only the contracts the app uses; the legacy analyzer, multi-angle report
+and score types were removed (D-028). Evidence-backed findings will need their
+own designed contract.
 
 ## Getting started
 
@@ -140,7 +140,8 @@ npm test
 Vitest runs `src/**/*.test.{ts,tsx}` once using jsdom's simulated browser
 objects and the app's existing Vite settings, including the `@` source alias.
 It also runs `scripts/**/*.test.mjs` in Node for synthetic packaging fixtures.
-All 383 tests pass: Task 11 adds 2 build-configuration cases to Task 10's 381.
+All 385 tests pass: Task 12 adds 2 lift/view metadata cases to Task 11's 383,
+which added 2 build-configuration cases to Task 10's 381.
 Task 10 added 11 store timing and 4 player badge cases to
 Task 9's 366, which added 34 summary-contract, 9 summary-panel and 3 timeline
 integration cases to the previous320. That baseline includes 10 native lifecycle,

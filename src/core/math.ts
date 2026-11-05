@@ -1,7 +1,8 @@
 /**
- * Geometry and signal-processing helpers used by the analyzers.
- * All angle math is designed to run on 3D world landmarks for view
- * invariance, but the vector helpers work on any {x,y,z}.
+ * Geometry and signal-processing helpers. The vector helpers work on any
+ * {x,y,z}; `elbowAngles.ts` calls `angleAt` on 2D image-pixel points. The other
+ * helpers, including gap filling, have no consumer yet. Inferred world landmarks
+ * are model estimates, so angles from them are not view-invariant measurements.
  */
 
 export interface Vec3 {
