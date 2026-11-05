@@ -3,8 +3,9 @@ import type { WorkoutData } from '@/types/workout';
 interface Props {
   data: WorkoutData; available: boolean; busy: boolean;
   onWorkout: () => void; onAnalyze: () => void; onHistory: (id?: string) => void;
+  onRoutines: () => void;
 }
-export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory }: Props) {
+export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines }: Props) {
   const sets = data.history.reduce((total, w) => total + w.exercises.reduce((n, e) => n + e.sets.length, 0), 0);
   const history = [...data.history].sort((a, b) => b.finishedAt! - a.finishedAt!);
   return <div className="space-y-7">
@@ -26,6 +27,11 @@ export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHis
       <div><dt className="text-sm text-slate-400">Workouts saved</dt><dd className="mt-1 text-3xl font-semibold text-white">{data.history.length}</dd></div>
       <div><dt className="text-sm text-slate-400">Sets logged</dt><dd className="mt-1 text-3xl font-semibold text-white">{sets}</dd></div>
     </dl>}
+    {available && <section className="flex flex-wrap items-center justify-between gap-3" aria-label="Saved routines">
+      <div><h2 className="text-lg font-semibold text-white">Your routines</h2>
+        <p className="mt-1 text-sm text-slate-400">{data.routines?.length ?? 0} saved · exercise plans for a fresh workout</p></div>
+      <button type="button" className="btn-ghost" disabled={busy} onClick={onRoutines}>Manage routines</button>
+    </section>}
     {available && <section aria-labelledby="recent-workouts">
       <div className="mb-3 flex items-center justify-between gap-3"><h2 id="recent-workouts" className="text-lg font-semibold text-white">Recent workouts</h2>
         {history.length > 0 && <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={() => onHistory()}>View workout history</button>}</div>

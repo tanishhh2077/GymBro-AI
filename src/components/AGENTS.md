@@ -24,3 +24,7 @@ Inherit [source guidance](../AGENTS.md). Follow the
 - D-033 adds an active-workout-ID-keyed, root-mounted manual rest timer. Retain
   time across navigation, use clock deadlines, release handlers and state the
   reload/in-app-completion limits. Do not imply background notifications.
+- D-034 adds local routine CRUD/editor and planned targets. Capture source and
+  opening revision together; preserve failed drafts and reject stale edits after
+  reload. Keep targets visibly separate from actual-set rows/counts and retain
+  active workout/timer/analysis when templates change. Confirm saved-routine deletion.

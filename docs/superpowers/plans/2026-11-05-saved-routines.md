@@ -47,13 +47,13 @@
 **Modify:** `src/App.tsx`, `WorkoutHome.tsx`, `WorkoutEditor.tsx`, browser/native workflow branch lists and applicable docs.
 **Interfaces:** `WorkoutRoutines({store,onStarted,onResume})`; `RoutineEditor({store,routine?,expectedRevision,onClose})` receives routine/revision captured together when opening; root routes 'routines'; Home onRoutines; active workout displays target metadata separately.
 
-- [ ] Write React tests first for CRUD/reorder/targets/confirmations, failed and stale-editor saves; observe RED then implement UI.
-- [ ] Add actual Chromium synthetic routine flow, native-IDB v1 upgrade scenario and two-tab routine conflict. Preserve14 existing cases and network/capture guard.
-- [ ] Run focused/full tests,lint/build,guarded sync,full browser suite and390/1280 synthetic UI inspection; document exact results and commit/push green implementation.
+- [x] Write React tests first for CRUD/reorder/targets/confirmations, failed and stale-editor saves; observe RED then implement UI.
+- [x] Add actual Chromium synthetic routine flow, native-IDB v1 upgrade scenario and two-tab routine conflict. Preserve14 existing cases and network/capture guard.
+- [x] Run focused/full tests,lint/build,guarded sync,full browser suite and390/1280 synthetic UI inspection; document exact results and commit/push green implementation.
 
 ## Step3: review, hosted verification and integration
 
-- [ ] Fresh read-only whole-feature reviewer against design/plan/base; evaluate findings, reproduce/fix supported defects test-first and record limits.
+- [x] Fresh read-only whole-feature reviewer against design/plan/base; no significant finding, no fix required; record limits.
 - [ ] Read actual hosted browser/native results, separately from local and physical-device evidence.
 - [ ] Complete current docs, reviewed fast-forward/push master; bring it into original Task8 checkout preserving histories and verify merged source/checks. Retain branches, close only owned servers and remove clean temporary worktree after preserving previews.
 
@@ -64,3 +64,5 @@
 - Baseline/design review and all feature evidence pending at plan creation; no feature code written yet.
 - Step1: baseline458tests/23files,lint/build and loopback4183 health200 pass after482-package locked install. Fresh Goldfish design ready with no findings.16 failures observed for unsupported v2/migration/actions; implementation now82/82 focused cases green. Full checks pending; test-only ES2022 hasOwn was replaced with ES2020-compatible existing prototype call after compiler caught it.
 - Step1 complete:488tests/25files,lint/build green; no dependencies/repository interface/native changes. Routine and opening revision will be captured together in parent to avoid a snapshot/revision mismatch before editor mount; this refines, rather than changes, the stale-draft contract.
+- Step2 in progress:6 UI tests RED->GREEN;494tests/26files,lint/build/guarded sync pass. Three actual browser routine cases pass after correcting a test-only reload-before-save race with visible saved-state waits. Full17 suite/fresh code review pending; synthetic390/1280 editor/library visual checks pass with no overflow.
+- Step2 complete:17/17 actual Chromium cases pass3.5minutes, including all14 existing cases. Fresh read-only code reviewer independently77tests/8files and diff check pass; no significant findings, production unchanged afterward. Hosted/browser/native results follow the green UI commit.

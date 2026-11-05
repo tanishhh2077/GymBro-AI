@@ -132,6 +132,8 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
   `npx playwright install chromium`. Read `tests/AGENTS.md` and scoped guidance.
   No human inputs/captures/uploads. Task 4's separate branch still owns its
   incomplete human-fixture/bench-acceptance tooling; do not merge it for tests.
-- Task14's current baseline is 448 tests / 22 files; manual workout boundaries,
+- Task14's baseline was 448 tests / 22 files; manual workout boundaries,
   transactional storage, state ordering and App UI are separate from pose tests.
   Browser smoke also uses synthetic manual logs, never real user workout data.
+- Task16's current baseline is494tests/26files and17 browser cases. Schema2
+  routines/targets preserve strict legacy data and actual logged-set semantics.

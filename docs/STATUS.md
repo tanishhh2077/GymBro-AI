@@ -40,7 +40,29 @@ Task8/Task4 physical phone/bench gates remain open. No other agent code changes.
   stale editor revisions even after reload. UI/browser/mobile checks are Step2;
   no completed routine interface or physical-device claim at this step.
 
-### Previous completed feature (Task15)
+### Task16 Step2 interface and browser evidence
+
+- Six React App flow tests RED (missing Routines) ->GREEN after implementation;
+ 13focused App cases including prior7 workout cases pass. Create/edit/reorder,
+ independent optional targets, fresh empty actual sets/counts, failed inputs,
+ stale reload/reopen, confirmed delete and active timer/snapshot retention covered.
+- **494tests/26files**,lint/build/guarded sync pass;421modules,11 shared files per
+ platform. CSS index-Ds3ylwAP.css, JS index-Bv_ujMEI.js, web-Bh0Ubt_t.js.
+- Three actual Chromium routine cases pass (6.6seconds): CRUD/order/targets/fresh
+ starts/history, native IndexedDB v1 read-without-write then first v2 save, two
+ tabs/stale editor after reload. First CRUD test reloaded before async save
+ completion; explicit saved-heading waits fix the test race, no production change.
+- Synthetic editor/library UI inspected at390/1280 with no overflow; previews in
+ ignored build/visual-review/task16. Chromium156.0.8078.4. Separate visual script,
+ not harness captures. No human media/logs/frames/pose or uploads.
+- Full17-case suite passes in3.5minutes:Chromium156.0.8078.4/GPU delegate label/
+ 120no-person samples, not a hardware benchmark or human-bench validation.
+- Fresh read-only Codex reviewer (requested gpt-6-astra, runtimeID unavailable)
+ independently passed77tests/8files and diff check with **no significant findings**.
+ Production unchanged after review. Dated review includes limits/dispositions.
+ Hosted/native and physical-device behavior remain separate pending checks.
+
+### Previous Task15 evidence
 
 Task15 is complete: reviewed source `9eef2fb` has been fast-forwarded/pushed to
 master after all local/hosted gates passed. It started from reviewed `b09f79a` in

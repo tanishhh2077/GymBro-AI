@@ -12,8 +12,12 @@ editing, reload/resume, finished history and explicit deletion. Records stay in
 local IndexedDB; clearing app/browser data removes them. There is no cloud backup
 or account sync. An active workout also has a manual rest timer with duration
 choices, pause/resume/reset and in-app completion. It stays across screen changes
-but resets on reload/restart; no background alert. Routines, personal bests/charts,
-set-linked analysis and live analysis remain future work. Accepted Q&A selects
+but resets on reload/restart; no background alert. Saved routines support create,
+edit, delete, exercise order and optional set/rep targets. Each routine starts a
+fresh workout with no completed sets; editing a routine keeps existing workouts
+unchanged. Routines use the same local library, including safe reads of earlier
+workout records. Personal bests/charts, set-linked and live analysis remain future
+work. Accepted Q&A selects
 guest access with optional workout-record sync only, excluding videos; those
 services are not built. See [PRODUCT_DIRECTION](docs/PRODUCT_DIRECTION.md).
 

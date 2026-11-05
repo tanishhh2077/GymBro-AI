@@ -5,7 +5,7 @@ smoke against only five fixed, checksummed non-human H.264 patterns. It uses
 Node from `.nvmrc`, the locked Playwright runner and installed Chromium on
 standard Ubuntu 24.04, one worker, bounded runtime, read-only token and the
 existing pinned checkout/setup-node actions. It runs on Task 13/master pushes
-with relevant changes; Task14/Task15 feature pushes are included too. No captures,
+with relevant changes; Task14/Task15/Task16 feature pushes are included too. No captures,
 caches, signing or artifact uploads.
 See [browser commands and limits](../../tests/browser/README.md). Hosted execution
 results belong in STATUS; this file's existence is not a passing run.
@@ -18,7 +18,7 @@ Node comes from `.nvmrc`; dependencies come from the lockfile. Third-party actio
 are pinned to exact release commits. No paid runner or Apple signing is used.
 
 Pushes to `feat/task6-mobile-app` or `master` trigger builds when relevant code,
-assets or build configuration change; Task14/Task15 feature pushes also trigger
+assets or build configuration change; Task14/Task15/Task16 feature pushes also trigger
 the same checks. Markdown-only changes do not. Manual
 dispatch is defined, but GitHub's UI requires the workflow on the repository's
 default branch. That default is still `feat/gymbro-video-landmarks`; this workflow

@@ -10,9 +10,10 @@ import { WorkoutHome } from '@/components/WorkoutHome';
 import { WorkoutEditor } from '@/components/WorkoutEditor';
 import { WorkoutHistory } from '@/components/WorkoutHistory';
 import { WorkoutRestTimer } from '@/components/WorkoutRestTimer';
+import { WorkoutRoutines } from '@/components/WorkoutRoutines';
 import { ShieldIcon } from '@/components/icons';
 
-type View = 'home' | 'workout' | 'analysis' | 'history';
+type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines';
 export default function App({ workouts = workoutStore }: { workouts?: WorkoutStore } = {}) {
   useEffect(() => connectNativeLifecycle({
     isNative: Capacitor.isNativePlatform(), app: NativeApp, session: useSessionStore, document,
@@ -33,9 +34,9 @@ export default function App({ workouts = workoutStore }: { workouts?: WorkoutSto
   return <div className="app-safe-sides min-h-full">
     <Header />
     <nav aria-label="Main navigation" className="mx-auto flex w-full max-w-5xl gap-1 border-b border-white/10 px-4 py-2 sm:px-6">
-      {([['home', 'Home'], ['workout', 'Workout'], ['analysis', 'Analyze']] as const).map(([target, label]) =>
+      {([['home', 'Home'], ['workout', 'Workout'], ['analysis', 'Analyze'], ['routines', 'Routines']] as const).map(([target, label]) =>
         <button key={target} type="button" aria-current={view === target ? 'page' : undefined}
-          className={`rounded-lg px-4 py-2 text-sm font-semibold ${view === target ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}
+          className={`min-w-0 flex-1 rounded-lg px-2 py-2 text-sm font-semibold sm:flex-none sm:px-4 ${view === target ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}
           onClick={() => navigate(target)}>{label}</button>)}
     </nav>
     <main ref={main} tabIndex={-1} className="app-safe-bottom mx-auto w-full max-w-5xl px-4 pt-6 outline-none sm:px-6">
@@ -47,10 +48,12 @@ export default function App({ workouts = workoutStore }: { workouts?: WorkoutSto
       {state.data.active && <WorkoutRestTimer key={state.data.active.id} />}
       {view === 'home' && <WorkoutHome data={state.data} available={available} busy={state.busy}
         onWorkout={() => navigate('workout')} onAnalyze={() => navigate('analysis')}
+        onRoutines={() => navigate('routines')}
         onHistory={id => { setSelected(id); navigate('history'); }} />}
       {view === 'workout' && <WorkoutEditor store={workouts} onFinished={() => { setView('home'); setNotice('Workout saved.'); }} />}
       {view === 'history' && <WorkoutHistory store={workouts} initialId={selected} />}
       {view === 'analysis' && <AnalysisWorkspace />}
+      {view === 'routines' && <WorkoutRoutines store={workouts} onStarted={() => navigate('workout')} onResume={() => navigate('workout')} />}
     </main>
   </div>;
 }

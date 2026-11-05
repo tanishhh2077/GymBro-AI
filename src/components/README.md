@@ -15,6 +15,14 @@ counts. Interval/focus/visibility handlers clean up on pause/expiry/unmount.
 Session-only: reload/restart resets the timer; completion appears in-app without
 a background notification. No saved-workout schema, media or native API changes.
 
+Task16 adds `WorkoutRoutines.tsx` and `RoutineEditor.tsx`: named local templates,
+ordered exercise rows, independent optional numeric targets and CRUD/start actions.
+App adds Routines navigation plus Home Manage routines. Editor captures its source
+routine and expected revision together at open, preserves failed inputs, and
+requires reopening after a stale-editor reload. Saving/deleting is confirmed by
+the repository before success UI; deletion requires confirmation. WorkoutEditor
+shows copied targets above actual sets; template edits cannot rewrite snapshots.
+
 - `ClipDropzone.tsx`: local file selection and drop area. It applies
   `validateSelection`, hands one file to `onSelect`, shows rejections in a named
   alert, blocks every input path while `disabled` (showing `disabledMessage`), and

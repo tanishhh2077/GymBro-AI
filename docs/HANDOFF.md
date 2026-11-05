@@ -12,8 +12,12 @@ No Task8/Task4 merge into master. Read saved-routines design/plan dated2026-11-0
 Fresh locked install482packages,458baseline tests/lint/build/loopback4183 health
 and independent Goldfish review pass. Schema2 normalization and routine actions
 now pass488tests/25files,lint/build;16 unsupported-behavior failures observed
-before implementation,82focused tests green. Next implement routine UI/browser
-Step2 test-first; no routine UI yet. No new dependencies/services.
+before implementation,82focused tests green.
+Step2 UI now works: library/editor, reorder/targets, new workout snapshots,
+confirmed deletion and failure/stale-draft recovery.494tests/26files,lint/build,
+guarded sync andall17 browser cases pass (3.5minutes). Fresh code review found
+no significant defect and independently passed77tests/8files;
+hosted checks not started for this UI source yet. No new dependencies/services.
 
 Legacy v1 reads must not write or grow the JSON at its exact1,000,000-char cap.
 Optional routines key/target metadata; new workouts copy order/unit/targets and
@@ -72,7 +76,8 @@ validated versioned plain data, atomic revision checks and save-before-state
 updates. Unknown data/failed or uncertain saves preserve confirmed state and
 require appropriate recovery. Existing analysis remains an independent in-memory
 bench workflow. No media/pose persistence or cloud/account/social/live service.
-Routines, charts/PRs, set-linked analysis and final styling remain future.
+Charts/PRs, set-linked analysis and final styling remain future. Task16 routines
+are implemented above; these older Task14 evidence bullets remain historical.
 
 [Design](superpowers/specs/2026-11-04-workout-logging-design.md),
 [plan](superpowers/plans/2026-11-04-workout-logging.md),
