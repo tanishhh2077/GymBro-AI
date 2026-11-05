@@ -405,6 +405,30 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   [plan](superpowers/plans/2026-11-04-browser-smoke.md). Exact harness choices
   are builder decisions within that scope, not user-prescribed architecture.
 
+### D-030: Begin personal workout tracking from the accepted Q&A
+
+- On 2026-11-04 the user answered Q1-Q7 as recorded in
+  [PRODUCT_DIRECTION](PRODUCT_DIRECTION.md): tracking and AI equally central,
+  mixed experience levels, set-linked/standalone analysis, combined Home actions
+  and dashboard, full personal tracking with community deferred, bench-only AI
+  at first release, and post-video analysis now with live analysis a future goal.
+- They then explicitly said "start building for now and ask me questions in an
+  hour". This authorizes bounded workout-tracking development while the remaining
+  questions wait; routine implementation proceeds without new checkpoints.
+- Builder selects Task 14: manual rep/weight workout logging, local resume/history
+  and the combined Home alongside the existing standalone bench workflow. This
+  narrowly supersedes earlier generic-fitness/persistence deferrals for workout
+  records only. No AI/media persistence, backend/account/cloud service, social,
+  new AI lift, live analysis or validated form claim is authorized by this slice.
+- IndexedDB/versioned records, explicit per-workout lb/kg, initial lb, engineering
+  bounds and provisional existing visual tokens/navigation are builder choices.
+  Future unit preference, capture/retention, routines, timers, charts/PR definitions,
+  account/sync and final design remain Q&A topics. The complete wish list is not
+  a claim of present implementation.
+- Follow the [design](superpowers/specs/2026-11-04-workout-logging-design.md) and
+  [plan](superpowers/plans/2026-11-04-workout-logging.md). Task 8 and bench M1 stay
+  open; actual phone/network/settings/media actions remain coordinated.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

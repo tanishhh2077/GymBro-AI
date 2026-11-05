@@ -1,0 +1,126 @@
+import { createStore } from 'zustand/vanilla';
+import { emptyWorkoutData, validateSetValues, validateWorkoutData, WorkoutError } from '@/core/workouts';
+import type { WeightUnit, Workout, WorkoutData, WorkoutExercise, WorkoutResult } from '@/types/workout';
+import { createWorkoutRepository, type WorkoutRepository } from './workoutRepository';
+interface WorkoutDeps { id: () => string; now: () => number }
+export interface WorkoutState {
+  data: WorkoutData; loaded: boolean; busy: boolean; needsReload: boolean; error: string | null;
+  load: () => Promise<WorkoutResult>;
+  startWorkout: (name: string, unit: WeightUnit) => Promise<WorkoutResult>;
+  addExercise: (name: string) => Promise<WorkoutResult>;
+  removeExercise: (id: string) => Promise<WorkoutResult>;
+  addSet: (exerciseId: string, reps: number, weight: number) => Promise<WorkoutResult>;
+  updateSet: (exerciseId: string, setId: string, reps: number, weight: number) => Promise<WorkoutResult>;
+  removeSet: (exerciseId: string, setId: string) => Promise<WorkoutResult>;
+  finishWorkout: () => Promise<WorkoutResult>;
+  discardWorkout: () => Promise<WorkoutResult>;
+  deleteWorkout: (id: string) => Promise<WorkoutResult>;
+}
+const browserDeps: WorkoutDeps = {
+  // getRandomValues also works on the trusted HTTP LAN used for phone testing.
+  id: () => Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join(''),
+  now: () => Date.now(),
+};
+function invalid(message: string): never { throw new WorkoutError('validation', message); }
+function cleanName(value: string) {
+  const name = value.trim();
+  if (!name || name.length > 80) invalid('Enter a name with 1 to 80 characters.');
+  return name;
+}
+function active(data: WorkoutData): Workout {
+  if (!data.active) invalid('Start a workout first.');
+  return data.active;
+}
+function editExercise(data: WorkoutData, id: string, change: (value: WorkoutExercise) => WorkoutExercise): WorkoutData {
+  const draft = active(data);
+  if (!draft.exercises.some(e => e.id === id)) invalid('This exercise is no longer in the active workout.');
+  return { ...data, active: { ...draft, exercises: draft.exercises.map(e => e.id === id ? change(e) : e) } };
+}
+export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutDeps = browserDeps) {
+  return createStore<WorkoutState>()((set, get) => {
+    let loading: Promise<WorkoutResult> | null = null;
+    const blocked = (message: string): WorkoutResult => ({ ok: false, message });
+    async function commit(change: (data: WorkoutData) => WorkoutData): Promise<WorkoutResult> {
+      const current = get();
+      if (current.busy) return blocked('Wait for the current save or load to finish.');
+      if (!current.loaded || current.needsReload) return blocked('Reload saved workouts before editing.');
+      set({ busy: true, error: null });
+      let writing = false;
+      try {
+        const next = validateWorkoutData(change(current.data));
+        writing = true;
+        const saved = await repository.save(current.data.revision, next);
+        set({ data: saved, busy: false, error: null, needsReload: false });
+        return { ok: true };
+      } catch (error) {
+        const message = error instanceof WorkoutError ? error.message :
+          writing ? 'The save could not be confirmed. Reload saved workouts before trying again.' : 'The workout could not be prepared. Try again.';
+        set({ busy: false, error: message, needsReload: writing && !(error instanceof WorkoutError && error.kind === 'validation') });
+        return blocked(message);
+      }
+    }
+    function load(): Promise<WorkoutResult> {
+      if (loading) return loading;
+      if (get().busy) return Promise.resolve(blocked('Wait for the current save to finish.'));
+      set({ busy: true, error: null });
+      loading = (async (): Promise<WorkoutResult> => {
+        try {
+          const data = validateWorkoutData(await repository.load());
+          set({ data, loaded: true, busy: false, needsReload: false, error: null });
+          return { ok: true };
+        } catch {
+          const message = 'Saved workouts could not be opened. Existing data has not been replaced. Try reloading saved workouts.';
+          set({ busy: false, needsReload: true, error: message });
+          return blocked(message);
+        }
+      })();
+      void loading.then(() => { loading = null; });
+      return loading;
+    }
+    return {
+      data: emptyWorkoutData(), loaded: false, busy: false, needsReload: false, error: null, load,
+      startWorkout: (name, unit) => commit(data => {
+        if (data.active) invalid('Finish or discard the active workout before starting another.');
+        return { ...data, active: { id: deps.id(), name: cleanName(name), unit, startedAt: deps.now(), finishedAt: null, exercises: [] } };
+      }),
+      addExercise: name => commit(data => {
+        const draft = active(data);
+        if (draft.exercises.length >= 100) invalid('This workout already has 100 exercises. Remove one before adding another.');
+        return { ...data, active: { ...draft, exercises: [...draft.exercises, { id: deps.id(), name: cleanName(name), sets: [] }] } };
+      }),
+      removeExercise: id => commit(data => {
+        const draft = active(data);
+        if (!draft.exercises.some(e => e.id === id)) invalid('This exercise is no longer in the active workout.');
+        return { ...data, active: { ...draft, exercises: draft.exercises.filter(e => e.id !== id) } };
+      }),
+      addSet: (exerciseId, reps, weight) => commit(data => editExercise(data, exerciseId, exercise => {
+        validateSetValues(reps, weight);
+        if (exercise.sets.length >= 100) invalid('This exercise already has 100 sets. Remove one before adding another.');
+        return { ...exercise, sets: [...exercise.sets, { id: deps.id(), reps, weight }] };
+      })),
+      updateSet: (exerciseId, setId, reps, weight) => commit(data => editExercise(data, exerciseId, exercise => {
+        validateSetValues(reps, weight);
+        if (!exercise.sets.some(s => s.id === setId)) invalid('This set is no longer in the workout.');
+        return { ...exercise, sets: exercise.sets.map(s => s.id === setId ? { ...s, reps, weight } : s) };
+      })),
+      removeSet: (exerciseId, setId) => commit(data => editExercise(data, exerciseId, exercise => {
+        if (!exercise.sets.some(s => s.id === setId)) invalid('This set is no longer in the workout.');
+        return { ...exercise, sets: exercise.sets.filter(s => s.id !== setId) };
+      })),
+      finishWorkout: () => commit(data => {
+        const draft = active(data), finishedAt = deps.now();
+        if (!draft.exercises.length || draft.exercises.some(e => !e.sets.length)) invalid('Log a set for each exercise, or remove empty exercises before finishing.');
+        if (!Number.isSafeInteger(finishedAt) || finishedAt < draft.startedAt) invalid('The device clock is earlier than the workout start. Check the clock and try again.');
+        if (data.history.length >= 1000) invalid('History is full. Delete an old saved workout before finishing another.');
+        return { ...data, active: null, history: [{ ...draft, finishedAt }, ...data.history] };
+      }),
+      discardWorkout: () => commit(data => { active(data); return { ...data, active: null }; }),
+      deleteWorkout: id => commit(data => {
+        if (!data.history.some(w => w.id === id)) invalid('This saved workout is no longer available.');
+        return { ...data, history: data.history.filter(w => w.id !== id) };
+      }),
+    };
+  });
+}
+export const workoutStore = createWorkoutStore(createWorkoutRepository(globalThis.indexedDB));
+export type WorkoutStore = ReturnType<typeof createWorkoutStore>;

@@ -10,6 +10,163 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task 14 is complete and pushed to master `b09f79a`: manual local workout logging,
+Home and history alongside existing bench analysis. Task 8 is incorporating it
+in the original checkout with a sixth preserved-history merge (Tasks9-14).
+Only HANDOFF/STATUS conflict; this record retains both branches' evidence and
+HANDOFF identifies current Q&A/phone prerequisites. Local merge checks follow.
+
+The temporary Claude transfer was cancelled; Codex resumed the unchanged task.
+At about23:29 Chicago, Q8 was presented as an MCQ with recommendation: guest
+logging/optional sync versus local-only versus account-required. Await the actual
+answer; no cloud/account implementation is authorized by the question. The
+one-time Codex automation is paused after fulfilling its purpose to avoid repeats.
+
+### Task 8 merge of reviewed master (Task 14)
+
+- Original checkout was clean at `8151248`; `git merge --no-commit master` keeps
+  histories. No Task4 merge. Final code `efa0c04` has fresh reviews, the single
+  Medium/P2 fix verified RED/GREEN, 448 local tests/lint/guarded sync, final hosted
+  browser4 (448 shared checks/13cases) and native11 success. Master `b09f79a`
+  adds only final documentation after that code. Non-Markdown parity must hold.
+- Q1-Q7, roadmap and provisional defaults are in PRODUCT_DIRECTION. First slice
+  is manual logging and standalone bench analysis, not routines/timers/charts/PRs,
+  set-linked persistence or live feedback. Phone/real-bench acceptance stay open.
+- Original checkout installed exactly1 new dev package; process-local Node22.23.2:
+  **448 tests / 22 files**, lint and guarded mobile sync/build pass, 418modules,
+  11 verified files/platform. Non-Markdown diff against master `b09f79a` is empty;
+  the reviewed/hosted source therefore covers this merge. Only HANDOFF/STATUS
+  conflicts were resolved, with both task histories preserved.
+- Preserved empty Home previews in ignored `build/visual-review/task14/`; verified
+  the temporary worktree's exact resolved path/clean state and removed it with
+  normal Git worktree removal. All task branches remain. No private media or
+  user workout logs moved, staged or uploaded.
+
+### Task 14 recorded implementation and acceptance
+
+Task 14 passes acceptance and review: local manual workout logging/Home under D-030, from
+reviewed master `a524387`, with user authorization after Q1-Q7. Q&A resumes at
+Q8 in about an hour via a one-time scheduled thread follow-up. No live analysis,
+cloud/account or media persistence. Read PRODUCT_DIRECTION and the separate plan.
+
+### Codex resumption after cancelled provider transfer
+
+- User cancelled the Claude handoff and requested continued Codex work. Checkout
+  was clean at `6fbd348` on `feat/task14-workout-logging`; no intervening source
+  changes. Codex Q&A automation restored for the original23:28 Chicago time.
+- Final-source browser run4 (`41972437861`, `efa0c04`) passed. Native run11
+  (`41972437881`) has shared/Android checks passed and iOS compile passed, with
+  simulator startup still running. Do not mark Task14 complete or advance master
+  before that final native gate resolves.
+
+### Task 14 final-source acceptance
+
+- [Browser run4](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437861)
+  on `efa0c04` passed 448 tests/lint/build and all13 browser cases in3.3minutes.
+  Chromium156.0.8078.4, GPU delegate label,120 no-person samples; no hardware or
+  physical-phone performance claim.
+- [Native run11](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437881)
+  passed shared checks, Android debug compile and iOS compile/visible simulator
+  startup. This validates the new empty Home shell, not native workout/video
+  behavior on physical devices. Packages not downloaded.
+- Additional actual production-bundle check: own loopback preview4182, Chromium
+  156.0.8078.4, fresh context with synthetic log only. After initial load, disable
+  networking, start/log a workout, reconnect/reload/resume/finish; stored values
+  and kg remain. No external/mutation requests or uncaught page errors. No offline
+  cold-start or video-inference claim. Owned preview/browser closed afterward.
+- All review findings resolved; final record/master integration follow D-018.
+  At the latest listener check only unrelated5173 remained; the previously observed
+  original5193 listener was absent. No action targeted that original process.
+
+### Cancelled handoff record (historical)
+
+- User explicitly requested handoff after hitting the Codex subscription limit.
+  Codex stops feature work; continue the clean `GymBro AI-task14` worktree on
+  `feat/task14-workout-logging`, source HEAD `efa0c04` plus this handoff record.
+  Original Task8 checkout remains `8151248`; master stays `a524387` until final
+  hosted verification resolves. No source changes or merges during transfer.
+- Final-source browser run4 `41972437861` and native run11 `41972437881` were
+  in progress on `efa0c04`. Run3/native10 were cancelled by superseding concurrency.
+  Check actual results before declaring Task14 complete or advancing master.
+- Local448 tests/lint/guarded sync pass; local13-case browser run passed before
+  the one-line final size-boundary fix. Fresh reviews complete, single Medium/P2
+  fixed with RED/GREEN regression. Do not repeat completed implementation/review
+  without new evidence. Last local empty Home visual checks at390/1280px show no
+  horizontal overflow; generated previews are ignored in `build/visual-review/`.
+- Q1-Q7 saved in PRODUCT_DIRECTION. MCQs with recommendations resume atQ8 when
+  user returns; post-video bench-only AI now, live+post-video future. Codex
+  automation `resume-gymbro-ai-design-q-a` is PAUSED; no Claude reminder is scheduled.
+
+### Task 14 setup and state foundation
+
+- Normal Git worktree used because native tool still references old `liftform`.
+  Clean Node22.23.2 install:481 packages; 391 tests/18files, lint/build pass.
+- Fresh read-only design review ready, no blockers. Current visual tokens,
+  per-workout unit selection, IndexedDB and provisional navigation are builder
+  choices; no more user questions needed for the bounded first slice.
+- Test-first data/repository/store behavior: reject malformed/future/media-bearing
+  records; atomic revision-checked writes, blocked/timeout failures and explicit
+  recovery; draft/log/edit/remove/finish/history. Test results will follow below.
+- State foundation is green: **46 focused tests**, **437 total / 21 files**, lint
+  and build pass (411 modules, unchanged app bundles because UI is not wired yet).
+  Includes real repository transactions against dev-only fake-indexeddb6.2.7,
+  stale-writer rejection, failed writes/unknown data preservation, late-open cleanup,
+  draft history lifecycle and load/save serialization. The simulator/browser
+  environment adapter is faked; actual browser/native persistence still awaits tests.
+
+### Previous completed work
+
+### Task 14 Home/log/history implementation (verification in progress)
+
+- Home has equal workout/video actions, real local workout/set counts and recent
+  history. Manual rep/weight logging supports fixed per-workout lb/kg, custom
+  entry names, edit/remove sets, resume after reload, finish and history deletion.
+  Destructive workout/exercise actions confirm. AI remains standalone bench only;
+  linked analysis, routines/timers/charts/PRs and final styling remain future work.
+- Existing video UI extracted to AnalysisWorkspace. Root retains native lifecycle;
+  browser checks enter analysis from Home and exercise navigation away/back.
+  Header/default empty Home still includes the native visual guard's independent
+  GymBro and Bench Press labels; actual native startup remains to be run.
+- UI RED: 5 tests failed on the original video-only App. New workflow/error/input
+  preservation/confirmation tests pass. Browser logging/resume/history and two-tab
+  conflict cases pass. A 390px/80-character-name case exposed fieldset/flex and
+  Home text overflow; reproduced and fixed with bounded/wrapping layout.
+- Stored-schema errors occurring after a prior load now require reload, distinct
+  from correctable input validation. A malformed undefined expected revision
+  cannot masquerade as a read. Two strengthened tests failed first, then passed.
+  Extra schema-creation failure characterization passes without a code change.
+- Full local browser rerun and shared/mobile checks are in progress. Initial run
+  passed all ten video cases plus two logging cases; the long-name case is fixed
+  and all three logging cases pass separately. No completion claim yet.
+- Shared verification now passes **447 tests / 22 files**, lint, build and
+  `mobile:sync`/`mobile:verify` (418 modules, 11 files per platform). Both workflows
+  pass local actionlint1.7.12 and now include this feature branch so native and
+  browser behavior can be verified before master integration. Full local browser
+  rerun, hosted execution and fresh code review remain pending.
+
+### Previous completed work (historical)
+
+### Task 14 fresh review and boundary fix
+
+- Final local browser rerun passes **13/13 in 3.5 minutes**, Chromium156.0.8078.4,
+  GPU delegate label/120 no-person samples. It includes navigation away/back both
+  during processing and after completion, all ten prior video cases, actual
+  logging/reload/history, two-tab conflicts and 390px long-name layout. No human data.
+- Fresh read-only critical review (`gpt-6-astra` requested, exact served identifier
+  unavailable) independently passed **58 focused tests** and found one supported
+  Medium/P2: revision increment could cross the JSON size cap after validation,
+  save an oversized record and prevent later reads. Reproduced with a valid
+  exactly1,000,000-character fixture; RED save incorrectly succeeded. Validate
+  the final incremented snapshot; GREEN preserves the prior readable revision.
+- Full **448 tests / 22 files**, lint and guarded mobile sync/build pass after the
+  fix. No unresolved code finding; [review record](superpowers/specs/2026-11-04-workout-logging-code-review.md).
+  Hosted jobs for pre-fix `5949c24` were browser run3 (`41971857025`) and native
+  run10 (`41971857066`); final source must be verified before master integration.
+
+### Earlier task evidence
+
+### Prior Task 8 state before the Task 14 merge
+
 Task 8 is ready for the coordinated phone session, with reviewed Task 13 merged
 from master `a524387` (fifth preserved-history merge, after Tasks 9-12). No
 runtime app behavior changes in Task 13; the maintained browser suite and

@@ -14,6 +14,9 @@ with the approved amendments in [decisions](../docs/DECISIONS.md).
 - Reuse the existing pipeline before adding infrastructure. Backend services
   and persistence remain deferred. D-022 now authorizes bounded mobile prototypes;
   consult the mobile design/plan before native integration work.
+- D-030 authorizes Task 14's separate manual workout contracts, local IndexedDB
+  repository/store and Home/log/history UI. Cloud/accounts and media persistence
+  remain deferred; keep workout entries separate from bench-analysis IDs/types.
 - Keep uncertainty and missing observations visible through every layer. A
   rendered skeleton does not establish measurement accuracy or good lifting form.
 - The legacy multi-lift, multi-angle and score declarations were removed (D-028).

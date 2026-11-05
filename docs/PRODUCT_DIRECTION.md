@@ -1,0 +1,44 @@
+# Product direction: Q&A in progress
+
+2026-11-04. This records the user's answers, not a claim that these features
+exist. Original PRODUCT_BRIEF remains unchanged; D-030 authorizes the next slice.
+Hevy was mentioned as a reference; exact visual resemblance and integrations
+have not been specified. MCQs must include a recommendation and brief reason.
+
+| Question | User choice |
+| --- | --- |
+| 1. Primary purpose | C: workout tracking and AI equally central |
+| 2. Audience | D: mixed experience levels, simple defaults/optional advanced controls |
+| 3. Analysis connection | D: set-linked and standalone analysis |
+| 4. Home | B+C: equal Start Workout/Analyze Video actions above a compact dashboard; detailed charts belong in Progress |
+| 5. Tracking scope | B: exercises/sets/reps/weights/routines/history plus timers, charts, personal bests and custom exercises; community deferred |
+| 6. First public AI exercise coverage | A only: bench press; logging may cover other exercises |
+| 7. Analysis timing | Post-video for now; live plus post-video is a future goal |
+
+After Q7 the user explicitly said to start building while they are busy, then
+resume questions in an hour. A one-time thread follow-up
+`resume-gymbro-ai-design-q-a` is scheduled for about 23:28 America/Chicago.
+Resume at Q8, one MCQ at a time. More design/product choices remain open.
+At the user's subsequent Codex-limit handoff to Claude, this automation was
+paused so it consumes no further Codex usage. Claude resumes questions when the
+user is available; no automatic Claude reminder has been created.
+The user then cancelled that handoff ("False alarm, continue working where you
+left off"). Codex resumed the unchanged task and restored the original one-time
+Q&A follow-up; the seven accepted answers and remaining scope are unchanged.
+
+## Bounded next implementation
+
+Task 14 delivers manual, rep-based local workout logging and history, with Home
+actions and the existing standalone video screen. It does not claim the whole
+tracking wish list, set-linked analysis, live analysis, or validated bench findings.
+Builder defaults: existing visual tokens/system font; provisional three-view
+navigation; visible lb/kg selection for each new workout, initially lb (US-first
+direction), no conversion; local IndexedDB only. Unit preference, accounts/cloud,
+video acquisition/retention, routines, metrics and final styling remain Q&A topics.
+
+Keep workout records separate from AI/media data. No videos, frames, landmarks,
+object URLs, form scores, server transfer or third-party integration is persisted.
+
+Q&A resumed around23:29 Chicago after Codex resumed: Q8 asks guest+optional sync
+(recommended), local-only, or account-required. No answer yet; do not assume one.
+The one-time Codex follow-up is fulfilled and paused to avoid duplicate prompts.

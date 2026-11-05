@@ -1,110 +1,85 @@
 # GymBro AI: current handoff
 
-Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
+Updated2026-11-04 America/Chicago. Read root/scoped AGENTS first.
 
-## Current task and next action
+## Current state and next action
 
-**Task 8: coordinated iPhone Safari testing**, on `feat/task8-safari-phone-test`.
-The user will provide the hotspot connection and a video later. Do not ask again
-now. D-024 and the latest "Clear just start working" authorize routine PC work;
-phone/account/network/settings actions still require coordination. One writer,
-read-only reviewers. No LAN listener, phone transfer or Safari case has run.
+**Task14 complete**, reviewed and pushed to master `b09f79a`. Original checkout
+is on `feat/task8-safari-phone-test`, incorporating that master with preserved
+history. Only documentation conflicts; non-Markdown source must match master.
+Local merge verification passes: **448 tests / 22 files**, lint/build and guarded
+mobile sync/verify, 418 modules and 11 shared files per platform. All non-Markdown
+files equal reviewed master. Keep Task8 open/unmerged into master until
+its own phone acceptance resolves. Task4 is incomplete/unmerged too.
 
-Reviewed master `a524387` (Task 13) is merged with preserved history, after the
-four merges of Tasks 9-12. All non-Markdown files equal that master. This checkout
-passes **391 tests / 18 files**, lint, build (411 modules) and read-only mobile
-verification (11 shared files per platform). Keep Task 8
-unmerged into master until its own acceptance/review resolves. Task 4 is also
-incomplete/unmerged; do not merge it for tooling.
+The user cancelled the temporary Claude handoff; Codex resumed without any
+intervening implementation. **Q&A has resumed:** question8 was presented around
+23:29 Chicago as an MCQ: guest logging+optional account sync (recommended),
+local-only, or account required. Await the actual answer, then continue Q9 onward
+one MCQ at a time, marking a recommendation and brief reason. Do not treat a
+recommendation as an accepted choice. The one-time Codex reminder was paused
+after the follow-up was fulfilled; no duplicate reminder or Claude task is active.
 
-**Next action when the user returns:** follow Step 2 of the
-[phone plan](superpowers/plans/2026-11-04-phone-video-acceptance.md). Agree a
-trusted private connection (home Wi-Fi or iPhone Personal Hotspot), re-detect the
-PC's address on it, check ports 5195/5196, and bind preview/fixture servers only
-to that address. The PC was on Public campus Ethernet UWNet; do not expose it
-there. Verify phone reachability, transfer non-human fixtures, and record Safari
-cases as passed/failed/blocked/not run. Firewall/VPN/router prompts are the user's
-decision; do not change settings automatically.
+Read [PRODUCT_DIRECTION](PRODUCT_DIRECTION.md) for Q1-Q7. Product target: tracking
+and AI equally central; mixed levels; linked/standalone analysis; Home actions
+plus compact dashboard; full personal tracking/community deferred; bench-only
+AI at first public release; post-video now, live+post-video later. D-030 permits
+this bounded implementation; remaining design/account/retention decisions wait.
 
-The phone is an **iPhone 12 Pro Max, user-reported iOS 26.5.2**. No Android phone,
-Apple Developer membership or owned MacBook; temporary Mac access unconfirmed.
-The installed native app remains a separate signing/device gate. No paid services,
-signing credentials or store release. A simulator ZIP cannot install on iPhone.
+## Implemented and verified
 
-## Completed PC work
+Manual workout start/resume, explicit lb/kg fixed per workout, free-name exercise
+entries, log/edit/remove sets, finish and reopen/delete history. IndexedDB uses
+validated versioned plain data, atomic revision checks and save-before-state
+updates. Unknown data/failed or uncertain saves preserve confirmed state and
+require appropriate recovery. Existing analysis remains an independent in-memory
+bench workflow. No media/pose persistence or cloud/account/social/live service.
+Routines, timers, charts/PRs, set-linked analysis and final styling remain future.
 
-Claude's Tasks 10-12 (processing-time badge, build-config checks, legacy cleanup)
-are on master and freshly audited by Codex: no material defect, 45 focused tests.
-Task 13 adds a maintained real-browser smoke command, exact Playwright 1.64.1,
-fixed pattern integrity preflight, typed test config and hosted checks. Its
-[design](superpowers/specs/2026-11-04-browser-smoke-design.md),
-[plan](superpowers/plans/2026-11-04-browser-smoke.md) and
-[code review](superpowers/specs/2026-11-04-browser-smoke-code-review.md) hold details.
+[Design](superpowers/specs/2026-11-04-workout-logging-design.md),
+[plan](superpowers/plans/2026-11-04-workout-logging.md),
+[code review](superpowers/specs/2026-11-04-workout-logging-code-review.md).
+Single Medium/P2 revision-size boundary issue fixed with exact-limit regression;
+no unresolved finding. Code source `efa0c04`; later changes are documentation.
 
-Task 13: **391 tests / 18 files**, lint/build, **10 browser cases** pass locally
-and in [Ubuntu run 1](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41947939605).
-Browser 156.0.8078.4, GPU delegate label, 120 no-person samples; no hardware or
-phone-performance claim. Fresh review's one Low wording finding is resolved.
-Screenshots/video/traces/page snapshots are off. Failure/source diagnostics are
-temporary and removed; last-run metadata may remain. No human inputs are allowed.
+- 448 tests/22files, lint/build and guarded mobile sync pass; 418modules,
+  11 verified shared files per platform.
+- [Browser run4](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437861)
+  passes448 shared checks and13 real browser cases (3.3minutes), including model,
+  navigation, logging/reload/history, two tabs and long names at390px. Chromium
+  156.0.8078.4/GPU delegate label/120 no-person samples, not a hardware benchmark.
+- [Native run11](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41972437881)
+  passes shared/Android/iOS compile and visible empty Home simulator startup.
+  This is not physical-device persistence/video validation. Packages not downloaded.
+- Actual production preview logged while offline after initial load, then
+  reconnect/reload/resume/finish retained values/units with no external/mutation
+  requests or page errors. Offline cold start/video inference remain unverified.
+- Empty Home visually inspected at390 and1280px, no overflow. Previews are kept
+  locally in ignored `build/visual-review/task14/` here, not uploaded or human data.
 
-```sh
-npx playwright install chromium
-npm run test:browser
-```
+## Phone/video acceptance remains open
 
-This owns strict loopback 4179 without reusing/stopping another server. It tests
-dev-server decoding/model/player integration with fixed non-human patterns only.
-No native/Safari, offline, rotated-metadata or useful lifter-landmark claim.
+User will provide hotspot/video later; do not ask again now. iPhone12ProMax,
+reported iOS26.5.2; no Android phone, paid Apple membership or owned Mac. Follow
+[phone plan](superpowers/plans/2026-11-04-phone-video-acceptance.md) only with user
+present: trusted private connection, re-detect address, ports5195/5196 bound only
+there. Campus Ethernet was Public; do not expose it or alter firewall/VPN/router.
+No LAN listener, phone transfer or Safari case has run. Simulator ZIP is not an
+installable iPhone app. No signing/payment/store release authorized.
 
-Ignored `build/fixtures/` retains the five non-human patterns/provenance plus
-S07/S08 inputs `zero-byte.mp4`, `corrupt.mp4`, `over-size.mp4`, hash-checked against
-the phone plan. The earlier seven Edge preflight cases and insecure-origin GPU
-check are PC evidence. Task 13 additionally asserts actual pause/seek state.
-
-[Native run 8](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41938020495)
-for Task 12 `1c44729` passed shared checks, Android compile and iOS simulator
-startup. Packages were not downloaded. Ignored `build/artifacts/run-5/` contains
-older Task 9 packages, without the processing badge. Task 13 changes tooling,
-not app/native sources; later master workflows are separate evidence. Pushing
-Task 8 does not trigger these workflows; do not change repository settings.
-[Master browser run 2](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41948751190)
-for `a524387` also passed: 391 tests/lint/build and 10 browser cases in 5.6 minutes,
-same browser/GPU delegate label/120 no-person samples.
-[Native run 9](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41948751280)
-also passed all three jobs: shared checks, Android debug APK, and iOS simulator
-build/visible startup. No physical-phone or native-video acceptance is implied.
-
-## Video and product boundaries
-
-Task 4 remains at `34538e4`. The user now expects to supply a video, superseding
-the earlier unavailability. Treat it as private by default: review permission,
-framing and encoding locally when supplied, then run actual inference and manual
-shoulder/elbow/wrist-to-lifter identity checks. Never upload/commit human footage,
-frames or pose traces. No real bench fixture has been accepted yet; M1 is open.
-
-One local side-view bench MP4, MediaPipe 0.10.35, bounded jobs/cancellation,
-synchronized overlay/player, image-space elbow traces/summary and observed
-processing-time badge. No backend, accounts, persistence, reps or form verdicts.
-Sample counts are availability, not confidence; extrema are not per-rep ROM or
-measured 3D anatomy. Safari success will not prove native or bench accuracy.
-
-## Later product-design discussion
-
-The user mentioned Hevy as a future direction and wants a detailed Q&A about
-features and appearance (roughly 15-30 questions if useful). They explicitly
-deferred that conversation: focus on the current validation task first. The
-meaning of the Hevy reference, feature selection and visual direction remain
-open; clarify them during that later discussion before implementation.
+Ignored build/fixtures in this original checkout holds five non-human patterns
+and S07/S08 inputs/provenance, previously hash-checked. Human bench footage is not
+accepted yet. Treat offered video as private; permission/framing/encoding/real
+inference and manual lifter-landmark identity checks still required. Never upload
+or commit human footage, frames or pose traces. M1/accuracy remain unverified.
 
 ## Environment and Git
 
-Use process-local Node 22.23.2 from `%LOCALAPPDATA%/nvm/v22.23.2`; never `nvm use`
-or change global Node 20. Existing Vite listeners `[::1]:5173` (other project)
-and `127.0.0.1:5193` (this checkout) must stay. Avoid `npm ci` here while their
-locks are active. Full tests/lint/build before every green commit; no attribution
-trailers, force-pushes, branch deletion or history rewrites. Retain all task
-branches; GitHub default remains `feat/gymbro-video-landmarks`. Detailed history
-and exact merge evidence are in STATUS. Markdown is the Claude/Codex handoff.
-The temporary sibling worktree was removed after its reviewed changes reached
-master and this checkout; all task branches remain. Continue in this folder.
+Use process-local Node22.23.2 from %LOCALAPPDATA%/nvm/v22.23.2; never nvm use or
+change global Node20. Do not stop unrelated listener5173. Earlier5193 was absent
+at latest check; no action targeted it. Full tests/lint/build before each green
+commit, no attribution trailers, force pushes or branch deletion. Retain both
+Task8 and Task14 histories. GitHub default remains feat/gymbro-video-landmarks.
+Temporary Task14 worktree was removed after verification; its empty Home previews
+were preserved here and all branches retained. Continue in this original folder.
+Markdown is the provider-neutral handoff.

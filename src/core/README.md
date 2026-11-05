@@ -1,5 +1,9 @@
 # Media and pose processing
 
+`workouts.ts` separately validates Task 14's manual workout schema, units, bounds,
+IDs and media-free storage shape. It does not derive anything from pose data.
+`workouts.test.ts` has 29 boundary cases; see D-030 and the tracking design.
+
 - `PoseEngine.ts`: MediaPipe coordinator. Runs one bounded job at a time:
   validates metadata before model work, owns a per-job detector, keeps only
   forward media times, copies and validates landmarks, and cleans up on every path.

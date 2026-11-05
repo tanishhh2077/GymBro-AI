@@ -3,12 +3,19 @@
 **GymBro AI — Your second set of eyes.**
 
 GymBro AI is being developed as an evidence-backed strength-training video
-analysis product. The initial scope is **one uploaded side-view barbell
-bench-press video**.
+analysis product, now expanding into personal workout tracking under D-030.
+The Home screen gives equal entry to a manual workout log and **one uploaded
+side-view barbell bench-press video** for analysis.
+
+The workout log supports per-workout lb/kg, manual exercises/sets/reps/weights,
+editing, reload/resume, finished history and explicit deletion. Records stay in
+local IndexedDB; clearing app/browser data removes them. There is no cloud backup
+or account sync. Routines, timers, personal bests/charts, set-linked analysis and
+live analysis remain future work. Accepted Q&A is in [PRODUCT_DIRECTION](docs/PRODUCT_DIRECTION.md).
 
 The existing browser prototype contains local video selection, MediaPipe pose
 estimation, and a skeleton overlay with playback controls. Repetition detection,
-depth/tempo findings, saved sessions, and comparisons are not yet
+depth/tempo findings, persisted AI sessions, and comparisons are not yet
 implemented. Real-video acceptance and mobile performance remain to be verified.
 The player now includes estimated left/right 2D elbow-angle traces, explicit
 unavailable reasons, observation timestamps, and sample navigation. A clip summary
@@ -16,8 +23,9 @@ adds per-elbow measurable-sample counts and jumps to lowest/highest observed
 angles. Counts describe available samples; extrema can include tracking errors.
 These are
 image-space measurements, not validated bench biomechanics or technique findings.
-The UI offers only the supported workflow: one side-view bench-press MP4, with
-recording guidance and no exercise or camera-angle choices. Unused legacy
+The analysis view offers only one side-view bench-press MP4, with recording
+guidance and no analysis exercise or camera-angle choices. Manual logging names
+do not imply AI support for those lifts. Unused legacy
 multi-lift code and score-bearing report types were removed in Task 12.
 
 Processing currently happens on-device using WebAssembly/WebGL. Choosing a local
@@ -134,6 +142,11 @@ fallbacks. Browser tests verify layout/startup; native device behavior and offli
 inference still need platform checks.
 
 ### Automated tests
+
+Task 14 currently passes **448 tests / 22 files**, lint and guarded mobile sync.
+Manual-workout schema/repository/store and App-flow tests supplement the media
+tests below. The browser suite additionally checks synthetic logging and two-tab
+conflicts; consult STATUS for the latest full-browser/hosted/native results.
 
 ```bash
 npm test

@@ -1,0 +1,74 @@
+import { test, expect } from './app';
+
+test('saves, edits, resumes and reopens a local workout with its original units', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Analyze video', exact: true })).toBeEnabled();
+  await page.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await page.getByLabel('Workout name', { exact: true }).fill('Synthetic upper day');
+  await page.getByLabel('Weight unit', { exact: true }).selectOption('kg');
+  await page.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Synthetic upper day', exact: true })).toBeVisible();
+  await page.getByLabel('Exercise name', { exact: true }).fill('Bench press');
+  await page.getByRole('button', { name: 'Add exercise', exact: true }).click();
+  const exercise = page.getByRole('region', { name: 'Bench press', exact: true });
+  await exercise.getByLabel('Reps', { exact: true }).fill('8');
+  await exercise.getByLabel('Weight (kg)', { exact: true }).fill('60.5');
+  await exercise.getByRole('button', { name: 'Log set', exact: true }).click();
+  await expect(exercise.getByRole('cell', { name: '60.5 kg', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Edit set 1 for Bench press', exact: true }).click();
+  await exercise.getByLabel('Reps', { exact: true }).fill('9');
+  await exercise.getByLabel('Weight (kg)', { exact: true }).fill('62.5');
+  await exercise.getByRole('button', { name: 'Save set', exact: true }).click();
+  await expect(exercise.getByRole('cell', { name: '62.5 kg', exact: true })).toBeVisible();
+  await page.reload();
+  await page.getByRole('button', { name: 'Resume workout', exact: true }).click();
+  await expect(page.getByRole('cell', { name: '62.5 kg', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Finish workout', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Workout saved.' })).toBeVisible();
+  await page.reload();
+  await page.getByRole('button', { name: 'View workout history', exact: true }).click();
+  await page.getByRole('button', { name: /Synthetic upper day/ }).click();
+  await expect(page.getByRole('cell', { name: '62.5 kg', exact: true })).toBeVisible();
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.getByRole('button', { name: 'Delete workout', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Synthetic upper day', exact: true })).toBeVisible();
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: 'Delete workout', exact: true }).click();
+  await expect(page.getByText('Finish a workout to see it here.', { exact: true })).toBeVisible();
+});
+
+test('a stale second tab reloads instead of overwriting the saved draft', async ({ page, context }) => {
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Start workout', exact: true })).toBeEnabled();
+  const other = await context.newPage();
+  await other.goto('/');
+  await expect(other.getByRole('button', { name: 'Start workout', exact: true })).toBeEnabled();
+  await page.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await page.getByLabel('Workout name', { exact: true }).fill('First tab');
+  await page.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'First tab', exact: true })).toBeVisible();
+  await other.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await other.getByLabel('Workout name', { exact: true }).fill('Second tab');
+  await other.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await expect(other.getByRole('alert')).toContainText('another tab');
+  await other.getByRole('button', { name: 'Reload saved workouts', exact: true }).click();
+  await expect(other.getByRole('heading', { name: 'First tab', exact: true })).toBeVisible();
+  await other.close();
+});
+
+test('long manual names fit the narrow Home and workout views', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await page.getByLabel('Workout name', { exact: true }).fill('W'.repeat(80));
+  await page.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await page.getByLabel('Exercise name', { exact: true }).fill('E'.repeat(80));
+  await page.getByRole('button', { name: 'Add exercise', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'E'.repeat(80), exact: true })).toBeVisible();
+  const fits = () => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
+  expect(await fits()).toBe(true);
+  await page.getByRole('button', { name: 'Home', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Resume workout', exact: true })).toBeVisible();
+  expect(await fits()).toBe(true);
+});

@@ -19,7 +19,20 @@ cloud CI; run3 also verifies visible iPhone-simulator startup after earlier
 blank/home-screen captures exposed weak test readiness. Neither is verified on
 physical devices or native video inference.
 There is no Python service, database,
-account system or persistence layer.
+account system or server database. Task 14 adds a separate local IndexedDB
+repository for manual workouts under D-030. Its transaction compares revisions
+before writing and exposes saved state only after completion; failed/unknown
+reads and uncertain writes require recovery without overwriting old data.
+
+Root App owns Home/Workout/Analyze navigation and native lifecycle registration.
+Manual contracts in `types/workout.ts` stay independent of pose/media types.
+`WorkoutHome`, `WorkoutEditor` and `WorkoutHistory` use the separate workout
+store/repository; `AnalysisWorkspace` retains the existing video pipeline.
+Leaving analysis pauses/releases the visible player without removing its clip
+or canceling the independent job; native app-background cancellation remains.
+No video, object URL, frame, landmark or form finding enters the workout database.
+Units are fixed per workout; history does not sum mixed loads. This prototype
+does not yet implement routines, charts/PRs, timers or set-linked/live analysis.
 
 Current data flow:
 

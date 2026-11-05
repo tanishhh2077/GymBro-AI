@@ -1,5 +1,12 @@
 # Session state and media ownership
 
+Task 14 (D-030) adds separate `workoutRepository.ts` and `useWorkoutStore.ts`.
+The versioned plain manual log lives in local IndexedDB. One readwrite transaction
+compares revisions and saves; UI state updates only on completion. Unknown data,
+conflicts and uncertain errors require explicit recovery. Media/session data below
+stay in memory. The new store's tests cover draft/edit/finish/history and ordering;
+repository tests exercise actual transaction code with the missing API adapted.
+
 `useSessionStore.ts` exports `createSessionStore(deps)` and the app's single
 `useSessionStore`. The store holds at most one clip and owns its whole lifecycle:
 
@@ -26,4 +33,4 @@ Design details: [ARCHITECTURE.md](../../docs/ARCHITECTURE.md#session-ownership).
 
 Follow [local rules](AGENTS.md) and [current handoff](../../docs/HANDOFF.md).
 Keep algorithms in [core](../core/README.md). Persistence and server video
-transfer are outside the approved milestone.
+transfer are outside the pose milestone; D-030 permits only separate manual-workout persistence.

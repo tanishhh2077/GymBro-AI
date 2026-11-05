@@ -1,10 +1,10 @@
 import { Buffer } from 'node:buffer';
 import { fileURLToPath } from 'node:url';
-import { test, expect, sessionSnapshot } from './app';
+import { test, expect, sessionSnapshot, openAnalysis } from './app';
 
 const invalidVideo = { name: 'invalid.mp4', mimeType: 'video/mp4', buffer: Buffer.from('not a movie') };
 
-test.beforeEach(async ({ page }) => { await page.goto('/'); });
+test.beforeEach(async ({ page }) => { await openAnalysis(page); });
 
 test('rejects empty files before creating a clip or loading the model', async ({ page }) => {
   const modelRequests: string[] = [];
