@@ -4,7 +4,7 @@ Updated 2026-11-04 (America/Chicago). Read root/scoped AGENTS.md first.
 
 ## Current task and next action
 
-**Task 12 (in progress): remove unrendered legacy code and template assets**
+**Task 12 (complete): remove unrendered legacy code and template assets**
 ([D-028](DECISIONS.md#d-028-remove-unrendered-legacy-code-and-template-assets)), on
 `feat/task12-legacy-cleanup` from reviewed master `eaf87e1`. The user, still away,
 asked the builder to keep working toward completion without frequent questions;
@@ -17,12 +17,16 @@ its checkboxes and Git show the latest step. Step 1 (D-028, plan) and Step 2
 guarded sync with 11 verified files per platform) and Step 3 (types/metadata
 narrowed, unused analysis types deleted, **385 tests / 17 files**) are done; next
 is Step 4: the browser check (screens match Task 10's) and fresh review (six Low
-documentation findings, fixed) are done; next is fast-forwarding master. D-024 applies. One writer;
+documentation findings, fixed) are done, and master is fast-forwarded to the
+reviewed result. **Task 12 is complete.** Next: merge master into Task 8, then
+the phone session when the user is present. D-024 applies. One writer;
 reviewers read only.
 
 Task 11 (D-027, the build's Vite/Vitest config type-check) is complete on master
-`eaf87e1`; native run7 (41936252985) for that commit was in progress when Task 12
-began. Follow-up: `capacitor.config.ts` is still checked with the root DOM settings.
+`eaf87e1`; [native run7](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41936252985)
+for that commit passed all three jobs (shared checks, Android APK, iOS simulator
+build/startup); packages not downloaded (needs a signed-in account). Pushing
+Task 12 to master starts another run. Follow-up: `capacitor.config.ts` is still checked with the root DOM settings.
 
 ## Task 8 phone test (separate branch, waiting for the user)
 

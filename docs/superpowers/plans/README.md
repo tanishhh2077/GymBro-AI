@@ -1,10 +1,11 @@
 # Implementation plans
 
-In progress: [Task 12 legacy cleanup](2026-11-04-legacy-cleanup.md) under D-028,
-on `feat/task12-legacy-cleanup` from master `eaf87e1`. It removes unrendered
-legacy code, unused analysis types and template assets; nothing visible changes.
+Latest completed feature: [Task 12 legacy cleanup](2026-11-04-legacy-cleanup.md)
+under D-028: unrendered legacy code, unused analysis types and template assets
+removed; screens unchanged. All 4 steps, 385 tests and a fresh review pass;
+fast-forwarded to master.
 
-Latest completed feature: [Task 11 config type-check](2026-11-04-config-typecheck.md)
+Preceding feature: [Task 11 config type-check](2026-11-04-config-typecheck.md)
 under D-027. The build checks `vite.config.ts`/`vitest.config.ts` with Node types
 and the unused template `tsconfig.app.json` is deleted; no application source
 changes. All 3 steps, 383 tests and a fresh review pass; fast-forwarded to master.

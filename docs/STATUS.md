@@ -10,10 +10,12 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task 12 (D-028, legacy code and template asset cleanup) is **in progress** on
-`feat/task12-legacy-cleanup` from reviewed master `eaf87e1`, chosen by the builder
+Task 12 (D-028, legacy code and template asset cleanup) is **complete**: built on
+`feat/task12-legacy-cleanup` from reviewed master `eaf87e1`, freshly reviewed and
+fast-forwarded to master; chosen by the builder
 under the user's request for continued work toward completion. Task 11 (D-027,
-build configuration type-check) is complete on master. Task 8's phone test waits
+build configuration type-check) is complete on master; native run7
+(41936252985, source `eaf87e1`) passed all three jobs. Task 8's phone test waits
 for the user on its own branch (`398b5c0`: master `eaf87e1` merged, iOS 26.5.2
 reported, S07/S08 inputs generated and reviewed); its branch records hold the
 details. Safari, installed-native and real-bench acceptance remain unverified.

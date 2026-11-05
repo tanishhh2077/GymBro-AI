@@ -17,7 +17,7 @@ Read only the relevant sections of the longer records after that.
 | [Phone/video test plan](superpowers/plans/2026-11-04-phone-video-acceptance.md) | Task 7 planning; free Safari proposal and separate native/bench gates |
 | [Clip elbow summary](superpowers/plans/2026-11-04-elbow-summary.md) | Completed Task9 observed counts/extrema and evidence jumps |
 | [Observed processing time](superpowers/plans/2026-11-04-processing-time.md) | Completed Task 10 (D-026): one run's admission-to-result time badge |
-| [Legacy cleanup](superpowers/plans/2026-11-04-legacy-cleanup.md) | Task 12 (D-028): remove unrendered legacy code, unused analysis types and template assets |
+| [Legacy cleanup](superpowers/plans/2026-11-04-legacy-cleanup.md) | Completed Task 12 (D-028): remove unrendered legacy code, unused analysis types and template assets |
 | [Config type-check](superpowers/plans/2026-11-04-config-typecheck.md) | Completed Task 11 (D-027): build checks the Vite/Vitest config files; template config removed |
 
 Follow [documentation rules](AGENTS.md). Update the compact handoff after a work

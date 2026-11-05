@@ -94,4 +94,4 @@ Changes:
   master's (names, view label, accent, badges); no new console errors.
 - [x] Fresh read-only review of D-028, this plan and the diff; fix supported
   findings in their own commit.
-- [ ] Record the review, fast-forward master, push, and merge master into Task 8.
+- [x] Record the review, fast-forward master, push, and merge master into Task 8.
