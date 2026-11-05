@@ -66,7 +66,8 @@ Capacitor 8.6.0/App 8.1.2 prototypes use appId `com.gymbroai.app`, version 0.1.0
 [Master run7](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41936252985)
 (Task 11 source `eaf87e1`) and run6 (Task 10 source) compiled both platforms and
 passed their iOS simulator startup jobs; their packages were not downloaded (that
-needs a signed-in account). Master `1c44729` (Task 12) started a further run.
+needs a signed-in account). [Run8](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41938020495)
+for master `1c44729` (Task 12) also passed all three jobs, packages not downloaded.
 [Run5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
 verified visible iPhone 17 Pro/iOS 26.4 simulator startup with Xcode 26.6/17F113;
 its packages are in ignored `build/artifacts/run-5/` (Task 9 source, no badge).

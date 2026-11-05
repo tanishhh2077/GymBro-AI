@@ -35,6 +35,8 @@ acceptance remain unverified.
   `npm run mobile:sync` exit 0 (411 modules; iOS and Android 11 shared files each
   verified). The phone session's screens match Task 10's; the built site no
   longer ships the two unused template SVGs.
+- Native run8 (41938020495, master `1c44729`) passed shared checks, the Android
+  debug APK and iOS simulator build/startup; packages were not downloaded.
 
 ### Task 12 record: legacy code and template asset cleanup, completed on master
 
