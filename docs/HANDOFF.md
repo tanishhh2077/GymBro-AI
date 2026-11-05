@@ -25,6 +25,11 @@ transfer:
   It needs its own design and per-view validation before any code. The user now
   has bench videos; they live in a private folder **outside** this repository
   and are never committed or uploaded.
+- User requirement (2026-11-05): the phone app must feel smooth and responsive,
+  not laggy or finicky. During the phone session, record how scrolling, screen
+  changes, playback and video processing actually feel and how long they take.
+  If the Capacitor web-app wrapper proves too slow, propose native or React Native
+  options as a separate decision; no switch is approved yet.
 
 ## Current task and next action
 
