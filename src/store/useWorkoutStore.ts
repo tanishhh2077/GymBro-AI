@@ -2,6 +2,7 @@ import { createStore } from 'zustand/vanilla';
 import { emptyWorkoutData, validateSetValues, validateWorkoutData, WorkoutError } from '@/core/workouts';
 import type { RoutineInput, WeightUnit, Workout, WorkoutData, WorkoutExercise, WorkoutResult, WorkoutRoutine } from '@/types/workout';
 import { createWorkoutRepository, type WorkoutRepository } from './workoutRepository';
+import { mergeWorkoutBackup, type WorkoutBackup } from '@/core/workoutBackup';
 interface WorkoutDeps { id: () => string; now: () => number }
 export interface WorkoutState {
   data: WorkoutData; loaded: boolean; busy: boolean; needsReload: boolean; error: string | null;
@@ -19,6 +20,7 @@ export interface WorkoutState {
   updateRoutine: (id: string, expectedRevision: number, input: RoutineInput) => Promise<WorkoutResult>;
   deleteRoutine: (id: string) => Promise<WorkoutResult>;
   startRoutine: (id: string) => Promise<WorkoutResult>;
+  restoreBackup: (backup: WorkoutBackup, expectedRevision: number) => Promise<WorkoutResult>;
 }
 const browserDeps: WorkoutDeps = {
   // getRandomValues also works on the trusted HTTP LAN used for phone testing.
@@ -61,6 +63,7 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
       let writing = false;
       try {
         const next = validateWorkoutData(change(current.data));
+        if (next === current.data) { set({ busy: false }); return { ok: true }; }
         writing = true;
         const saved = await repository.save(current.data.revision, next);
         set({ data: saved, busy: false, error: null, needsReload: false });
@@ -92,6 +95,10 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
     }
     return {
       data: emptyWorkoutData(), loaded: false, busy: false, needsReload: false, error: null, load,
+      restoreBackup: (backup, expectedRevision) => commit(data => {
+        if (data.revision !== expectedRevision) invalid('The library changed after the preview. Choose the backup file again.');
+        return mergeWorkoutBackup(data, backup).data;
+      }),
       startWorkout: (name, unit) => commit(data => {
         if (data.active) invalid('Finish or discard the active workout before starting another.');
         return { ...data, active: { id: deps.id(), name: cleanName(name), unit, startedAt: deps.now(), finishedAt: null, exercises: [] } };
