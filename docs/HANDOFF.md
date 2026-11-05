@@ -4,15 +4,22 @@ Updated2026-11-05 America/Chicago. Read root/scoped AGENTS first.
 
 ## Current state and next action
 
-**Task15 in progress:** manual active-workout rest timer (D-033), isolated sibling
-checkout `GymBro AI-task15`, branch `feat/task15-rest-timer`, from reviewed master
-`b09f79a`. Original checkout stays on `feat/task8-safari-phone-test` at `52789b0`;
-do not merge Task8 or Task4 into master. Task14 remains complete. Baseline clean
-install,448tests/22files, lint/build and owned loopback Vite4183 health pass.
-Step2 implementation passes458tests/23files, lint/build, guarded mobile sync/verify
-and all14 actual Chromium cases (2.8minutes). Fresh code review found no significant
-issues and independently passed15 focused tests. Hosted checks and reviewed master
-integration remain; no production change after the local checks/review.
+**Task15 complete:** manual active-workout rest timer (D-033), reviewed source
+`9eef2fb`, fast-forwarded/pushed to master. Final documentation adds no production
+change. Continue in original `GymBro AI` checkout on `feat/task8-safari-phone-test`,
+bringing current master into it with preserved history. Keep Task8 and Task4
+open/unmerged into master; their phone/bench acceptance is separate.
+
+458tests/23files, lint/build, guarded mobile sync/verify, all14 local browser
+cases (2.8minutes), synthetic390/1280 visual inspection and fresh review pass.
+Reviewer independently passed15focused tests with no significant findings.
+[Hosted browser run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41977815775)
+passes458shared checks and14cases (3.4minutes). [Native run13](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41977815811)
+passes shared/Android/iOS compile,11-file bundle comparisons and visible iPhone
+simulator Home startup (iPhone17Pro/iOS26.4). Both use exact source `9eef2fb`.
+Startup was slow but passed; packages were not downloaded. No physical-device
+timer/video or background-alert validation. Duplicate master checks are not needed
+to establish the already-green source; report any actual new failures separately.
 
 Timer: manual start/pause/resume/reset with30/60/90/120/180/300-second presets,
 initial90. Root keyed by active workout ID, navigation retained; successful
@@ -92,6 +99,8 @@ change global Node20. Do not stop unrelated listener5173. Earlier5193 was absent
 at latest check; no action targeted it. Full tests/lint/build before each green
 commit, no attribution trailers, force pushes or branch deletion. Retain both
 Task8 and Task14 histories. GitHub default remains feat/gymbro-video-landmarks.
-Temporary Task14 worktree was removed after verification; its empty Home previews
-were preserved here and all branches retained. Continue in this original folder.
+Temporary feature worktrees are only for isolated development; continue in the
+original folder. Empty Home and synthetic Task15 timer previews are preserved
+locally in ignored build/visual-review; all feature branches remain. Owned Task15
+loopback4183 server was identity-checked and stopped; unrelated servers untouched.
 Markdown is the provider-neutral handoff.

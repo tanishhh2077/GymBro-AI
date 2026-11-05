@@ -49,8 +49,8 @@
 ## Step3: fresh review and integration
 
 - [x] Fresh reviewer reads branch/spec/plan and surrounding code, read-only, no inherited conversation. No significant finding; no fix required.
-- [ ] Read actual hosted browser/native checks separately from local evidence. Do not claim physical-phone/bench validation.
-- [ ] Update all changed facts; reviewed fast-forward/push master and preserve Task8 history when bringing it into original checkout. Retain branches.
+- [x] Read actual hosted browser/native checks separately from local evidence. Do not claim physical-phone/bench validation.
+- [x] Update all changed facts; reviewed fast-forward/push master. Original Task8 checkout receives it with preserved history in the integration record; retain all branches.
 
 ## Execution record
 
@@ -60,3 +60,4 @@
 - Ruling: first timer is session-only, not another storage schema — keeps the bounded feature independent of saved workout recovery/sync; users must restart it after reload, stated in UI.
 - Step2:8 component and2 new App cases RED for missing behavior -> GREEN (15 focused);458 total tests/23files,lint/build,guarded sync pass. New browser timer case passes; full14-case run/review pending. Synthetic local visuals inspected390/1280 with no overflow. No production change after these checks.
 - Final Step2 evidence:14/14 actual Chromium cases pass in2.8minutes (156.0.8078.4/GPU delegate label/120no-person samples). Fresh Codex reviewer, requested gpt-6-astra, exact runtimeID unavailable:15focused tests pass and no significant finding. Limits/dispositions are in the dated review. Hosted checks/master integration pending.
+- Step3 complete: exact source9eef2fb passes hosted browser6 (458tests/14cases,3.4minutes) and native13 (shared/Android/iOS compile/visible simulator startup). Fresh final458tests/lint/build pass unchanged source. Master fast-forwarded/pushed; completion docs follow. Original-checkout merge/cleanup evidence belongs in current STATUS.

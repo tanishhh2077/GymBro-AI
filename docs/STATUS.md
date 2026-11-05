@@ -10,8 +10,10 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
-Task15 starts from reviewed master `b09f79a` in isolated `GymBro AI-task15`, branch
-`feat/task15-rest-timer`. User answered Q9 A (workout-record sync only, no videos),
+Task15 is complete: reviewed source `9eef2fb` has been fast-forwarded/pushed to
+master after all local/hosted gates passed. It started from reviewed `b09f79a` in
+isolated `GymBro AI-task15`, branch `feat/task15-rest-timer`.
+User answered Q9 A (workout-record sync only, no videos),
 then said "Clear bro now work"; D-032/D-033 and PRODUCT_DIRECTION preserve this.
 Builder selects the already requested manual rest timer as the next bounded
 tracking task. Q&A resumes at Q10 later; no routine confirmation stop.
@@ -49,8 +51,29 @@ tracking task. Q&A resumes at Q10 later; no routine confirmation stop.
 - Fresh read-only Codex reviewer requested on gpt-6-astra, no inherited conversation;
  actual runtime model ID not exposed. **No significant findings**; independently
  15focused tests/2files and diff check pass. Production unchanged after review.
- See `2026-11-05-rest-timer-code-review.md` for limits/dispositions. Hosted results
- pending; no physical-iPhone, background-alert or real-bench acceptance claim.
+ See `2026-11-05-rest-timer-code-review.md` for limits/dispositions. No physical-
+ iPhone, background-alert or real-bench acceptance claim.
+
+### Task15 final hosted acceptance and integration
+
+- Source `9eef2fbfd9aedada0478fbcc07d44c5609dfcc8d`, [browser run6](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41977815775):
+  success,458 tests/23files,lint/build,14 browser cases in3.4minutes.
+  Chromium156.0.8078.4/GPU delegate label/120no-person samples, not a benchmark.
+- [Native run13](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41977815811), same source:
+  success for shared/Android/iOS compile and visible simulator Home startup;
+  iPhone17Pro/iOS26.4,11 bundled shared files byte-identical. Startup took longer
+  than the other gates but passed without source/workflow changes. No live logs
+  were available before completion (404); that was not a failed build. Packages
+  were not downloaded; empty-shell startup is not native timer/video acceptance.
+- Fresh final local458tests/23files,lint/build pass, same419modules/bundle hashes.
+  No production edits after review. Master fast-forwarded/pushed to `9eef2fb`;
+  this completion record is documentation-only and follows onto master.
+- Owned Vite4183 listener PID/command line was verified before stopping only that
+  helper. Synthetic timer previews copied to original ignored build/visual-review/
+  task15. Next bring final master into original Task8 checkout, verify source
+  parity and merged checks, retain branches and remove the clean temporary tree.
+- Accounts/sync are planned, not implemented. Q10 waits until Q&A resumes; user
+  hotspot/video/device gates stay pending without another availability request.
 
 ### Previous accepted state (Task14/Q8)
 

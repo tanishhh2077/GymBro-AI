@@ -28,6 +28,8 @@ changes only on state transitions. No saved-record/media/native/network change.
 - Reviewer did not rerun hosted/native or the whole suite. Implementer observed
  458 tests/23files,lint/build,guarded sync and14browser cases; fresh hosted results
  remain separately pending at this review record.
+  Subsequently exact reviewed source9eef2fb passed hosted browser6 and native13,
+  including simulator startup. This updates evidence, not the review's scope.
 - Stopwatch accuracy across system-clock changes, background alerts and reload
   persistence are outside this explicit first contract. UI states reload reset
   and in-app completion; system-clock changes may affect timing. No unsupported
