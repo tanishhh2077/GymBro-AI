@@ -107,7 +107,21 @@ bench gates remain open.
   step 9, `npm run test:browser`, failed after 352 seconds. Its only annotation is
   "Process completed with exit code 1", the check run has no output text, and
   the job-log API answers 403 "Must have admin rights to Repository". No
-  credentials were added, so the failing case is unknown.
+  credentials were added. The job page itself, opened later in the user's
+  browser through the Claude in Chrome extension, shows the failing case:
+  `tests/browser/input-validation.spec.ts:53`, "reports real decode failure, blocks
+replacement, and restores keyboard admission". It failed with "TimeoutError: page.waitForEvent: Timeout
+  10000ms exceeded while waiting for event \"filechooser\"" at line 56, after
+  focusing "Choose video" and pressing Enter; 1 failed and 16 passed in 5.9
+  minutes, and Playwright flagged `no-person.spec.ts` as slow (5.5 minutes).
+- Code check (read-only): only two places move focus. `App.tsx` focuses `main`
+  when the view changes, but React 18 runs effects from a click before the click
+  finishes, so that happens before the test focuses the button; and
+  `AnalysisWorkspace` focuses its heading only when a clip is removed. There is no
+  lazy loading. So no race is confirmed; a slow runner missing the 10-second wait
+  stays a hypothesis. If the case fails again, a separate test-first task should
+  first assert that the button still has focus before Enter, to tell lost focus
+  from a slow file chooser.
 - Comparison: hosted browser run 8 passed the same source in 256 seconds (06:49
   UTC), Task 15's master browser run passed in 326 seconds, and this failed run
   (07:11 UTC) also took longer in `npm ci` (7 s against 5 s) and the browser

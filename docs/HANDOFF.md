@@ -48,11 +48,17 @@ with its old default branch, which was 52 commits behind.
 - The fully merged branches are kept; deleting them needs the user's agreement.
 
 **Open hosted failure, first:** master's push started a hosted browser run that
-**failed** (details under Task 16 evidence). Its log needs a signed-in account
-with admin rights, so the failing case is unknown. The user should open
-[that run](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41985529794) while signed in, or re-run its job, before more feature
-work; a real failing case then gets a test-first fix. Do not call it a flake
-without that evidence.
+**failed** (details under Task 16 evidence). The run page, read later in the
+user's browser, names one failing case: `tests/browser/input-validation.spec.ts:53`, "reports real decode failure, blocks
+replacement, and restores keyboard admission". It focuses "Choose video",
+presses Enter and waited 10 seconds for a file-chooser event that never came; the
+other 16 cases passed, on a runner slow enough that `no-person.spec.ts` alone took
+5.5 minutes. No code race is confirmed (see STATUS). The user should
+start a new run while signed in (Actions, then "Non-human browser checks", then
+"Run workflow" on branch `master`) or re-run
+[that run](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41985529794)'s job
+before more feature work. If the case fails again, it gets a test-first fix. Do
+not call it a flake without that evidence.
 
 **Next action:** no approved implementation task remains. The next work needs the
 user: the phone session (below), the product Q&A, which resumes at question Q10
