@@ -738,6 +738,18 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   Preserve numeric precision, quote CSV fields and protect formula-leading names.
   Reuse browser/native export ownership. CSV is separate from JSON restoration.
 
+### D-057 Approved Claude Code follow-up batch
+
+- The user accepted all recommended Q26–Q33 options and selected Claude Code
+  to implement them. The exact choices are in PRODUCT_DIRECTION. They are
+  approved work, with implementation pending. Assign individual task numbers
+  at integration. This approval includes the required bounded persistence
+  extensions for workout notes and routine target weights. Preserve legacy
+  records, backup/sync compatibility, atomic saves and planned/actual separation.
+- Explain and proceed under D-024. Use isolated parallel ownership where useful,
+  sequence shared storage changes and obtain fresh review of persistence changes.
+  No additional phone/account/service setup is implied.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

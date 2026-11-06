@@ -33,10 +33,19 @@ and brief reason.
 | 23. Training summary | A: seven-day workouts, sets, duration and unit-separated volume |
 | 24. History browsing | A: optional calendar with day filtering |
 | 25. Spreadsheet export | A: completed actual sets as CSV with units and types |
+| 26. Workout notes | A: one optional workout note, editable during and after training |
+| 27. Active exercise order | A: Move Up/Down while preserving logged sets |
+| 28. Repeat completed workout | A: copy exercises into a fresh workout with previous values and zero logged sets |
+| 29. Exercise detail | A: existing history, records and progress for exact name/unit |
+| 30. Leaving changed forms | A: confirm before discarding changed inputs |
+| 31. Routine target weights | A: optional target weight per exercise, separate from actual results |
+| 32. Training consistency | A: weekly completed-workout counts for the last 12 weeks |
+| 33. Workout names | A: suggest previous names while allowing custom names |
 
 Q20–Q25 were accepted together with an explicit instruction to build all
 recommended options. Tasks32–37 implement them under D-051–D-056.
-Questions can resume at Q26.
+Q26–Q33 are approved for Claude Code implementation under D-057.
+Questions can resume at Q34.
 
 Q17–Q19 were accepted together. Tasks27–29 integrate their three separate agent
 branches under D-046–D-048. Questions can resume at Q20.

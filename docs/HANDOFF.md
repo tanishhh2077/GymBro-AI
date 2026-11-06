@@ -21,7 +21,12 @@ Actual iPhone sound/vibration/sharing and native compilation remain unverified.
 
 ## Next work
 
-Q&A resumes at Q26. Start the next approved task from updated origin/master.
+Transfer to Claude Code. Q26–Q33 all A are approved under D-057, pending build.
+Read their eight exact choices in PRODUCT_DIRECTION. Q&A resumes at Q34.
+Plan shared saved-data extensions together before parallel UI work. Preserve
+legacy libraries, backup/sync, independent routines and actual logged values.
+Use fresh review for saved-data/export changes. Do not ask for approval again
+for the eight accepted features. Start from updated origin/master.
 Preserve all worker branches/checkouts and the incomplete Task4 branch.
 Use isolated ownership and one browser suite on4179, previews on4183.
 Assign task/decision numbers at integration and update shared docs once.

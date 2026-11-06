@@ -10,6 +10,12 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Provider handover records Q26–Q33 all A approved for Claude Code under D-057.
+Implementation has not started. Handoff/product choices/decision updated, with
+local link and diff checks only. Existing 824-test/36-browser baseline applies
+to unchanged source. Next action is Claude's bounded shared-data plan and build.
+
+
 Tasks32–37 implement accepted Q20–Q25 under D-051–D-056. Three parallel Codex
 workers each owned two features in isolated worktrees. One fresh independent
 Codex source reviewer inspected all three diffs and found no significant defects.
