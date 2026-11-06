@@ -17,7 +17,8 @@
     "mobile:assets": "capacitor-assets generate --ios --android --iconBackgroundColor \"#05070d\" --iconBackgroundColorDark \"#05070d\" --splashBackgroundColor \"#05070d\" --splashBackgroundColorDark \"#05070d\"",
     "mobile:open:ios": "cap open ios",
     "mobile:open:android": "cap open android",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "test:sync-db": "node scripts/test-sync-db.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.6.0",

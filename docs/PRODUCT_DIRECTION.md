@@ -47,8 +47,10 @@ Task 19 (D-039) later added session-only set-linked analysis for bench-press set
 Builder defaults: existing visual tokens/system font; provisional three-view
 navigation; visible lb/kg selection for each new workout, initially lb (US-first
 direction), no conversion; local IndexedDB only. Q8 now selects guest use with
-optional accounts and sync as the future direction; neither is implemented.
-Q9 restricts future sync to workout records, excluding videos. Guest-data
+optional accounts and sync as the future direction. D-044/Task25 now supplies
+the Supabase email-code client, manual sync and backend SQL. Cloud setup and
+real service/device verification are pending. Q9 limits sync to workout records.
+Guest-data
 migration, unit preference, local video acquisition/retention,
 routines, metrics and final styling remain Q&A topics.
 

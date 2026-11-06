@@ -1,6 +1,6 @@
 # System architecture
 
-Updated 2026-11-05 through Task24 startup integration. This map distinguishes
+Updated 2026-11-06 through Task25 accounts/sync. This map distinguishes
 observed implementation and accepted future direction.
 
 Task 13's `tests/browser/` exercises the existing development-server application
@@ -19,12 +19,13 @@ build in iOS/Android projects under D-022. Both native wrappers now compile in
 cloud CI; run3 also verifies visible iPhone-simulator startup after earlier
 blank/home-screen captures exposed weak test readiness. Neither is verified on
 physical devices or native video inference.
-Backend accounts and sync are future work. Task14 supplies a local IndexedDB
+Task25 adds optional Supabase accounts/manual sync under D-044. Task14 supplies a local IndexedDB
 repository for manual workouts under D-030. Its transaction compares revisions
 before writing and exposes saved state only after completion; failed/unknown
 reads and uncertain writes require recovery without overwriting old data.
 
-Root App owns Home/Workout/Analyze navigation and native lifecycle registration.
+AccountRoot selects the guest or authenticated account library. Root App owns
+Home/Workout/Analyze navigation and native lifecycle registration.
 Manual contracts in `types/workout.ts` stay independent of pose/media types.
 `WorkoutHome`, `WorkoutEditor` and `WorkoutHistory` use the separate workout
 store/repository; `AnalysisWorkspace` retains the existing video pipeline.
@@ -217,7 +218,9 @@ acceptable performance.
 
 Record the tested device, OS, runtime, model, delegate, clip characteristics, processing time, failure/cancellation behavior, and available resource measurements. Do not choose the processing architecture from an App Store target alone. Prototype evidence determines whether local processing remains suitable or another implementation/service is justified.
 
-Python/NumPy may support evaluation or a later analysis implementation. FastAPI and PostgreSQL remain possible later services for demonstrated needs such as saved sessions. Saving measurements and retaining/uploading raw videos are separate privacy decisions. Do not introduce accounts, object storage, queues, or distributed infrastructure into milestone one.
+Python/NumPy may support evaluation or a later analysis implementation. Task25's
+Supabase/PostgreSQL backend serves manual workout accounts/sync under D-044.
+Saving measurements and retaining/uploading raw videos remain separate decisions.
 
 ## Saved routines and library schema2 (Task16)
 
@@ -285,6 +288,34 @@ artifacts. Filesystem 8.1.5/Share 8.0.3 are pinned and synchronized. iOS embeds 
 file-timestamp privacy reason C617.1. Native recipients retain access to successful
 cache files, managed by the OS. Export messages report admission/handoff. Actual
 file saving, picker behavior and performance need physical-device verification.
+
+## Optional accounts and workout sync (Task25)
+
+`main` mounts `AccountRoot`. Missing configuration opens the established guest
+store. Configured accounts load the Supabase SDK on demand and restore email-code
+sessions. Guest uses `gymbro-workouts`; an account uses
+`gymbro-account:<service-host>:<user-uuid>`. Identity changes remount App and reset
+the video session, links and timer. Guest copying uses the existing additive,
+revision-bound backup merge and leaves the guest source available.
+
+`core/workoutSync` compares whole workout/routine records against the previous
+shared snapshot. Independent changes merge, unchanged-side deletions propagate,
+and concurrent edits/deletes require a device/cloud choice. Active-to-finished
+transitions retain the workout ID. Two distinct active workouts block merging.
+`previewSync` captures local/cloud revisions. `confirmSync` owns the store busy
+flag, checks the local preview and writes through a cloud compare-and-swap RPC.
+The repository then commits `current` and `shared` together. A failed remote save
+allows continued logging. Uncertain local commits require reload. Retrying reads
+the server again against the previous local baseline, preserving explicit conflicts.
+
+`accountService` validates public configuration, email/code inputs and manual
+snapshots. Every database request pins the checked session's bearer token, then
+checks identity again before accepting its result. Fetch has a 20-second abort
+deadline. SDK authentication owns its persisted session/refresh lifecycle.
+The backend migration restricts reads to `auth.uid()`, revokes direct writes and
+exposes one owner-bound, validated, revision-checked RPC with a fixed search path.
+`supabase/README.md` owns setup and verification boundaries. Cloud configuration,
+hosted email/API behavior and physical-device sync still require observation.
 
 ## Runtime reference sources
 

@@ -9,8 +9,9 @@ side-view barbell bench-press video** for analysis.
 
 The workout log supports per-workout lb/kg, manual exercises/sets/reps/weights,
 editing, reload/resume, finished history and explicit deletion. Records stay in
-local IndexedDB; clearing app/browser data removes them. There is no cloud backup
-or account sync. An active workout also has a manual rest timer with duration
+local IndexedDB; clearing app/browser data removes them. Task25 adds optional
+Supabase email-code accounts and explicit manual workout/routine sync after
+[service setup](supabase/README.md). An active workout also has a manual rest timer with duration
 choices, pause/resume/reset and in-app completion. It stays across screen changes
 but resets on reload/restart; no background alert. Saved routines support create,
 edit, delete, exercise order and optional set/rep targets. Each routine starts a
@@ -21,8 +22,10 @@ heaviest-load charts and source-linked workout tables. Records use completed
 actual sets and update after deletion. A logged bench-press set can open video
 analysis and return to that set; the link lasts for the session only and is never
 saved. Live analysis remains future work. Accepted Q&A selects
-guest access with optional workout-record sync only, excluding videos; those
-services are not built. See [PRODUCT_DIRECTION](docs/PRODUCT_DIRECTION.md).
+guest access with optional workout-record sync only, excluding videos. Each
+account has a separate local library, with explicit guest-copy and conflict
+choices. Cloud configuration and real email/device checks are pending. See
+[PRODUCT_DIRECTION](docs/PRODUCT_DIRECTION.md).
 
 Home's **Backup and restore** exports saved workouts, routines and the active
 workout as a JSON file. Choose a backup to preview additions, then confirm.
@@ -52,7 +55,7 @@ release direction. Task 6 now adds Capacitor iOS/Android project sources and
 branding, with iPhone first. Android and iOS simulator compilation pass in cloud
 CI; [run 5](https://github.com/tanishhh2077/GymBro-AI/actions/runs/41901984826)
 also verifies the visible iPhone-simulator interface. Physical-device video
-handling is unverified; no backend exists. See [iOS](ios/README.md),
+handling is unverified. Optional account services need the setup above. See [iOS](ios/README.md),
 [Android](android/README.md) and the [mobile plan](docs/superpowers/plans/2026-11-03-mobile-prototype.md).
 
 ## Project context and development
@@ -243,11 +246,13 @@ Markdown; its rules are in [AGENTS.md](AGENTS.md#static-files-in-public).
 
 ## Privacy
 
-The inspected processing path keeps selected videos on the device. There is no
-backend, analytics service, or account system. Fonts use local system fallbacks;
-browser startup checks observed no external requests. This is not a general
-runtime network audit or proof of native offline inference. Any
-future upload/storage behavior needs an explicit privacy decision.
+The inspected processing path keeps selected videos on the device. When configured,
+optional Supabase accounts send email authentication requests. Confirm sync
+transfers validated manual workout records and routines to that account's database
+row. Guest logging works without configuration. Sessions use the SDK's browser
+storage, and account libraries remain cached locally after sign-out. Fonts, the
+pose model and its runtime load locally. Hosted email delivery and physical-device
+sync require separate verification. See [account setup](supabase/README.md).
 
 ## Build status
 

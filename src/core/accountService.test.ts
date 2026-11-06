@@ -82,7 +82,7 @@ it('subscribes to account changes and releases the auth listener', () => {
   emit(); expect(receive).toHaveBeenCalledWith(null); release();
   expect(auth.onAuthStateChange.mock.results[0].value.data.subscription.unsubscribe).toHaveBeenCalledOnce();
 });
-it('aborts a stalled request after its deadline and retains caller cancellation', async () => {
+it('retains caller cancellation in the request deadline signal', async () => {
   let signal: AbortSignal | undefined;
   vi.stubGlobal('fetch', vi.fn((_input, options: RequestInit) => {
     signal = options.signal!;
@@ -90,4 +90,12 @@ it('aborts a stalled request after its deadline and retains caller cancellation'
   }));
   const abort = new AbortController(); const pending = deadlineFetch('https://example.invalid', { signal: abort.signal });
   expect(signal).toBeDefined(); abort.abort(); await expect(pending).rejects.toThrow();
+});
+it('aborts a stalled request at the configured 20-second deadline', async () => {
+  const timeout = AbortSignal.timeout.bind(AbortSignal);
+  vi.spyOn(AbortSignal, 'timeout').mockImplementation(ms => { expect(ms).toBe(20_000); return timeout(5); });
+  vi.stubGlobal('fetch', vi.fn((_input, options: RequestInit) => new Promise((_resolve, reject) => {
+    options.signal!.addEventListener('abort', () => reject(new DOMException('timeout', 'TimeoutError')));
+  })));
+  await expect(deadlineFetch('https://example.invalid')).rejects.toThrow('timeout');
 });

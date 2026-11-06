@@ -66,3 +66,11 @@ tests. Local PostgreSQL can establish SQL behavior. SDK/request mocks establish
 client protocol and lifecycle behavior. Hosted email delivery, cloud credentials,
 real cross-device service access and physical iPhone testing require their own
 observations and must be recorded as pending until performed.
+
+## Implemented 2026-11-06
+
+All five code/verification steps are implemented. STATUS records the full and
+affected tests, real PostgreSQL checks, browser reload interruptions and passing
+reruns, native asset sync and resolved independent review. Cloud project/email
+setup and user-present cross-device verification remain prerequisites for a live
+service claim. D-044 records manual sync and isolated libraries as builder choices.

@@ -1,6 +1,6 @@
 # Current project status
 
-Updated: 2026-11-05 (America/Chicago).
+Updated: 2026-11-06 (America/Chicago).
 
 For a new session in either Claude Code or Codex, start with [HANDOFF.md](HANDOFF.md).
 This file retains detailed evidence/history; the compact handoff avoids loading
@@ -9,6 +9,44 @@ usage, and these documents are the only handoff; see D-016 in
 [accepted decisions](DECISIONS.md).
 
 ## Current stage
+
+Task25 (D-044) implements optional Supabase email-code accounts and manual
+workout/routine sync, authorized by the user on 2026-11-06. Codex implemented it
+(runtime model ID unavailable). Guest uses its established store/database;
+each service/account has a separate local library. Explicit guest copying reuses
+backup merge/revision rules. Three-way sync exposes whole-record conflicts,
+propagates deletions and preserves active-workout transitions. Token-pinned SDK
+requests, remote compare-and-swap and atomic local library/baseline commits handle
+account changes, stale writes and uncertain retries. The backend SQL and owner
+setup guide are in `supabase/`. The SDK is pinned to 2.119.0.
+
+- Verification on process-local Node 22.23.2 passes the full 678-test/46-file
+  baseline, then 46 focused cases/6 files after review/recovery/input changes.
+  The current inventory is 681 tests / 47 files, verified through the full run
+  plus affected reruns. Lint, all build/type checks and guarded native sync pass
+  (16 files/platform, 3 plugins). Entry JS is 263.52 kB / 81.31 kB gzip. The
+  optional SDK chunk is 229.87 kB and loads when configured.
+- Actual PostgreSQL 17.11 tests pass RLS account isolation, anonymous/direct-write
+  rejection, strict nested payload cases, stale writes, rollback and a two-process
+  initial-write race. A null-unit rejection first failed and was corrected.
+  Temporary labeled containers were removed, preserving existing containers.
+- Chromium 156.0.8078.4 passes 28/29 in the full run. A source/cache-triggered
+  reload invalidated portrait processing. After all edits/checks settled, the
+  affected account and portrait cases pass 2/2, covering all 29. An earlier run
+  was stopped after a review edit reloaded an active inference case. No harness
+  timeout/retry was loosened. GPU no-person inference observes 120 samples.
+- Fresh read-only Codex review found one medium initialization-retry defect.
+  Browser module failures now offer explicit app-reload recovery; its regression
+  failed before the fix. The reviewer confirmed the correction and found no
+  unresolved significant issues. It inspected source and diff only. Self-review
+  also corrected undefined input styling to the existing themed 16px treatment.
+  A real pinned-SDK/fake-HTTP test covers OTP/read/write/stale/sign-out protocol.
+- Cloud project/email configuration is pending the user's action. No live cloud
+  signup, email delivery, actual cross-device sync, native compilation or physical
+  iPhone test was performed in this task. Account deletion and automatic sync are
+  subsequent work. Next follow `supabase/README.md`, then verify the configured
+  service and user-present phone. Task24 48d3918 hosted browser 42171205737 and
+  native 42171205658 both passed. Check Actions for Task25 after integration.
 
 Task24 startup integration is complete under D-043, implemented by Codex (runtime
 model ID unavailable), porting the runtime from Task20 8b336f4 onto Tasks21–23.

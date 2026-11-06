@@ -33,8 +33,9 @@ class AnalysisBoundary extends Component<{ children: ReactNode }, { failed: bool
   }
 }
 
-type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines' | 'progress' | 'backup';
-export default function App({ workouts = workoutStore, session = useSessionStore }: { workouts?: WorkoutStore; session?: SessionStore } = {}) {
+type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines' | 'progress' | 'backup' | 'account';
+export default function App({ workouts = workoutStore, session = useSessionStore, accountPanel, accountLabel }:
+  { workouts?: WorkoutStore; session?: SessionStore; accountPanel?: ReactNode; accountLabel?: string } = {}) {
   const appearance = useAppearance();
   useEffect(() => connectNativeLifecycle({
     isNative: Capacitor.isNativePlatform(), app: NativeApp, session, document,
@@ -108,6 +109,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
         onWorkout={() => navigate('workout')} onAnalyze={() => navigate('analysis')}
         onRoutines={() => navigate('routines')}
         onProgress={() => navigate('progress')} onBackup={() => navigate('backup')} onHistory={openHistory}
+        onAccount={accountPanel ? () => navigate('account') : undefined} accountLabel={accountLabel}
         appearance={<AppearanceControl settings={appearance} />} />}
       {view === 'workout' && <WorkoutEditor store={workouts} analysis={analysis} onSetLogged={workoutId => {
         if (workouts.getState().data.active?.id === workoutId) restTimer.current?.afterSetLogged();
@@ -121,6 +123,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
       {view === 'progress' && <WorkoutProgress data={state.data} available={available} onHome={() => navigate('home')}
         onWorkout={() => navigate('workout')} onHistory={openHistory} />}
       {view === 'backup' && <WorkoutBackup store={workouts} onHome={() => navigate('home')} />}
+      {view === 'account' && accountPanel}
     </main>
   </div>;
 }

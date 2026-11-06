@@ -8,8 +8,10 @@ interface Props {
   onProgress: () => void;
   onBackup: () => void;
   appearance?: ReactNode;
+  onAccount?: () => void;
+  accountLabel?: string;
 }
-export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines, onProgress, onBackup, appearance }: Props) {
+export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines, onProgress, onBackup, appearance, onAccount, accountLabel }: Props) {
   const sets = data.history.reduce((total, w) => total + w.exercises.reduce((n, e) => n + e.sets.length, 0), 0);
   const history = [...data.history].sort((a, b) => b.finishedAt! - a.finishedAt!);
   return <div className="space-y-7">
@@ -54,6 +56,8 @@ export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHis
     </section>}
     <section className="space-y-3 border-t border-white/10 pt-5">
       {appearance}
+      {onAccount && <div className="space-y-2"><button type="button" className="btn-ghost" onClick={onAccount}>Account and sync</button>
+        <p className="break-words text-xs text-slate-500">{accountLabel}</p></div>}
       <button type="button" className="btn-ghost" onClick={onBackup}>Backup and restore</button>
       <p className="text-xs leading-relaxed text-slate-500">Workout logs are saved on this device. Clearing this app or browser’s data removes them. Keep a backup file for recovery. Video analysis is available for bench press.</p>
     </section>

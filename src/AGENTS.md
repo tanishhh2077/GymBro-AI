@@ -17,6 +17,10 @@ with the approved amendments in [decisions](../docs/DECISIONS.md).
 - D-030 authorizes Task 14's separate manual workout contracts, local IndexedDB
   repository/store and Home/log/history UI. Cloud/accounts and media persistence
   remain deferred; keep workout entries separate from bench-analysis IDs/types.
+- D-044 supersedes the account/sync deferral for Task25. `AccountRoot` selects
+  guest or account-scoped manual libraries and resets session links on identity
+  changes. Keep Supabase requests limited to validated manual records and bind
+  them to the checked identity's token. Read `supabase/README.md` for setup.
 - D-034 adds local saved routines and separate planned targets in document schema2.
   Preserve strict legacy reads without writes/size growth, atomic revision checks
   and actual-set counts. New routine workouts copy fresh IDs/order/unit/targets.

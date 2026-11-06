@@ -98,7 +98,12 @@ precedence over older documentation, review and check-cadence requirements.
   preserve strict legacy data, atomic revisions and target/actual separation.
 
 - D-031/D-032 select guest access with optional workout-record sync only; videos
-  must not be uploaded. This remains a future product direction, not a service.
+  must not be uploaded. D-044 authorizes Task25's optional Supabase email-code
+  accounts and explicit manual workout/routine sync. Follow its plan and
+  `supabase/README.md`. Preserve per-account local libraries, explicit guest copy,
+  three-way conflicts, revision checks and atomic library/baseline commits.
+  Cloud project/email configuration belongs to the user. Service deployment,
+  real email delivery and physical-device sync need their own verification.
 - D-033 authorizes Task15's session-only rest timer. D-040 adds opt-in automatic
   rest after successful new-set saves and previous-workout/quick-entry controls.
   The timer's original design describes the earlier manual-only behavior;

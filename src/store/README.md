@@ -1,5 +1,11 @@
 # Session state and media ownership
 
+Task25 adds account-scoped repository databases and a `shared` baseline beside
+the manual `current` document. `confirmSync` checks preview revisions, writes
+through the authenticated cloud adapter, then commits merged data and baseline
+atomically. Guest uses the established singleton/database. Local failures require
+reload, and remote failures preserve the ability to keep logging locally.
+
 Task18's restore method merges validated backup records through the same atomic
 repository save. Preview revisions reject stale actions, identical imports avoid
 writes, and unknown/conflicting/uncertain results retain existing recovery rules.

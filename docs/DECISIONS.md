@@ -622,6 +622,22 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   confirm staged local loading and cancellation recovery. Phone startup timing
   still belongs to the user-present test.
 
+### D-044 Optional Supabase accounts and manual workout sync
+
+- On 2026-11-06 the user authorized building accounts/sync and selected Supabase
+  with email codes. This implements Q8/Q9's optional workout-record service.
+- Builder choices are explicit Preview/Confirm sync, separate guest/account
+  IndexedDB libraries and explicit additive guest copying. A three-way merge
+  propagates independent edits/deletes and asks for a choice on concurrent record
+  changes. Different active workouts require finishing one before sync.
+- The server restricts reads by authenticated user ID and writes through a
+  validated revision-checked RPC. The client pins requests to that identity's
+  token and commits merged local records and shared baseline atomically.
+- Cloud project/email configuration belongs to the user. Task25 supplies client,
+  SQL migration, setup instructions and local tests. Hosted service and physical
+  iPhone verification remain pending. Automatic sync and account deletion are
+  follow-on work. See the [Task25 plan](superpowers/plans/2026-11-06-account-sync.md).
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
@@ -632,7 +648,7 @@ The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md]
 - The available first phone is recorded in D-023; its OS and actual Safari/native
   acceptance remain to be established. A broader supported-device matrix is unverified.
 - Exact measurement definitions, quality thresholds, evaluation references, and dataset methodology belong to later bounded specifications.
-- D-031 accepts guest use with optional accounts/sync as a future product
-  direction; implementation and service/data boundaries remain undefined.
+- D-044 authorizes the bounded Supabase accounts/sync implementation. Cloud
+  project configuration, email delivery and real device testing remain open.
   Backend video processing, video retention, database deployment, custom
   training and multi-camera work remain unapproved future work.

@@ -1,7 +1,8 @@
 # Application source
 
 React/TypeScript shared app for GymBro AI's browser/native prototypes. `main.tsx`
-starts React; `App.tsx` connects the interface, native lifecycle and session store;
+starts React through `AccountRoot.tsx`, which selects the guest/account library.
+`App.tsx` connects the interface, native lifecycle and session store;
 CSS supplies presentation, including device safe areas.
 
 - [components](components/README.md): inputs, playback, overlay, elbow timeline

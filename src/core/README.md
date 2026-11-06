@@ -1,5 +1,10 @@
 # Media and pose processing
 
+Task25's `workoutSync.ts` merges manual libraries against their shared baseline
+and exposes explicit conflicts. `accountService.ts` owns optional email-code
+authentication and identity-bound Supabase requests. The SDK loads when account
+configuration exists. Backend setup is in [supabase](../../supabase/README.md).
+
 `setLinks.ts` (Task 19) owns the flat-barbell bench-name rule and
 `resolveSetLink`, which matches workout, exercise and set IDs together.
 

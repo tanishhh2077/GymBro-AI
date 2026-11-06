@@ -10,6 +10,10 @@ Inherit [source guidance](../AGENTS.md). Follow the
   recovery and release its media-query listener and document changes on unmount.
 - Task18 restore uses the existing library transaction and destination revision.
   Reject stale previews and conflicts before writing. Identical imports are no-ops.
+- D-044 permits an account-namespaced IndexedDB library with an atomic shared
+  sync baseline in the same object store. Remote failures permit local logging.
+  An uncertain local commit requires reload. Preserve guest/account isolation
+  and require preview revisions plus explicit choices for concurrent conflicts.
 - Coordinate access to a shared pose engine; do not let independent clip jobs
   interleave tracker state or violate the detector's timestamp requirements.
 - Cancel work when its clip is removed, replaced, or the session resets. Ignore
