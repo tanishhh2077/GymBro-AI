@@ -5,6 +5,7 @@ import type { WorkoutStore } from '@/store/useWorkoutStore';
 import { findPreviousExercise } from '@/core/previousWorkout';
 import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton';
 import { ExercisePicker } from './ExercisePicker';
+import { ExerciseHistory } from './ExerciseHistory';
 import { PlateCalculator } from './PlateCalculator';
 import { REST_DURATIONS, type ExerciseRestSettings } from '@/store/useExerciseRest';
 
@@ -105,6 +106,7 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
       </li>)}</ul>
       <p className="mt-2 text-xs text-slate-500">Same exercise name and unit. Review copied values before logging.</p>
     </div>}
+    {state.data.active && <ExerciseHistory history={state.data.history} name={exercise.name} unit={unit} startedAt={state.data.active.startedAt} />}
     {exercise.sets.length > 0 && <div className="mb-4 overflow-x-auto"><table className="w-full text-left text-sm">
       <caption className="sr-only">Logged sets for {exercise.name}</caption><thead className="text-slate-400"><tr><th className="py-2">Set</th><th>Reps</th><th>Weight</th><th><span className="sr-only">Actions</span></th></tr></thead>
       <tbody className="divide-y divide-white/10">{exercise.sets.map((set, index) => <tr key={set.id} id={`set-row-${set.id}`} tabIndex={-1}>
