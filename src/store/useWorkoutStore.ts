@@ -23,7 +23,8 @@ export interface WorkoutState {
   discardWorkout: () => Promise<WorkoutResult>;
   deleteWorkout: (id: string) => Promise<WorkoutResult>;
   /** Sets the note on the active or a finished workout; blank text removes it. */
-  setWorkoutNote: (workoutId: string, note: string) => Promise<WorkoutResult>;
+  /** Pass the revision the editor opened with so a newer note is never overwritten. */
+  setWorkoutNote: (workoutId: string, note: string, expectedRevision?: number) => Promise<WorkoutResult>;
   /** Starts a fresh active workout with a finished workout's exercises and targets but no sets. */
   repeatWorkout: (workoutId: string) => Promise<WorkoutResult>;
   correctCompletedWorkout: (id: string, expectedRevision: number, input: CompletedWorkoutCorrection) => Promise<WorkoutResult>;
@@ -197,10 +198,11 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
         if (!data.history.some(w => w.id === id)) invalid('This saved workout is no longer available.');
         return { ...data, history: data.history.filter(w => w.id !== id) };
       }),
-      setWorkoutNote: (workoutId, note) => commit(data => {
+      setWorkoutNote: (workoutId, note, expectedRevision) => commit(data => {
+        if (expectedRevision !== undefined && data.revision !== expectedRevision) invalid('Saved workouts changed. Reopen the note before saving.');
         const source = data.active?.id === workoutId ? data.active : data.history.find(w => w.id === workoutId);
         if (!source) invalid('This workout is no longer available.');
-        const text = typeof note === 'string' ? note.trim() : invalid('Enter the workout note as text.');
+        const text = typeof note === 'string' ? note.replace(/\r\n?/g, '\n').trim() : invalid('Enter the workout note as text.');
         if (text) validateWorkoutNote(text);
         if ((source.note ?? '') === text) return data;
         const updated: { -readonly [K in keyof Workout]: Workout[K] } = { ...source, note: text };
