@@ -5,6 +5,7 @@ import type { WorkoutStore } from '@/store/useWorkoutStore';
 import { findPreviousExercise } from '@/core/previousWorkout';
 import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton';
 import { ExercisePicker } from './ExercisePicker';
+import { PlateCalculator } from './PlateCalculator';
 import { REST_DURATIONS, type ExerciseRestSettings } from '@/store/useExerciseRest';
 
 const inputClass = 'mt-1 w-full rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white';
@@ -52,6 +53,7 @@ export function WorkoutEditor({ store, onFinished, onSetLogged, analysis, restSe
           <button type="submit" className="btn-ghost">Add exercise</button>
         </ExercisePicker>
       </form>
+      <PlateCalculator key={workout.id} unit={workout.unit} />
       <button type="button" className="btn-primary w-full sm:w-auto" onClick={async () => { if ((await state.finishWorkout()).ok) onFinished(workout.id); }}>Finish workout</button>
     </fieldset>
   </div>;
