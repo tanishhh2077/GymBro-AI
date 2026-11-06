@@ -38,6 +38,7 @@ for (const mode of ['light', 'dark'] as const) {
     await page.getByRole('button', { name: 'Log set', exact: true }).click();
     await expect(page.getByRole('row')).toHaveCount(2);
     await page.getByRole('button', { name: 'Finish workout', exact: true }).click();
+    await page.getByRole('button', { name: 'Back to Home', exact: true }).click();
     await page.getByRole('button', { name: 'View progress', exact: true }).click();
     await expectReadable(page.getByRole('heading', { name: 'Progress', exact: true }));
     await expectReadable(page.locator('svg[role=img] path.text-accent'));

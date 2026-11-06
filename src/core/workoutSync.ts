@@ -44,7 +44,9 @@ export function validateSharedSnapshot(value: unknown): SharedWorkoutSnapshot {
 /** Compare whole records. Independent records merge; concurrent edits stay visible. */
 export function mergeWorkoutSync(base: WorkoutData, device: WorkoutData, cloud: WorkoutData,
   choices: Readonly<Record<string, SyncChoice>> = {}): { data: WorkoutData; conflicts: SyncConflict[] } {
-  [base, device, cloud].forEach(validateWorkoutData);
+  base = validateWorkoutData(base);
+  device = validateWorkoutData(device);
+  cloud = validateWorkoutData(cloud);
   const conflicts: SyncConflict[] = [];
   function records<T extends Workout | WorkoutRoutine>(kind: string, before: readonly T[], local: readonly T[], remote: readonly T[]): T[] {
     const maps = [before, local, remote].map(values => new Map(values.map(value => [value.id, value])));

@@ -5,12 +5,15 @@ import type { WorkoutStore } from '@/store/useWorkoutStore';
 import { findPreviousExercise } from '@/core/previousWorkout';
 import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton';
 import { ExercisePicker } from './ExercisePicker';
+import { REST_DURATIONS, type ExerciseRestSettings } from '@/store/useExerciseRest';
 
 const inputClass = 'mt-1 w-full rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white';
 function numeric(value: string) { return value.trim() ? Number(value) : NaN; }
 
-export function WorkoutEditor({ store, onFinished, onSetLogged, analysis }: {
-  store: WorkoutStore; onFinished: (workoutId: string) => void; onSetLogged?: (workoutId: string) => void; analysis?: SetAnalysisActions;
+export function WorkoutEditor({ store, onFinished, onSetLogged, analysis, restSettings, onRest }: {
+  store: WorkoutStore; onFinished: (workoutId: string) => void;
+  onSetLogged?: (workoutId: string, name: string, seconds: number) => void; analysis?: SetAnalysisActions;
+  restSettings?: ExerciseRestSettings; onRest?: (name: string, seconds: number) => void;
 }) {
   const state = useStore(store);
   const [name, setName] = useState('Workout');
@@ -41,7 +44,7 @@ export function WorkoutEditor({ store, onFinished, onSetLogged, analysis }: {
     </div>
     <fieldset disabled={disabled} className="min-w-0 space-y-6">
       {workout.exercises.map(exercise => <ExerciseEditor key={exercise.id} workoutId={workout.id} exercise={exercise} unit={workout.unit}
-        store={store} analysis={analysis} onSetLogged={onSetLogged} />)}
+        store={store} analysis={analysis} onSetLogged={onSetLogged} restSettings={restSettings} onRest={onRest} />)}
       <form aria-label="Add an exercise" className="border-t border-white/10 pt-5" onSubmit={async event => {
         event.preventDefault(); if ((await state.addExercise(exerciseName)).ok) setExerciseName('');
       }}>
@@ -54,9 +57,10 @@ export function WorkoutEditor({ store, onFinished, onSetLogged, analysis }: {
   </div>;
 }
 
-function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogged }: {
+function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogged, restSettings, onRest }: {
   workoutId: string; exercise: WorkoutExercise; unit: WeightUnit; store: WorkoutStore; analysis?: SetAnalysisActions;
-  onSetLogged?: (workoutId: string) => void;
+  onSetLogged?: (workoutId: string, name: string, seconds: number) => void;
+  restSettings?: ExerciseRestSettings; onRest?: (name: string, seconds: number) => void;
 }) {
   const id = useId();
   const [reps, setReps] = useState('');
@@ -67,12 +71,23 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
   const state = useStore(store);
   const previous = state.data.active ? findPreviousExercise(state.data.history, state.data.active, exercise.name, kind) : null;
   const lastSet = exercise.sets[exercise.sets.length - 1];
+  const restSeconds = restSettings?.getDuration(exercise.name) ?? 90;
   function focusReps() { repsInput.current?.focus(); repsInput.current?.select(); }
   return <section className="rounded-xl border border-white/10 bg-ink-900/50 p-4" aria-label={exercise.name}>
     <div className="mb-3 flex items-start justify-between gap-3"><h2 className="min-w-0 break-words text-xl font-semibold text-white">{exercise.name}</h2>
       <button type="button" className="shrink-0 text-sm text-slate-400 underline underline-offset-4" aria-label={`Remove exercise ${exercise.name}`} onClick={async () => {
         if (window.confirm(`Remove ${exercise.name} and its logged sets?`)) await state.removeExercise(exercise.id);
       }}>Remove</button></div>
+    {restSettings && <div className="mb-4 flex flex-wrap items-end gap-3">
+      <div><label htmlFor={`${id}-rest`} className="text-sm text-slate-300">Default rest</label>
+        <select id={`${id}-rest`} className={inputClass} value={restSeconds}
+          onChange={event => restSettings.setDuration(exercise.name, Number(event.target.value))}>
+          {REST_DURATIONS.map(seconds => <option value={seconds} key={seconds}>{seconds} seconds</option>)}
+        </select></div>
+      {onRest && <button type="button" className="btn-ghost" aria-label={`Start rest for ${exercise.name}`}
+        onClick={() => onRest(exercise.name, restSeconds)}>Start rest</button>}
+      <p className="w-full text-xs text-slate-500">Remembered on this device for this exact exercise name.</p>
+    </div>}
     {(exercise.targetSets !== undefined || exercise.targetReps !== undefined) && <p className="mb-4 text-sm text-slate-400">
       <span className="text-accent">Planned target: {exercise.targetSets !== undefined ? `${exercise.targetSets} sets` : ''}
         {exercise.targetSets !== undefined && exercise.targetReps !== undefined ? ' · ' : ''}
@@ -104,7 +119,7 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
       event.preventDefault();
       const result = editing ? await state.updateSet(exercise.id, editing, numeric(reps), numeric(weight), kind) : await state.addSet(exercise.id, numeric(reps), numeric(weight), kind);
       if (result.ok) {
-        if (!editing) onSetLogged?.(workoutId);
+        if (!editing) onSetLogged?.(workoutId, exercise.name, restSeconds);
         setEditing(null); focusReps();
       }
     }}>
@@ -118,7 +133,7 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
         </select></div>
       <div className="flex flex-wrap items-center gap-3"><button type="submit" className="btn-ghost">{editing ? 'Save set' : 'Log set'}</button>
         {!editing && lastSet && <button type="button" className="btn-ghost" aria-label={`Repeat last set for ${exercise.name}`} onClick={async () => {
-          if ((await state.addSet(exercise.id, lastSet.reps, lastSet.weight, lastSet.kind ?? 'regular')).ok) { onSetLogged?.(workoutId); focusReps(); }
+          if ((await state.addSet(exercise.id, lastSet.reps, lastSet.weight, lastSet.kind ?? 'regular')).ok) { onSetLogged?.(workoutId, exercise.name, restSeconds); focusReps(); }
         }}>Repeat last set</button>}
         {editing && <button type="button" className="text-sm text-slate-400 underline" onClick={() => setEditing(null)}>Cancel edit</button>}
         <span className="text-xs text-slate-500">Use 0 for no added load.</span></div>

@@ -7,6 +7,7 @@ import { resolveSetLink } from '@/core/setLinks';
 import type { SetLink } from '@/types';
 import { workoutStore, type WorkoutStore } from '@/store/useWorkoutStore';
 import { useAppearance } from '@/store/useAppearance';
+import { useExerciseRest } from '@/store/useExerciseRest';
 import { AppearanceControl } from '@/components/AppearanceControl';
 import { connectNativeLifecycle } from '@/mobile/nativeLifecycle';
 import { WorkoutHome } from '@/components/WorkoutHome';
@@ -35,9 +36,10 @@ class AnalysisBoundary extends Component<{ children: ReactNode }, { failed: bool
 }
 
 type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines' | 'progress' | 'backup' | 'account' | 'summary';
-export default function App({ workouts = workoutStore, session = useSessionStore, accountPanel, accountLabel }:
-  { workouts?: WorkoutStore; session?: SessionStore; accountPanel?: ReactNode; accountLabel?: string } = {}) {
+export default function App({ workouts = workoutStore, session = useSessionStore, accountPanel, accountLabel, restScope = 'guest' }:
+  { workouts?: WorkoutStore; session?: SessionStore; accountPanel?: ReactNode; accountLabel?: string; restScope?: string } = {}) {
   const appearance = useAppearance();
+  const restSettings = useExerciseRest(restScope);
   useEffect(() => connectNativeLifecycle({
     isNative: Capacitor.isNativePlatform(), app: NativeApp, session, document,
   }), [session]);
@@ -105,6 +107,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
         <p>{state.error}</p>{state.needsReload && <button type="button" disabled={state.busy} className="mt-3 underline underline-offset-4" onClick={() => { void state.load(); }}>Reload saved workouts</button>}
       </div>}
       <div role="status" aria-live="polite" className={notice ? 'mb-4 text-sm text-accent' : undefined}>{notice}</div>
+      {restSettings.notice && <p role="status" className="mb-4 text-sm text-warn">{restSettings.notice}</p>}
       {state.data.active && <WorkoutRestTimer key={state.data.active.id} ref={restTimer} />}
       {view === 'home' && <WorkoutHome data={state.data} available={available} busy={state.busy}
         onWorkout={() => navigate('workout')} onAnalyze={() => navigate('analysis')}
@@ -112,8 +115,9 @@ export default function App({ workouts = workoutStore, session = useSessionStore
         onProgress={() => navigate('progress')} onBackup={() => navigate('backup')} onHistory={openHistory}
         onAccount={accountPanel ? () => navigate('account') : undefined} accountLabel={accountLabel}
         appearance={<AppearanceControl settings={appearance} />} />}
-      {view === 'workout' && <WorkoutEditor store={workouts} analysis={analysis} onSetLogged={workoutId => {
-        if (workouts.getState().data.active?.id === workoutId) restTimer.current?.afterSetLogged();
+      {view === 'workout' && <WorkoutEditor store={workouts} analysis={analysis} restSettings={restSettings}
+        onRest={(name, seconds) => restTimer.current?.startForExercise(seconds, name)} onSetLogged={(workoutId, name, seconds) => {
+        if (workouts.getState().data.active?.id === workoutId) restTimer.current?.afterSetLogged(seconds, name);
       }} onFinished={id => { setSelected(id); setView('summary'); setNotice('Workout saved.'); }} />}
       {view === 'history' && <WorkoutHistory store={workouts} initialId={selected} analysis={analysis}
         onSummary={id => { setSelected(id); navigate('summary'); }} />}

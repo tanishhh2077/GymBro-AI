@@ -22,6 +22,7 @@ test('copies previous values, repeats actual sets and starts opt-in rest after s
   await expect(exercise.getByRole('row')).toHaveCount(3);
   await page.getByRole('button', { name: 'Finish workout', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Workout saved.' })).toBeVisible();
+  await page.getByRole('button', { name: 'Back to Home', exact: true }).click();
 
   await page.getByRole('button', { name: 'Start workout', exact: true }).click();
   await page.getByLabel('Workout name', { exact: true }).fill('Synthetic current workout');
@@ -44,7 +45,7 @@ test('copies previous values, repeats actual sets and starts opt-in rest after s
   await expect(page.getByRole('button', { name: 'Start rest timer', exact: true })).toBeVisible();
 
   await page.clock.pauseAt(epoch + 60_000);
-  await page.getByLabel('Rest duration', { exact: true }).selectOption('30');
+  await exercise.getByLabel('Default rest', { exact: true }).selectOption('30');
   await autoRest.check();
   await exercise.getByRole('button', { name: 'Repeat last set for Bench press', exact: true }).click();
   await expect(exercise.getByRole('row')).toHaveCount(3);

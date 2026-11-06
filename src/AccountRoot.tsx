@@ -60,7 +60,7 @@ export function AccountRoot({ loadService = loadConfiguredService, factory = glo
       }}>Continue as guest</button>
     </div>}
   </main>;
-  return <App key={identity} workouts={workouts}
+  return <App key={identity} workouts={workouts} restScope={identity}
     accountLabel={access.account ? `Signed in · ${access.account.email}` : 'Guest mode'}
     accountPanel={<AccountPanel service={access.service} account={access.account} store={workouts} guest={guest} />} />;
 }

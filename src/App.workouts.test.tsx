@@ -14,6 +14,7 @@ let container: HTMLDivElement;
 let store: WorkoutStore;
 let repository: ReturnType<typeof createWorkoutRepository>;
 beforeEach(() => {
+  localStorage.clear();
   vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(false);
   repository = createWorkoutRepository(new IDBFactory()); store = createWorkoutStore(repository);
   container = document.createElement('div'); document.body.append(container); root = createRoot(container);
@@ -185,7 +186,7 @@ it('starts optional auto-rest only after a new set save is confirmed', async () 
 });
 
 it('restarts the full selected auto-rest duration after repeating a set, even while paused', async () => {
-  await draft(); await autoRest(); await fill('Rest duration', '30');
+  await draft(); await autoRest(); await fill('Default rest', '30');
   vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
   await fill('Reps', '8'); await fill('Weight (kg)', '60.5'); await submit('Log a set for Bench press');
   await act(async () => vi.advanceTimersByTime(5_000));

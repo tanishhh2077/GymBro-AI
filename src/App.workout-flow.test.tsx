@@ -60,3 +60,28 @@ it('logs, edits and repeats warm-ups with visible types and a correct completion
   now = 181000; await click('Finish workout'); expect(container.textContent).toContain('Warm-up sets');
   expect(container.textContent).toContain('Regular sets'); expect(container.textContent).toContain('400 kg');
 });
+it('uses the exercise default for manual and opt-in automatic rest after a saved set', async () => {
+  await enter('Default rest', '180'); await click('Start rest for Bench press');
+  expect(container.querySelector('output')?.textContent).toBe('3:00'); await click('Reset timer');
+  await act(async () => (container.querySelector('input[type="checkbox"]') as HTMLInputElement).click());
+  await enter('Reps', '8'); await enter('Weight (kg)', '60'); await click('Log set');
+  expect(container.querySelector('output')?.textContent).toBe('3:00');
+  await act(async () => root.unmount()); root = createRoot(container);
+  await act(async () => root.render(<App workouts={store} />)); await act(settle); await click('Workout');
+  const label = [...container.querySelectorAll('label')].find(value => value.textContent === 'Default rest')!;
+  expect((document.getElementById(label.htmlFor) as HTMLSelectElement).value).toBe('180');
+  expect((container.querySelector('input[type="checkbox"]') as HTMLInputElement).checked).toBe(false);
+});
+it('keeps workout data independent of a failed rest-preference save', async () => {
+  const before = store.getState().data;
+  vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new DOMException('quota'); });
+  await enter('Default rest', '120');
+  expect(container.textContent).toContain('Rest defaults apply for this session');
+  expect(store.getState().data).toBe(before);
+  await click('Start rest for Bench press'); expect(container.querySelector('output')?.textContent).toBe('2:00');
+});
+it('explains the regular-set requirement after a warm-up-only completed workout', async () => {
+  await enter('Set type', 'warmup'); await enter('Reps', '10'); await enter('Weight (kg)', '20'); await click('Log set');
+  now = 181000; await click('Finish workout'); await click('Back to Home'); await click('View progress');
+  expect(container.textContent).toContain('with a regular set');
+});

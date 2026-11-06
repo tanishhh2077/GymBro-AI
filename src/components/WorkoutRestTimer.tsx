@@ -1,10 +1,13 @@
-import { forwardRef, useEffect, useId, useImperativeHandle, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useState } from 'react';
+import { REST_DURATIONS } from '@/store/useExerciseRest';
 
-const durations = [30, 60, 90, 120, 180, 300];
 type Rest = { phase: 'idle' } | { phase: 'running'; endsAt: number } | { phase: 'paused'; remainingMs: number };
 function clock(seconds: number) { return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; }
 
-export interface WorkoutRestTimerHandle { afterSetLogged: () => void }
+export interface WorkoutRestTimerHandle {
+  afterSetLogged: (seconds?: number, exerciseName?: string) => void;
+  startForExercise: (seconds: number, exerciseName: string) => void;
+}
 
 export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function WorkoutRestTimer(_props, ref) {
   const id = useId();
@@ -12,19 +15,23 @@ export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function Work
   const [rest, setRest] = useState<Rest>({ phase: 'idle' });
   const [now, setNow] = useState(0);
   const [autoStart, setAutoStart] = useState(false);
+  const [exerciseName, setExerciseName] = useState('');
   const remainingMs = rest.phase === 'idle' ? duration * 1000 : rest.phase === 'paused' ? rest.remainingMs
     : Math.max(0, Math.min(duration * 1000, rest.endsAt - now));
   const complete = rest.phase !== 'idle' && remainingMs === 0;
   const counting = rest.phase === 'running' && !complete;
   const paused = rest.phase === 'paused' && !complete;
 
+  const begin = useCallback((seconds: number, name: string) => {
+    if (!REST_DURATIONS.includes(seconds)) return;
+    const current = Date.now();
+    setDuration(seconds); setExerciseName(name); setNow(current);
+    setRest({ phase: 'running', endsAt: current + seconds * 1000 });
+  }, []);
   useImperativeHandle(ref, () => ({
-    afterSetLogged() {
-      if (!autoStart) return;
-      const current = Date.now();
-      setNow(current); setRest({ phase: 'running', endsAt: current + duration * 1000 });
-    },
-  }), [autoStart, duration]);
+    afterSetLogged(seconds = duration, name = '') { if (autoStart) begin(seconds, name); },
+    startForExercise: begin,
+  }), [autoStart, begin, duration]);
 
   useEffect(() => {
     if (!counting) return;
@@ -56,6 +63,7 @@ export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function Work
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
         <h2 id={`${id}-title`} className="font-semibold text-white">Rest timer</h2>
+        {exerciseName && <p className="mt-1 break-words text-xs text-slate-400">{exerciseName}</p>}
         <p role="status" aria-live="polite" className={`mt-1 text-sm ${complete ? 'text-accent' : 'text-slate-400'}`}>
           {complete ? 'Rest complete.' : counting ? 'Resting…' : paused ? 'Paused.' : 'Not started.'}
         </p>
@@ -71,9 +79,9 @@ export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function Work
           className="rounded-lg border border-white/10 bg-ink-950 px-3 py-2.5 text-sm text-white disabled:opacity-50"
           onChange={event => {
             const next = Number(event.target.value);
-            if (durations.includes(next)) { setDuration(next); setRest({ phase: 'idle' }); }
+            if (REST_DURATIONS.includes(next)) { setDuration(next); setExerciseName(''); setRest({ phase: 'idle' }); }
           }}>
-          {durations.map(seconds => <option key={seconds} value={seconds}>{clock(seconds)}</option>)}
+          {REST_DURATIONS.map(seconds => <option key={seconds} value={seconds}>{clock(seconds)}</option>)}
         </select>
       </div>
       {counting ? <button type="button" className="btn-ghost" onClick={pause}>Pause timer</button>

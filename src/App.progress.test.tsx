@@ -74,7 +74,7 @@ function historyRows() { return container.querySelectorAll('table[aria-label="Wo
 it('opens empty progress from Home and starts the existing workout flow', async () => {
   await render(); await click('View progress');
   expect(container.querySelector('h1')?.textContent).toBe('Progress');
-  expect(container.textContent).toContain('Complete a workout to see your progress.');
+  expect(container.textContent).toContain('Complete a workout with a regular set to see your progress.');
   expect(container.querySelector('svg[role="img"]')).toBeNull();
   await click('Start workout');
   expect(container.querySelector('h1')?.textContent).toBe('Start a workout');

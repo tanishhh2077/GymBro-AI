@@ -1,0 +1,38 @@
+import { test, expect } from './app';
+
+test('warm-up labels, saved exercise rest and finish summary survive the normal workout flow', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const epoch = Date.UTC(2026, 10, 6, 18); await page.clock.install({ time: epoch }); await page.clock.pauseAt(epoch);
+  await page.goto('/'); await page.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await page.getByLabel('Workout name', { exact: true }).fill('Synthetic upper workout');
+  await page.getByLabel('Weight unit', { exact: true }).selectOption('kg');
+  await page.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await page.getByLabel('Exercise name', { exact: true }).fill('Bench press');
+  await page.getByRole('button', { name: 'Add exercise', exact: true }).click();
+  const exercise = page.getByRole('region', { name: 'Bench press', exact: true });
+  await exercise.getByLabel('Default rest', { exact: true }).selectOption('180');
+  await page.getByLabel('Start rest automatically after logging a set', { exact: true }).check();
+  await exercise.getByLabel('Set type', { exact: true }).selectOption('warmup');
+  await exercise.getByLabel('Reps', { exact: true }).fill('10');
+  await exercise.getByLabel('Weight (kg)', { exact: true }).fill('20');
+  await exercise.getByRole('button', { name: 'Log set', exact: true }).click();
+  await expect(exercise.getByRole('cell', { name: '1 Warm-up', exact: true })).toBeVisible();
+  await expect(page.getByLabel('Rest time remaining', { exact: true })).toHaveText('3:00');
+  await page.reload(); await page.getByRole('button', { name: 'Resume workout', exact: true }).click();
+  await expect(exercise.getByLabel('Default rest', { exact: true })).toHaveValue('180');
+  await expect(exercise.getByRole('cell', { name: '1 Warm-up', exact: true })).toBeVisible();
+  await expect(page.getByLabel('Start rest automatically after logging a set', { exact: true })).not.toBeChecked();
+  await exercise.getByLabel('Reps', { exact: true }).fill('8'); await exercise.getByLabel('Weight (kg)', { exact: true }).fill('60.5');
+  await exercise.getByRole('button', { name: 'Log set', exact: true }).click();
+  await expect(exercise.getByRole('cell', { name: '2 Regular', exact: true })).toBeVisible();
+  await page.clock.fastForward(180000);
+  await page.getByRole('button', { name: 'Finish workout', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Workout complete', exact: true })).toBeVisible();
+  await expect(page.getByText('684 kg', { exact: true })).toBeVisible();
+  await expect(page.getByText('3m 0s', { exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('button', { name: 'Back to Home', exact: true }).click();
+  await page.getByRole('button', { name: 'View progress', exact: true }).click();
+  await expect(page.getByRole('region', { name: 'Heaviest logged set', exact: true }).getByText('60.5 kg × 8 reps', { exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Most reps in a set', exact: true })).toContainText('8 reps at 60.5 kg');
+});

@@ -29,7 +29,7 @@ export function WorkoutProgress({ data, available, onHome, onWorkout, onHistory 
     </div>
     {!available && <p className="text-slate-400">Reload saved workouts to view progress.</p>}
     {available && !selected && <div className="space-y-4">
-      <p className="text-slate-400">Complete a workout to see your progress.</p>
+      <p className="text-slate-400">Complete a workout with a regular set to see your progress.</p>
       <button type="button" className="btn-primary" onClick={onWorkout}>{data.active ? 'Resume workout' : 'Start workout'}</button>
     </div>}
     {available && selected && <>
@@ -54,7 +54,7 @@ function ProgressDetails({ group, onHistory }: { group: ExerciseProgress; onHist
   return <div className="space-y-6">
     <div>
       <h2 className="break-words text-2xl font-semibold text-white">{group.name}</h2>
-      <p className="mt-1 text-sm text-slate-400">{group.workouts.length} completed workouts with {group.loggedSetCount} logged sets in {group.unit}.</p>
+      <p className="mt-1 text-sm text-slate-400">{group.workouts.length} completed workouts with {group.loggedSetCount} regular sets in {group.unit}.</p>
     </div>
     <div className="grid gap-4 sm:grid-cols-2">
       <section aria-label="Heaviest logged set" className="card min-w-0 p-4">

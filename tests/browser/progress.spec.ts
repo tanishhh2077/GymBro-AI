@@ -17,6 +17,7 @@ async function logWorkout(page: Page, name: string, unit: WeightUnit, reps: numb
   await expect(exercise.getByRole('cell', { name: `${weight} ${unit}`, exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Finish workout', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Workout saved.' })).toBeVisible();
+  await page.getByRole('button', { name: 'Back to Home', exact: true }).click();
 }
 
 function fixtureWorkout(id: string, exerciseName: string, weight: number, unit: WeightUnit, finishedAt: number): Workout {
