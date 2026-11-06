@@ -28,7 +28,12 @@ function button(name: string) {
   const found = [...container.querySelectorAll('button')].find(el => (el.getAttribute('aria-label') ?? el.textContent?.trim()) === name);
   if (!found) throw new Error(`Missing button: ${name}`); return found;
 }
-async function click(name: string) { await act(async () => { button(name).click(); await idle(); }); }
+async function settleLazy() {
+  for (let i = 0; i < 100 && container.textContent?.includes('Opening video analysis'); i++) {
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
+  }
+}
+async function click(name: string) { await act(async () => { button(name).click(); await idle(); }); await settleLazy(); }
 async function fill(name: string, value: string) {
   const label = [...container.querySelectorAll('label')].find(el => el.textContent?.trim() === name);
   const input = label && document.getElementById(label.htmlFor) as HTMLInputElement | HTMLSelectElement;

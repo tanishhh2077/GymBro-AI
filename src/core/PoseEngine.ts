@@ -1,8 +1,4 @@
-import {
-  FilesetResolver,
-  PoseLandmarker,
-  type PoseLandmarkerResult,
-} from "@mediapipe/tasks-vision";
+import type { PoseLandmarker, PoseLandmarkerResult } from "@mediapipe/tasks-vision";
 import { TOTAL_LANDMARKS } from "./landmarks";
 import { PoseEngineError } from "./processingErrors";
 import { M1_LIMITS, type ProcessingLimits } from "./processingLimits";
@@ -271,9 +267,19 @@ export class PoseEngine {
 
 /** Returns null when the owning wait ended before a fallback would start. */
 async function createDetector(abandoned: () => boolean): Promise<PreparedDetector | null> {
+  let vision: typeof import("@mediapipe/tasks-vision");
+  try {
+    vision = await import("@mediapipe/tasks-vision");
+  } catch (err) {
+    throw new PoseEngineError(
+      `Failed to load the pose-estimation library: ${String(err)}`, "init", "initialization",
+    );
+  }
+  if (abandoned()) return null;
+
   let fileset;
   try {
-    fileset = await FilesetResolver.forVisionTasks(WASM_PATH);
+    fileset = await vision.FilesetResolver.forVisionTasks(WASM_PATH);
   } catch (err) {
     throw new PoseEngineError(
       `Failed to load vision WASM runtime: ${String(err)}`, "init", "initialization",
@@ -282,7 +288,7 @@ async function createDetector(abandoned: () => boolean): Promise<PreparedDetecto
   if (abandoned()) return null;
 
   const build = (delegate: PoseDelegate) =>
-    PoseLandmarker.createFromOptions(fileset, {
+    vision.PoseLandmarker.createFromOptions(fileset, {
       baseOptions: { modelAssetPath: MODEL_PATH, delegate },
       runningMode: "VIDEO",
       numPoses: 1,

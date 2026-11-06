@@ -610,6 +610,18 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   A failed read/write uses an honest session-only notice and an operable theme.
   Preference ownership is independent of workout records, backup and media.
 
+### D-043 Integrate on-demand analysis loading
+
+- Under the user's continuing-development instruction, Task24 integrates the
+  committed Task20 runtime work from 8b336f4 with Tasks21–23. The original Task20
+  branch/worktree retains its implementation history.
+- App loads the analysis screen when Analyze opens, with loading status and
+  reload recovery. PoseEngine loads MediaPipe inside bounded initialization,
+  checks abandonment before acquiring the runtime and reports typed init errors.
+- The entry chunk changes from 519.13 to 245.39 kB. Production request checks
+  confirm staged local loading and cancellation recovery. Phone startup timing
+  still belongs to the user-present test.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

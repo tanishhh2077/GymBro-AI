@@ -5,36 +5,37 @@ Follow D-024, briefly explain and proceed. Follow D-036, update docs at task end
 or tool handover. Root Development pace now sets focused checks, lightweight
 planning and risk-based independent review. Detailed history is in [STATUS.md](STATUS.md).
 
-## Completed Task23
+## Completed Tasks22–24
 
-Appearance is implemented under D-042 on `feat/task23-appearance` by Codex
-(runtime model ID unavailable). Home offers **Appearance** with System/Light/Dark.
-System follows live device changes. The choice is stored on the device, with an
-honest session-only fallback when preference storage is unavailable.
+Task24 (D-043) integrates the committed Task20 startup work with the later UI,
+implemented by Codex (runtime model ID unavailable). Analyze loads its screen on
+demand, with loading/reload recovery. MediaPipe loads when detector initialization
+begins, within the existing deadline and abandonment rules.
 
-- Shared colors cover tracking, the exercise library, charts and video controls.
-  A fresh read-only review found one loaded-analysis contrast issue; it was
-  reproduced and corrected. The final code passes 629 tests / 39 files, lint,
-  build, guarded sync (13 files/platform, 3 plugins) and all 28 Chromium cases.
-  Both themes and 390 px layouts were visually inspected with synthetic data.
-- Task22's 57-entry searchable library, saved custom-name reuse and Task21's
-  previous values/repeat/auto-rest are complete. Their evidence is in STATUS.
-  Task22's c1de9c6 hosted runs 42167023244 and 42167023234 both pass.
-- The entry chunk is 519.13 kB. Physical iPhone behavior and real-bench accuracy
-  require their own tests. Check Actions for hosted results on the latest commit.
+- Entry JS drops from 519.13 to 245.39 kB (75.88 kB gzip). Production preview
+  verifies staged local requests and cancellation recovery using only the
+  checksummed no-person pattern. Phone startup timing is unmeasured.
+- Final checks pass 635 tests / 41 files, lint, build, guarded sync
+  (15 files/platform, 3 plugins) and all 28 Chromium cases. A fresh read-only
+  review found no significant defects. See STATUS for exact evidence/limits.
+- Task22 offers 57 bundled exercise names plus reusable exact saved names in
+  workouts/routines. Task23 adds Home **Appearance** with System/Light/Dark,
+  live system following and a device-local preference. Both are complete.
+  Task23 f90ff1a hosted browser 42168918984 and native 42168918968 pass.
+- Physical iPhone behavior and real-bench accuracy require their own tests.
+  Check Actions for hosted results on the latest integrated commit.
 
 ## Next work
 
-The user authorized continuing through the accepted tasks. Next is reviewing and
-integrating the committed Task20 on-demand analysis loading with the newer
-tracking/appearance changes. Keep its separate worktree's work intact. Q10
-selects familiar Hevy-style flows with GymBro's own design. See PRODUCT_DIRECTION
-for all 13 answers.
+The accepted exercise-library, appearance and workout-convenience slices are
+complete. Continue with the user-present phone session, Q&A from Q14, or a newly
+approved feature. Accounts/sync, persisted analysis results and live analysis
+need their own bounded decisions. Q1–Q13 are in PRODUCT_DIRECTION.
 
-An existing `feat/task20-faster-start` branch contains on-demand video-analysis
-loading (`8b336f4` observed). Check its current ownership/integration before
-assigning another task number. Phone testing needs the user present. Accounts/sync, persisted analysis
-results and live analysis remain future work.
+Task24 is the current startup implementation, ported from 8b336f4. The original
+`feat/task20-faster-start` branch/worktree retains earlier implementation history.
+Keep its separate work intact. The incomplete Task4 branch requires user approval
+before integration. Retain branches unless the user agrees to deletion.
 
 The recurring keyboard-admission failure was observed again in master run
 42153259160 and reproduced in 5/25 local repeats. A new failing regression

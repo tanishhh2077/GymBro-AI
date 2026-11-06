@@ -10,6 +10,23 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task24 startup integration is complete under D-043, implemented by Codex (runtime
+model ID unavailable), porting the runtime from Task20 8b336f4 onto Tasks21–23.
+Four reused cases failed before the port. Two additional cases cover navigation
+during a late screen import and cancellation before SDK/runtime acquisition.
+The async mock needed one shared gate, and build checking caught a required
+timeout field in its cancellation fixture; corrected reruns pass. Final checks
+pass 635 tests / 41 files, lint, build, guarded sync (15 files/platform, 3 plugins)
+and all 28 Chromium cases in 3.8 minutes. Injected module-failure cases print
+expected mock diagnostics. A fresh read-only Codex review found no significant
+defects; its verification was source-only. Entry JS is 245.39 kB / 75.88 kB gzip,
+versus 519.13 / 162.30 before the port. Production preview confirms zero heavy
+chunks on Home, the screen chunk on Analyze, the vision chunk on first processing,
+restored admission after cancellation and zero off-origin requests. The check
+uses the checksummed first-party no-person fixture. Phone timing and real-bench
+accuracy require user-present testing. The original Task20 worktree is retained.
+Task23 f90ff1a hosted browser 42168918984 and native 42168918968 both succeeded.
+
 Task23 appearance is complete under D-042, implemented by Codex (runtime model
 ID unavailable). Home offers System/Light/Dark with a device-local override,
 live system following and graceful session-only storage failure. Seven new App

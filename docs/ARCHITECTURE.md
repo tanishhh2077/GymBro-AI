@@ -1,6 +1,6 @@
 # System architecture
 
-Updated 2026-11-05 through Task18 workout backup. This map distinguishes
+Updated 2026-11-05 through Task24 startup integration. This map distinguishes
 observed implementation and accepted future direction.
 
 Task 13's `tests/browser/` exercises the existing development-server application
@@ -19,8 +19,7 @@ build in iOS/Android projects under D-022. Both native wrappers now compile in
 cloud CI; run3 also verifies visible iPhone-simulator startup after earlier
 blank/home-screen captures exposed weak test readiness. Neither is verified on
 physical devices or native video inference.
-There is no Python service, database,
-account system or server database. Task 14 adds a separate local IndexedDB
+Backend accounts and sync are future work. Task14 supplies a local IndexedDB
 repository for manual workouts under D-030. Its transaction compares revisions
 before writing and exposes saved state only after completion; failed/unknown
 reads and uncertain writes require recovery without overwriting old data.
@@ -29,6 +28,13 @@ Root App owns Home/Workout/Analyze navigation and native lifecycle registration.
 Manual contracts in `types/workout.ts` stay independent of pose/media types.
 `WorkoutHome`, `WorkoutEditor` and `WorkoutHistory` use the separate workout
 store/repository; `AnalysisWorkspace` retains the existing video pipeline.
+Task24 loads that screen through React.lazy on Analyze, with a loading status
+and error boundary. PoseEngine imports the MediaPipe SDK during its existing
+bounded, cancellable detector initialization. Native packages include these
+chunks among their verified local web assets.
+Task22's shared exercise picker searches bundled names and names derived from
+saved records. Task23's root appearance hook follows device changes and keeps
+the System/Light/Dark preference in a separate device-local localStorage key.
 Leaving analysis pauses/releases the visible player without removing its clip
 or canceling the independent job; native app-background cancellation remains.
 No video, object URL, frame, landmark or form finding enters the workout database.
