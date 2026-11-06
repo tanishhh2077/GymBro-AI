@@ -600,6 +600,16 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   while a saved record contains it. Selecting a suggestion fills the name field;
   the existing Add/Save action confirms it. Results expand eight at a time.
 
+### D-042 System appearance and manual override
+
+- Q11 A and the user's continued-development instruction authorize Task23's
+  System/Light/Dark choice on Home. System follows live device changes. Shared
+  color tokens cover tracking, pickers, charts and video controls.
+- Builder choices persist one raw enum string under `gymbro-ai:appearance` in
+  device localStorage. Unknown values resolve to System without writing on read.
+  A failed read/write uses an honest session-only notice and an operable theme.
+  Preference ownership is independent of workout records, backup and media.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

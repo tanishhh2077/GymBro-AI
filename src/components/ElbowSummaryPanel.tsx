@@ -10,7 +10,7 @@ export function ElbowSummaryPanel({ summary, onSeek }: ElbowSummaryPanelProps) {
       <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {(['left', 'right'] as const).map(side => (
           <div key={side} className="min-w-0">
-            <h5 className={`text-xs font-semibold ${side === 'left' ? 'text-green-400' : 'text-blue-400'}`}>
+            <h5 className={`text-xs font-semibold ${side === 'left' ? 'text-accent' : 'text-chart-right'}`}>
               {side === 'left' ? 'Left' : 'Right'} elbow
             </h5>
             <p className="mt-1 text-xs text-slate-400">

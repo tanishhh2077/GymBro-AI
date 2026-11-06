@@ -5,6 +5,9 @@ Inherit [source guidance](../AGENTS.md). Follow the
 
 - Own clip state, processing orchestration, cancellation, and resource ownership
   here. Keep pose algorithms and form interpretation in the processing layer.
+- D-042 permits `useAppearance` to store the device's System/Light/Dark choice
+  under its own localStorage key. Keep preference failures independent of workout
+  recovery and release its media-query listener and document changes on unmount.
 - Task18 restore uses the existing library transaction and destination revision.
   Reject stale previews and conflicts before writing. Identical imports are no-ops.
 - Coordinate access to a shared pose engine; do not let independent clip jobs

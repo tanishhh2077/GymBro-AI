@@ -20,7 +20,7 @@ const REASONS: Record<ElbowUnavailableReason, string> = {
   'degenerate-geometry': 'Joint positions overlap.',
 };
 const SIDES: ElbowSide[] = ['left', 'right'];
-const COLORS = { left: '#4ade80', right: '#60a5fa' };
+const COLORS = { left: 'rgb(var(--accent-rgb))', right: 'rgb(var(--chart-right-rgb))' };
 const FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white';
 
 export function ElbowTimeline({ pose, time, onSeek }: ElbowTimelineProps) {
@@ -80,12 +80,12 @@ export function ElbowTimeline({ pose, time, onSeek }: ElbowTimelineProps) {
       <div aria-hidden="true" className="mt-4 grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-1 gap-y-2 text-[11px] text-slate-400">
         <div className="flex h-32 flex-col justify-between"><span>180°</span><span>90°</span><span>0°</span></div>
         <svg viewBox="0 0 580 104" preserveAspectRatio="none" className="h-32 w-full overflow-visible">
-          {[0, 52, 104].map((y) => <line key={y} x1="0" x2="580" y1={y} y2={y} stroke="#ffffff14" />)}
+          {[0, 52, 104].map((y) => <line key={y} x1="0" x2="580" y1={y} y2={y} stroke="currentColor" className="text-white/10" />)}
           {traces.map((trace) => trace.singleton
             ? <circle key={trace.key} cx={trace.x} cy={trace.y} r="2.5" fill={COLORS[trace.side]} />
             : <polyline key={trace.key} points={trace.points} fill="none" stroke={COLORS[trace.side]}
                 strokeWidth="2" strokeDasharray={trace.side === 'right' ? '5 3' : undefined} />)}
-          {cursor !== null && <line x1={cursor} x2={cursor} y1="0" y2="104" stroke="#e2e8f0" strokeWidth="1" />}
+          {cursor !== null && <line x1={cursor} x2={cursor} y1="0" y2="104" stroke="currentColor" className="text-slate-200" strokeWidth="1" />}
         </svg>
         <div />
         <div className="flex justify-between"><span>0 s</span><span>{series.duration.toFixed(2)} s</span></div>

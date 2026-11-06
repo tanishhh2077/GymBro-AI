@@ -5,28 +5,31 @@ Follow D-024, briefly explain and proceed. Follow D-036, update docs at task end
 or tool handover. Root Development pace now sets focused checks, lightweight
 planning and risk-based independent review. Detailed history is in [STATUS.md](STATUS.md).
 
-## Completed Task22
+## Completed Task23
 
-The exercise library is implemented under D-041 on `feat/task22-exercise-library`
-by Codex (runtime model ID unavailable), with ordinary UI/helper self-review.
+Appearance is implemented under D-042 on `feat/task23-appearance` by Codex
+(runtime model ID unavailable). Home offers **Appearance** with System/Light/Dark.
+System follows live device changes. The choice is stored on the device, with an
+honest session-only fallback when preference storage is unavailable.
 
-- Workouts and routine rows offer **Browse exercise library**, search by name,
-  equipment or muscle group, 57 bundled entries and reusable saved custom names.
-  Selection fills a draft field. Existing Add/Save actions confirm the record.
-  Custom names are derived from saved workout/routine records, preserving case.
-- Checks pass 622 tests / 38 files, lint, build, guarded sync (13 files/platform,
-  3 plugins) and eight affected Chromium cases, including 390 px long-name and
-  keyboard flows. The production build reports a 516.41 kB main-chunk advisory.
-- Task21's final 09fb1ba hosted browser 42158947908 and native 42158947509 both
-  pass. Its previous-value/repeat/auto-rest behavior and earlier features are in
-  STATUS. Physical iPhone behavior and real-bench accuracy require their own tests.
+- Shared colors cover tracking, the exercise library, charts and video controls.
+  A fresh read-only review found one loaded-analysis contrast issue; it was
+  reproduced and corrected. The final code passes 629 tests / 39 files, lint,
+  build, guarded sync (13 files/platform, 3 plugins) and all 28 Chromium cases.
+  Both themes and 390 px layouts were visually inspected with synthetic data.
+- Task22's 57-entry searchable library, saved custom-name reuse and Task21's
+  previous values/repeat/auto-rest are complete. Their evidence is in STATUS.
+  Task22's c1de9c6 hosted runs 42167023244 and 42167023234 both pass.
+- The entry chunk is 519.13 kB. Physical iPhone behavior and real-bench accuracy
+  require their own tests. Check Actions for hosted results on the latest commit.
 
 ## Next work
 
-The user authorized continuing through the accepted tasks. Task23 is Q11's
-system-following light/dark appearance with a manual override, using the existing
-visual system. Q10 selects familiar Hevy-style flows with GymBro's own design.
-See PRODUCT_DIRECTION for all 13 answers.
+The user authorized continuing through the accepted tasks. Next is reviewing and
+integrating the committed Task20 on-demand analysis loading with the newer
+tracking/appearance changes. Keep its separate worktree's work intact. Q10
+selects familiar Hevy-style flows with GymBro's own design. See PRODUCT_DIRECTION
+for all 13 answers.
 
 An existing `feat/task20-faster-start` branch contains on-demand video-analysis
 loading (`8b336f4` observed). Check its current ownership/integration before

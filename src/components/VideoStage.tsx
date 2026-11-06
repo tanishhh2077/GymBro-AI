@@ -133,7 +133,7 @@ function VideoStagePlayer({
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/5 bg-black">
+    <div className="overflow-hidden rounded-2xl border border-white/5 bg-ink-900">
       <div className="flex w-full justify-center bg-black">
         <div className="relative min-h-[220px]">
           <video
@@ -168,7 +168,7 @@ function VideoStagePlayer({
             type="button"
             onClick={togglePlay}
             disabled={!playable}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-ink-950 shadow-glow transition-transform hover:scale-105 disabled:opacity-40"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-on-accent shadow-glow transition-transform hover:scale-105 disabled:opacity-40"
             aria-label={playing ? "Pause" : "Play"}
           >
             {playing ? <PauseIcon width={20} /> : <PlayIcon width={20} />}
@@ -249,7 +249,7 @@ function ProcessingLayer({ clip, accent }: { clip: Clip; accent: string }) {
                 cy="40"
                 r="34"
                 fill="none"
-                stroke="rgba(255,255,255,0.08)"
+                stroke="rgb(var(--foreground-rgb) / 0.08)"
                 strokeWidth="6"
               />
               <circle

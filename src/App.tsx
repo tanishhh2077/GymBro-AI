@@ -6,6 +6,8 @@ import { useSessionStore, type SessionStore } from '@/store/useSessionStore';
 import { resolveSetLink } from '@/core/setLinks';
 import type { SetLink } from '@/types';
 import { workoutStore, type WorkoutStore } from '@/store/useWorkoutStore';
+import { useAppearance } from '@/store/useAppearance';
+import { AppearanceControl } from '@/components/AppearanceControl';
 import { connectNativeLifecycle } from '@/mobile/nativeLifecycle';
 import { AnalysisWorkspace } from '@/components/AnalysisWorkspace';
 import { WorkoutHome } from '@/components/WorkoutHome';
@@ -19,6 +21,7 @@ import { ShieldIcon } from '@/components/icons';
 
 type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines' | 'progress' | 'backup';
 export default function App({ workouts = workoutStore, session = useSessionStore }: { workouts?: WorkoutStore; session?: SessionStore } = {}) {
+  const appearance = useAppearance();
   useEffect(() => connectNativeLifecycle({
     isNative: Capacitor.isNativePlatform(), app: NativeApp, session, document,
   }), [session]);
@@ -90,7 +93,8 @@ export default function App({ workouts = workoutStore, session = useSessionStore
       {view === 'home' && <WorkoutHome data={state.data} available={available} busy={state.busy}
         onWorkout={() => navigate('workout')} onAnalyze={() => navigate('analysis')}
         onRoutines={() => navigate('routines')}
-        onProgress={() => navigate('progress')} onBackup={() => navigate('backup')} onHistory={openHistory} />}
+        onProgress={() => navigate('progress')} onBackup={() => navigate('backup')} onHistory={openHistory}
+        appearance={<AppearanceControl settings={appearance} />} />}
       {view === 'workout' && <WorkoutEditor store={workouts} analysis={analysis} onSetLogged={workoutId => {
         if (workouts.getState().data.active?.id === workoutId) restTimer.current?.afterSetLogged();
       }} onFinished={() => { setView('home'); setNotice('Workout saved.'); }} />}
@@ -133,10 +137,10 @@ function Header() {
 function Logo() {
   return (
     <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent/30 to-electric/20">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-accent">
         <path
           d="M4 9v6M20 9v6M7 12h10M7 8v8M17 8v8"
-          stroke="#4ade80"
+          stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
         />

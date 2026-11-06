@@ -92,13 +92,13 @@ export function AnalysisWorkspace({
           <div className="mb-3 flex flex-wrap gap-2">
             <span
               className="chip text-xs font-semibold"
-              style={{ background: `${accent}1f`, color: accent }}
+              style={{ background: `${accent}1f`, color: 'rgb(var(--pink-text-rgb))' }}
             >
               {exerciseName}
             </span>
             <span
               className="chip text-xs font-semibold"
-              style={{ background: `${accent}1f`, color: accent }}
+              style={{ background: `${accent}1f`, color: 'rgb(var(--pink-text-rgb))' }}
             >
               {ANGLES.side.name} view
             </span>
@@ -151,7 +151,7 @@ export function AnalysisWorkspace({
                             className="chip text-xs font-semibold"
                             style={{
                               background: `${accent}1f`,
-                              color: accent,
+                              color: 'rgb(var(--pink-text-rgb))',
                             }}
                           >
                             {exerciseName} · {ANGLES[clip.angle].name} view

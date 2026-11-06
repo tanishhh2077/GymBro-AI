@@ -10,6 +10,22 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task23 appearance is complete under D-042, implemented by Codex (runtime model
+ID unavailable). Home offers System/Light/Dark with a device-local override,
+live system following and graceful session-only storage failure. Seven new App
+cases failed before implementation. Checks pass 629 tests / 39 files, lint,
+build, guarded sync (13 files/platform, 3 plugins) and all 28 Chromium cases in
+3.3 minutes. Shared computed-color checks cover both modes, tracking/library/
+progress/validation controls and real non-human loaded analysis. Three 390 px
+synthetic visual previews were inspected in ignored build/visual-review/task23.
+A fresh read-only Codex review found one P2 across the loaded clip badge and
+elbow headings. Its 2.22 contrast failure was reproduced before correcting the
+remaining colors; final tests pass. The reviewer found no significant storage,
+system-following or cleanup issue and performed source review only. Native
+compilation and physical iPhone behavior were not checked locally. The entry
+chunk is 519.13 kB. Next is integration of the existing Task20 startup work.
+Task22 c1de9c6 hosted runs 42167023244 and 42167023234 both succeeded.
+
 Task22 exercise library is complete under D-041, implemented and self-reviewed
 by Codex (runtime model ID unavailable). `core/exerciseCatalog` supplies 57 local
 entries, search and exact-name reuse from saved workout/routine records.

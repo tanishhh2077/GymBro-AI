@@ -87,7 +87,7 @@ export function ClipDropzone({
           type="button"
           disabled={disabled}
           onClick={() => inputRef.current?.click()}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-ink-950 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40"
         >
           Choose video
         </button>

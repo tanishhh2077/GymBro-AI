@@ -78,6 +78,10 @@ precedence over older documentation, review and check-cadence requirements.
 
 ## Independent judgment
 
+- D-042 adds System/Light/Dark appearance and a device-local preference in
+  `localStorage`, separate from workout records and backups. Follow the live
+  system setting in System mode and report session-only fallback on storage errors.
+
 - D-039 links a video analysis to a logged bench-press set for the session only.
   Follow Task19's three-ID link, permanent detach and no-persistence rules.
 

@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { test, expect, sessionSnapshot, expectNoPose, openAnalysis } from './app';
+import { expectReadable } from './readability';
 
 const noPerson = fileURLToPath(new URL('../fixtures/no-person.mp4', import.meta.url));
 
@@ -9,10 +10,14 @@ test('real no-person inference stays replayable, releases URLs, and permits a fr
     const url = new URL(request.url());
     if (/\/(models|wasm)\//.test(url.pathname)) assets.add(url.pathname);
   });
+  await page.emulateMedia({ colorScheme: 'light' });
   await openAnalysis(page);
   await page.locator('input[type=file]').setInputFiles(noPerson);
   await expect(page.getByRole('button', { name: 'Choose video' })).toBeDisabled();
+  await expectReadable(page.getByText('no-person.mp4', { exact: true }).locator('..').getByText(/view$/));
   await expectNoPose(page);
+  await expectReadable(page.getByRole('heading', { name: 'Left elbow', exact: true }));
+  await expectReadable(page.getByRole('heading', { name: 'Right elbow', exact: true }));
   const first = (await sessionSnapshot(page)).clips[0];
   expect(first.status).toBe('no-pose');
   expect(first.pose?.frames.length).toBeGreaterThan(0);

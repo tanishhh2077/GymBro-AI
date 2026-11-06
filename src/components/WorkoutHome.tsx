@@ -1,4 +1,5 @@
 import type { WorkoutData } from '@/types/workout';
+import type { ReactNode } from 'react';
 
 interface Props {
   data: WorkoutData; available: boolean; busy: boolean;
@@ -6,8 +7,9 @@ interface Props {
   onRoutines: () => void;
   onProgress: () => void;
   onBackup: () => void;
+  appearance?: ReactNode;
 }
-export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines, onProgress, onBackup }: Props) {
+export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines, onProgress, onBackup, appearance }: Props) {
   const sets = data.history.reduce((total, w) => total + w.exercises.reduce((n, e) => n + e.sets.length, 0), 0);
   const history = [...data.history].sort((a, b) => b.finishedAt! - a.finishedAt!);
   return <div className="space-y-7">
@@ -51,6 +53,7 @@ export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHis
           </button></li>)}</ul>}
     </section>}
     <section className="space-y-3 border-t border-white/10 pt-5">
+      {appearance}
       <button type="button" className="btn-ghost" onClick={onBackup}>Backup and restore</button>
       <p className="text-xs leading-relaxed text-slate-500">Workout logs are saved on this device. Clearing this app or browser’s data removes them. Keep a backup file for recovery. Video analysis is available for bench press.</p>
     </section>

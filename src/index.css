@@ -5,11 +5,61 @@
 @layer base {
   :root {
     color-scheme: dark;
+    --ink-950-rgb: 5 7 13;
+    --ink-900-rgb: 10 14 23;
+    --ink-850-rgb: 14 19 32;
+    --ink-800-rgb: 19 26 42;
+    --ink-700-rgb: 28 39 64;
+    --ink-600-rgb: 40 54 85;
+    --foreground-rgb: 255 255 255;
+    --body-rgb: 226 232 240;
+    --secondary-rgb: 203 213 225;
+    --muted-rgb: 148 163 184;
+    --subtle-rgb: 100 116 139;
+    --accent-rgb: 74 222 128;
+    --accent-hover-rgb: 108 242 168;
+    --accent-soft-rgb: 209 250 223;
+    --on-accent-rgb: 5 7 13;
+    --electric-rgb: 56 189 248;
+    --chart-right-rgb: 96 165 250;
+    --warn-rgb: 251 191 36;
+    --danger-rgb: 251 113 133;
+    --pink-rgb: 244 114 182;
+    --pink-text-rgb: 249 168 212;
+    --gradient-middle-rgb: 110 231 183;
+    --shadow-card: 0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 20px 50px -24px rgb(0 0 0 / 0.8);
     /* Capacitor supplies Android values; iOS/browser use the CSS environment. */
     --app-safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
     --app-safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
     --app-safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
     --app-safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --ink-950-rgb: 245 247 251;
+    --ink-900-rgb: 255 255 255;
+    --ink-850-rgb: 248 250 252;
+    --ink-800-rgb: 241 245 249;
+    --ink-700-rgb: 226 232 240;
+    --ink-600-rgb: 203 213 225;
+    --foreground-rgb: 15 23 42;
+    --body-rgb: 30 41 59;
+    --secondary-rgb: 51 65 85;
+    --muted-rgb: 71 85 105;
+    --subtle-rgb: 85 99 119;
+    --accent-rgb: 22 101 52;
+    --accent-hover-rgb: 20 83 45;
+    --accent-soft-rgb: 22 101 52;
+    --on-accent-rgb: 255 255 255;
+    --electric-rgb: 3 105 161;
+    --chart-right-rgb: 29 78 216;
+    --warn-rgb: 146 64 14;
+    --danger-rgb: 190 18 60;
+    --pink-rgb: 157 23 77;
+    --pink-text-rgb: 157 23 77;
+    --gradient-middle-rgb: 4 120 87;
+    --shadow-card: 0 1px 2px rgb(15 23 42 / 0.06), 0 14px 32px -20px rgb(15 23 42 / 0.18);
   }
 
   html,
@@ -24,6 +74,10 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  input::placeholder {
+    color: rgb(var(--subtle-rgb));
+  }
+
   /* Custom range slider for the scrubber */
   input[type="range"].scrubber {
     -webkit-appearance: none;
@@ -34,12 +88,12 @@
   input[type="range"].scrubber::-webkit-slider-runnable-track {
     height: 6px;
     border-radius: 9999px;
-    background: rgba(255, 255, 255, 0.12);
+    background: rgb(var(--foreground-rgb) / 0.12);
   }
   input[type="range"].scrubber::-moz-range-track {
     height: 6px;
     border-radius: 9999px;
-    background: rgba(255, 255, 255, 0.12);
+    background: rgb(var(--foreground-rgb) / 0.12);
   }
   input[type="range"].scrubber::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -48,16 +102,16 @@
     height: 16px;
     width: 16px;
     border-radius: 9999px;
-    background: #4ade80;
-    box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.18);
+    background: rgb(var(--accent-rgb));
+    box-shadow: 0 0 0 4px rgb(var(--accent-rgb) / 0.18);
   }
   input[type="range"].scrubber::-moz-range-thumb {
     height: 16px;
     width: 16px;
     border: none;
     border-radius: 9999px;
-    background: #4ade80;
-    box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.18);
+    background: rgb(var(--accent-rgb));
+    box-shadow: 0 0 0 4px rgb(var(--accent-rgb) / 0.18);
   }
 }
 
@@ -86,7 +140,7 @@
            transition-all duration-200 select-none disabled:opacity-40 disabled:pointer-events-none;
   }
   .btn-primary {
-    @apply btn bg-accent text-ink-950 hover:bg-accent-300 shadow-glow hover:shadow-glow;
+    @apply btn bg-accent text-on-accent hover:bg-accent-300 shadow-glow hover:shadow-glow;
   }
   .btn-ghost {
     @apply btn bg-white/5 text-slate-200 hover:bg-white/10 border border-white/5;
