@@ -96,6 +96,8 @@ it('preserves a stale edit but refuses to overwrite the newly loaded routine aft
   expect(container.textContent).toContain('Reopen this routine');
   expect([...container.querySelectorAll('input')].map(el => el.value)).toContain('My stale edit');
   expect((await repository.load()).routines![0].name).toBe('Other tab edit');
+  // The stale draft holds typed changes, so leaving it asks first (Q30).
+  vi.spyOn(window, 'confirm').mockReturnValue(true);
   await click('Cancel routine edit'); await click('Edit routine Other tab edit');
   await fill('Routine name', 'Fresh edit'); await submit();
   expect((await repository.load()).routines![0].name).toBe('Fresh edit');

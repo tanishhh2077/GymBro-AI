@@ -18,6 +18,10 @@ export function WorkoutSummary({ data, id, available, onHome, onHistory }:
       <h1 className="text-3xl font-bold text-white">Workout complete</h1>
       <h2 className="mt-3 break-words text-xl font-semibold text-slate-300">{workout.name}</h2>
       <p className="mt-1 text-sm text-slate-400">{new Date(workout.finishedAt!).toLocaleString()}</p></div>
+    {workout.note && <section aria-labelledby="summary-workout-note">
+      <h2 id="summary-workout-note" className="text-sm font-semibold text-slate-300">Workout note</h2>
+      <p className="mt-1 whitespace-pre-wrap break-words text-slate-200">{workout.note}</p>
+    </section>}
     <dl className="grid grid-cols-2 gap-x-5 gap-y-6 border-y border-white/10 py-6">
       {stats.map(([label, value]) => <div className="min-w-0" key={label}>
         <dt className="text-sm text-slate-400">{label}</dt><dd className="mt-1 break-words text-2xl font-semibold text-white">{value}</dd>

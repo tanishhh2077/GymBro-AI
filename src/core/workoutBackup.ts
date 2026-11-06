@@ -47,8 +47,9 @@ export function parseWorkoutBackup(text: string): WorkoutBackup {
 }
 
 // Known fields fix object-key order while retaining the meaningful order of arrays.
+// Every stored record field must be listed, or a difference in it would be skipped as identical.
 const recordFields = ['id', 'name', 'unit', 'startedAt', 'finishedAt', 'exercises',
-  'sets', 'reps', 'weight', 'kind', 'targetSets', 'targetReps'];
+  'sets', 'reps', 'weight', 'kind', 'targetSets', 'targetReps', 'targetWeight', 'note'];
 
 function mergeRecords<T extends Workout | WorkoutRoutine>(current: readonly T[], incoming: readonly T[], label: string): T[] {
   const records = new Map(current.map(item => [item.id, item]));

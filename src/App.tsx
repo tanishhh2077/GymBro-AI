@@ -19,6 +19,7 @@ import { WorkoutProgress } from '@/components/WorkoutProgress';
 import { WorkoutBackup } from '@/components/WorkoutBackup';
 import { WorkoutSummary } from '@/components/WorkoutSummary';
 import { ShieldIcon } from '@/components/icons';
+import { confirmDiscard, createUnsavedChanges, UnsavedChangesContext } from '@/components/unsavedChanges';
 
 const AnalysisWorkspace = lazy(() => import('@/components/AnalysisWorkspace').then(module => ({ default: module.AnalysisWorkspace })));
 
@@ -60,6 +61,15 @@ export default function App({ workouts = workoutStore, session = useSessionStore
   // A set row requested by Back to set; this parent effect runs after the new
   // view's children render, so it can focus the row instead of <main>.
   const focusSet = useRef<string | null>(null);
+  const [unsaved] = useState(createUnsavedChanges);
+  // Browsers show their own wording for this prompt and ignore custom text.
+  useEffect(() => {
+    function warn(event: BeforeUnloadEvent) { if (unsaved.forms.size) { event.preventDefault(); event.returnValue = ''; } }
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [unsaved]);
+  /** Ask once before a view change would unmount forms holding typed, unsaved input. */
+  function leave() { return confirmDiscard(unsaved.forms.size > 0); }
   // Set navigation focus before paint so a later effect cannot steal a user's focus.
   useLayoutEffect(() => {
     if (previousView.current !== view) {
@@ -76,12 +86,17 @@ export default function App({ workouts = workoutStore, session = useSessionStore
     if (!available || !openClipId || !openLink) return;
     if (!resolveSetLink(state.data, openLink)) detachLink(openClipId);
   }, [available, openClipId, openLink, detachLink, state.data]);
-  function navigate(next: View) {
+  function navigate(next: View, confirmed = false) {
+    if (!confirmed && next !== view && !leave()) return;
     setView(next); setNotice('');
     // A pending link only applies while its Analyze screen is showing.
     if (next !== 'analysis') setPendingLink(undefined);
   }
-  function openHistory(id?: string) { setSelected(id); navigate('history'); }
+  function openHistory(id?: string) {
+    // A new selection closes an open correction even when History is already showing.
+    if (!leave()) return;
+    setSelected(id); navigate('history', true);
+  }
   function backToSet(link: SetLink) {
     const found = resolveSetLink(state.data, link);
     if (!found) return;
@@ -90,10 +105,10 @@ export default function App({ workouts = workoutStore, session = useSessionStore
   }
   const analysis = {
     openLink,
-    onAnalyze: (link: SetLink) => { setPendingLink(link); setView('analysis'); setNotice(''); },
+    onAnalyze: (link: SetLink) => { if (!leave()) return; setPendingLink(link); setView('analysis'); setNotice(''); },
     onView: () => navigate('analysis'),
   };
-  return <div className="app-safe-sides min-h-full">
+  return <UnsavedChangesContext.Provider value={unsaved}><div className="app-safe-sides min-h-full">
     <Header />
     <nav aria-label="Main navigation" className="mx-auto flex w-full max-w-5xl gap-1 border-b border-white/10 px-4 py-2 sm:px-6">
       {([['home', 'Home'], ['workout', 'Workout'], ['analysis', 'Analyze'], ['routines', 'Routines']] as const).map(([target, label]) =>
@@ -120,7 +135,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
         if (workouts.getState().data.active?.id === workoutId) restTimer.current?.afterSetLogged(seconds, name);
       }} onFinished={id => { setSelected(id); setView('summary'); setNotice('Workout saved.'); }} />}
       {view === 'history' && <WorkoutHistory store={workouts} initialId={selected} analysis={analysis}
-        onSummary={id => { setSelected(id); navigate('summary'); }} />}
+        onSummary={id => { setSelected(id); navigate('summary'); }} onWorkout={() => navigate('workout')} />}
       {view === 'summary' && <WorkoutSummary data={state.data} id={selected} available={available}
         onHome={() => navigate('home')} onHistory={openHistory} />}
       {view === 'analysis' && <AnalysisBoundary><Suspense fallback={<p role="status" className="text-sm text-slate-400">Opening video analysis…</p>}>
@@ -133,7 +148,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
       {view === 'backup' && <WorkoutBackup store={workouts} onHome={() => navigate('home')} />}
       {view === 'account' && accountPanel}
     </main>
-  </div>;
+  </div></UnsavedChangesContext.Provider>;
 }
 
 function Header() {

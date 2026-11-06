@@ -1,5 +1,5 @@
 import { createStore } from 'zustand/vanilla';
-import { emptyWorkoutData, validateSetKind, validateSetValues, validateWorkoutData, WorkoutError } from '@/core/workouts';
+import { emptyWorkoutData, validateSetKind, validateSetValues, validateWorkoutData, validateWorkoutNote, WorkoutError } from '@/core/workouts';
 import type { RoutineInput, SetKind, WeightUnit, Workout, WorkoutData, WorkoutExercise, WorkoutResult, WorkoutRoutine } from '@/types/workout';
 import { createWorkoutRepository, type WorkoutRepository, type SyncedWorkoutRepository } from './workoutRepository';
 import { mergeWorkoutBackup, type WorkoutBackup } from '@/core/workoutBackup';
@@ -15,12 +15,18 @@ export interface WorkoutState {
   startWorkout: (name: string, unit: WeightUnit) => Promise<WorkoutResult>;
   addExercise: (name: string) => Promise<WorkoutResult>;
   removeExercise: (id: string) => Promise<WorkoutResult>;
+  moveExercise: (exerciseId: string, direction: 'up' | 'down') => Promise<WorkoutResult>;
   addSet: (exerciseId: string, reps: number, weight: number, kind?: SetKind) => Promise<WorkoutResult>;
   updateSet: (exerciseId: string, setId: string, reps: number, weight: number, kind?: SetKind) => Promise<WorkoutResult>;
   removeSet: (exerciseId: string, setId: string) => Promise<WorkoutResult>;
   finishWorkout: () => Promise<WorkoutResult>;
   discardWorkout: () => Promise<WorkoutResult>;
   deleteWorkout: (id: string) => Promise<WorkoutResult>;
+  /** Sets the note on the active or a finished workout; blank text removes it. */
+  /** Pass the revision the editor opened with so a newer note is never overwritten. */
+  setWorkoutNote: (workoutId: string, note: string, expectedRevision?: number) => Promise<WorkoutResult>;
+  /** Starts a fresh active workout with a finished workout's exercises and targets but no sets. */
+  repeatWorkout: (workoutId: string) => Promise<WorkoutResult>;
   correctCompletedWorkout: (id: string, expectedRevision: number, input: CompletedWorkoutCorrection) => Promise<WorkoutResult>;
   createRoutine: (input: RoutineInput) => Promise<WorkoutResult>;
   duplicateRoutine: (id: string) => Promise<WorkoutResult>;
@@ -165,6 +171,17 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
         return { ...exercise, sets: exercise.sets.map(s => s.id === setId ? { id: s.id, reps, weight,
           ...((kind ?? s.kind) === 'warmup' ? { kind: 'warmup' as const } : {}) } : s) };
       })),
+      moveExercise: (exerciseId, direction) => commit(data => {
+        const draft = active(data), index = draft.exercises.findIndex(e => e.id === exerciseId);
+        if (index < 0) invalid('This exercise is no longer in the active workout.');
+        if (direction !== 'up' && direction !== 'down') invalid('Choose up or down to move this exercise.');
+        const target = direction === 'up' ? index - 1 : index + 1;
+        if (target < 0) invalid('This exercise is already first.');
+        if (target >= draft.exercises.length) invalid('This exercise is already last.');
+        const exercises = [...draft.exercises];
+        [exercises[index], exercises[target]] = [exercises[target], exercises[index]];
+        return { ...data, active: { ...draft, exercises } };
+      }),
       removeSet: (exerciseId, setId) => commit(data => editExercise(data, exerciseId, exercise => {
         if (!exercise.sets.some(s => s.id === setId)) invalid('This set is no longer in the workout.');
         return { ...exercise, sets: exercise.sets.filter(s => s.id !== setId) };
@@ -180,6 +197,29 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
       deleteWorkout: id => commit(data => {
         if (!data.history.some(w => w.id === id)) invalid('This saved workout is no longer available.');
         return { ...data, history: data.history.filter(w => w.id !== id) };
+      }),
+      setWorkoutNote: (workoutId, note, expectedRevision) => commit(data => {
+        if (expectedRevision !== undefined && data.revision !== expectedRevision) invalid('Saved workouts changed. Reopen the note before saving.');
+        const source = data.active?.id === workoutId ? data.active : data.history.find(w => w.id === workoutId);
+        if (!source) invalid('This workout is no longer available.');
+        const text = typeof note === 'string' ? note.replace(/\r\n?/g, '\n').trim() : invalid('Enter the workout note as text.');
+        if (text) validateWorkoutNote(text);
+        if ((source.note ?? '') === text) return data;
+        const updated: { -readonly [K in keyof Workout]: Workout[K] } = { ...source, note: text };
+        // Blank removes the field so stored records never carry an empty note.
+        if (!text) delete updated.note;
+        return data.active === source ? { ...data, active: updated } : { ...data, history: data.history.map(w => w === source ? updated : w) };
+      }),
+      repeatWorkout: workoutId => commit(data => {
+        if (data.active) invalid('Finish or discard the active workout before repeating another.');
+        const source = data.history.find(w => w.id === workoutId);
+        if (!source) invalid('This saved workout is no longer available.');
+        const id = deps.id();
+        // Copy only the plan: names, order and targets. Notes and actual sets stay with the source record.
+        const exercises = source.exercises.map(({ name, targetSets, targetReps, targetWeight }) => ({ id: deps.id(), name,
+          ...(targetSets !== undefined ? { targetSets } : {}), ...(targetReps !== undefined ? { targetReps } : {}),
+          ...(targetWeight !== undefined ? { targetWeight } : {}), sets: [] }));
+        return { ...data, active: { id, name: source.name, unit: source.unit, startedAt: deps.now(), finishedAt: null, exercises } };
       }),
       correctCompletedWorkout: (id, expectedRevision, input) => commit(data => {
         if (data.revision !== expectedRevision) invalid('Saved workouts changed. Cancel and reopen this workout before saving your edits.');

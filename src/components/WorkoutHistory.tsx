@@ -10,7 +10,11 @@ import { WorkoutCalendar } from './WorkoutCalendar';
 
 const inputClass = 'w-full min-w-0 rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white';
 
-export function WorkoutHistory({ store, initialId, analysis, onSummary }: { store: WorkoutStore; initialId?: string; analysis?: SetAnalysisActions; onSummary?: (id: string) => void }) {
+export function WorkoutHistory({ store, initialId, analysis, onSummary, onWorkout }: {
+  store: WorkoutStore; initialId?: string; analysis?: SetAnalysisActions; onSummary?: (id: string) => void;
+  /** Opens the active workout after Repeat, or to resume the one that blocks it. */
+  onWorkout?: () => void;
+}) {
   const state = useStore(store);
   const [selectedId, setSelectedId] = useState(initialId);
   const [requestedId, setRequestedId] = useState(initialId);
@@ -19,10 +23,12 @@ export function WorkoutHistory({ store, initialId, analysis, onSummary }: { stor
   const [visible, setVisible] = useState(20);
   const [editing, setEditing] = useState<{ workout: Workout; revision: number } | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [repeatError, setRepeatError] = useState('');
   if (initialId !== requestedId) {
     setRequestedId(initialId);
     setSelectedId(initialId);
     setEditing(null);
+    setRepeatError('');
   }
   // Direct links resolve against all saved workouts, even when filters exclude them.
   const selected = state.data.history.find(w => w.id === selectedId);
@@ -33,11 +39,24 @@ export function WorkoutHistory({ store, initialId, analysis, onSummary }: { stor
   }
   if (editing) return <CompletedWorkoutEditor store={store} workout={editing.workout} expectedRevision={editing.revision} onClose={() => setEditing(null)} />;
   if (selected) return <div className="space-y-5">
-    <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={() => setSelectedId(undefined)}>Back to history</button>
+    <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={() => { setSelectedId(undefined); setRepeatError(''); }}>Back to history</button>
     <div><h1 className="break-words text-3xl font-bold text-white">{selected.name}</h1><p className="mt-2 text-sm text-slate-400">{new Date(selected.finishedAt!).toLocaleString()} · weights in {selected.unit}</p></div>
     {onSummary && <button type="button" className="btn-ghost" onClick={() => onSummary(selected.id)}>View summary</button>}
     <button type="button" className="btn-ghost" disabled={state.busy || state.needsReload || !state.loaded}
       onClick={() => setEditing({ workout: selected, revision: state.data.revision })}>Edit completed workout</button>
+    {onWorkout && <button type="button" className="btn-ghost" disabled={state.busy || state.needsReload || !state.loaded} onClick={async () => {
+      setRepeatError('');
+      const result = await state.repeatWorkout(selected.id);
+      if (result.ok) onWorkout(); else setRepeatError(result.message);
+    }}>Repeat workout</button>}
+    {repeatError && <div className="rounded-xl border border-accent/20 bg-accent/5 p-4 text-sm text-slate-300">
+      {repeatError !== state.error && <p role="alert">{repeatError}</p>}
+      {state.data.active && <button type="button" className="mt-2 text-accent underline underline-offset-4" onClick={onWorkout}>Resume workout</button>}
+    </div>}
+    {selected.note && <section aria-labelledby="saved-workout-note" className="rounded-lg bg-white/5 p-3">
+      <h2 id="saved-workout-note" className="text-sm font-semibold text-slate-300">Workout note</h2>
+      <p className="mt-1 whitespace-pre-wrap break-words text-sm text-slate-200">{selected.note}</p>
+    </section>}
     {selected.exercises.map(e => <section key={e.id} className="border-t border-white/10 pt-4">
       <h2 className="break-words text-xl font-semibold text-white">{e.name}</h2>
       <table className="mt-3 w-full text-left text-sm"><caption className="sr-only">Saved sets for {e.name}</caption>

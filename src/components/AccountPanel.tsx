@@ -6,17 +6,21 @@ import { mergeWorkoutBackup, type WorkoutBackup, type BackupMerge } from '@/core
 import type { Workout, WorkoutRoutine } from '@/types/workout';
 import type { WorkoutRepository } from '@/store/workoutRepository';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
+import { plannedTarget } from './plannedTarget';
 
 interface Props { service: AccountService | null; account: Account | null; store: WorkoutStore; guest: WorkoutRepository }
 const inputClass = 'mt-2 w-full rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white disabled:opacity-60';
-function RecordVersion({ value }: { value: Workout | WorkoutRoutine | null }) {
+/** One side of a sync conflict; shows every synced field so versions differing only in notes or targets are distinguishable. */
+export function RecordVersion({ value }: { value: Workout | WorkoutRoutine | null }) {
   if (!value) return <p className="text-sm text-slate-400">Deleted</p>;
   return <div className="space-y-2 break-words text-sm text-slate-300">
     <p>{value.name} · {value.unit}{'finishedAt' in value ? value.finishedAt === null ? ' · Active' : ' · Completed' : ' · Routine'}</p>
+    {'note' in value && value.note && <p className="whitespace-pre-wrap">Note: {value.note}</p>}
     <ul className="space-y-2">{value.exercises.map(exercise => <li key={exercise.id}>
       <span className="font-medium">{exercise.name}</span>
       {'sets' in exercise && <span> · {exercise.sets.length ? exercise.sets.map(set => `${set.kind === 'warmup' ? 'Warm-up' : 'Regular'} ${set.reps} reps × ${set.weight} ${value.unit}`).join(', ') : 'No logged sets'}</span>}
-      {!('sets' in exercise) && <span> · {exercise.targetSets ?? '—'} sets / {exercise.targetReps ?? '—'} reps planned</span>}
+      {'sets' in exercise && plannedTarget(exercise, value.unit) && <span> · Planned: {plannedTarget(exercise, value.unit)}</span>}
+      {!('sets' in exercise) && <span> · {exercise.targetSets ?? '—'} sets / {exercise.targetReps ?? '—'} reps{exercise.targetWeight !== undefined ? ` / ${exercise.targetWeight} ${value.unit}` : ''} planned</span>}
     </li>)}</ul>
   </div>;
 }

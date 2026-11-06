@@ -11,10 +11,13 @@ cloud-account and dashboard actions below. Local development needs Node22.23.2.
 2. Open its SQL editor and apply migrations once in filename order. Start with
    [workout sync](migrations/202611060001_workout_sync.sql), which creates the
    per-user table and revision-checked write RPC, then apply
-   [schema3 set kinds](migrations/202611060002_set_kinds.sql). For a project that
-   already has the first migration, apply only the second. Current clients save
-   schema3 records, including Regular/Warm-up labels. Update both app clients
-   before testing cross-device sync.
+   [schema3 set kinds](migrations/202611060002_set_kinds.sql), then
+   [schema4 notes and target weights](migrations/202611070001_notes_target_weight.sql).
+   For an existing project, apply only the migrations it does not have yet, in
+   that order. Current clients save schema4 records, including workout notes,
+   planned target weights and Regular/Warm-up labels, so sync fails with an
+   invalid-library error until the third migration is applied. Update both app
+   clients before testing cross-device sync.
 3. Enable email authentication. In Authentication → Email Templates → Magic Link,
    include `{{ .Token }}` in the message body so users receive a numeric code.
    The app verifies an email OTP. The default link-only template needs this change.
