@@ -551,6 +551,21 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   session. Follow the [design](superpowers/specs/2026-11-05-workout-backup-design.md)
   and [plan](superpowers/plans/2026-11-05-workout-backup.md).
 
+### D-039 Set-linked bench-press video analysis
+
+- On 2026-11-05 the user asked for Task19: open analysis from a logged
+  bench-press set, process the video with the existing local pipeline and return
+  to that set, alongside standalone analysis, defining bench-set identification,
+  reload, deleted sets and wrong-link protection first.
+- Builder choices: an exact list of flat barbell bench names, a link of three
+  IDs fixed at admission, and session-only links with no workout-schema change;
+  nothing about analysis is saved, backed up or uploaded.
+- In-session set-linked analysis replaces the "set-linked analysis remains
+  future" statements in ARCHITECTURE, PRODUCT_DIRECTION and HANDOFF (updated at
+  task end). Saving analysis results with a set remains future work needing its
+  own decision. See the [design](superpowers/specs/2026-11-05-set-linked-analysis-design.md)
+  and [plan](superpowers/plans/2026-11-05-set-linked-analysis.md).
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
