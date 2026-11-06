@@ -10,6 +10,34 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Tasks27–29 integrate Q17–Q19 from `feat/history-filters` (3dafdab),
+`feat/progress-ranges` (1d91e1e) and `feat/plate-calculator` (838581b), with
+decisions D-046–D-048 assigned at integration. Code arrived from user-managed
+agents whose runtime model/provider was unrecorded. Codex coordinated integration
+and three parallel read-only source reviews, with runtime model ID unavailable.
+
+- The three source reviews found no significant defects. Merge commits preserve
+  published branch history. The original worker worktrees and branches remain.
+  Shared docs were updated after merging current origin/master into the owned
+  integration branch. No source conflicts or integration fixes were needed.
+- On process-local Node 22.23.2, clean npm ci and the owned loopback dev endpoint
+  succeeded. Focused filter tests pass 28 cases and calculator tests pass 25 cases.
+  Combined checks pass 763 tests/57 files, lint, build and guarded native asset
+  sync (16 files/platform, 3 plugins, 496 modules). Entry JS is 280.65 kB/86.33 kB gzip.
+- All 31 Chromium 156.0.8078.4 cases pass in 3.5 minutes. The new synthetic narrow-
+  screen case combines search/date filtering, scoped progress and calculator use
+  while preserving entered workout drafts and leaving actual sets unlogged.
+  Existing GPU/120-sample no-person checks pass. Files/checks stayed steady during
+  the browser suite, and the coordinator owned the fixed port exclusively.
+- History filters use inclusive local dates. Progress snapshots its displayed
+  cutoff on entry/period changes and retains exact exercise/unit groups in empty
+  periods. Calculator bounds are explicit, including three-decimal weights and
+  finite inventory. These features read existing schema3 data with local UI state.
+- Physical iPhone behavior, live Supabase/email/sync and real-bench validation
+  remain open. The exercise-history agent can now base its work on the integrated
+  master containing the calculator. Next proposed work also includes routine
+  duplication and completed-workout correction, each with its own ownership.
+
 Task26 (D-045) implements recommended Q14–Q16 after the user's explicit start.
 Codex implemented the saved-workout finish/History summary, schema3 Regular/Warm-up
 sets and exact-name device-local rest defaults, scoped by guest/account. Summary

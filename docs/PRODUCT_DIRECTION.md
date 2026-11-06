@@ -24,6 +24,12 @@ and brief reason.
 | 14. After finishing a workout | A: summary of duration, exercises, sets and logged volume |
 | 15. Set types | A: Regular and Warm-up |
 | 16. Rest defaults | A: remember a duration for each exercise |
+| 17. Finding past workouts | A: workout/exercise-name search and completion-date filters |
+| 18. Progress periods | A: one/three/six months and All time |
+| 19. Barbell loading | A: optional calculator with editable bar weight and plate inventory |
+
+Q17–Q19 were accepted together. Tasks27–29 integrate their three separate agent
+branches under D-046–D-048. Questions can resume at Q20.
 
 Q14–Q16 were accepted together on 2026-11-06 with "start with all the recommended".
 Task26 implements them under D-045. Rest defaults are device-local and scoped to

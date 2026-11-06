@@ -656,6 +656,28 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   an explicit session-only fallback on settings errors. The timer and auto-start
   remain session-only. Backups/sync carry manual records separately from defaults.
 
+### D-046 Workout history search and completion dates
+
+- Q17 A authorizes Task27. Search matches workout or exercise names without case
+  sensitivity. Optional From/To dates are inclusive local completion dates.
+  Clear resets filters and pagination. Direct workout links use full history.
+
+### D-047 Calendar-month progress ranges
+
+- Q18 A authorizes Task28. All time remains the default, with rolling one-,
+  three- and six-calendar-month ranges across cards, charts, tables and counts.
+  Month ends clamp to valid dates. The displayed endpoint is captured on opening
+  Progress or changing the period. Exact exercise/unit choices persist in empty
+  periods. The existing Regular-set metric definitions and source links apply.
+
+### D-048 Optional inventory-aware plate calculator
+
+- Q19 A authorizes Task29. The workout editor offers a collapsible calculator
+  using the workout unit, editable bar/target weights and available plate pairs.
+  Integer thousandths and bounded minimum-plate search find an exact balanced
+  loading or explain invalid/unattainable input. The starter inventory is editable,
+  initially one pair per listed denomination. Inputs are component-local drafts.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

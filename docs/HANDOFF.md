@@ -1,44 +1,41 @@
 # GymBro AI current handoff
 
-Updated 2026-11-06, America/Chicago. Read root/scoped `AGENTS.md` first.
-Follow D-024, briefly explain and proceed. D-036 keeps checks/plans/docs lean.
-Detailed evidence is in [STATUS.md](STATUS.md).
+Updated 2026-11-06, America/Chicago. Read root/scoped AGENTS.md first.
+Follow D-024 and D-036. Detailed evidence is in [STATUS.md](STATUS.md).
 
-## Task26 workout flow
+## Integrated Tasks27–29
 
-The user selected recommended Q14–Q16 and authorized all three (D-045).
-Codex implemented the finish/History summary, Regular/Warm-up labels and remembered
-exercise rest defaults. Summary volume includes every logged set. Progress records
-use Regular sets. Missing kinds in older data mean Regular.
+Q17–Q19's three user-managed agent branches are integrated together and checked.
 
-- Schema3 preserves strict v1/v2 reads without read-time writes or size growth.
-  Set kinds travel through backup/restore and sync. Existing cloud projects need
-  migration002. Apply both migrations in filename order for new projects, using
-  [Supabase setup](../supabase/README.md). Update old app clients before syncing.
-- Rest defaults use exact exercise names and existing duration presets, saved
-  separately for guest/account on the device. Storage failures use session values
-  with a notice. Timer clocks and auto-start remain session-only. Successful new
-  sets use the exercise default for opt-in auto-rest. Manual exercise rest works too.
-- Full checks passed 707 tests / 51 files. After compatibility/wording fixes,
-  42 affected cases pass, covering the current 710-test inventory. Lint, build,
-  guarded native sync (16 files/platform, 3 plugins), real PostgreSQL 17.11 and
-  all 30 Chromium cases pass. Independent source review found no significant code
-  defect and flagged the migration guide, now corrected. See STATUS for limits.
+- Task27/D-046 adds case-insensitive workout/exercise-name search and inclusive
+  local completion-date filters. Direct workout links resolve against full history.
+- Task28/D-047 adds All time and rolling one/three/six-calendar-month Progress.
+  Cards, charts, tables and counts share the selected period. The displayed cutoff
+  refreshes on mount/period changes. Empty periods preserve exercise/unit selection.
+- Task29/D-048 adds the collapsible plate calculator to WorkoutEditor. It uses
+  editable bar weight, target and plate-pair inventory in the workout unit. Exact
+  solutions minimize plates. Inputs remain local to the screen.
+
+Combined checks pass 763 tests/57 files, lint, build, guarded native sync
+(16 files/platform, 3 plugins) and all 31 Chromium cases. Three independent
+source-only reviews found no significant defects. The new browser case verifies
+all three features together. See STATUS for limits and source branch hashes.
 
 ## Next work
 
-1. User configures Supabase URL/publishable key in ignored `.env.local`, applies
-   the two migrations and sets the email-code template using the guide. Dashboard,
-   account and spending actions require coordination. Live service is unverified.
-2. Verify real email sign-in and PC–iPhone manual sync, including offline edits,
-   conflicts, labels and deletion. Phone work runs only with the user present.
-3. Continue Q&A from Q17 or another approved feature. Automatic sync, account
-   deletion, persisted analysis and live analysis need their own bounded work.
+The exercise-history agent can create a fresh branch/worktree from updated
+origin/master containing the calculator. Preserve its WorkoutEditor integration.
+Routine duplication and completed-workout correction are the other proposed
+agent tasks. Assign task/decision numbers only when integrating completed work.
 
-Task25 optional accounts/manual sync is built. Its 81b4362 hosted browser
-42180714200 and native42180714184 passed. Check Actions for Task26 after integration.
-Retain branches and the separate Task20 worktree. Task4 is incomplete and needs
+Use separate worktrees and branches. Shared docs update at final integration.
+Only one browser suite may use 4179, with previews on 4183. Merge one at a time.
+Retain existing worker worktrees and branches. The incomplete Task4 branch needs
 explicit approval before integration.
+
+Supabase setup still needs the user's dashboard actions, both migrations and
+email-code configuration through [the guide](../supabase/README.md). Live email,
+real cross-device sync and physical-phone checks remain unverified.
 
 ## Phone and media boundaries
 

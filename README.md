@@ -2,6 +2,11 @@
 
 **GymBro AI — Your second set of eyes.**
 
+Workout History supports name/exercise search and inclusive completion-date
+filters. Progress offers All time and rolling calendar-month ranges. The active
+workout includes an optional inventory-aware plate calculator with editable bar
+weight and plate-pair counts. Calculator inputs stay in the current screen.
+
 GymBro AI is being developed as an evidence-backed strength-training video
 analysis product, now expanding into personal workout tracking under D-030.
 The Home screen gives equal entry to a manual workout log and **one uploaded
