@@ -39,7 +39,7 @@ it('treats an unchanged note as a no-op without a write', async () => {
   expect(store.getState().data.revision).toBe(revision);
 });
 it.each([
-  ['x'.repeat(1001), /1000 characters/], ['a\u0007b', /control characters/], ['a\rb', /control characters/],
+  ['x'.repeat(1001), /1000 characters/], ['a\u0007b', /control characters/], ['a\u007fb', /control characters/],
 ])('rejects an invalid note before writing', async (note, message) => {
   const store = await open(); const before = await repository.load();
   const result = await store.getState().setWorkoutNote('done', note);
@@ -113,4 +113,26 @@ it('repeats a finished workout as a fresh empty plan without changing the source
     message: 'Finish or discard the active workout before repeating another.' });
   await store.getState().discardWorkout();
   expect(await store.getState().repeatWorkout('missing')).toEqual({ ok: false, message: 'This saved workout is no longer available.' });
+});
+
+it('refuses a note saved against an older library revision', async () => {
+  const store = await open(), opened = store.getState().data.revision;
+  expect(await store.getState().setWorkoutNote('done', 'From another device', opened)).toEqual({ ok: true });
+  const stale = await store.getState().setWorkoutNote('done', 'Older draft', opened);
+  expect(stale).toEqual({ ok: false, message: 'Saved workouts changed. Reopen the note before saving.' });
+  expect((await repository.load()).history[0].note).toBe('From another device');
+  expect(await store.getState().setWorkoutNote('done', 'Current draft', store.getState().data.revision)).toEqual({ ok: true });
+});
+
+it('stores Windows and old Mac line breaks as plain line breaks', async () => {
+  const store = await open();
+  expect(await store.getState().setWorkoutNote('done', 'Set 1 fast\r\nSet 2 slow\rSet 3 paused')).toEqual({ ok: true });
+  expect((await repository.load()).history[0].note).toBe('Set 1 fast\nSet 2 slow\nSet 3 paused');
+});
+
+it('rejects a note with an unpaired surrogate the sync server cannot store', async () => {
+  const store = await open();
+  const result = await store.getState().setWorkoutNote('done', 'Bad \ud800 text');
+  expect(result).toEqual({ ok: false, message: 'Remove unsupported characters from the workout note.' });
+  expect(await store.getState().setWorkoutNote('done', 'Good 💪 text')).toEqual({ ok: true });
 });

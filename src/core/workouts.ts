@@ -38,6 +38,8 @@ export function validateWorkoutNote(value: unknown): asserts value is string {
   requireValue(typeof value === 'string' && value.length > 0 && value.trim() === value);
   requireValue(value.length <= 1000, 'Keep the workout note to 1000 characters or fewer.');
   requireValue(!noteControl.test(value), 'Remove control characters from the workout note. Line breaks and tabs are allowed.');
+  // An unpaired surrogate is valid in a JS string but rejected by the sync database.
+  requireValue(!/\p{Cs}/u.test(value), 'Remove unsupported characters from the workout note.');
 }
 function targets(item: Record<string, unknown>) {
   if (Object.prototype.hasOwnProperty.call(item, 'targetWeight')) requireValue(typeof item.targetWeight === 'number' &&
