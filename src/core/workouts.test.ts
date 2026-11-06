@@ -9,13 +9,13 @@ const document = () => ({ version: 2, revision: 0, active: workout(), history: [
 
 describe('workout storage boundary', () => {
   it('starts empty without fabricating workouts', () => {
-    expect(emptyWorkoutData()).toEqual({ version: 4, revision: 0, active: null, history: [] });
+    expect(emptyWorkoutData()).toEqual({ version: 5, revision: 0, active: null, history: [] });
     expect(validateWorkoutData(emptyWorkoutData())).toEqual(emptyWorkoutData());
   });
   it('accepts fractional loads, zero added load and explicit units', () => {
     const value = document();
     value.active.exercises[0].sets[0].weight = 0;
-    expect(validateWorkoutData(value)).toEqual({ ...value, version: 4 });
+    expect(validateWorkoutData(value)).toEqual({ ...value, version: 5 });
     expect(validateWorkoutData({ ...value, active: { ...value.active, unit: 'lb' } })).toBeTruthy();
   });
   it('permits an empty active draft but requires sets in completed history', () => {
@@ -24,7 +24,7 @@ describe('workout storage boundary', () => {
       history: [{ ...workout(2000), exercises: [] }] })).toThrow();
   });
   const invalid = [
-    ['future schema', () => ({ ...document(), version: 5 })],
+    ['future schema', () => ({ ...document(), version: 6 })],
     ['negative revision', () => ({ ...document(), revision: -1 })],
     ['unknown media fields', () => ({ ...document(), video: 'blob:private' })],
     ['missing history', () => ({ version: 1, revision: 0, active: null })],

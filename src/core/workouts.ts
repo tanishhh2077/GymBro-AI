@@ -1,11 +1,13 @@
 import type { SetKind, WorkoutData } from '@/types/workout';
 
+export const WORKOUT_SCHEMA_VERSION = 5;
+
 export class WorkoutError extends Error {
   constructor(readonly kind: 'validation' | 'storage' | 'conflict', message: string) {
     super(message); this.name = 'WorkoutError';
   }
 }
-export function emptyWorkoutData(): WorkoutData { return { version: 4, revision: 0, active: null, history: [] }; }
+export function emptyWorkoutData(): WorkoutData { return { version: 5, revision: 0, active: null, history: [] }; }
 
 function requireValue(condition: unknown, message = 'Saved workout data is invalid or exceeds the supported limits.'): asserts condition {
   if (!condition) throw new WorkoutError('validation', message);
@@ -25,9 +27,37 @@ function identifier(value: unknown, seen: Set<string>) {
   seen.add(value);
 }
 function timestamp(value: unknown) { requireValue(typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 && value <= 8.64e15); }
-export function validateSetValues(reps: number, weight: number): void {
+/** On a bodyweight exercise the weight is added load; a negative value records assistance. */
+export function validateSetValues(reps: number, weight: number, bodyweight = false): void {
   requireValue(Number.isInteger(reps) && reps >= 1 && reps <= 1000, 'Enter whole-number reps from 1 to 1000.');
-  requireValue(Number.isFinite(weight) && weight >= 0 && weight <= 10000, 'Enter a weight from 0 to 10000. Use 0 for no added load.');
+  if (bodyweight) {
+    requireValue(Number.isFinite(weight) && weight >= -1000 && weight <= 10000,
+      'Enter added weight from -1000 to 10000. Use 0 for bodyweight only and a negative number for assistance.');
+  } else requireValue(Number.isFinite(weight) && weight >= 0 && weight <= 10000, 'Enter a weight from 0 to 10000. Use 0 for no added load.');
+}
+export function validateRpe(rpe: unknown): asserts rpe is number {
+  requireValue(typeof rpe === 'number' && Number.isInteger(rpe * 2) && rpe >= 1 && rpe <= 10,
+    'Enter an RPE from 1 to 10 in steps of 0.5, or leave it blank.');
+}
+export function validateGroupId(value: unknown): asserts value is string {
+  requireValue(typeof value === 'string' && /^[A-Za-z0-9_-]{1,80}$/.test(value), 'This superset label is invalid. Ungroup and group the exercises again.');
+}
+const supersetMessage = 'Keep each superset to two or more neighbouring exercises.';
+/** A group ID must be shared by two or more exercises that sit next to each other. */
+function supersets(exercises: readonly Record<string, unknown>[]) {
+  const closed = new Set<string>();
+  let current: string | null = null, size = 0;
+  for (const exercise of [...exercises, {} as Record<string, unknown>]) {
+    const group = Object.prototype.hasOwnProperty.call(exercise, 'superset') ? exercise.superset as string : null;
+    if (group !== null && group === current) { size += 1; continue; }
+    if (current !== null) { requireValue(size >= 2, supersetMessage); closed.add(current); }
+    requireValue(group === null || !closed.has(group), supersetMessage);
+    current = group; size = 1;
+  }
+}
+function exerciseDetail(exercise: Record<string, unknown>) {
+  if (Object.prototype.hasOwnProperty.call(exercise, 'superset')) validateGroupId(exercise.superset);
+  if (Object.prototype.hasOwnProperty.call(exercise, 'bodyweight')) requireValue(exercise.bodyweight === true);
 }
 export function validateSetKind(kind: unknown): asserts kind is SetKind {
   requireValue(kind === 'regular' || kind === 'warmup', 'Choose Regular or Warm-up for this set.');
@@ -52,7 +82,24 @@ function targets(item: Record<string, unknown>) {
   }
 }
 function targetFields(version: number) {
-  return version >= 4 ? ['targetSets', 'targetReps', 'targetWeight'] : version >= 2 ? ['targetSets', 'targetReps'] : [];
+  return [...(version >= 4 ? ['targetSets', 'targetReps', 'targetWeight'] : version >= 2 ? ['targetSets', 'targetReps'] : []),
+    ...(version >= 5 ? ['superset', 'bodyweight'] : [])];
+}
+function goals(value: unknown) {
+  requireValue(Array.isArray(value) && value.length <= 100, 'Save up to 100 goals on this device.');
+  const ids = new Set<string>(), keys = new Set<string>();
+  for (const entry of value) {
+    const goal = record(entry, ['id', 'name', 'unit', 'weight', 'reps', 'createdAt'], ['bodyweight']);
+    identifier(goal.id, ids); name(goal.name); timestamp(goal.createdAt);
+    requireValue(goal.unit === 'lb' || goal.unit === 'kg');
+    if (Object.prototype.hasOwnProperty.call(goal, 'bodyweight')) requireValue(goal.bodyweight === true);
+    requireValue(typeof goal.reps === 'number' && typeof goal.weight === 'number');
+    validateSetValues(goal.reps, goal.weight, goal.bodyweight === true);
+    const key = JSON.stringify([goal.name, goal.unit, goal.bodyweight === true]);
+    requireValue(!keys.has(key), `There are two goals for "${goal.name as string}" (${goal.unit}${goal.bodyweight ? ', bodyweight' : ''}). ` +
+      'Keep one goal for each exercise, unit and bodyweight setting.');
+    keys.add(key);
+  }
 }
 function workout(value: unknown, complete: boolean, ids: Set<string>, version: number) {
   const item = record(value, ['id', 'name', 'unit', 'startedAt', 'finishedAt', 'exercises'], version >= 4 ? ['note'] : []);
@@ -68,21 +115,26 @@ function workout(value: unknown, complete: boolean, ids: Set<string>, version: n
   for (const value of item.exercises) {
     const exercise = record(value, ['id', 'name', 'sets'], targetFields(version));
     identifier(exercise.id, entries); name(exercise.name);
-    targets(exercise);
+    targets(exercise); exerciseDetail(exercise);
     requireValue(Array.isArray(exercise.sets) && exercise.sets.length <= 100 && (!complete || exercise.sets.length > 0));
     for (const value of exercise.sets) {
-      const set = record(value, ['id', 'reps', 'weight'], version >= 3 ? ['kind'] : []); identifier(set.id, entries);
+      const set = record(value, ['id', 'reps', 'weight'], [...(version >= 3 ? ['kind'] : []), ...(version >= 5 ? ['rpe'] : [])]);
+      identifier(set.id, entries);
       requireValue(typeof set.reps === 'number' && typeof set.weight === 'number');
-      validateSetValues(set.reps, set.weight);
+      validateSetValues(set.reps, set.weight, exercise.bodyweight === true);
       if (Object.prototype.hasOwnProperty.call(set, 'kind')) validateSetKind(set.kind);
+      if (Object.prototype.hasOwnProperty.call(set, 'rpe')) validateRpe(set.rpe);
     }
   }
+  supersets(item.exercises as Record<string, unknown>[]);
 }
 /** Reject unknown fields as well as bad values; media/pose objects never cross this boundary. */
 export function validateWorkoutData(value: unknown): WorkoutData {
   const version = value !== null && typeof value === 'object' ? (value as Record<string, unknown>).version : undefined;
-  const item = record(value, ['version', 'revision', 'active', 'history'], version === 2 || version === 3 || version === 4 ? ['routines'] : []);
-  requireValue((version === 1 || version === 2 || version === 3 || version === 4) && typeof item.revision === 'number' && Number.isSafeInteger(item.revision) && item.revision >= 0);
+  const known = version === 1 || version === 2 || version === 3 || version === 4 || version === 5;
+  const item = record(value, ['version', 'revision', 'active', 'history'],
+    version === 5 ? ['routines', 'goals'] : known && version !== 1 ? ['routines'] : []);
+  requireValue(known && typeof item.revision === 'number' && Number.isSafeInteger(item.revision) && item.revision >= 0);
   requireValue(Array.isArray(item.history) && item.history.length <= 1000);
   const ids = new Set<string>();
   if (item.active !== null) workout(item.active, false, ids, version);
@@ -99,11 +151,13 @@ export function validateWorkoutData(value: unknown): WorkoutData {
       const exerciseIds = new Set<string>();
       for (const value of routine.exercises) {
         const exercise = record(value, ['id', 'name'], targetFields(version));
-        identifier(exercise.id, exerciseIds); name(exercise.name); targets(exercise);
+        identifier(exercise.id, exerciseIds); name(exercise.name); targets(exercise); exerciseDetail(exercise);
       }
+      supersets(routine.exercises as Record<string, unknown>[]);
     }
   }
+  if (Object.prototype.hasOwnProperty.call(item, 'goals')) goals(item.goals);
   requireValue(JSON.stringify(value).length <= 1_000_000);
   // No defaults or writes: a valid legacy record at the size cap stays readable.
-  return (version === 4 ? value : { ...item, version: 4 }) as WorkoutData;
+  return (version === WORKOUT_SCHEMA_VERSION ? value : { ...item, version: WORKOUT_SCHEMA_VERSION }) as WorkoutData;
 }

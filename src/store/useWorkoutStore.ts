@@ -127,7 +127,7 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
       confirmSync: (preview, choices, cloud) => commit(data => {
         if (data.revision !== preview.localRevision) invalid('Workouts changed after the preview. Preview sync again.');
         const merged = mergeWorkoutSync(preview.base, data, preview.remote.data, choices);
-        if (merged.conflicts.length) invalid('Choose a version for each conflict before confirming sync.');
+        if (merged.conflicts.length || merged.goalConflicts.length) invalid('Choose a version for each conflict before confirming sync.');
         return merged.data;
       }, async (revision, next) => {
         const syncRepository = repository as SyncedWorkoutRepository;

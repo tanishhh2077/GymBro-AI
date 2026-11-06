@@ -1,4 +1,4 @@
-import type { Workout, WorkoutData, WorkoutRoutine } from '@/types/workout';
+import type { Workout, WorkoutData, WorkoutGoal, WorkoutRoutine } from '@/types/workout';
 import { validateWorkoutData, WorkoutError } from './workouts';
 
 export const MAX_BACKUP_BYTES = 4 * 1024 * 1024;
@@ -13,6 +13,7 @@ export interface BackupMerge {
   readonly data: WorkoutData;
   readonly addedWorkouts: number;
   readonly addedRoutines: number;
+  readonly addedGoals: number;
   readonly addedActive: boolean;
   readonly duplicates: number;
 }
@@ -49,9 +50,10 @@ export function parseWorkoutBackup(text: string): WorkoutBackup {
 // Known fields fix object-key order while retaining the meaningful order of arrays.
 // Every stored record field must be listed, or a difference in it would be skipped as identical.
 const recordFields = ['id', 'name', 'unit', 'startedAt', 'finishedAt', 'exercises',
-  'sets', 'reps', 'weight', 'kind', 'targetSets', 'targetReps', 'targetWeight', 'note'];
+  'sets', 'reps', 'weight', 'kind', 'targetSets', 'targetReps', 'targetWeight', 'note',
+  'rpe', 'superset', 'bodyweight', 'createdAt'];
 
-function mergeRecords<T extends Workout | WorkoutRoutine>(current: readonly T[], incoming: readonly T[], label: string): T[] {
+function mergeRecords<T extends Workout | WorkoutRoutine | WorkoutGoal>(current: readonly T[], incoming: readonly T[], label: string): T[] {
   const records = new Map(current.map(item => [item.id, item]));
   for (const item of incoming) {
     const existing = records.get(item.id);
@@ -73,15 +75,17 @@ export function mergeWorkoutBackup(current: WorkoutData, backup: WorkoutBackup):
     [...destination.history, ...(destination.active ? [destination.active] : [])],
     [...incoming.history, ...(incoming.active ? [incoming.active] : [])], 'workout');
   const routines = mergeRecords(destination.routines ?? [], incoming.routines ?? [], 'routine');
+  const goals = mergeRecords(destination.goals ?? [], incoming.goals ?? [], 'goal');
   const active = workouts.find(item => item.finishedAt === null) ?? null;
   const history = workouts.filter(item => item.finishedAt !== null);
   const addedWorkouts = history.length - destination.history.length;
   const addedRoutines = routines.length - (destination.routines?.length ?? 0);
+  const addedGoals = goals.length - (destination.goals?.length ?? 0);
   const addedActive = destination.active === null && active !== null;
-  const duplicates = incoming.history.length + (incoming.routines?.length ?? 0) + Number(incoming.active !== null) -
-    addedWorkouts - addedRoutines - Number(addedActive);
-  const data = addedWorkouts || addedRoutines || addedActive ? validateWorkoutData({
-    ...destination, active, history, ...(routines.length ? { routines } : {}),
+  const duplicates = incoming.history.length + (incoming.routines?.length ?? 0) + (incoming.goals?.length ?? 0) +
+    Number(incoming.active !== null) - addedWorkouts - addedRoutines - addedGoals - Number(addedActive);
+  const data = addedWorkouts || addedRoutines || addedGoals || addedActive ? validateWorkoutData({
+    ...destination, active, history, ...(routines.length ? { routines } : {}), ...(goals.length ? { goals } : {}),
   }) : destination;
-  return { data, addedWorkouts, addedRoutines, addedActive, duplicates };
+  return { data, addedWorkouts, addedRoutines, addedGoals, addedActive, duplicates };
 }
