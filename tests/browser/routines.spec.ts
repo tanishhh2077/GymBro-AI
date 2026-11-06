@@ -120,6 +120,7 @@ test('a stale routine editor cannot overwrite another tab after conflict and rel
   await expect(other.getByRole('alert')).toContainText('Reopen this routine');
   await expect(other.getByLabel('Routine name', { exact: true })).toHaveValue('Stale edit');
   expect((await library(page)).routines![0].name).toBe('First tab edit');
+  other.once('dialog', dialog => { expect(dialog.message()).toBe('Discard unsaved changes?'); void dialog.accept(); });
   await other.getByRole('button', { name: 'Cancel routine edit', exact: true }).click();
   await expect(other.getByRole('heading', { name: 'First tab edit', exact: true })).toBeVisible();
   await other.close();
