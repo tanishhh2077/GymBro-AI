@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
 import { REST_DURATIONS } from '@/store/useExerciseRest';
 
 type Rest = { phase: 'idle' } | { phase: 'running'; endsAt: number } | { phase: 'paused'; remainingMs: number };
@@ -16,6 +16,14 @@ export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function Work
   const [now, setNow] = useState(0);
   const [autoStart, setAutoStart] = useState(false);
   const [exerciseName, setExerciseName] = useState('');
+  const [sound, setSound] = useState(false);
+  const [vibration, setVibration] = useState(false);
+  const [soundStatus, setSoundStatus] = useState('');
+  const [vibrationStatus, setVibrationStatus] = useState('');
+  const audio = useRef<AudioContext | null>(null);
+  const releaseTone = useRef<(() => void) | null>(null);
+  const armed = useRef(false);
+  const didVibrate = useRef(false);
   const remainingMs = rest.phase === 'idle' ? duration * 1000 : rest.phase === 'paused' ? rest.remainingMs
     : Math.max(0, Math.min(duration * 1000, rest.endsAt - now));
   const complete = rest.phase !== 'idle' && remainingMs === 0;
@@ -24,6 +32,7 @@ export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function Work
 
   const begin = useCallback((seconds: number, name: string) => {
     if (!REST_DURATIONS.includes(seconds)) return;
+    armed.current = true;
     const current = Date.now();
     setDuration(seconds); setExerciseName(name); setNow(current);
     setRest({ phase: 'running', endsAt: current + seconds * 1000 });
@@ -47,12 +56,76 @@ export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function Work
     };
   }, [counting]);
 
+  useEffect(() => () => {
+    armed.current = false;
+    const context = audio.current;
+    audio.current = null;
+    releaseTone.current?.(); releaseTone.current = null;
+    if (context) void context.close().catch(() => {});
+    if (didVibrate.current) {
+      try { navigator.vibrate?.(0); } catch { /* Some devices reject cancellation. */ }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!complete || rest.phase !== 'running' || !armed.current) return;
+    armed.current = false;
+    if (sound && audio.current) {
+      const context = audio.current;
+      try {
+        if (context.state !== 'running') throw new Error('Audio suspended');
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        releaseTone.current?.();
+        const release = () => { oscillator.onended = null; oscillator.disconnect(); gain.disconnect(); };
+        releaseTone.current = release;
+        oscillator.frequency.value = 660;
+        gain.gain.value = 0.15;
+        oscillator.connect(gain); gain.connect(context.destination);
+        oscillator.onended = () => { release(); if (releaseTone.current === release) releaseTone.current = null; };
+        oscillator.start(); oscillator.stop(context.currentTime + 0.2);
+      } catch { releaseTone.current?.(); releaseTone.current = null; setSoundStatus('Sound was blocked or unavailable. Enable sound again to retry.'); }
+    }
+    if (vibration) {
+      try {
+        if (!navigator.vibrate(200)) setVibrationStatus('Vibration was blocked or unavailable.');
+        else didVibrate.current = true;
+      } catch { setVibrationStatus('Vibration was blocked or unavailable.'); }
+    }
+  }, [complete, rest.phase, sound, vibration]);
+
+  async function enableSound(enabled: boolean) {
+    setSound(enabled); setSoundStatus('');
+    const previous = audio.current; audio.current = null;
+    releaseTone.current?.(); releaseTone.current = null;
+    if (previous) void previous.close().catch(() => {});
+    if (!enabled) return;
+    if (typeof window.AudioContext !== 'function') {
+      setSound(false); setSoundStatus('Sound is unavailable in this browser.'); return;
+    }
+    let context: AudioContext | null = null;
+    try {
+      context = new window.AudioContext(); audio.current = context;
+      await context.resume();
+      if (audio.current !== context) return;
+      if (context.state !== 'running') throw new Error('Audio suspended');
+      setSoundStatus('Sound enabled for this workout.');
+    } catch {
+      if (audio.current !== context) return;
+      audio.current = null;
+      if (context) void context.close().catch(() => {});
+      setSound(false); setSoundStatus('Sound was blocked or unavailable. Enable sound again to retry.');
+    }
+  }
+
   function start() {
+    armed.current = true;
     const current = Date.now();
     const remaining = paused && rest.phase === 'paused' ? rest.remainingMs : duration * 1000;
     setNow(current); setRest({ phase: 'running', endsAt: current + remaining });
   }
   function pause() {
+    armed.current = false;
     if (rest.phase !== 'running') return;
     const current = Date.now();
     setNow(current);
@@ -86,15 +159,26 @@ export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function Work
       </div>
       {counting ? <button type="button" className="btn-ghost" onClick={pause}>Pause timer</button>
         : <button type="button" className="btn-primary" onClick={start}>{paused ? 'Resume timer' : 'Start rest timer'}</button>}
-      {rest.phase !== 'idle' && <button type="button" className="btn-ghost" onClick={() => setRest({ phase: 'idle' })}>Reset timer</button>}
+      {rest.phase !== 'idle' && <button type="button" className="btn-ghost" onClick={() => { armed.current = false; setRest({ phase: 'idle' }); }}>Reset timer</button>}
     </div>
     <label className="mt-4 flex items-center gap-3 text-sm text-slate-300">
       <input type="checkbox" checked={autoStart} onChange={event => setAutoStart(event.target.checked)} className="h-4 w-4 accent-accent" />
       Start rest automatically after logging a set
     </label>
+    <div className="mt-4 space-y-2 text-sm text-slate-300">
+      <label className="flex items-center gap-3"><input type="checkbox" checked={sound} onChange={event => { void enableSound(event.target.checked); }} className="h-4 w-4 accent-accent" />Sound on completion</label>
+      {soundStatus && <p role="status" className="text-xs text-slate-400">{soundStatus}</p>}
+      <label className="flex items-center gap-3"><input type="checkbox" checked={vibration} onChange={event => {
+        const enabled = event.target.checked;
+        if (enabled && typeof navigator.vibrate !== 'function') {
+          setVibration(false); setVibrationStatus('Vibration is unavailable in this browser.');
+        } else { setVibration(enabled); setVibrationStatus(''); }
+      }} className="h-4 w-4 accent-accent" />Vibrate on completion</label>
+      {vibrationStatus && <p role="status" className="text-xs text-slate-400">{vibrationStatus}</p>}
+    </div>
     <p id={`${id}-limits`} className="mt-3 text-xs text-slate-500">
-      Auto-rest starts after a new set saves. You can also start manually. Timer and auto-rest reset on reload or a new workout.
-      Completion appears here, without a background alert.
+      Auto-rest starts after a new set saves. You can also start manually. Timer, auto-rest and alert choices reset on reload or a new workout.
+      Completion appears here. Optional sound and vibration depend on browser support and device settings, without a guaranteed background alert.
     </p>
   </section>;
 });

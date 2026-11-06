@@ -15,7 +15,7 @@ beforeEach(async () => {
 });
 afterEach(async () => {
   await act(async () => root.unmount());
-  document.body.replaceChildren(); vi.useRealTimers(); vi.restoreAllMocks();
+  document.body.replaceChildren(); vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals();
 });
 function remaining() { return container.querySelector('output[aria-label="Rest time remaining"]')?.textContent; }
 function button(name: string) { return [...container.querySelectorAll('button')].find(el => el.textContent === name); }
@@ -102,4 +102,87 @@ it('cleans up its interval and event handlers on unmount under StrictMode', asyn
   expect(vi.getTimerCount()).toBe(0);
   expect(removeDocument.mock.calls.some(([name, fn]) => name === 'visibilitychange' && fn === visibility![1])).toBe(true);
   expect(removeWindow.mock.calls.some(([name, fn]) => name === 'focus' && fn === focus![1])).toBe(true);
+});
+
+function checkbox(label: string) {
+  const input = [...container.querySelectorAll('label')].find(el => el.textContent?.includes(label))?.querySelector('input');
+  expect(input, `Missing checkbox ${label}`).toBeTruthy(); return input!;
+}
+it('keeps optional completion alerts off by default and reports unsupported sound and vibration', async () => {
+  expect(checkbox('Sound on completion').checked).toBe(false);
+  expect(checkbox('Vibrate on completion').checked).toBe(false);
+  await act(async () => checkbox('Sound on completion').click());
+  expect(container.textContent).toContain('Sound is unavailable');
+  await act(async () => checkbox('Vibrate on completion').click());
+  expect(container.textContent).toContain('Vibration is unavailable');
+});
+it('vibrates once per completed run and stays silent on pause, reset and remount', async () => {
+  const vibrate = vi.fn<(duration: number) => boolean>(() => true); vi.stubGlobal('navigator', Object.assign(Object.create(navigator), { vibrate }));
+  await act(async () => checkbox('Vibrate on completion').click());
+  expect(vibrate).not.toHaveBeenCalled();
+  await duration(30); await click('Start rest timer'); await jump(epoch + 30_000);
+  expect(vibrate).toHaveBeenCalledWith(200); expect(vibrate).toHaveBeenCalledTimes(1);
+  await jump(epoch + 40_000); expect(vibrate).toHaveBeenCalledTimes(1);
+  await click('Start rest timer'); await click('Pause timer'); await click('Reset timer');
+  expect(vibrate).toHaveBeenCalledTimes(1);
+  await click('Start rest timer'); await jump(epoch + 70_000);
+  expect(vibrate.mock.calls.filter(call => call[0] === 200)).toHaveLength(2);
+  await act(async () => root.render(null));
+  await act(async () => root.render(<WorkoutRestTimer />));
+  expect(checkbox('Vibrate on completion').checked).toBe(false);
+  expect(vibrate.mock.calls.filter(call => call[0] === 200)).toHaveLength(2);
+  vi.unstubAllGlobals();
+});
+it('reports a denied vibration request honestly', async () => {
+  const vibrate = vi.fn<(duration: number) => boolean>(() => false); vi.stubGlobal('navigator', Object.assign(Object.create(navigator), { vibrate }));
+  await act(async () => checkbox('Vibrate on completion').click());
+  await duration(30); await click('Start rest timer'); await jump(epoch + 30_000);
+  expect(container.textContent).toContain('Vibration was blocked');
+  vi.unstubAllGlobals();
+});
+
+function mockAudio(resume = vi.fn(async () => {})) {
+  const oscillator = { frequency: { value: 0 }, connect: vi.fn(), disconnect: vi.fn(), start: vi.fn(), stop: vi.fn(), onended: null as (() => void) | null };
+  const gain = { gain: { value: 0 }, connect: vi.fn(), disconnect: vi.fn() };
+  const context = { state: 'running', currentTime: 10, destination: {}, resume,
+    close: vi.fn(async () => {}), createOscillator: vi.fn(() => oscillator), createGain: vi.fn(() => gain) };
+  vi.stubGlobal('AudioContext', class { constructor() { return context; } });
+  return { context, oscillator, gain };
+}
+it('unlocks sound on opt-in and emits a single short tone only at each running completion', async () => {
+  const { context, oscillator, gain } = mockAudio();
+  await act(async () => checkbox('Sound on completion').click());
+  expect(context.resume).toHaveBeenCalledTimes(1); expect(oscillator.start).not.toHaveBeenCalled();
+  await duration(30); await click('Start rest timer'); await click('Pause timer'); await click('Resume timer');
+  expect(oscillator.start).not.toHaveBeenCalled();
+  await jump(epoch + 30_000); expect(oscillator.start).toHaveBeenCalledTimes(1);
+  expect(oscillator.stop).toHaveBeenCalledWith(10.2);
+  oscillator.onended!(); expect(oscillator.disconnect).toHaveBeenCalledTimes(1); expect(gain.disconnect).toHaveBeenCalledTimes(1);
+  await jump(epoch + 60_000); await click('Reset timer'); expect(oscillator.start).toHaveBeenCalledTimes(1);
+  await act(async () => checkbox('Sound on completion').click()); expect(context.close).toHaveBeenCalledTimes(1);
+});
+it('reports denied audio unlock and releases its context', async () => {
+  const { context, oscillator } = mockAudio(vi.fn(async () => { throw new Error('Denied'); }));
+  await act(async () => checkbox('Sound on completion').click());
+  expect(checkbox('Sound on completion').checked).toBe(false);
+  expect(container.textContent).toContain('Sound was blocked'); expect(context.close).toHaveBeenCalledTimes(1);
+  await duration(30); await click('Start rest timer'); await jump(epoch + 30_000);
+  expect(oscillator.start).not.toHaveBeenCalled();
+});
+it('closes pending audio unlock on unmount without alerting a stale workout', async () => {
+  let finish!: () => void;
+  const pending = new Promise<void>(resolve => { finish = resolve; });
+  const { context, oscillator } = mockAudio(vi.fn(() => pending));
+  await act(async () => checkbox('Sound on completion').click());
+  await click('Start rest timer'); await act(async () => root.render(null));
+  expect(context.close).toHaveBeenCalledTimes(1); expect(vi.getTimerCount()).toBe(0);
+  await act(async () => { finish(); await pending; vi.advanceTimersByTime(90_000); });
+  expect(oscillator.start).not.toHaveBeenCalled();
+});
+it('does not alert when pause observes an already expired deadline', async () => {
+  const { oscillator } = mockAudio();
+  await act(async () => checkbox('Sound on completion').click());
+  await duration(30); await click('Start rest timer');
+  vi.setSystemTime(epoch + 31_000); await click('Pause timer');
+  expect(oscillator.start).not.toHaveBeenCalled();
 });
