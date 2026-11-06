@@ -86,3 +86,86 @@ it('does not expose a failed save or delete as successful and requires reload', 
   expect((await a.deleteRoutine(before.routines![0].id)).ok).toBe(false);
   expect(store.getState().data).toBe(before); expect(store.getState().needsReload).toBe(true);
 });
+
+it('duplicates the current routine with independent IDs and preserves workouts and source', async () => {
+  const store = await saved(), a = store.getState(), source = a.data.routines![0];
+  await a.startRoutine(source.id);
+  for (const exercise of store.getState().data.active!.exercises) await a.addSet(exercise.id, 5, 20);
+  await a.finishWorkout(); await a.startRoutine(source.id);
+  const before = structuredClone(store.getState().data);
+  expect(a.duplicateRoutine).toBeTypeOf('function');
+  expect(await a.duplicateRoutine(source.id)).toEqual({ ok: true });
+  const data = store.getState().data, copy = data.routines![1];
+  expect(copy).toMatchObject({ name: 'Upper day (copy)', unit: 'kg', exercises: [
+    { name: 'Bench press', targetSets: 3, targetReps: 8 }, { name: 'Row' },
+  ] });
+  expect(copy.id).not.toBe(source.id);
+  expect(copy.exercises.map(e => e.id).some(id => source.exercises.some(e => e.id === id))).toBe(false);
+  expect(copy.exercises[1]).not.toHaveProperty('targetSets');
+  expect(copy.exercises[1]).not.toHaveProperty('targetReps');
+  expect(data.routines![0]).toEqual(before.routines![0]);
+  expect(data.active).toEqual(before.active); expect(data.history).toEqual(before.history);
+  expect((await repository.load()).routines).toEqual(data.routines);
+  await a.updateRoutine(copy.id, data.revision, { ...input(), name: 'Independent copy' });
+  expect(store.getState().data.routines![0]).toEqual(source);
+  await a.discardWorkout(); await a.startRoutine(copy.id);
+  expect(store.getState().data.active).toMatchObject({ name: 'Independent copy', exercises: [{ sets: [] }, { sets: [] }] });
+});
+
+it.each(['A'.repeat(80), 'A'.repeat(72) + '💪long'])('bounds a copied long name without splitting a character', async name => {
+  const store = await saved(), a = store.getState(), source = a.data.routines![0];
+  await a.updateRoutine(source.id, a.data.revision, { ...input(), name });
+  expect(await a.duplicateRoutine(source.id)).toEqual({ ok: true });
+  const copiedName = store.getState().data.routines![1].name;
+  expect(copiedName).toBe('A'.repeat(name.includes('💪') ? 72 : 73) + ' (copy)');
+  expect(copiedName.length).toBeLessThanOrEqual(80);
+});
+
+it('uses the latest loaded routine and rejects a stale tab without writing a copy', async () => {
+  const store = await saved(), other = makeStore(); await other.getState().load();
+  const source = store.getState().data.routines![0], before = store.getState().data;
+  await other.getState().updateRoutine(source.id, before.revision, { ...input(), name: 'Latest plan' });
+  expect((await store.getState().duplicateRoutine(source.id)).ok).toBe(false);
+  expect(store.getState().data).toBe(before); expect(store.getState().needsReload).toBe(true);
+  expect((await repository.load()).routines).toHaveLength(1);
+  await store.getState().load();
+  expect(await store.getState().duplicateRoutine(source.id)).toEqual({ ok: true });
+  expect(store.getState().data.routines![1].name).toBe('Latest plan (copy)');
+});
+
+it('rejects a missing source and the 100-routine cap without writing', async () => {
+  const store = await saved(), a = store.getState(), before = a.data;
+  expect((await a.duplicateRoutine('missing')).ok).toBe(false);
+  expect(store.getState().data).toBe(before);
+  for (let count = 1; count < 100; count++) expect((await a.createRoutine(input())).ok).toBe(true);
+  const full = store.getState().data;
+  expect((await a.duplicateRoutine(full.routines![0].id)).ok).toBe(false);
+  expect(store.getState().data).toBe(full); expect(store.getState().needsReload).toBe(false);
+  expect((await repository.load()).revision).toBe(full.revision);
+});
+
+it('blocks duplication before load, during a save and after an uncertain save', async () => {
+  const store = makeStore(), a = store.getState();
+  expect((await a.duplicateRoutine('missing')).ok).toBe(false);
+  await a.load(); await a.createRoutine(input());
+  const before = store.getState().data, id = before.routines![0].id;
+  let rejectSave!: (error: Error) => void;
+  vi.spyOn(repository, 'save').mockImplementationOnce(() => new Promise((_, reject) => { rejectSave = reject; }));
+  const saving = a.duplicateRoutine(id);
+  expect(store.getState().busy).toBe(true);
+  expect((await a.duplicateRoutine(id)).ok).toBe(false);
+  expect(store.getState().data).toBe(before);
+  rejectSave(new Error('Unknown save outcome'));
+  expect((await saving).ok).toBe(false);
+  expect(store.getState().needsReload).toBe(true); expect(store.getState().data).toBe(before);
+  expect((await a.duplicateRoutine(id)).ok).toBe(false);
+  expect((await repository.load()).routines).toHaveLength(1);
+});
+
+it('blocks duplication after saved data cannot be loaded', async () => {
+  const store = await saved(), before = store.getState().data;
+  vi.spyOn(repository, 'load').mockRejectedValueOnce(new Error('Unknown data'));
+  await store.getState().load();
+  expect((await store.getState().duplicateRoutine(before.routines![0].id)).ok).toBe(false);
+  expect(store.getState().data).toBe(before);
+});

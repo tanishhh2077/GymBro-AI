@@ -18,6 +18,7 @@ export interface WorkoutState {
   discardWorkout: () => Promise<WorkoutResult>;
   deleteWorkout: (id: string) => Promise<WorkoutResult>;
   createRoutine: (input: RoutineInput) => Promise<WorkoutResult>;
+  duplicateRoutine: (id: string) => Promise<WorkoutResult>;
   updateRoutine: (id: string, expectedRevision: number, input: RoutineInput) => Promise<WorkoutResult>;
   deleteRoutine: (id: string) => Promise<WorkoutResult>;
   startRoutine: (id: string) => Promise<WorkoutResult>;
@@ -178,6 +179,14 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
       createRoutine: input => commit(data => {
         if ((data.routines?.length ?? 0) >= 100) invalid('You already have 100 routines. Delete one before adding another.');
         return { ...data, routines: [...(data.routines ?? []), preparedRoutine(deps.id(), input)] };
+      }),
+      duplicateRoutine: id => commit(data => {
+        const source = routine(data, id);
+        if (data.routines!.length >= 100) invalid('You already have 100 routines. Delete one before adding another.');
+        // Reserve seven characters for the suffix without splitting a UTF-16 pair.
+        const name = source.name.slice(0, 73).replace(/[\uD800-\uDBFF]$/u, '') + ' (copy)';
+        const copy = preparedRoutine(deps.id(), { ...source, name });
+        return { ...data, routines: [...data.routines!, copy] };
       }),
       updateRoutine: (id, expectedRevision, input) => commit(data => {
         if (data.revision !== expectedRevision) invalid('Saved workouts or routines changed. Reopen this routine before saving your edits.');

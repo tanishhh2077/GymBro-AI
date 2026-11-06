@@ -40,6 +40,10 @@ export function WorkoutRoutines({ store, onStarted, onResume }: { store: Workout
             <button type="button" className="btn-ghost" aria-label={`Edit routine ${routine.name}`} disabled={disabled} onClick={() => {
               setNotice(''); setEditor({ routine, revision: state.data.revision });
             }}>Edit</button>
+            <button type="button" className="btn-ghost" aria-label={`Duplicate routine ${routine.name}`} disabled={disabled || routines.length >= 100} onClick={async () => {
+              setNotice('');
+              if ((await state.duplicateRoutine(routine.id)).ok) setNotice('Routine duplicated.');
+            }}>Duplicate</button>
             <button type="button" className="btn-ghost text-danger" aria-label={`Delete routine ${routine.name}`} disabled={disabled} onClick={async () => {
               if (window.confirm(`Delete routine ${routine.name}? Existing workouts will stay saved.`) && (await state.deleteRoutine(routine.id)).ok) setNotice('Routine deleted.');
             }}>Delete</button>
