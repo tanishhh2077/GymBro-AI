@@ -4,7 +4,7 @@ import { Share } from '@capacitor/share';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { createWorkoutBackup } from '@/core/workoutBackup';
 import { emptyWorkoutData } from '@/core/workouts';
-import { saveWorkoutBackup } from './workoutBackupExport';
+import { saveWorkoutBackup, saveWorkoutCsv } from './workoutBackupExport';
 
 vi.mock('@capacitor/filesystem', () => ({ Directory: { Cache: 'CACHE' }, Encoding: { UTF8: 'utf8' },
   Filesystem: { writeFile: vi.fn(), deleteFile: vi.fn() } }));
@@ -90,4 +90,33 @@ it('serializes native export while the share sheet is pending', async () => {
   await expect(saveWorkoutBackup(text())).rejects.toThrow(/already|finish/i);
   resume();
   expect(await first).toEqual({ value: 'share' });
+});
+it('downloads CSV using its own filename and MIME type and releases the URL', async () => {
+  vi.useFakeTimers();
+  const click = vi.mocked(HTMLAnchorElement.prototype.click);
+  click.mockImplementationOnce(function (this: HTMLAnchorElement) { expect(this.download).toBe('gymbro-ai-workouts-1970-01-01.csv'); });
+  expect(await saveWorkoutCsv(emptyWorkoutData(), 1000)).toBe('download');
+  expect((vi.mocked(URL.createObjectURL).mock.calls[0][0] as Blob).type).toBe('text/csv;charset=utf-8');
+  await vi.advanceTimersByTimeAsync(1000);
+  expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:backup');
+});
+it('shares CSV through native cache and cleans up a failed share', async () => {
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+  expect(await saveWorkoutCsv(emptyWorkoutData(), 1000)).toBe('share');
+  expect(Filesystem.writeFile).toHaveBeenCalledWith(expect.objectContaining({ path: expect.stringMatching(/\.csv$/), data: expect.stringContaining('workout_id,') }));
+  vi.mocked(Share.share).mockRejectedValueOnce(new Error('cancelled'));
+  await expect(saveWorkoutCsv(emptyWorkoutData(), 1000)).rejects.toThrow('cancelled');
+  expect(Filesystem.deleteFile).toHaveBeenCalledOnce();
+});
+it('serializes CSV and JSON together and validates CSV sources before allocating files', async () => {
+  await expect(saveWorkoutCsv({ ...emptyWorkoutData(), media: 'private' } as never, 1000)).rejects.toThrow();
+  await expect(saveWorkoutCsv(emptyWorkoutData(), NaN)).rejects.toThrow();
+  expect(URL.createObjectURL).not.toHaveBeenCalled(); expect(Filesystem.writeFile).not.toHaveBeenCalled();
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+  let resume!: () => void;
+  vi.mocked(Share.share).mockImplementationOnce(() => new Promise(resolve => { resume = () => resolve({}); }));
+  const pending = saveWorkoutCsv(emptyWorkoutData(), 1000);
+  await vi.waitFor(() => expect(Share.share).toHaveBeenCalled());
+  await expect(saveWorkoutBackup(text())).rejects.toThrow(/already|finish/i);
+  resume(); await pending;
 });

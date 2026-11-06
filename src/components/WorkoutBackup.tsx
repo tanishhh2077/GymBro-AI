@@ -3,7 +3,7 @@ import { useStore } from 'zustand';
 import { createWorkoutBackup, mergeWorkoutBackup, type BackupMerge, type WorkoutBackup as BackupFile } from '@/core/workoutBackup';
 import { readWorkoutBackup } from '@/core/workoutBackupFile';
 import { WorkoutError } from '@/core/workouts';
-import { saveWorkoutBackup } from '@/mobile/workoutBackupExport';
+import { saveWorkoutBackup, saveWorkoutCsv } from '@/mobile/workoutBackupExport';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
 import type { WorkoutData } from '@/types/workout';
 
@@ -58,15 +58,22 @@ export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: 
     }
   }
 
-  async function exportBackup() {
+  async function exportRecords(format: 'json' | 'csv' = 'json') {
     if (blocked) return;
     setExporting(true); setError(''); setNotice('');
     try {
-      const mode = await saveWorkoutBackup(createWorkoutBackup(store.getState().data, Date.now()));
-      if (mounted.current) setNotice(mode === 'download' ? 'Download requested. Keep the JSON file for recovery.' :
-        'Backup share sheet closed. Keep your saved file for recovery.');
+      const data = store.getState().data;
+      const mode = await (format === 'csv' ? saveWorkoutCsv(data, Date.now()) : saveWorkoutBackup(createWorkoutBackup(data, Date.now())));
+      const notices = {
+        csv: { download: 'CSV download requested. Check your downloads for the file.',
+          share: 'CSV share sheet closed. Check your chosen destination for the file.' },
+        json: { download: 'Download requested. Keep the JSON file for recovery.',
+          share: 'Backup share sheet closed. Keep your saved file for recovery.' },
+      };
+      if (mounted.current) setNotice(notices[format][mode]);
     } catch (failure) {
-      if (mounted.current) setError(failure instanceof WorkoutError ? failure.message : 'Backup export was not confirmed. Try again when ready.');
+      if (mounted.current) setError(failure instanceof WorkoutError ? failure.message :
+        `${format === 'csv' ? 'CSV' : 'Backup'} export was not confirmed. Try again when ready.`);
     } finally { if (mounted.current) setExporting(false); }
   }
 
@@ -92,7 +99,13 @@ export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: 
       <h2 id="backup-export-title" className="text-lg font-semibold text-white">Save a backup</h2>
       <p className="text-sm text-slate-400">Includes completed workouts, routines and your active workout. The file contains readable JSON workout records.</p>
       <p className="text-sm text-slate-400">Your browser downloads the file. In the installed app, choose a destination in the share sheet, such as Save to Files. Keep the file somewhere you trust.</p>
-      <button type="button" className="btn-primary" disabled={blocked} onClick={() => { void exportBackup(); }}>{exporting ? 'Opening export…' : 'Export backup'}</button>
+      <button type="button" className="btn-primary" disabled={blocked} onClick={() => { void exportRecords(); }}>{exporting ? 'Opening export…' : 'Export backup'}</button>
+    </section>
+    <section aria-labelledby="csv-export-title" className="card space-y-3 p-4 sm:p-5">
+      <h2 id="csv-export-title" className="text-lg font-semibold text-white">Export workout CSV</h2>
+      <p className="text-sm text-slate-400">All completed actual sets, including warm-ups, with workout and exercise names, IDs, UTC timestamps, original units and entered values. Oldest completions appear first.</p>
+      <p className="text-sm text-slate-400">Open the CSV in a spreadsheet. Use a JSON backup for recovery and restore. Names beginning with spreadsheet formula characters receive a protective apostrophe.</p>
+      <button type="button" className="btn-ghost" disabled={blocked} onClick={() => { void exportRecords('csv'); }}>Export workout CSV</button>
     </section>
     <section aria-labelledby="backup-import-title" className="card min-w-0 space-y-3 p-4 sm:p-5">
       <h2 id="backup-import-title" className="text-lg font-semibold text-white">Restore from a file</h2>
