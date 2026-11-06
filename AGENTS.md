@@ -65,11 +65,25 @@ task. They must not interfere with one another:
 - Get a working development environment running before feature code. Treat an existing `node_modules` folder or an old build result as insufficient evidence of a reproducible setup.
 - Preserve unrelated and preexisting uncommitted work. Report failures, skipped checks, and mistaken assumptions plainly.
 - Git practice ([D-018](docs/DECISIONS.md#d-018-regular-commits-and-reviewed-merges-to-master), [D-019](docs/DECISIONS.md#d-019-one-branch-per-feature-one-commit-per-step)):
-  - Build each feature (plan task) on its own branch, `feat/task<N>-<short-name>`, created from an up-to-date `master`.
-  - Commit coherent working steps after their relevant checks pass, and push them. Update documents at feature completion or handover. Keep failing tests with the implementation that makes them pass. Review fixes get their own commit.
-  - Stage only the step's paths; check the staged diff for secrets, private media, and personal paths. Write an imperative subject naming the task and step, and a body saying what changed and what was verified.
-  - When the feature's applicable review and checks are resolved, fast-forward `master` to the branch, push `master`, and start the next feature's branch from it. Delete a merged branch only with the user's agreement.
-  - Never commit a failing state, force-push, or rewrite published history; if a push fails, report it rather than changing credentials.
+  - The repository is public; branches, messages and history are part of the work.
+  - Branches: `<type>/<short-kebab-name>` from an up-to-date `master`, with `feat`,
+    `fix`, `refactor`, `test`, `docs`, `chore` or `ci` (`feat/task<N>-<name>` remains
+    valid for numbered tasks). One concern per branch.
+  - Commits follow [Conventional Commits](https://www.conventionalcommits.org):
+    `type(scope): imperative summary`, at most 72 characters, lower-case after the
+    colon, no trailing period, e.g. `feat(analysis): link a clip to a logged bench set`.
+    The body, wrapped at 72, says why and what changed and how it was verified.
+    Put the task in a footer (`Refs: Task 19`), not process notes in the subject.
+  - Each commit is atomic and green: it builds, passes its checks and does one
+    thing. No "WIP", "fix typo again" or mixed refactor-plus-feature commits; tidy
+    unpushed local commits before pushing (amend or fixup), never after.
+  - Stage only the change's paths; check the staged diff for secrets, private
+    media, generated files and personal paths. Review fixes get their own commit.
+  - Integrate by fast-forwarding `master` once checks and any required review pass;
+    keep history linear when the branch is unpublished, and merge (never rebase)
+    when it is already published. Delete a merged branch only with the user's agreement.
+  - Never commit a failing state, force-push, or rewrite published history; if a
+    push fails, report it rather than changing credentials.
 - Never add `Co-Authored-By` lines or attribution trailers of any kind to commits.
 
 ## Product boundaries
