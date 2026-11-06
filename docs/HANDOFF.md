@@ -2,40 +2,39 @@
 
 Updated 2026-11-05, America/Chicago. Read root/scoped `AGENTS.md` first.
 Follow D-024, briefly explain and proceed. Follow D-036, update docs at task end
-or tool handover. Detailed history is in [STATUS.md](STATUS.md).
+or tool handover. Root Development pace now sets focused checks, lightweight
+planning and risk-based independent review. Detailed history is in [STATUS.md](STATUS.md).
 
-## Completed Task19
+## Completed Task21
 
-Set-linked bench-press analysis is implemented under D-039 (Claude Code, Opus 5.5).
-Bench-press set rows in the workout editor and history detail offer **Analyze video
-for set N**. Analyze shows that set with the user's entered reps and weight,
-links the next video to it, and offers **Back to set**, which focuses the row.
-Standalone analysis is unchanged.
+Workout convenience is implemented under D-040 on
+`feat/task21-workout-convenience` by Codex (runtime model ID unavailable).
 
-- A link is the workout, exercise and set IDs, copied onto the clip at admission.
-  Bench sets are an exact list of flat-barbell names. Links are session-only:
-  reload or app close ends them, and nothing is saved, backed up or uploaded.
-- If the set, exercise or workout disappears, App detaches the link on any
-  screen and the clip keeps a permanent "no longer linked" notice, so a restore
-  cannot relink it. Finishing a workout keeps the link (history detail).
-- Final source `e50b144`: 597 tests in 36 files, lint, build, guarded sync and all
-  23 Chromium cases pass. Fresh design review (2 Medium, 5 Low) and code review
-  (5 Low) were adopted. Hosted [browser 42152162079](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42152162079)
-  and [native 42152161985](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42152161985)
-  (shared checks, Android APK, iOS simulator startup) pass on `e50b144`; the
-  earlier `eab39bd` native run was cancelled by the newer push. No package
-  download or physical-device validation.
-- Synthetic previews are in the original checkout's ignored
-  `build/visual-review/task19/`. Task18's backup/restore and earlier tracking
-  features are unchanged; see STATUS for their history.
+- Previous workout shows the latest completed session before the active workout
+  began, matching exact exercise names and units. **Use values** fills editable
+  fields. **Repeat last set** logs a fresh actual set without replacing a draft.
+- **Start rest automatically after logging a set** is opt-in per workout. New
+  set saves restart the full selected duration. Edits/removals do not restart it.
+  Navigation retains timer state; reload/new workouts reset the timer and option.
+- Local checks pass 612 tests in 37 files, lint, build, guarded native sync
+  (13 files per platform, 3 plugins) and all 24 Chromium cases in 3.7 minutes.
+  The new flow fits 390 px. Ordinary UI/helper changes were self-reviewed.
+- The production build reports a 509.51 kB main-chunk advisory. Physical iPhone
+  behavior remains unverified. See GitHub Actions for hosted results on the
+  integrated commit. Task19's completed session-only set links and earlier
+  feature evidence are recorded in STATUS.
 
 ## Next work
 
-No further bounded implementation task has been selected. Continue with the
-phone session when the user is present, Q&A from Q10 when requested, or the next
-feature approved by the user. Q&A uses one MCQ at a time, with a recommendation
-and reason. Optional accounts/workout-record sync, saving analysis results with a set, and
-live analysis remain future work. Q1–Q9 are in PRODUCT_DIRECTION.
+Q13's workout-convenience slice is complete. The next recommended feature is
+Q12's searchable exercise catalog plus custom entries. Q11 selects system-following
+light/dark mode with an override. Q10 selects familiar Hevy-style flows with
+GymBro's own design. See PRODUCT_DIRECTION for all 13 answers.
+
+An existing `feat/task20-faster-start` branch contains on-demand video-analysis
+loading (`8b336f4` observed). Check its current ownership/integration before
+assigning another task number. Phone testing needs the user present. Accounts/sync, persisted analysis
+results and live analysis remain future work.
 
 The old master browser run 41985529794 failed at input-validation.spec.ts:53.
 Cause remains unknown. The same case passes locally and in both new hosted runs
@@ -60,8 +59,9 @@ requires a reproducing test, including checking keyboard focus, before a fix.
 ## Environment
 
 Select installed Node 22.23.2 per process from `%LOCALAPPDATA%\nvm\v22.23.2`,
-prepend it to PATH and confirm `node -v`. Preserve global Node 20. Run full tests,
-lint and build before each commit. GitHub default is master. No branch deletion,
+prepend it to PATH and confirm `node -v`. Preserve global Node 20. Use focused
+checks during work and full tests, lint and build at code-feature completion.
+GitHub default is master. No branch deletion,
 force push, attribution trailers or settings changes. Leave unrelated 5173
 listeners alone. Raw media stays outside the project and captures/uploads remain
 disabled in the browser-test harness.

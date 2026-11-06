@@ -11,7 +11,7 @@ import { AnalysisWorkspace } from '@/components/AnalysisWorkspace';
 import { WorkoutHome } from '@/components/WorkoutHome';
 import { WorkoutEditor } from '@/components/WorkoutEditor';
 import { WorkoutHistory } from '@/components/WorkoutHistory';
-import { WorkoutRestTimer } from '@/components/WorkoutRestTimer';
+import { WorkoutRestTimer, type WorkoutRestTimerHandle } from '@/components/WorkoutRestTimer';
 import { WorkoutRoutines } from '@/components/WorkoutRoutines';
 import { WorkoutProgress } from '@/components/WorkoutProgress';
 import { WorkoutBackup } from '@/components/WorkoutBackup';
@@ -34,6 +34,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
   const openLink = session(s => s.clips[0]?.link);
   const detachLink = session(s => s.detachLink);
   const main = useRef<HTMLElement>(null);
+  const restTimer = useRef<WorkoutRestTimerHandle>(null);
   const previousView = useRef<View>('home');
   // A set row requested by Back to set; this parent effect runs after the new
   // view's children render, so it can focus the row instead of <main>.
@@ -84,12 +85,14 @@ export default function App({ workouts = workoutStore, session = useSessionStore
         <p>{state.error}</p>{state.needsReload && <button type="button" disabled={state.busy} className="mt-3 underline underline-offset-4" onClick={() => { void state.load(); }}>Reload saved workouts</button>}
       </div>}
       <div role="status" aria-live="polite" className={notice ? 'mb-4 text-sm text-accent' : undefined}>{notice}</div>
-      {state.data.active && <WorkoutRestTimer key={state.data.active.id} />}
+      {state.data.active && <WorkoutRestTimer key={state.data.active.id} ref={restTimer} />}
       {view === 'home' && <WorkoutHome data={state.data} available={available} busy={state.busy}
         onWorkout={() => navigate('workout')} onAnalyze={() => navigate('analysis')}
         onRoutines={() => navigate('routines')}
         onProgress={() => navigate('progress')} onBackup={() => navigate('backup')} onHistory={openHistory} />}
-      {view === 'workout' && <WorkoutEditor store={workouts} analysis={analysis} onFinished={() => { setView('home'); setNotice('Workout saved.'); }} />}
+      {view === 'workout' && <WorkoutEditor store={workouts} analysis={analysis} onSetLogged={workoutId => {
+        if (workouts.getState().data.active?.id === workoutId) restTimer.current?.afterSetLogged();
+      }} onFinished={() => { setView('home'); setNotice('Workout saved.'); }} />}
       {view === 'history' && <WorkoutHistory store={workouts} initialId={selected} analysis={analysis} />}
       {view === 'analysis' && <AnalysisWorkspace session={session} data={state.data} available={available} pendingLink={pendingLink}
         onClearPending={() => setPendingLink(undefined)} onBackToSet={backToSet} />}

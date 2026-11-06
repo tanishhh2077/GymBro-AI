@@ -1,13 +1,16 @@
-import { useId, useState, type FormEvent } from 'react';
+import { useId, useRef, useState, type FormEvent } from 'react';
 import { useStore } from 'zustand';
 import type { WeightUnit, WorkoutExercise } from '@/types/workout';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
+import { findPreviousExercise } from '@/core/previousWorkout';
 import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton';
 
 const inputClass = 'mt-1 w-full rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white';
 function numeric(value: string) { return value.trim() ? Number(value) : NaN; }
 
-export function WorkoutEditor({ store, onFinished, analysis }: { store: WorkoutStore; onFinished: () => void; analysis?: SetAnalysisActions }) {
+export function WorkoutEditor({ store, onFinished, onSetLogged, analysis }: {
+  store: WorkoutStore; onFinished: () => void; onSetLogged?: (workoutId: string) => void; analysis?: SetAnalysisActions;
+}) {
   const state = useStore(store);
   const [name, setName] = useState('Workout');
   const [unit, setUnit] = useState<WeightUnit>('lb');
@@ -36,7 +39,8 @@ export function WorkoutEditor({ store, onFinished, analysis }: { store: WorkoutS
       }}>Discard workout</button>
     </div>
     <fieldset disabled={disabled} className="min-w-0 space-y-6">
-      {workout.exercises.map(exercise => <ExerciseEditor key={exercise.id} workoutId={workout.id} exercise={exercise} unit={workout.unit} store={store} analysis={analysis} />)}
+      {workout.exercises.map(exercise => <ExerciseEditor key={exercise.id} workoutId={workout.id} exercise={exercise} unit={workout.unit}
+        store={store} analysis={analysis} onSetLogged={onSetLogged} />)}
       <form aria-label="Add an exercise" className="border-t border-white/10 pt-5" onSubmit={async event => {
         event.preventDefault(); if ((await state.addExercise(exerciseName)).ok) setExerciseName('');
       }}>
@@ -50,14 +54,19 @@ export function WorkoutEditor({ store, onFinished, analysis }: { store: WorkoutS
   </div>;
 }
 
-function ExerciseEditor({ workoutId, exercise, unit, store, analysis }: {
+function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogged }: {
   workoutId: string; exercise: WorkoutExercise; unit: WeightUnit; store: WorkoutStore; analysis?: SetAnalysisActions;
+  onSetLogged?: (workoutId: string) => void;
 }) {
   const id = useId();
   const [reps, setReps] = useState('');
   const [weight, setWeight] = useState('');
   const [editing, setEditing] = useState<string | null>(null);
+  const repsInput = useRef<HTMLInputElement>(null);
   const state = useStore(store);
+  const previous = state.data.active ? findPreviousExercise(state.data.history, state.data.active, exercise.name) : null;
+  const lastSet = exercise.sets[exercise.sets.length - 1];
+  function focusReps() { repsInput.current?.focus(); repsInput.current?.select(); }
   return <section className="rounded-xl border border-white/10 bg-ink-900/50 p-4" aria-label={exercise.name}>
     <div className="mb-3 flex items-start justify-between gap-3"><h2 className="min-w-0 break-words text-xl font-semibold text-white">{exercise.name}</h2>
       <button type="button" className="shrink-0 text-sm text-slate-400 underline underline-offset-4" aria-label={`Remove exercise ${exercise.name}`} onClick={async () => {
@@ -68,6 +77,16 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis }: {
         {exercise.targetSets !== undefined && exercise.targetReps !== undefined ? ' · ' : ''}
         {exercise.targetReps !== undefined ? `${exercise.targetReps} reps per set` : ''}.</span> Log actual sets below.
     </p>}
+    {previous && <div className="mb-4 rounded-lg bg-white/5 p-3">
+      <h3 className="text-sm font-semibold text-slate-300">Previous workout</h3>
+      <p className="mt-1 break-words text-xs text-slate-400">{previous.workoutName} · {new Date(previous.finishedAt).toLocaleDateString()}</p>
+      <ul className="mt-2 space-y-1">{previous.sets.map((set, index) => <li key={set.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
+        <span className="text-slate-300">{index + 1}. {set.reps} reps × {set.weight} {unit}</span>
+        <button type="button" className="px-2 py-2 text-accent" aria-label={`Use previous set ${index + 1} for ${exercise.name}`}
+          onClick={() => { setReps(String(set.reps)); setWeight(String(set.weight)); focusReps(); }}>Use values</button>
+      </li>)}</ul>
+      <p className="mt-2 text-xs text-slate-500">Same exercise name and unit. Review copied values before logging.</p>
+    </div>}
     {exercise.sets.length > 0 && <div className="mb-4 overflow-x-auto"><table className="w-full text-left text-sm">
       <caption className="sr-only">Logged sets for {exercise.name}</caption><thead className="text-slate-400"><tr><th className="py-2">Set</th><th>Reps</th><th>Weight</th><th><span className="sr-only">Actions</span></th></tr></thead>
       <tbody className="divide-y divide-white/10">{exercise.sets.map((set, index) => <tr key={set.id} id={`set-row-${set.id}`} tabIndex={-1}>
@@ -83,13 +102,19 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis }: {
     <form aria-label={`Log a set for ${exercise.name}`} className="space-y-3" onSubmit={async event => {
       event.preventDefault();
       const result = editing ? await state.updateSet(exercise.id, editing, numeric(reps), numeric(weight)) : await state.addSet(exercise.id, numeric(reps), numeric(weight));
-      if (result.ok) setEditing(null);
+      if (result.ok) {
+        if (!editing) onSetLogged?.(workoutId);
+        setEditing(null); focusReps();
+      }
     }}>
       <div className="grid grid-cols-2 gap-3">
-        <div><label htmlFor={`${id}-reps`} className="text-sm text-slate-300">Reps</label><input id={`${id}-reps`} type="number" inputMode="numeric" required min={1} max={1000} step={1} className={inputClass} value={reps} onChange={e => setReps(e.target.value)} /></div>
+        <div><label htmlFor={`${id}-reps`} className="text-sm text-slate-300">Reps</label><input ref={repsInput} id={`${id}-reps`} type="number" inputMode="numeric" required min={1} max={1000} step={1} className={inputClass} value={reps} onChange={e => setReps(e.target.value)} /></div>
         <div><label htmlFor={`${id}-weight`} className="text-sm text-slate-300">Weight ({unit})</label><input id={`${id}-weight`} type="number" inputMode="decimal" required min={0} max={10000} step="any" className={inputClass} value={weight} onChange={e => setWeight(e.target.value)} /></div>
       </div>
-      <div className="flex items-center gap-3"><button type="submit" className="btn-ghost">{editing ? 'Save set' : 'Log set'}</button>
+      <div className="flex flex-wrap items-center gap-3"><button type="submit" className="btn-ghost">{editing ? 'Save set' : 'Log set'}</button>
+        {!editing && lastSet && <button type="button" className="btn-ghost" aria-label={`Repeat last set for ${exercise.name}`} onClick={async () => {
+          if ((await state.addSet(exercise.id, lastSet.reps, lastSet.weight)).ok) { onSetLogged?.(workoutId); focusReps(); }
+        }}>Repeat last set</button>}
         {editing && <button type="button" className="text-sm text-slate-400 underline" onClick={() => setEditing(null)}>Cancel edit</button>}
         <span className="text-xs text-slate-500">Use 0 for no added load.</span></div>
     </form>

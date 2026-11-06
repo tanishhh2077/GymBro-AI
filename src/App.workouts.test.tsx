@@ -50,6 +50,20 @@ async function draft() {
   await fill('Weight unit', 'kg'); await submit('Start a workout');
   await fill('Exercise name', 'Bench press'); await submit('Add an exercise');
 }
+async function previousWorkout(unit: 'kg' | 'lb' = 'kg', exerciseName = 'Bench press') {
+  await store.getState().load();
+  await store.getState().startWorkout('Previous upper day', unit);
+  await store.getState().addExercise(exerciseName);
+  const exercise = store.getState().data.active!.exercises[0];
+  await store.getState().addSet(exercise.id, 8, 60.5);
+  await store.getState().addSet(exercise.id, 6, 65);
+  await store.getState().finishWorkout();
+}
+async function autoRest() {
+  const checkbox = container.querySelector<HTMLInputElement>('input[type=checkbox]');
+  expect(checkbox, 'Auto-rest must be an explicit option').not.toBeNull();
+  await act(async () => checkbox!.click());
+}
 it('shows both Home actions and an actual saved workout after logging and finish', async () => {
   await draft(); await fill('Reps', '8'); await fill('Weight (kg)', '60.5'); await submit('Log a set for Bench press');
   expect(container.querySelector('tbody')?.textContent).toContain('60.5 kg');
@@ -96,6 +110,7 @@ it('keeps the active workout timer through Home and Analyze navigation', async (
 });
 it('removes the timer only after finish saves, then gives a new workout a fresh timer', async () => {
   await draft(); await fill('Reps', '5'); await fill('Weight (kg)', '20'); await submit('Log a set for Bench press');
+  await autoRest();
   await click('Start rest timer');
   vi.spyOn(repository, 'save').mockRejectedValueOnce(new WorkoutError('storage', 'Reload required'));
   await click('Finish workout');
@@ -104,6 +119,106 @@ it('removes the timer only after finish saves, then gives a new workout a fresh 
   expect(container.querySelector('output[aria-label="Rest time remaining"]')).toBeNull();
   await click('Start workout'); await fill('Workout name', 'Fresh workout'); await submit('Start a workout');
   expect(container.querySelector('output')?.textContent).toBe('1:30'); expect(button('Start rest timer')).toBeTruthy();
+  expect(container.querySelector<HTMLInputElement>('input[type=checkbox]')?.checked).toBe(false);
   vi.spyOn(window, 'confirm').mockReturnValue(true); await click('Discard workout');
   expect(container.querySelector('output[aria-label="Rest time remaining"]')).toBeNull();
+});
+
+it('copies a previous set into editable fields without recording a set', async () => {
+  await previousWorkout(); await draft();
+  expect(container.textContent).toContain('Previous upper day');
+  expect(container.textContent).toContain('8 reps × 60.5 kg');
+  await click('Use previous set 2 for Bench press');
+  const inputs = [...container.querySelectorAll<HTMLInputElement>('input[type=number]')];
+  expect(inputs.map(input => input.value)).toEqual(['6', '65']);
+  expect(document.activeElement).toBe(inputs[0]);
+  expect(store.getState().data.active!.exercises[0].sets).toHaveLength(0);
+  await submit('Log a set for Bench press');
+  expect(store.getState().data.active!.exercises[0].sets[0]).toMatchObject({ reps: 6, weight: 65 });
+  expect(document.activeElement).toBe(inputs[0]);
+});
+
+it.each([
+  ['lb', 'Bench press'],
+  ['kg', 'bench press'],
+] as const)('keeps previous values separate for %s and exercise %s', async (unit, exerciseName) => {
+  await previousWorkout(unit, exerciseName); await draft();
+  expect(container.textContent).not.toContain('Previous upper day');
+  expect(container.querySelector('button[aria-label^="Use previous set"]')).toBeNull();
+});
+
+it('repeats the latest actual set with a new ID and supports zero added load', async () => {
+  await draft(); await fill('Reps', '8'); await fill('Weight (kg)', '0'); await submit('Log a set for Bench press');
+  await fill('Reps', '12'); await fill('Weight (kg)', '40');
+  await click('Repeat last set for Bench press');
+  const sets = store.getState().data.active!.exercises[0].sets;
+  expect(sets).toHaveLength(2);
+  expect(sets[1]).toMatchObject({ reps: 8, weight: 0 });
+  expect(sets[1].id).not.toBe(sets[0].id);
+  expect(container.querySelector('output')?.textContent).toBe('1:30');
+  expect(button('Start rest timer')).toBeTruthy();
+  expect([...container.querySelectorAll<HTMLInputElement>('input[type=number]')].map(input => input.value)).toEqual(['12', '40']);
+});
+
+it('starts optional auto-rest only after a new set save is confirmed', async () => {
+  await draft(); await autoRest();
+  const save = repository.save.bind(repository);
+  let release!: () => void;
+  vi.spyOn(repository, 'save').mockImplementationOnce(async (...args) => {
+    await new Promise<void>(resolve => { release = resolve; });
+    return save(...args);
+  });
+  await fill('Reps', '8'); await fill('Weight (kg)', '60');
+  await act(async () => container.querySelector('form[aria-label="Log a set for Bench press"]')!
+    .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })));
+  expect(store.getState().busy).toBe(true);
+  expect(button('Start rest timer')).toBeTruthy();
+  await act(async () => { release(); await idle(); });
+  expect(button('Pause timer')).toBeTruthy();
+  expect(container.querySelector('output')?.textContent).toBe('1:30');
+});
+
+it('restarts the full selected auto-rest duration after repeating a set, even while paused', async () => {
+  await draft(); await autoRest(); await fill('Rest duration', '30');
+  vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+  await fill('Reps', '8'); await fill('Weight (kg)', '60.5'); await submit('Log a set for Bench press');
+  await act(async () => vi.advanceTimersByTime(5_000));
+  expect(container.querySelector('output')?.textContent).toBe('0:25');
+  await click('Pause timer'); await click('Repeat last set for Bench press');
+  expect(container.querySelector('output')?.textContent).toBe('0:30');
+  expect(button('Pause timer')).toBeTruthy();
+  expect(store.getState().data.active!.exercises[0].sets).toHaveLength(2);
+});
+
+it('does not restart auto-rest after edits, removals, navigation or a library reload', async () => {
+  await draft(); await autoRest();
+  vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+  await fill('Reps', '8'); await fill('Weight (kg)', '60'); await submit('Log a set for Bench press');
+  await act(async () => vi.advanceTimersByTime(10_000));
+  await click('Edit set 1 for Bench press'); await fill('Reps', '9'); await submit('Log a set for Bench press');
+  await click('Remove set 1 for Bench press');
+  await click('Home'); await click('Workout');
+  await act(async () => { await store.getState().load(); });
+  expect(container.querySelector('output')?.textContent).toBe('1:20');
+  expect(container.querySelector<HTMLInputElement>('input[type=checkbox]')?.checked).toBe(true);
+});
+
+it('keeps the timer and entered values when an auto-rest set save fails', async () => {
+  await draft(); await autoRest();
+  vi.spyOn(repository, 'save').mockRejectedValueOnce(new WorkoutError('storage', 'Reload required'));
+  await fill('Reps', '8'); await fill('Weight (kg)', '50'); await submit('Log a set for Bench press');
+  expect(container.querySelector('[role=alert]')?.textContent).toContain('Reload required');
+  expect(button('Start rest timer')).toBeTruthy();
+  expect(store.getState().data.active!.exercises[0].sets).toHaveLength(0);
+  expect([...container.querySelectorAll<HTMLInputElement>('input[type=number]')].map(input => input.value)).toEqual(['8', '50']);
+});
+
+it('stops automatic restarts when opted out and lets the current rest finish', async () => {
+  await draft(); await autoRest();
+  vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+  await fill('Reps', '8'); await fill('Weight (kg)', '60'); await submit('Log a set for Bench press');
+  await act(async () => vi.advanceTimersByTime(10_000));
+  await autoRest(); await click('Repeat last set for Bench press');
+  expect(container.querySelector('output')?.textContent).toBe('1:20');
+  expect(button('Pause timer')).toBeTruthy();
 });

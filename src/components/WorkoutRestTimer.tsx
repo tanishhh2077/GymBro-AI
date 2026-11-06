@@ -1,19 +1,30 @@
-import { useEffect, useId, useState } from 'react';
+import { forwardRef, useEffect, useId, useImperativeHandle, useState } from 'react';
 
 const durations = [30, 60, 90, 120, 180, 300];
 type Rest = { phase: 'idle' } | { phase: 'running'; endsAt: number } | { phase: 'paused'; remainingMs: number };
 function clock(seconds: number) { return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; }
 
-export function WorkoutRestTimer() {
+export interface WorkoutRestTimerHandle { afterSetLogged: () => void }
+
+export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function WorkoutRestTimer(_props, ref) {
   const id = useId();
   const [duration, setDuration] = useState(90);
   const [rest, setRest] = useState<Rest>({ phase: 'idle' });
   const [now, setNow] = useState(0);
+  const [autoStart, setAutoStart] = useState(false);
   const remainingMs = rest.phase === 'idle' ? duration * 1000 : rest.phase === 'paused' ? rest.remainingMs
     : Math.max(0, Math.min(duration * 1000, rest.endsAt - now));
   const complete = rest.phase !== 'idle' && remainingMs === 0;
   const counting = rest.phase === 'running' && !complete;
   const paused = rest.phase === 'paused' && !complete;
+
+  useImperativeHandle(ref, () => ({
+    afterSetLogged() {
+      if (!autoStart) return;
+      const current = Date.now();
+      setNow(current); setRest({ phase: 'running', endsAt: current + duration * 1000 });
+    },
+  }), [autoStart, duration]);
 
   useEffect(() => {
     if (!counting) return;
@@ -69,8 +80,13 @@ export function WorkoutRestTimer() {
         : <button type="button" className="btn-primary" onClick={start}>{paused ? 'Resume timer' : 'Start rest timer'}</button>}
       {rest.phase !== 'idle' && <button type="button" className="btn-ghost" onClick={() => setRest({ phase: 'idle' })}>Reset timer</button>}
     </div>
+    <label className="mt-4 flex items-center gap-3 text-sm text-slate-300">
+      <input type="checkbox" checked={autoStart} onChange={event => setAutoStart(event.target.checked)} className="h-4 w-4 accent-accent" />
+      Start rest automatically after logging a set
+    </label>
     <p id={`${id}-limits`} className="mt-3 text-xs text-slate-500">
-      Start manually after a set. Resets on reload or app restart. Completion appears here, without a background alert.
+      Auto-rest starts after a new set saves. You can also start manually. Timer and auto-rest reset on reload or a new workout.
+      Completion appears here, without a background alert.
     </p>
   </section>;
-}
+});

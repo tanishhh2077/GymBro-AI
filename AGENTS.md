@@ -1,5 +1,28 @@
 # GymBro AI: project instructions
 
+## Development pace
+
+The user requested a working full app sooner on 2026-11-05. These rules take
+precedence over older documentation, review and check-cadence requirements.
+
+- Prioritize small, usable end-to-end features. For ordinary features, use a
+  short chat outline with acceptance criteria. Create separate design/plan
+  documents only for consequential data, architecture or analysis decisions.
+- Run focused tests while implementing. Run full tests, lint and build once on
+  the completed code feature before integration. Re-run affected checks after
+  fixes. Documentation-only edits need a diff/link check. Reuse applicable CI
+  evidence for identical source instead of repeating it locally.
+- Self-review ordinary changes. Obtain one fresh independent review for changes
+  to saved data formats or storage behavior, import/restore, accounts/network access, media handling or
+  analysis algorithms. Review supported failure cases. Defer speculative
+  hardening and nonblocking polish to a short backlog instead of expanding scope.
+- Update the compact handoff and one brief status entry at feature completion
+  or provider handover. Edit other documents only when their actual contracts
+  change. Avoid separate review reports, repeated command transcripts and README
+  churn. Add directory guidance only when that directory needs distinct rules.
+- Keep protections against lost workouts, unintended video uploads and invented
+  analysis claims. Escalate concrete blockers and user-owned decisions promptly.
+
 ## Start here
 
 - Start with this file and the compact [current handoff](docs/HANDOFF.md). Read applicable ancestor/local `AGENTS.md`, local README, and relevant sections of the sources below before code changes. Load detailed historical evidence only when needed; do not repeatedly ingest every document. Do not assume nested guidance was automatically loaded.
@@ -20,9 +43,9 @@
 - Preserve unrelated and preexisting uncommitted work. Report failures, skipped checks, and mistaken assumptions plainly.
 - Git practice ([D-018](docs/DECISIONS.md#d-018-regular-commits-and-reviewed-merges-to-master), [D-019](docs/DECISIONS.md#d-019-one-branch-per-feature-one-commit-per-step)):
   - Build each feature (plan task) on its own branch, `feat/task<N>-<short-name>`, created from an up-to-date `master`.
-  - Make each plan step its own commit once its checks pass and its documents are updated, and push it. A step that only writes failing tests is committed together with the step that makes them pass, so every commit builds and passes. Review fixes get their own commit.
+  - Commit coherent working steps after their relevant checks pass, and push them. Update documents at feature completion or handover. Keep failing tests with the implementation that makes them pass. Review fixes get their own commit.
   - Stage only the step's paths; check the staged diff for secrets, private media, and personal paths. Write an imperative subject naming the task and step, and a body saying what changed and what was verified.
-  - When the feature's fresh review is resolved, fast-forward `master` to the branch, push `master`, and start the next feature's branch from it. Delete a merged branch only with the user's agreement.
+  - When the feature's applicable review and checks are resolved, fast-forward `master` to the branch, push `master`, and start the next feature's branch from it. Delete a merged branch only with the user's agreement.
   - Never commit a failing state, force-push, or rewrite published history; if a push fails, report it rather than changing credentials.
 - Never add `Co-Authored-By` lines or attribution trailers of any kind to commits.
 
@@ -72,7 +95,9 @@
 
 - D-031/D-032 select guest access with optional workout-record sync only; videos
   must not be uploaded. This remains a future product direction, not a service.
-- D-033 authorizes Task15's manual session-only rest timer. Read its design/plan;
+- D-033 authorizes Task15's session-only rest timer. D-040 adds opt-in automatic
+  rest after successful new-set saves and previous-workout/quick-entry controls.
+  The timer's original design describes the earlier manual-only behavior;
   keep timer state independent of saved workout/media data and state reload and
   in-app-completion limits honestly. Continue routine work after "Clear bro now work".
 
@@ -94,7 +119,7 @@
 - Give workers explicit goals, allowed paths, interfaces, acceptance criteria, and verification expectations. Delegate only work within the approved step; workers return material blockers to the coordinator.
 - Keep durable facts in the documents, rather than relying on chat memory. Update the status/handoff after a milestone; avoid copying the entire brief into every directory.
 - Keep `docs/HANDOFF.md` concise and current after each approved work chunk; keep detailed command evidence/history in `docs/STATUS.md`. A handoff must identify the next task and whether its teaching checkpoint was approved.
-- Add concise local `AGENTS.md` guidance when creating an authored project directory. Exclude `.git`, dependencies, build output, generated caches, and `public/` (see the next section). Local guidance adds responsibilities; it must not silently weaken product or privacy requirements.
+- Add concise local `AGENTS.md` guidance when an authored directory needs distinct responsibilities. Parent guidance covers ordinary directories. Exclude `.git`, dependencies, build output, generated caches, and `public/` (see the next section).
 
 ## Static files in `public/`
 
@@ -113,12 +138,12 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
 - Match the surrounding code's naming, comment density, and idiom. Comments explain why, not what. Remove placeholders, dead code, and debugging output before committing.
 - Validate inputs at module boundaries and fail with typed, actionable errors; never substitute zeros or defaults for missing or invalid data.
 - Release everything a job acquires (timers, listeners, object URLs, detectors, video sources) on every exit path, and test that release.
-- Run `npm test`, `npm run lint`, and `npm run build` before every commit.
+- Run focused checks for working commits. Run `npm test`, `npm run lint`, and `npm run build` on a completed code feature before integration, following Development pace above.
 
 ## Verification and code review
 
 - Run checks appropriate to the change. State exact results and checks not run; never claim that source inspection, mocks, or successful compilation proves real-video accuracy.
-- After code implementation and the relevant checks, obtain a fresh critical review against the approved specification. Review rules and a reusable prompt are in [WORKFLOW.md](docs/WORKFLOW.md).
+- Review completed changes against their acceptance criteria. Obtain a fresh critical review for the higher-risk changes listed in Development pace. Review rules and a reusable prompt are in [WORKFLOW.md](docs/WORKFLOW.md).
 - Each review finding needs a severity, location, realistic trigger, consequence, and supporting evidence. Keep speculative concerns separate. No issue quotas or performative hostility.
 - Evaluate findings independently. Fix supported defects, document evidence-backed disagreements, and verify affected behavior after fixes. Do not report a milestone complete with unresolved acceptance-blocking defects.
 - Before handoff, record changed paths, actual verification, limitations, review disposition, remaining prerequisites, and the next concrete action in [STATUS.md](docs/STATUS.md).
@@ -158,3 +183,5 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
   with three native plugins. Task19 (D-039, session-only set-linked bench
   analysis) brings it to 597 tests in 36 files and 23 browser cases. Read STATUS
   for actual hosted/device evidence.
+- Task21 workout convenience (D-040) passes 612 tests in 37 files and 24 local
+  browser cases. Auto-rest is opt-in and session-only. See HANDOFF for next work.

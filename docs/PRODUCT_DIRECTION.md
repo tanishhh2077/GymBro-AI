@@ -2,8 +2,9 @@
 
 2026-11-04. This records the user's answers, not a claim that these features
 exist. Original PRODUCT_BRIEF remains unchanged; D-030 authorizes the next slice.
-Hevy was mentioned as a reference; exact visual resemblance and integrations
-have not been specified. MCQs must include a recommendation and brief reason.
+Hevy is a reference for familiar workout flows, with GymBro's own visual design
+(Q10). Third-party integration remains unspecified. MCQs include a recommendation
+and brief reason.
 
 | Question | User choice |
 | --- | --- |
@@ -16,6 +17,15 @@ have not been specified. MCQs must include a recommendation and brief reason.
 | 7. Analysis timing | Post-video for now; live plus post-video is a future goal |
 | 8. Accounts and sync | A: guest logging with optional accounts for backup and syncing; sign-up must not block a first workout |
 | 9. Sync contents | A: workout records only; no video uploads |
+| 10. Hevy resemblance | A: familiar workout flow with GymBro's own design |
+| 11. Appearance | A: follow the phone's light/dark setting, with a manual override |
+| 12. Exercise entry | A: searchable built-in exercise list plus custom exercises |
+| 13. Next development priority | A: previous-set values, faster set entry and optional automatic rest timers |
+
+Q10–Q13 were answered together on 2026-11-05. They are accepted product choices.
+The next feature priority is everyday workout convenience from Q13. Theme
+controls and the exercise catalog are accepted follow-on work. These answers
+describe intended behavior, with implementation status recorded in HANDOFF.
 
 After Q7 the user explicitly said to start building while they are busy, then
 resume questions in an hour. A one-time thread follow-up

@@ -1,11 +1,14 @@
 # Working and review workflow
 
+The root AGENTS.md Development pace section governs task size, documentation,
+checks and review depth. The user requested this faster cadence on 2026-11-05.
+
 ## Start a task
 
-1. Read root and applicable local `AGENTS.md` files, the original product brief, decisions, current status, and relevant architecture/specification sections.
+1. Read root and applicable local `AGENTS.md`, the compact handoff and relevant local README. Read brief, decision, status and architecture sections only as the task requires.
 2. Inspect actual repository state, including uncommitted work. Resolve stale documentation by recording the discrepancy; do not overwrite the work to make it match a plan.
 3. Explain the next meaningful step, its purpose, and its obvious alternative, then proceed; do not ask "Is this clear?" routinely ([D-024](DECISIONS.md#d-024-explain-and-proceed-without-routine-is-this-clear-checkpoints)). Stop only for the user's decisions, device/account actions, spending, publishing, or settings changes.
-4. Before feature code, establish a working development environment and relevant baseline checks. Write a bounded implementation plan only after the design is understood and approved.
+4. Before feature code, establish a working development environment and relevant baseline checks. Use a short chat outline for ordinary work. Write a separate design/plan only for consequential decisions requiring a durable contract.
 
 ## Independent judgment: always applicable
 
@@ -23,13 +26,16 @@ Keep the original source brief separate. If the user later amends it, record tha
 
 ## Goldfish: review before implementation
 
+Use this stage for consequential specifications. Ordinary features proceed from
+their understood acceptance criteria without a separate specification review.
+
 Start a new reviewer with no inherited Elephant conversation. Supply only the original approved brief, accepted amendments, the specification, applicable instructions, and relevant read-only repository access. Do not supply persuasive design commentary or an expected positive verdict. Fresh context reduces anchoring; it does not guarantee independent model errors or scientific correctness.
 
 Reusable prompt:
 
 > You are a fresh specification reviewer. Read the user-supplied product brief, accepted amendments, the current specification, applicable repository instructions, and relevant code. Do not edit files or implement anything. Assess whether the specification faithfully expresses the approved requirements and can be planned without inventing material decisions. Check contradictions, missing inputs/outputs, failure states, privacy, unsupported scientific claims, and testable acceptance criteria. Distinguish blockers, material questions, and nonblocking suggestions. For each issue, identify the requirement or repository evidence, location, realistic consequence, and why the answer changes implementation. Skip builder choices explicitly left open and ordinary details an implementer can settle. No finding quota: report no significant issues if appropriate. State what you inspected, what remains unverified, and whether the spec is ready for implementation planning. A ready verdict does not approve implementation or certify measurement accuracy.
 
-Record the review and disposition. Elephant must check findings, update omissions already answered by source material, and settle minor builder choices transparently. Bring only material unanswered user decisions back to the user. Do not silently treat Goldfish's suggestions as requirements.
+Record significant findings and their disposition briefly in the task handoff. Elephant must check findings, update omissions already answered by source material, and settle minor builder choices transparently. Bring only material unanswered user decisions back to the user. Do not silently treat Goldfish's suggestions as requirements.
 
 ## Implement a bounded task
 
@@ -40,7 +46,12 @@ Record the review and disposition. Elephant must check findings, update omission
 
 ## Critical review after code implementation
 
-A separate fresh reviewer checks the actual changed code against the approved specification after the implementer runs relevant checks. "Mean review" means rigorous scrutiny; keep the tone professional and the findings evidence-based. Do not require a minimum issue count.
+Self-review every change. Use one separate fresh reviewer for data format/storage behavior,
+import/restore, account/network, media-handling or analysis-algorithm changes.
+The reviewer checks the actual changed code against its acceptance criteria
+after relevant checks pass. "Mean review" means rigorous scrutiny. Keep findings
+evidence-based and professional, with no minimum issue count or separate report
+requirement. Re-review only material fixes or unresolved blockers.
 
 Reusable prompt:
 
@@ -86,15 +97,21 @@ for the decisions, spending, publishing and settings changes listed in D-024.
 README files describe each directory; they are not substitutes for the approved
 brief/specification or shared agent rules.
 
-Update `STATUS.md` with the outcome, changed paths, commands actually run and results, checks not run, limitations, unresolved review findings, prerequisites, and the next concrete action. Update architecture/decisions when their facts change. Keep one clear next task; the full vision belongs in the brief.
+At feature completion or provider handover, refresh the compact `HANDOFF.md`
+and add one brief `STATUS.md` entry with the result, checks, material limits and
+next action. Update architecture/decisions only when their contracts change.
+Existing plans need only their completion state. Ordinary features need no new
+plan or review files. Keep detailed command transcripts out of routine updates.
 
-Also refresh the concise `HANDOFF.md` and actual plan progress after each work
-chunk. Then commit that step on the task's own branch and push it, and
-fast-forward `master` after each reviewed plan task
+Commit coherent working steps on the task's branch after relevant focused
+checks. Run full tests, lint and build once on the completed code feature before
+integration, then fast-forward `master` after the applicable review
 ([D-018](DECISIONS.md#d-018-regular-commits-and-reviewed-merges-to-master),
 [D-019](DECISIONS.md#d-019-one-branch-per-feature-one-commit-per-step)), so the
-pushed history and the documents describe the same state. Keep old detailed command evidence in STATUS so repeated startup does not
-require loading the entire development history.
+pushed history and documents describe the same state. Reuse matching CI evidence
+and run affected checks after fixes. Documentation-only edits need a diff/link
+check. Browser/native/device checks follow changes to those paths and actual
+acceptance needs.
 
 Do not equate "implemented," "compiled," "mock-tested," "tested with real video," "benchmarked on a phone," and "ready to ship." Record exactly which claim the evidence supports.
 

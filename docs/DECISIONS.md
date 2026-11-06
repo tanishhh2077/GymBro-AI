@@ -518,6 +518,15 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   actions change no files. HANDOFF stays current and short; STATUS gets one brief
   entry per task. Decisions, privacy rules, tests and reviews are unchanged. This
   supersedes the wording that every work chunk updates every affected document.
+- On 2026-11-05 the user explicitly requested faster delivery of the functioning
+  app and less premature security/process work. The root Development pace rules
+  now extend this decision. Ordinary work uses a chat outline and self-review,
+  with focused checks during implementation and full tests/lint/build at feature
+  completion. Fresh independent review is reserved for data format/storage changes, import,
+  account/network, media and analysis changes. Separate design/review files and
+  speculative hardening require a concrete need. This supersedes the earlier
+  sentence preserving all review/check cadence requirements. Core data safety,
+  local-video privacy and evidence requirements continue to apply.
 
 ### D-037 Workout progress follows saved routines
 
@@ -565,6 +574,20 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   task end). Saving analysis results with a set remains future work needing its
   own decision. See the [design](superpowers/specs/2026-11-05-set-linked-analysis-design.md)
   and [plan](superpowers/plans/2026-11-05-set-linked-analysis.md).
+
+### D-040 Faster everyday workout logging
+
+- On 2026-11-05 the user selected Q10–Q13 A, then said "start" for previous-set
+  values, faster set entry and optional automatic rest timers. Task21 implements
+  this workout-convenience slice using existing records and save methods.
+- Builder choices use the latest completed workout at or before today's workout
+  start, exact exercise names/units, stable ID ties and the first logged matching
+  exercise block. Copying previous values fills editable fields. Repeat last set
+  logs a fresh set with the latest actual values and retains any typed draft.
+- Auto-rest starts off per workout, uses the selected timer duration and restarts
+  only after a new manual/repeated set saves. Edits, removals and reloads do not
+  trigger it. Timer/option state ends on reload or a new workout. This supersedes
+  D-033's manual-only boundary. Q11 theme controls and Q12 catalog remain planned.
 
 ## Specification-author defaults and later acceptance
 

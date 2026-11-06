@@ -10,6 +10,31 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task21 workout convenience is implemented under D-040 by Codex (runtime model
+ID unavailable). It adds `core/previousWorkout`, workout-editor copy/repeat/focus
+controls and an App-to-timer handle for opt-in rest after confirmed new-set saves.
+Builder defaults are exact name/unit matches, latest completion before workout
+start, stable ID ties and first matching logged exercise block. Auto-rest is
+session-only and starts off. Q10–Q13 and the faster D-036 workflow are recorded.
+
+- Test-first: six new App cases failed on missing previous values, repeat action
+  and auto-rest option before implementation. Final checks pass 612 tests / 37
+  files, lint, build (438 modules), guarded sync (13 files per platform, 3 plugins)
+  and all 24 Chromium 156.0.8078.4 cases in 3.7 minutes. GPU smoke checks use 120
+  synthetic samples. Keyboard admission at input-validation.spec.ts:53 passes.
+- Self-review checks save confirmation, active-workout timer ownership, draft
+  retention and strict historical matching. Browser coverage includes copying
+  without saving, edit-vs-new-set timing, navigation, reload and 390 px layout.
+  Targeted tests cover failed/deferred saves, paused restarts, opt-out, zero loads,
+  unit/name separation and deterministic historical selection.
+- Setup used Node 22.23.2 and locked install (485 packages). Windows sandbox
+  restrictions required permitted retries for installation, test temp files and
+  loopback access. The build reports a 509.51 kB main-chunk advisory. Native
+  compilation, physical iPhone behavior and real-bench accuracy were not checked
+  in this slice. Hosted results belong to Actions on the integrated commit.
+- Next recommended feature is Q12's exercise catalog. Task20 startup loading is
+  a separate existing branch. Coordinate phone testing only with the user present.
+
 Task19 set-linked bench analysis is complete under D-039, built by Claude Code
 (Opus 5.5) in sibling worktree `GymBro AI-task19` from master `94068fc`.
 
