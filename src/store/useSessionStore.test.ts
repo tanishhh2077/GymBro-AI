@@ -461,4 +461,48 @@ describe("session store: one clip, owned job, leased media", () => {
     expect(revokeObjectURL).toHaveBeenCalledTimes(1);
     expect(store.getState().processingState).toBe("idle");
   });
+
+  it("copies a set link onto the admitted clip and keeps standalone clips unlinked", async () => {
+    const { store } = setup();
+    const link = { workoutId: "w1", exerciseId: "e1", setId: "s1" };
+    expect(store.getState().startClip(mp4(), link)).toBeNull();
+    // The clip keeps its own copy; a caller changing its object cannot relink it.
+    link.setId = "changed";
+    expect(store.getState().clips[0].link).toEqual({ workoutId: "w1", exerciseId: "e1", setId: "s1" });
+    await settle();
+    expect(store.getState().clips[0]).toMatchObject({ status: "ready", link: { setId: "s1" } });
+
+    store.getState().removeClip(store.getState().clips[0].id);
+    await settle();
+    expect(store.getState().startClip(mp4())).toBeNull();
+    expect(store.getState().clips[0]).not.toHaveProperty("link");
+  });
+
+  it("keeps the open clip's link on a rejected admission and drops it on reset", async () => {
+    const { store } = setup();
+    store.getState().startClip(mp4(), { workoutId: "w1", exerciseId: "e1", setId: "s1" });
+    expect(store.getState().startClip(mp4("other.mp4"), { workoutId: "w9", exerciseId: "e9", setId: "s9" }))
+      .toMatchObject({ code: "busy" });
+    expect(store.getState().clips.map(clip => clip.link?.setId)).toEqual(["s1"]);
+
+    store.getState().reset();
+    await settle();
+    expect(store.getState().clips).toEqual([]);
+    expect(store.getState().startClip(mp4())).toBeNull();
+    expect(store.getState().clips[0]).not.toHaveProperty("link");
+  });
+
+  it("detaches a link without touching the clip and offers no way to add one", async () => {
+    const { store } = setup();
+    store.getState().startClip(mp4(), { workoutId: "w1", exerciseId: "e1", setId: "s1" });
+    await settle();
+    const before = store.getState().clips[0];
+
+    store.getState().detachLink(before.id);
+    expect(store.getState().clips[0]).not.toHaveProperty("link");
+    expect(store.getState().clips[0]).toMatchObject({ id: before.id, status: "ready", url: before.url });
+    store.getState().detachLink(before.id);
+    store.getState().detachLink("missing");
+    expect(store.getState().clips[0]).not.toHaveProperty("link");
+  });
 });

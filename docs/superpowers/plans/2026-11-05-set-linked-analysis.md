@@ -22,8 +22,8 @@ worktree `GymBro AI-task19` from master `94068fc`; Task 8 and Task 4 untouched.
 `src/store/useSessionStore.ts` (`startClip(file, link?)`, `detachLink(clipId)`)
 and its tests. Signatures are in the design's Interfaces section.
 
-- [ ] RED tests for the name rule, resolution and store link ownership; then the
-  minimal code; full checks; commit.
+- [x] RED tests for the name rule, resolution and store link ownership (missing
+  module, no stored link, no `detachLink`); then the minimal code; 587 tests pass (22 core + 3 store new).
 
 ## Step 3: screens and browser flow
 

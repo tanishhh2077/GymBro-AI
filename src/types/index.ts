@@ -120,6 +120,18 @@ export interface Clip {
    * the job did not complete or the clock reading was invalid.
    */
   processingMs?: number;
+  /** The logged set this session-only analysis belongs to; never saved. */
+  link?: SetLink;
+}
+
+/**
+ * One logged set. Exercise and set IDs are unique only inside one workout, so the
+ * three IDs identify a set only together.
+ */
+export interface SetLink {
+  readonly workoutId: string;
+  readonly exerciseId: string;
+  readonly setId: string;
 }
 
 /**

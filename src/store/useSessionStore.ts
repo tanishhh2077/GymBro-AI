@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Clip, PoseDelegate } from "@/types";
+import type { Clip, PoseDelegate, SetLink } from "@/types";
 import { PoseEngine, PoseEngineError } from "@/core/PoseEngine";
 import { validateSelection, type SelectionIssue } from "@/core/clipPolicy";
 
@@ -34,8 +34,13 @@ interface SessionState {
   /** Delegate (GPU or CPU) the current clip's completed job ran on; null otherwise. */
   engineDelegate: PoseDelegate | null;
 
-  /** Admit one file or explain why not; processing continues in the background. */
-  startClip: (file: File) => SelectionIssue | null;
+  /**
+   * Admit one file or explain why not; processing continues in the background.
+   * A link is copied onto the new clip and cannot be changed afterwards.
+   */
+  startClip: (file: File, link?: SetLink) => SelectionIssue | null;
+  /** Remove a clip's set link; there is no way to add or change one. */
+  detachLink: (id: string) => void;
   removeClip: (id: string) => void;
   reset: () => void;
   /** Hold the clip's URL open for a visible player; call the result to release. */
@@ -185,7 +190,7 @@ export function createSessionStore(overrides: Partial<SessionDeps> = {}) {
       processingState: "idle",
       engineDelegate: null,
 
-      startClip: (file) => {
+      startClip: (file, link) => {
         const { clips, processingState } = get();
         if (clips.length > 0) {
           return { code: "busy", message: "Remove the current clip before choosing another." };
@@ -209,12 +214,20 @@ export function createSessionStore(overrides: Partial<SessionDeps> = {}) {
         const current: Job = { clipId: id, controller: new AbortController(), engine, startedAt };
         job = current;
         set({
-          clips: [{ id, name: file.name, source: "upload", angle: "side", url, status: "processing" }],
+          clips: [{
+            id, name: file.name, source: "upload", angle: "side", url, status: "processing",
+            ...(link ? { link: { workoutId: link.workoutId, exerciseId: link.exerciseId, setId: link.setId } } : {}),
+          }],
           engineDelegate: null,
         });
         refreshState();
         void runJob(current, url);
         return null;
+      },
+
+      detachLink: (id) => {
+        if (!get().clips.some((c) => c.id === id && c.link)) return;
+        set((s) => ({ clips: s.clips.map((c) => (c.id === id ? withoutLink(c) : c)) }));
       },
 
       removeClip: (id) => {
@@ -247,4 +260,11 @@ export function createSessionStore(overrides: Partial<SessionDeps> = {}) {
   });
 }
 
+function withoutLink(clip: Clip): Clip {
+  const copy = { ...clip };
+  delete copy.link;
+  return copy;
+}
+
 export const useSessionStore = createSessionStore();
+export type SessionStore = typeof useSessionStore;
