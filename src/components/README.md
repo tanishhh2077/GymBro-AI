@@ -1,5 +1,10 @@
 # Interface components
 
+Task18's `WorkoutBackup.tsx` supplies Home export, bounded file selection,
+revision-bound previews, explicit confirmation and recovery. A synchronous store
+subscription invalidates previews even during same-revision reloads. Navigation
+aborts pending reads while the root workout timer retains its identity.
+
 Task 14: root App now owns provisional Home/Workout/Analyze navigation and keeps
 the native lifecycle registration mounted. `AnalysisWorkspace.tsx` contains the
 previous video UI. `WorkoutHome.tsx` presents equal entry actions, real counters

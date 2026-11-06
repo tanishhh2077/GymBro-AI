@@ -1,5 +1,8 @@
 # Packaging tools
 
+`workout-backup-native.test.mjs` checks pinned export plugins, the embedded iOS
+filesystem privacy declaration and the app's Android public-storage permissions.
+
 `verify-mobile.mjs` checks both native copies after build/sync: local entrypoints,
 matching complete web bundles, expected app identities and byte-identical local
 model/runtime assets. It also rejects served Markdown, obvious video/signing files

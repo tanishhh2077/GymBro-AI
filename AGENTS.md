@@ -55,6 +55,10 @@
 
 ## Independent judgment
 
+- D-038 authorizes manual JSON backup/restore of validated workout records and
+  routines. Follow Task18's additive/conflict rules, revision-bound previews,
+  bounded file reads and browser/native export ownership.
+
 - D-037 adds derived workout progress and personal records from completed actual
   sets. Follow Task17's exact name/unit groups, source-linked metric definitions,
   chronological workout order and deletion/reload behavior.
@@ -147,3 +151,5 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
 - Task17 adds derived Progress and source-linked records. Its current local
   checks pass 511 tests in 28 files and 19 browser cases. Read STATUS for hosted and
   physical-device evidence.
+- Task18's completed baseline is 562 tests in 34 files and 22 browser cases,
+  with three native plugins. Read STATUS for actual hosted/device evidence.

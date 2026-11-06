@@ -1,5 +1,9 @@
 # Feature designs
 
+[Workout backup](2026-11-05-workout-backup-design.md) defines Task18 under D-038,
+with bounded JSON export/import, additive ID merges and atomic confirmation.
+Its fresh design/code reviews and implementation evidence are recorded alongside.
+
 [Workout progress](2026-11-05-workout-progress-design.md) defines Task17 under
 D-037. Exact exercise/unit groups supply completed-set personal records,
 finish-order charts and source-workout links. Its

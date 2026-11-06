@@ -1,5 +1,9 @@
 # Android prototype
 
+Task18 adds generated Filesystem/Share plugin references for cache-only manual
+backup exports. Root `mobile:sync` owns these references. Device share/file flows
+still need physical acceptance.
+
 The Capacitor 8.6.0 wrapper embeds GymBro AI (`com.gymbroai.app`). Shared React
 code and local pose processing stay in `src/`; `MainActivity` hosts the WebView.
 The generated project targets SDK 36, with minimum SDK 24, Gradle 8.14.3 and

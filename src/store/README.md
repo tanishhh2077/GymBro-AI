@@ -1,5 +1,9 @@
 # Session state and media ownership
 
+Task18's restore method merges validated backup records through the same atomic
+repository save. Preview revisions reject stale actions, identical imports avoid
+writes, and unknown/conflicting/uncertain results retain existing recovery rules.
+
 Task 14 (D-030) adds separate `workoutRepository.ts` and `useWorkoutStore.ts`.
 The versioned plain manual log lives in local IndexedDB. One readwrite transaction
 compares revisions and saves; UI state updates only on completion. Unknown data,

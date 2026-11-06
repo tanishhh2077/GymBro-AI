@@ -4,31 +4,32 @@ Updated 2026-11-05, America/Chicago. Read root/scoped `AGENTS.md` first.
 Follow D-024, briefly explain and proceed. Follow D-036, update docs at task end
 or tool handover. Detailed history is in [STATUS.md](STATUS.md).
 
-## Completed Task17
+## Completed Task18
 
-Workout Progress and personal records are implemented, reviewed and integrated
-under D-037. Home's View progress opens exact exercise/unit groups, heaviest-set
-and most-reps summaries, a load chart, per-weight rep records and saved-workout
-links. Completed actual sets supply every metric. Deletion/reload recomputes
-results. The root timer survives navigation. The builder selected the metric
-definitions, exact name/unit grouping, evenly spaced finish-order chart and
-20-row table paging.
+Backup and restore is implemented under D-038. Home exports validated history,
+routines and the active workout as a JSON file. Restore previews additions,
+skips identical IDs and rejects conflicts before an atomic save. Previews expire
+on load/source changes. The builder chose additive merges, format version 1,
+4 MiB admission and retained OS-managed successful-share cache files.
 
-- Reviewed source `22d694b` passes fresh design/code reviews. The code reviewer
-  independently passed 86 tests in 7 files, with no significant findings.
-- The original checkout passes 511 tests in 28 files, lint, build, guarded mobile
-  sync and all 19 local Chromium cases. Phone/desktop synthetic previews were
-  inspected at 390/1280 px, including a zero-load marker, with no overflow.
-- Hosted feature runs 42125223775 and 42125223989 pass browser/native checks.
-  Integrated master `3006feb` passes browser run 42127574129 and native
-  run 42127573785, including Android compilation and visible iPhone 17 Pro/iOS 26.4
-  simulator startup. Final documentation commits retain that runtime source.
-- Master and the original Task8 branch preserve concurrent `b7e4b39` phone-speed
-  requirements and `967b82e` lean-doc rules. Task17's decision is D-037, keeping
-  the user's D-036 numbering. All branches are retained. Task4 stays unmerged.
-- The clean temporary worktree was removed. This original `GymBro AI` checkout
-  is the only worktree. Synthetic previews/script remain ignored under
-  `build/visual-review/task17/`. The owned 4183 listener was verified and stopped.
+- Reviewed source 070988e passes 562 tests in 34 files, lint, build and guarded
+  mobile sync. The original checkout passes all 22 Chromium cases in 4.4 minutes
+  and sequential tests/lint/build. Fresh code review passes 75 tests in 8 files with
+  no unresolved significant findings. Design/plan/reviews are in superpowers.
+- Feature browser 42134699804/native 42134699316 and master browser 42136735021/
+  native 42136734990 all pass. Native evidence covers Android/iOS compilation
+  and visible iPhone 17 Pro/iOS 26.4 startup with three plugins. Actual device
+  picker/share saving remains a phone-session requirement.
+- One initial browser video case timed out during live edits, with cause
+  unconfirmed. Frozen-source local/hosted runs pass. Original parallel checks
+  hit a test-output-directory race and one five-second unit timeout, then sequential
+  checks pass. The build reports a 502.21 kB entry-chunk advisory.
+- Original GymBro AI is the only worktree. All branches are retained, Task4 is
+  unmerged. Synthetic previews/script are preserved in ignored
+  build/visual-review/task18, hash-checked. Owned 4183 preview is stopped.
+- Prior tracking features include manual workouts/history, saved routines,
+  session rest timer and Progress/records. Video analysis remains the existing
+  local side-view pose/elbow workflow. Read STATUS for historical evidence.
 
 ## Next work
 

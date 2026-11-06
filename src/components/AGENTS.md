@@ -5,6 +5,8 @@ Inherit [source guidance](../AGENTS.md). Follow the
 
 - Components present inputs and results; keep pose processing and measurement
   algorithms outside React rendering and event handlers.
+- Task18 adds Home Backup and restore. Invalidate previews synchronously on load,
+  busy state or source changes. Copy live file selections before clearing inputs.
 - Present the active side-view bench-press milestone honestly. Do not add
   exercise or view choices that imply unimplemented analysis capabilities.
 - Align overlays with the video's displayed image, accounting for aspect ratio,

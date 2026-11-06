@@ -1,5 +1,10 @@
 # Implementation plans
 
+Completed [Task18 workout backup](2026-11-05-workout-backup.md) under D-038.
+Reviewed source 070988e passes 562 tests, 22 browser cases, fresh reviews, guarded
+sync and feature/master hosted native checks. Physical file flows await the phone
+session. See the compact HANDOFF for current limits and next work.
+
 Completed work is [Task17 workout progress](2026-11-05-workout-progress.md) under
 D-037. Local checks pass 511 tests and 19 browser cases. Fresh design/code reviews
 found no significant issues. Hosted browser/native checks pass on source

@@ -5,6 +5,8 @@ Inherit [source guidance](../AGENTS.md). Follow the
 
 - Own clip state, processing orchestration, cancellation, and resource ownership
   here. Keep pose algorithms and form interpretation in the processing layer.
+- Task18 restore uses the existing library transaction and destination revision.
+  Reject stale previews and conflicts before writing. Identical imports are no-ops.
 - Coordinate access to a shared pose engine; do not let independent clip jobs
   interleave tracker state or violate the detector's timestamp requirements.
 - Cancel work when its clip is removed, replaced, or the session resets. Ignore

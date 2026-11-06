@@ -1,6 +1,6 @@
 # System architecture
 
-Updated 2026-11-05 through Task17 workout progress. This map distinguishes
+Updated 2026-11-05 through Task18 workout backup. This map distinguishes
 observed implementation and accepted future direction.
 
 Task 13's `tests/browser/` exercises the existing development-server application
@@ -257,6 +257,25 @@ Tables initially show 20 rows and reset paging on group/revision changes. Curren
 history is the only source, so reload/deletion recomputes results. Derived stats
 add no persisted schema. Root navigation reuses saved-workout detail and retains
 the active-workout-keyed timer.
+
+## Manual workout backups (Task18)
+
+`core/workoutBackup` validates the version 1 file envelope and uses existing v1/v2
+library validation. Known-field comparisons ignore object-key order while keeping
+array order. ID-based additions preserve current records. Conflicts reject the
+whole import. Destination revisions and aggregate bounds drive the existing
+repository transaction. Identical imports avoid writes.
+
+The bounded FileReader helper decodes strict UTF-8 under a 4 MiB byte cap and
+10-second read timeout. `WorkoutBackup` captures preview source/revision and
+subscribes synchronously to load/busy/source changes, releasing stale readers.
+Home owns navigation. The root rest timer retains its active-workout identity.
+
+`mobile/workoutBackupExport` owns browser download URLs and native cache/share
+artifacts. Filesystem 8.1.5/Share 8.0.3 are pinned and synchronized. iOS embeds the
+file-timestamp privacy reason C617.1. Native recipients retain access to successful
+cache files, managed by the OS. Export messages report admission/handoff. Actual
+file saving, picker behavior and performance need physical-device verification.
 
 ## Runtime reference sources
 

@@ -537,6 +537,20 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   [plan](superpowers/plans/2026-11-05-workout-progress.md). Phone actions require
   the user's presence and private recordings are kept outside the repository.
 
+### D-038 Local workout backup and restore
+
+- The user chose the recommended workout/routine export/import feature with
+  "start with recommended". Task18 implements manual JSON backup and restore.
+- Builder choices are a version 1 envelope, 4 MiB file cap, ID-based additive
+  merges, conflict rejection and revision-bound preview confirmation. Existing
+  validation, count/size limits and atomic destination revisions govern writes.
+- Native export uses pinned Filesystem/Share plugins and the system share sheet.
+  Successful export cache files stay available for asynchronous recipient reads,
+  managed by the OS. Manual workout records alone cross the backup boundary.
+- Physical picker/share behavior and phone performance require the user-present
+  session. Follow the [design](superpowers/specs/2026-11-05-workout-backup-design.md)
+  and [plan](superpowers/plans/2026-11-05-workout-backup.md).
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

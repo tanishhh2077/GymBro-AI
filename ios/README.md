@@ -3,7 +3,9 @@
 `App/App.xcodeproj` hosts GymBro AI (`com.gymbroai.app`) through Capacitor 8.6.0.
 The React interface, local video handling and pose engine remain in `src/`.
 Swift Package Manager references the exact Capacitor release and the root's
-installed App plugin. Install root dependencies before opening the project.
+installed App, Filesystem and Share plugins. Install root dependencies before
+opening the project. Task18 embeds `App/App/PrivacyInfo.xcprivacy` as a resource
+with filesystem reason C617.1. Its cache/share path needs physical-device testing.
 
 From the repository root, using Node 22+:
 

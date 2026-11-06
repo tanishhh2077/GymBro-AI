@@ -1,5 +1,10 @@
 # Real browser smoke checks
 
+Task18 brings the suite to 22 cases. Synthetic backup checks download/read/delete
+the actual temporary JSON file, restore into an empty library, reject malformed
+or conflicting records and exercise reload invalidation/narrow layout. Only
+synthetic record data enters these temporary downloads.
+
 Requires Node from `.nvmrc` and the locked dependencies:
 
 ```sh

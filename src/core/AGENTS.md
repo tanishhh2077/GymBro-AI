@@ -5,6 +5,8 @@ Inherit [source guidance](../AGENTS.md). Follow the
 
 - Keep processing independent of React. Separate decoded/model observations,
   deterministic measurements, and interpretations into explicit stages.
+- Task18 backup functions reuse strict workout validation and preserve aggregate
+  bounds, IDs and destination revisions. Own file-read abort/timeout cleanup.
 - D-037's workoutProgress reads validated manual history. Keep exact name/unit
   groups, actual-set provenance and deterministic ties throughout derived results.
 - Preserve actual media timestamps in seconds. Variable-frame-rate videos have

@@ -10,6 +10,38 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task18 backup/restore is complete under D-038, implemented by Codex after the
+user said "start with recommended". Reviewed/integrated source 070988e.
+
+- Home exports saved workouts, routines and active state as JSON. Additive imports
+  preview IDs/counts, skip identical records and reject conflicts atomically.
+  Format/4 MiB/merge/cache-retention choices are recorded in the design and D-038.
+- Fresh design/code reviews find no unresolved significant issues. Code review
+  independently passes 75 tests in 8 files plus exact-cap/multibyte probes. Requested
+  model gpt-6-astra, detailed runtime ID unavailable. RED/green evidence is in plan.
+- Original checkout locked install 485 packages, process-local Node 22.23.2. Final
+  sequential checks pass 562 tests in 34 files, lint and build. Guarded sync checks
+  13 web files per platform with 3 plugins. All 22 local Chromium 156.0.8078.4 cases pass in 4.4 minutes,
+  GPU, 120 synthetic samples. Four previews inspected at 390/1280 px without overflow.
+- [Feature browser](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42134699804)
+  and [native](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42134699316)
+  pass. Integrated master also passes
+  [browser 42136735021](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42136735021)
+  and [native 42136734990](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42136734990).
+  Logs confirm 562 tests, all 22 cases, Android/iOS compilation, 13 embedded web files
+  and visible iPhone 17 Pro/iOS 26.4 startup. Artifacts stay in the workflows.
+- An initial local video case lost its session during live edits and timed out.
+  Cause is unconfirmed. Frozen-source reruns pass. Original parallel checks hit
+  an ESLint/test-output cleanup race and one existing five-second fixture timeout.
+  Sequential checks pass. Build has 435 modules, JS index-BcFiZ8Aj/CSS index-D3AO3QCE,
+  with a 502.21 kB entry-chunk advisory. Physical picker/share/performance tests wait.
+- Source `070988e` is pushed to master/Task8. Only the original worktree remains,
+  all branches retained, Task4 unmerged. The owned 4183 listener was verified and
+  stopped. Ignored Task18 previews/script are copied/hash-checked in the original.
+  Next is the user-present phone session, Q10 or another approved bounded task.
+
+### Previous Task17 baseline
+
 Task17 workout Progress and personal records are complete under D-037. Codex
 implemented the accepted tracking slice after the user said "ok keep building
 the next things". Reviewed source is 22d694b, integrated master source 3006feb.

@@ -1,5 +1,9 @@
 # Media and pose processing
 
+`workoutBackup.ts` owns the versioned manual-record JSON format and additive,
+conflict-rejecting merges. `workoutBackupFile.ts` owns bounded strict UTF-8 reads,
+abort/timeout cleanup and the 4 MiB file limit. Both reuse workout validation.
+
 `workouts.ts` separately validates Task 14's manual workout schema, units, bounds,
 IDs and media-free storage shape. It does not derive anything from pose data.
 `workouts.test.ts` has 29 boundary cases; see D-030 and the tracking design.

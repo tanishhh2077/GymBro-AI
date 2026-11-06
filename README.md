@@ -23,6 +23,13 @@ work. Accepted Q&A selects
 guest access with optional workout-record sync only, excluding videos; those
 services are not built. See [PRODUCT_DIRECTION](docs/PRODUCT_DIRECTION.md).
 
+Home's **Backup and restore** exports saved workouts, routines and the active
+workout as a JSON file. Choose a backup to preview additions, then confirm.
+Restore skips identical IDs and rejects conflicting versions. Browser export
+requests a download. Installed-app export opens the native share sheet and keeps
+an OS-managed cache copy available to receiving apps. Physical-phone file flows
+still need testing.
+
 The existing browser prototype contains local video selection, MediaPipe pose
 estimation, and a skeleton overlay with playback controls. Repetition detection,
 depth/tempo findings, persisted AI sessions, and comparisons are not yet
