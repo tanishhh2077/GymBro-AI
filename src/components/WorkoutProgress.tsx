@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { buildWorkoutProgress } from '@/core/workoutProgress';
+import { filterProgressHistory, progressRangeStart, PROGRESS_PERIODS, type ProgressPeriod } from '@/core/progressRange';
 import type { ExerciseProgress, RecordedSet } from '@/types/progress';
 import type { WorkoutData } from '@/types/workout';
 import { WorkoutProgressChart } from './WorkoutProgressChart';
@@ -19,7 +20,13 @@ function finishedDate(record: RecordedSet): string {
 export function WorkoutProgress({ data, available, onHome, onWorkout, onHistory }: Props) {
   const groups = useMemo(() => buildWorkoutProgress(data.history), [data.history]);
   const [selectedKey, setSelectedKey] = useState('');
+  const [{ period, now }, setRange] = useState(() => ({ period: 'all' as ProgressPeriod, now: Date.now() }));
   const selected = groups.find(group => group.key === selectedKey) ?? groups[0];
+  const start = progressRangeStart(period, now);
+  const periodLabel = PROGRESS_PERIODS.find(option => option.value === period)!.label;
+  const periodGroups = useMemo(() => period === 'all' ? groups :
+    buildWorkoutProgress(filterProgressHistory(data.history, period, now)), [data.history, groups, period, now]);
+  const periodGroup = periodGroups.find(group => group.key === selected?.key);
 
   return <div className="space-y-6">
     <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={onHome}>Back to Home</button>
@@ -41,7 +48,20 @@ export function WorkoutProgress({ data, available, onHome, onWorkout, onHistory 
         </select>
         <p className="mt-2 text-xs text-slate-500">Each saved exercise name and weight unit has its own history. Use consistent names when logging.</p>
       </div>
-      <ProgressDetails key={`${selected.key}:${data.revision}`} group={selected} onHistory={onHistory} />
+      <div>
+        <label htmlFor="progress-period" className="text-sm text-slate-300">Time period</label>
+        <select id="progress-period" value={period} onChange={event => setRange({ period: event.target.value as ProgressPeriod, now: Date.now() })}
+          className="mt-1 w-full min-w-0 rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white">
+          {PROGRESS_PERIODS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+        </select>
+        <p className="mt-2 text-xs text-slate-500">{start === null ? 'All saved completed workouts.' :
+          `${new Date(start).toLocaleDateString()} through ${new Date(now).toLocaleString()}. Rolling calendar months from local midnight; shorter months use their last day. Reopen Progress or change periods to refresh the cutoff.`}</p>
+      </div>
+      <div aria-live="polite">
+        <p className="mb-3 text-sm text-slate-300">{period === 'all' ? 'All-time records' : `Records for ${periodLabel}`}</p>
+        {periodGroup ? <ProgressDetails key={`${selected.key}:${data.revision}:${period}`} group={periodGroup} onHistory={onHistory} /> :
+          <p className="text-slate-400">No regular sets for {selected.name} ({selected.unit}) in {periodLabel}. Choose a longer period or All time to see earlier progress.</p>}
+      </div>
     </>}
   </div>;
 }
