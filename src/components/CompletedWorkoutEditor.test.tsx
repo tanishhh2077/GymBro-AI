@@ -26,7 +26,10 @@ it('opens a correction draft, cancels without writes and retains failed edits th
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input, 'Corrected');
       input.dispatchEvent(new Event('input', { bubbles: true }));
     });
-    await click('Cancel workout edit'); expect((await repository.load()).revision).toBe(1);
+    // Typed corrections make Cancel ask before discarding them (Q30).
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    await click('Cancel workout edit'); expect(confirm).toHaveBeenCalledWith('Discard unsaved changes?');
+    expect((await repository.load()).revision).toBe(1);
     await click('Edit completed workout');
     vi.spyOn(repository, 'save').mockRejectedValueOnce(new Error('disk'));
     await act(async () => {

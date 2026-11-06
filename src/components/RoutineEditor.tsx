@@ -3,9 +3,10 @@ import { useStore } from 'zustand';
 import type { RoutineInput, WeightUnit, WorkoutRoutine } from '@/types/workout';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
 import { ExercisePicker } from './ExercisePicker';
+import { confirmDiscard, useUnsavedChanges } from './unsavedChanges';
 
 const inputClass = 'mt-1 w-full rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white';
-interface Row { key: string; name: string; sets: string; reps: string }
+interface Row { key: string; name: string; sets: string; reps: string; weight: string }
 export function RoutineEditor({ store, routine, expectedRevision, onClose }: {
   store: WorkoutStore; routine?: WorkoutRoutine; expectedRevision: number; onClose: (saved: boolean) => void;
 }) {
@@ -15,11 +16,15 @@ export function RoutineEditor({ store, routine, expectedRevision, onClose }: {
   const [name, setName] = useState(routine?.name ?? '');
   const [unit, setUnit] = useState<WeightUnit>(routine?.unit ?? 'lb');
   const [rows, setRows] = useState<Row[]>(() => routine ? routine.exercises.map(e => ({ key: e.id, name: e.name,
-    sets: e.targetSets === undefined ? '' : String(e.targetSets), reps: e.targetReps === undefined ? '' : String(e.targetReps) }))
-    : [{ key: 'draft:0', name: '', sets: '', reps: '' }]);
+    sets: e.targetSets === undefined ? '' : String(e.targetSets), reps: e.targetReps === undefined ? '' : String(e.targetReps),
+    weight: e.targetWeight === undefined ? '' : String(e.targetWeight) }))
+    : [{ key: 'draft:0', name: '', sets: '', reps: '', weight: '' }]);
+  const [opened] = useState(() => JSON.stringify({ name, unit, rows }));
+  const dirty = JSON.stringify({ name, unit, rows }) !== opened;
+  useUnsavedChanges(dirty);
   const [error, setError] = useState('');
   const disabled = !state.loaded || state.busy || state.needsReload;
-  function change(key: string, field: 'name' | 'sets' | 'reps', value: string) {
+  function change(key: string, field: 'name' | 'sets' | 'reps' | 'weight', value: string) {
     setRows(current => current.map(row => row.key === key ? { ...row, [field]: value } : row));
   }
   function move(key: string, direction: number) {
@@ -32,7 +37,9 @@ export function RoutineEditor({ store, routine, expectedRevision, onClose }: {
   async function save(event: FormEvent) {
     event.preventDefault(); setError('');
     const input: RoutineInput = { name, unit, exercises: rows.map(row => ({ name: row.name,
-      ...(row.sets.trim() ? { targetSets: Number(row.sets) } : {}), ...(row.reps.trim() ? { targetReps: Number(row.reps) } : {}) })) };
+      ...(row.sets.trim() ? { targetSets: Number(row.sets) } : {}), ...(row.reps.trim() ? { targetReps: Number(row.reps) } : {}),
+      // Blank stays absent: the store rejects an explicit undefined target.
+      ...(row.weight.trim() ? { targetWeight: Number(row.weight) } : {}) })) };
     const result = routine ? await state.updateRoutine(routine.id, expectedRevision, input) : await state.createRoutine(input);
     if (result.ok) onClose(true); else setError(result.message);
   }
@@ -61,6 +68,9 @@ export function RoutineEditor({ store, routine, expectedRevision, onClose }: {
             <div><label htmlFor={`${id}-${row.key}-reps`} className="text-xs text-slate-400">Target reps for exercise {index + 1}</label>
               <input id={`${id}-${row.key}-reps`} type="number" inputMode="numeric" min={1} max={1000} step={1} placeholder="Optional"
                 className={inputClass} value={row.reps} onChange={e => change(row.key, 'reps', e.target.value)} /></div>
+            <div className="col-span-2"><label htmlFor={`${id}-${row.key}-weight`} className="text-xs text-slate-400">Target weight for exercise {index + 1} ({unit})</label>
+              <input id={`${id}-${row.key}-weight`} type="number" inputMode="decimal" min={0} max={10000} step="any" placeholder="Optional"
+                className={inputClass} value={row.weight} onChange={e => change(row.key, 'weight', e.target.value)} /></div>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" className="btn-ghost" disabled={index === 0} aria-label={`Move exercise ${index + 1} up`} onClick={() => move(row.key, -1)}>Move up</button>
@@ -70,12 +80,12 @@ export function RoutineEditor({ store, routine, expectedRevision, onClose }: {
         </fieldset>)}</div>
         {!rows.length && <p className="text-sm text-slate-400">Add at least one exercise before saving.</p>}
         <button type="button" className="btn-ghost" disabled={rows.length >= 100} onClick={() => {
-          const key = `draft:${++sequence.current}`; setRows(current => [...current, { key, name: '', sets: '', reps: '' }]);
+          const key = `draft:${++sequence.current}`; setRows(current => [...current, { key, name: '', sets: '', reps: '', weight: '' }]);
         }}>Add routine exercise</button>
         <div className="flex flex-wrap items-center gap-3"><button type="submit" className="btn-primary" disabled={!rows.length}>Save routine</button>
-          <span className="text-xs text-slate-500">Targets: 1–100 sets, 1–1000 reps, or leave blank.</span></div>
+          <span className="text-xs text-slate-500">Targets: 1–100 sets, 1–1000 reps, 0–10000 {unit}, or leave blank.</span></div>
       </fieldset>
     </form>
-    <button type="button" className="text-sm text-slate-400 underline underline-offset-4" disabled={state.busy} onClick={() => onClose(false)}>Cancel routine edit</button>
+    <button type="button" className="text-sm text-slate-400 underline underline-offset-4" disabled={state.busy} onClick={() => { if (confirmDiscard(dirty)) onClose(false); }}>Cancel routine edit</button>
   </div>;
 }

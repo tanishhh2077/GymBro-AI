@@ -53,6 +53,7 @@ export function WorkoutRoutines({ store, onStarted, onResume }: { store: Workout
           <ol className="my-4 list-inside list-decimal space-y-2 text-sm text-slate-300">{routine.exercises.map(e => <li key={e.id} className="break-words">
             {e.name}{e.targetSets !== undefined && <span className="text-slate-400"> · {e.targetSets} sets</span>}
             {e.targetReps !== undefined && <span className="text-slate-400"> · {e.targetReps} reps per set</span>}
+            {e.targetWeight !== undefined && <span className="text-slate-400"> · {e.targetWeight} {routine.unit}</span>}
           </li>)}</ol>
           <div className="flex flex-wrap gap-2">
             <button type="button" className="btn-primary" aria-label={`Start routine ${routine.name}`} disabled={disabled || !!state.data.active}
