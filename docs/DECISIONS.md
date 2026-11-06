@@ -589,6 +589,17 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   trigger it. Timer/option state ends on reload or a new workout. This supersedes
   D-033's manual-only boundary. Q11 theme controls and Q12 catalog remain planned.
 
+### D-041 Searchable exercise library
+
+- Q12 A selects built-in exercise search plus custom entries. The user then
+  directed continued implementation. Task22 adds a shared picker to workout and
+  routine editors, with 57 bundled rep-based exercise names and search by name,
+  equipment, muscle group and common aliases.
+- Builder choices derive reusable custom names from existing active/history/
+  routine records, preserving exact spelling and case. A name stays available
+  while a saved record contains it. Selecting a suggestion fills the name field;
+  the existing Add/Save action confirms it. Results expand eight at a time.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

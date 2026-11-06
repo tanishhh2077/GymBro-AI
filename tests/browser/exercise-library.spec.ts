@@ -1,0 +1,52 @@
+import { test, expect } from './app';
+
+test('selects built-in and custom exercises in workouts and routines at phone width', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await page.getByLabel('Workout name', { exact: true }).fill('Synthetic library workout');
+  await page.getByRole('button', { name: 'Start workout', exact: true }).click();
+  await page.getByLabel('Exercise name', { exact: true }).fill('Unsubmitted draft');
+  await page.getByText('Browse exercise library', { exact: true }).click();
+  await page.getByLabel('Search exercise library', { exact: true }).fill('barbell bench');
+  await page.getByLabel('Search exercise library', { exact: true }).press('Enter');
+  await expect(page.getByRole('region', { name: 'Unsubmitted draft', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Use Bench press', exact: true }).focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByLabel('Exercise name', { exact: true })).toHaveValue('Bench press');
+  await expect(page.getByLabel('Exercise name', { exact: true })).toBeFocused();
+  await page.getByRole('button', { name: 'Add exercise', exact: true }).click();
+  await expect(page.getByRole('region', { name: 'Bench press', exact: true })).toBeVisible();
+
+  const custom = 'Z'.repeat(80);
+  await page.getByText('Browse exercise library', { exact: true }).click();
+  await page.getByLabel('Search exercise library', { exact: true }).fill(custom);
+  const customChoice = page.getByRole('button', { name: `Use custom exercise ${custom}`, exact: true });
+  await expect(customChoice).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await customChoice.click();
+  await page.getByRole('button', { name: 'Add exercise', exact: true }).click();
+  await expect(page.getByRole('region', { name: custom, exact: true })).toBeVisible();
+  await page.reload();
+  await page.getByRole('button', { name: 'Resume workout', exact: true }).click();
+  await page.getByText('Browse exercise library', { exact: true }).click();
+  await page.getByLabel('Search exercise library', { exact: true }).fill('ZZZZ');
+  await page.getByRole('button', { name: `Use ${custom}`, exact: true }).click();
+  await expect(page.getByLabel('Exercise name', { exact: true })).toHaveValue(custom);
+  await expect(page.locator('section[aria-label]')).toHaveCount(2);
+
+  await page.getByRole('button', { name: 'Routines', exact: true }).click();
+  await page.getByRole('button', { name: 'New routine', exact: true }).click();
+  await page.getByLabel('Routine name', { exact: true }).fill('Synthetic library routine');
+  await page.getByLabel('Exercise 1 name', { exact: true }).fill('Unsubmitted row');
+  await page.getByText('Browse exercise library', { exact: true }).click();
+  await page.getByLabel('Search exercise library', { exact: true }).fill('back cable');
+  await page.getByLabel('Search exercise library', { exact: true }).press('Enter');
+  await expect(page.getByRole('heading', { name: 'New routine', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Use Lat pulldown', exact: true }).click();
+  await page.getByLabel('Target reps for exercise 1', { exact: true }).fill('12');
+  await page.getByRole('button', { name: 'Save routine', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Routine saved.' })).toBeVisible();
+  await expect(page.getByText('Lat pulldown', { exact: false })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});

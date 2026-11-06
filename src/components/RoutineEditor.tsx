@@ -2,6 +2,7 @@ import { useId, useRef, useState, type FormEvent } from 'react';
 import { useStore } from 'zustand';
 import type { RoutineInput, WeightUnit, WorkoutRoutine } from '@/types/workout';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
+import { ExercisePicker } from './ExercisePicker';
 
 const inputClass = 'mt-1 w-full rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white';
 interface Row { key: string; name: string; sets: string; reps: string }
@@ -51,8 +52,8 @@ export function RoutineEditor({ store, routine, expectedRevision, onClose }: {
         </div>
         <div className="space-y-4">{rows.map((row, index) => <fieldset key={row.key} className="min-w-0 rounded-xl border border-white/10 p-4">
           <legend className="px-1 text-sm font-semibold text-slate-300">Exercise {index + 1}</legend>
-          <div><label htmlFor={`${id}-${row.key}-name`} className="text-sm text-slate-300">Exercise {index + 1} name</label>
-            <input id={`${id}-${row.key}-name`} required maxLength={80} className={inputClass} value={row.name} onChange={e => change(row.key, 'name', e.target.value)} /></div>
+          <ExercisePicker id={`${id}-${row.key}-name`} label={`Exercise ${index + 1} name`} value={row.name}
+            onChange={value => change(row.key, 'name', value)} data={state.data} />
           <div className="mt-3 grid grid-cols-2 gap-3">
             <div><label htmlFor={`${id}-${row.key}-sets`} className="text-xs text-slate-400">Target sets for exercise {index + 1}</label>
               <input id={`${id}-${row.key}-sets`} type="number" inputMode="numeric" min={1} max={100} step={1} placeholder="Optional"

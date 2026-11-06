@@ -5,31 +5,28 @@ Follow D-024, briefly explain and proceed. Follow D-036, update docs at task end
 or tool handover. Root Development pace now sets focused checks, lightweight
 planning and risk-based independent review. Detailed history is in [STATUS.md](STATUS.md).
 
-## Completed Task21
+## Completed Task22
 
-Workout convenience is implemented under D-040 on
-`feat/task21-workout-convenience` by Codex (runtime model ID unavailable).
+The exercise library is implemented under D-041 on `feat/task22-exercise-library`
+by Codex (runtime model ID unavailable), with ordinary UI/helper self-review.
 
-- Previous workout shows the latest completed session before the active workout
-  began, matching exact exercise names and units. **Use values** fills editable
-  fields. **Repeat last set** logs a fresh actual set without replacing a draft.
-- **Start rest automatically after logging a set** is opt-in per workout. New
-  set saves restart the full selected duration. Edits/removals do not restart it.
-  Navigation retains timer state; reload/new workouts reset the timer and option.
-- Local checks pass 613 tests in 37 files, lint, build, guarded native sync
-  (13 files per platform, 3 plugins) and all 24 Chromium cases in 2.9 minutes.
-  The new flow fits 390 px. Ordinary UI/helper changes were self-reviewed.
-- The production build reports a 509.52 kB main-chunk advisory. Physical iPhone
-  behavior remains unverified. See GitHub Actions for hosted results on the
-  integrated commit. Task19's completed session-only set links and earlier
-  feature evidence are recorded in STATUS.
+- Workouts and routine rows offer **Browse exercise library**, search by name,
+  equipment or muscle group, 57 bundled entries and reusable saved custom names.
+  Selection fills a draft field. Existing Add/Save actions confirm the record.
+  Custom names are derived from saved workout/routine records, preserving case.
+- Checks pass 622 tests / 38 files, lint, build, guarded sync (13 files/platform,
+  3 plugins) and eight affected Chromium cases, including 390 px long-name and
+  keyboard flows. The production build reports a 516.41 kB main-chunk advisory.
+- Task21's final 09fb1ba hosted browser 42158947908 and native 42158947509 both
+  pass. Its previous-value/repeat/auto-rest behavior and earlier features are in
+  STATUS. Physical iPhone behavior and real-bench accuracy require their own tests.
 
 ## Next work
 
-Q13's workout-convenience slice is complete. The next recommended feature is
-Q12's searchable exercise catalog plus custom entries. Q11 selects system-following
-light/dark mode with an override. Q10 selects familiar Hevy-style flows with
-GymBro's own design. See PRODUCT_DIRECTION for all 13 answers.
+The user authorized continuing through the accepted tasks. Task23 is Q11's
+system-following light/dark appearance with a manual override, using the existing
+visual system. Q10 selects familiar Hevy-style flows with GymBro's own design.
+See PRODUCT_DIRECTION for all 13 answers.
 
 An existing `feat/task20-faster-start` branch contains on-demand video-analysis
 loading (`8b336f4` observed). Check its current ownership/integration before

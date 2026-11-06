@@ -10,6 +10,18 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task22 exercise library is complete under D-041, implemented and self-reviewed
+by Codex (runtime model ID unavailable). `core/exerciseCatalog` supplies 57 local
+entries, search and exact-name reuse from saved workout/routine records.
+`ExercisePicker` integrates with both editors through their existing save paths.
+Four new integration cases failed before implementation. Final checks pass 622
+tests / 38 files, lint, build, guarded sync (13 files/platform, 3 plugins) and
+eight affected browser cases. A new 390 px browser case exposed 80-character
+custom-name overflow, corrected with a shrinkable text child. Search Enter does
+not submit the parent form. The build reports a 516.41 kB entry chunk. No physical
+phone test or real-video assessment was performed. Next is Q11 appearance.
+Task21's 09fb1ba hosted browser 42158947908 and native 42158947509 both succeeded.
+
 Task21 workout convenience is implemented under D-040 by Codex (runtime model
 ID unavailable). It adds `core/previousWorkout`, workout-editor copy/repeat/focus
 controls and an App-to-timer handle for opt-in rest after confirmed new-set saves.

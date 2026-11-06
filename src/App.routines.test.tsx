@@ -108,3 +108,14 @@ it('does not claim an empty routine library when storage cannot be loaded', asyn
   expect(container.textContent).toContain('Open saved workouts to view routines');
   expect(container.textContent).not.toContain('Save a routine to reuse');
 });
+
+it('selects a library exercise for one routine row while retaining its targets and other rows', async () => {
+  await draft();
+  await act(async () => container.querySelector('summary')!.click());
+  await fill('Search exercise library', 'lat pulldown'); await click('Use Lat pulldown');
+  expect(store.getState().data.routines).toBeUndefined();
+  await submit();
+  expect(store.getState().data.routines![0].exercises).toMatchObject([
+    { name: 'Lat pulldown', targetSets: 3, targetReps: 8 }, { name: 'Row', targetReps: 12 },
+  ]);
+});

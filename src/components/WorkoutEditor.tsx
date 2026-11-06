@@ -4,6 +4,7 @@ import type { WeightUnit, WorkoutExercise } from '@/types/workout';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
 import { findPreviousExercise } from '@/core/previousWorkout';
 import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton';
+import { ExercisePicker } from './ExercisePicker';
 
 const inputClass = 'mt-1 w-full rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white';
 function numeric(value: string) { return value.trim() ? Number(value) : NaN; }
@@ -44,10 +45,9 @@ export function WorkoutEditor({ store, onFinished, onSetLogged, analysis }: {
       <form aria-label="Add an exercise" className="border-t border-white/10 pt-5" onSubmit={async event => {
         event.preventDefault(); if ((await state.addExercise(exerciseName)).ok) setExerciseName('');
       }}>
-        <label htmlFor="exercise-name" className="text-sm text-slate-300">Exercise name</label>
-        <div className="mt-1 flex flex-wrap gap-2"><input id="exercise-name" className={`${inputClass} !mt-0 min-w-0 flex-1`} required maxLength={80}
-          placeholder="e.g. Bench press" value={exerciseName} onChange={e => setExerciseName(e.target.value)} />
-          <button type="submit" className="btn-ghost">Add exercise</button></div>
+        <ExercisePicker id="exercise-name" label="Exercise name" value={exerciseName} onChange={setExerciseName} data={state.data}>
+          <button type="submit" className="btn-ghost">Add exercise</button>
+        </ExercisePicker>
       </form>
       <button type="button" className="btn-primary w-full sm:w-auto" onClick={async () => { if ((await state.finishWorkout()).ok) onFinished(); }}>Finish workout</button>
     </fieldset>
