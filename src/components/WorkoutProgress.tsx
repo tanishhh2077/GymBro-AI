@@ -1,8 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { buildExerciseHistory } from '@/core/exerciseHistory';
 import { buildWorkoutProgress } from '@/core/workoutProgress';
 import { filterProgressHistory, progressRangeStart, PROGRESS_PERIODS, type ProgressPeriod } from '@/core/progressRange';
 import type { ExerciseProgress, RecordedSet } from '@/types/progress';
-import type { WorkoutData } from '@/types/workout';
+import type { WeightUnit, WorkoutData } from '@/types/workout';
+import { ExerciseWorkoutHistory } from './ExerciseWorkoutHistory';
+import { WeeklyConsistency } from './WeeklyConsistency';
 import { WorkoutProgressChart } from './WorkoutProgressChart';
 
 interface Props {
@@ -13,6 +16,9 @@ interface Props {
   onHistory: (id: string) => void;
 }
 
+/** The exact name/unit group a detail view shows; kept by value so a deletion can be explained. */
+interface DetailTarget { key: string; name: string; unit: WeightUnit }
+
 function finishedDate(record: RecordedSet): string {
   return new Date(record.finishedAt).toLocaleDateString();
 }
@@ -21,12 +27,30 @@ export function WorkoutProgress({ data, available, onHome, onWorkout, onHistory 
   const groups = useMemo(() => buildWorkoutProgress(data.history), [data.history]);
   const [selectedKey, setSelectedKey] = useState('');
   const [{ period, now }, setRange] = useState(() => ({ period: 'all' as ProgressPeriod, now: Date.now() }));
+  const [openedAt] = useState(() => Date.now());
+  const [detail, setDetail] = useState<DetailTarget | null>(null);
+  const returnKey = useRef<string | null>(null);
+  const exerciseList = useRef<HTMLUListElement>(null);
   const selected = groups.find(group => group.key === selectedKey) ?? groups[0];
-  const start = progressRangeStart(period, now);
   const periodLabel = PROGRESS_PERIODS.find(option => option.value === period)!.label;
   const periodGroups = useMemo(() => period === 'all' ? groups :
     buildWorkoutProgress(filterProgressHistory(data.history, period, now)), [data.history, groups, period, now]);
   const periodGroup = periodGroups.find(group => group.key === selected?.key);
+  const choosePeriod = (value: ProgressPeriod) => setRange({ period: value, now: Date.now() });
+
+  // Return keyboard focus to the exercise that opened the detail view.
+  useEffect(() => {
+    if (detail || returnKey.current === null) return;
+    const key = returnKey.current;
+    returnKey.current = null;
+    [...exerciseList.current?.querySelectorAll<HTMLButtonElement>('button[data-group-key]') ?? []]
+      .find(item => item.dataset.groupKey === key)?.focus();
+  }, [detail]);
+
+  if (available && detail) {
+    return <ExerciseDetail target={detail} data={data} groups={groups} period={period} now={now} periodLabel={periodLabel}
+      onPeriod={choosePeriod} onHistory={onHistory} onBack={() => { returnKey.current = detail.key; setDetail(null); }} />;
+  }
 
   return <div className="space-y-6">
     <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={onHome}>Back to Home</button>
@@ -39,6 +63,21 @@ export function WorkoutProgress({ data, available, onHome, onWorkout, onHistory 
       <p className="text-slate-400">Complete a workout with a regular set to see your progress.</p>
       <button type="button" className="btn-primary" onClick={onWorkout}>{data.active ? 'Resume workout' : 'Start workout'}</button>
     </div>}
+    {available && groups.length > 0 && <section aria-labelledby="progress-exercises-title" className="space-y-3">
+      <h2 id="progress-exercises-title" className="text-xl font-semibold text-white">Exercise details</h2>
+      <p className="text-sm text-slate-400">Open one exact exercise name and unit for its records, chart and completed workouts.</p>
+      <ul ref={exerciseList} aria-label="Exercises" className="divide-y divide-white/10 rounded-lg border border-white/10">
+        {groups.map(group => <li key={group.key}>
+          <button type="button" data-group-key={group.key} aria-label={`Open details for ${group.name} (${group.unit})`}
+            className="flex w-full min-w-0 items-center justify-between gap-3 px-3 py-3 text-left focus-visible:outline focus-visible:outline-accent"
+            onClick={() => setDetail({ key: group.key, name: group.name, unit: group.unit })}>
+            <span className="min-w-0 break-words text-white">{group.name} ({group.unit})</span>
+            <span className="shrink-0 text-xs text-slate-400">{group.workouts.length} {group.workouts.length === 1 ? 'workout' : 'workouts'} ›</span>
+          </button>
+        </li>)}
+      </ul>
+    </section>}
+    {available && <WeeklyConsistency history={data.history} now={openedAt} />}
     {available && selected && <>
       <div>
         <label htmlFor="progress-exercise" className="text-sm text-slate-300">Exercise and unit</label>
@@ -48,15 +87,7 @@ export function WorkoutProgress({ data, available, onHome, onWorkout, onHistory 
         </select>
         <p className="mt-2 text-xs text-slate-500">Each saved exercise name and weight unit has its own history. Use consistent names when logging.</p>
       </div>
-      <div>
-        <label htmlFor="progress-period" className="text-sm text-slate-300">Time period</label>
-        <select id="progress-period" value={period} onChange={event => setRange({ period: event.target.value as ProgressPeriod, now: Date.now() })}
-          className="mt-1 w-full min-w-0 rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white">
-          {PROGRESS_PERIODS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
-        </select>
-        <p className="mt-2 text-xs text-slate-500">{start === null ? 'All saved completed workouts.' :
-          `${new Date(start).toLocaleDateString()} through ${new Date(now).toLocaleString()}. Rolling calendar months from local midnight; shorter months use their last day. Reopen Progress or change periods to refresh the cutoff.`}</p>
-      </div>
+      <PeriodControl period={period} now={now} onChange={choosePeriod} />
       <div aria-live="polite">
         <p className="mb-3 text-sm text-slate-300">{period === 'all' ? 'All-time records' : `Records for ${periodLabel}`}</p>
         {periodGroup ? <ProgressDetails key={`${selected.key}:${data.revision}:${period}`} group={periodGroup} onHistory={onHistory} /> :
@@ -66,14 +97,74 @@ export function WorkoutProgress({ data, available, onHome, onWorkout, onHistory 
   </div>;
 }
 
-function ProgressDetails({ group, onHistory }: { group: ExerciseProgress; onHistory: (id: string) => void }) {
+function PeriodControl({ period, now, onChange }: { period: ProgressPeriod; now: number; onChange: (period: ProgressPeriod) => void }) {
+  const start = progressRangeStart(period, now);
+  return <div>
+    <label htmlFor="progress-period" className="text-sm text-slate-300">Time period</label>
+    <select id="progress-period" value={period} onChange={event => onChange(event.target.value as ProgressPeriod)}
+      className="mt-1 w-full min-w-0 rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white">
+      {PROGRESS_PERIODS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+    </select>
+    <p className="mt-2 text-xs text-slate-500">{start === null ? 'All saved completed workouts.' :
+      `${new Date(start).toLocaleDateString()} through ${new Date(now).toLocaleString()}. Rolling calendar months from local midnight; shorter months use their last day. Reopen Progress or change periods to refresh the cutoff.`}</p>
+  </div>;
+}
+
+function ExerciseDetail({ target, data, groups, period, now, periodLabel, onPeriod, onHistory, onBack }: {
+  target: DetailTarget;
+  data: WorkoutData;
+  groups: readonly ExerciseProgress[];
+  period: ProgressPeriod;
+  now: number;
+  periodLabel: string;
+  onPeriod: (period: ProgressPeriod) => void;
+  onHistory: (id: string) => void;
+  onBack: () => void;
+}) {
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => heading.current?.focus(), []);
+  const periodHistory = useMemo(() => filterProgressHistory(data.history, period, now), [data.history, period, now]);
+  const periodGroup = useMemo(() => buildWorkoutProgress(periodHistory).find(group => group.key === target.key),
+    [periodHistory, target.key]);
+  // Infinity keeps every completed workout; the period filter above sets the range.
+  const entries = useMemo(() => buildExerciseHistory(periodHistory, Number.POSITIVE_INFINITY, target.name, target.unit),
+    [periodHistory, target.name, target.unit]);
+  const remaining = useMemo(() => groups.some(group => group.key === target.key) ||
+    buildExerciseHistory(data.history, Number.POSITIVE_INFINITY, target.name, target.unit).length > 0,
+  [groups, data.history, target]);
+  const label = `${target.name} (${target.unit})`;
+
+  return <div className="space-y-6">
+    <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={onBack}>Back to Progress</button>
+    <div>
+      <h1 ref={heading} tabIndex={-1} className="break-words text-3xl font-bold text-white focus:outline-none">{label}</h1>
+      <p className="mt-2 text-sm text-slate-400">Only this exact saved exercise name and {target.unit} unit. Other names and units stay separate and are never converted.</p>
+    </div>
+    {!remaining ? <p className="text-slate-400">No completed workouts remain for {label}. They may have been deleted.</p> : <>
+      <PeriodControl period={period} now={now} onChange={onPeriod} />
+      <div aria-live="polite" className="space-y-3">
+        <p className="text-sm text-slate-300">{period === 'all' ? 'All-time records' : `Records for ${periodLabel}`} from regular sets. Warm-ups are excluded.</p>
+        {periodGroup ? <ProgressDetails key={`${data.revision}:${period}`} group={periodGroup} onHistory={onHistory} showTitle={false} /> :
+          <p className="text-slate-400">No regular sets for {label} in {periodLabel}. Choose a longer period or All time to see earlier progress.</p>}
+      </div>
+      <ExerciseWorkoutHistory key={`${data.revision}:${period}`} entries={entries} name={target.name} unit={target.unit}
+        periodLabel={periodLabel} onHistory={onHistory} />
+    </>}
+  </div>;
+}
+
+function ProgressDetails({ group, onHistory, showTitle = true }: {
+  group: ExerciseProgress;
+  onHistory: (id: string) => void;
+  showTitle?: boolean;
+}) {
   const [visibleWorkouts, setVisibleWorkouts] = useState(20);
   const [visibleWeights, setVisibleWeights] = useState(20);
   const recentWorkouts = [...group.workouts].reverse();
 
   return <div className="space-y-6">
     <div>
-      <h2 className="break-words text-2xl font-semibold text-white">{group.name}</h2>
+      {showTitle && <h2 className="break-words text-2xl font-semibold text-white">{group.name}</h2>}
       <p className="mt-1 text-sm text-slate-400">{group.workouts.length} completed workouts with {group.loggedSetCount} regular sets in {group.unit}.</p>
     </div>
     <div className="grid gap-4 sm:grid-cols-2">

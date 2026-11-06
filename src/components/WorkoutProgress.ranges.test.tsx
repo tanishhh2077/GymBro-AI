@@ -84,7 +84,8 @@ it('keeps the exact exercise/unit selected when a period has no sets and restore
   expect(container.textContent).toContain('No regular sets for Row (lb) in Last month');
   expect(container.textContent).toContain('Choose a longer period');
   expect(container.querySelector('svg')).toBeNull();
-  expect(container.querySelector('table')).toBeNull();
+  expect(container.querySelector('table[aria-label="Workout progress history"]')).toBeNull();
+  expect(container.querySelector('table[aria-label="Rep records by weight"]')).toBeNull();
   expect(container.querySelector('[aria-label="Heaviest logged set"]')).toBeNull();
   await select('progress-period', 'all');
   expect(container.querySelector<HTMLSelectElement>('#progress-exercise')?.value).toBe(key);
