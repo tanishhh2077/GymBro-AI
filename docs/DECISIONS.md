@@ -566,6 +566,18 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   own decision. See the [design](superpowers/specs/2026-11-05-set-linked-analysis-design.md)
   and [plan](superpowers/plans/2026-11-05-set-linked-analysis.md).
 
+### D-040 Load video-analysis code on demand
+
+- On 2026-11-05 the user asked for Task19 "along with ... some other tasks", and
+  earlier required the phone app to feel smooth, not laggy. The builder selected
+  Task20: the 507 kB entry chunk carried MediaPipe's JavaScript and framer-motion,
+  which only video analysis uses, so every start downloaded and parsed them.
+- `PoseEngine` imports MediaPipe when it first creates a detector, and App loads
+  the analysis screen when Analyze opens, with a loading status and an error
+  boundary. No behavior, dependency, model, runtime-location or native change.
+- See the [plan](superpowers/plans/2026-11-05-faster-start.md). Phone start-up time
+  itself stays unmeasured until the phone session.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
