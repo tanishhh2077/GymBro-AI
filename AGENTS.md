@@ -23,6 +23,29 @@ precedence over older documentation, review and check-cadence requirements.
 - Keep protections against lost workouts, unintended video uploads and invented
   analysis claims. Escalate concrete blockers and user-owned decisions promptly.
 
+## Parallel agents
+
+The user may run several Claude Code or Codex chats at once, each on its own
+task. They must not interfere with one another:
+
+- **Isolate.** Run `git fetch` and `git worktree list` first. Work only in your
+  own sibling worktree (`GymBro AI-task<N>`) on your own branch from current
+  `origin/master`. Never edit, run servers in, or remove another agent's
+  worktree; the original `GymBro AI` checkout stays on `master` for the user.
+- **Stay in your lane.** Change only the files your task needs. If your task must
+  edit a source file another open branch is changing, finish one task first
+  instead of editing both at once.
+- **No number collisions.** Task and decision numbers are assigned at
+  integration: use your branch name in drafts (for example "D-next (task-x)") and
+  take the next free `Tnn`/`D-0nn` from `master` only when you merge.
+- **Shared documents last.** Edit HANDOFF, STATUS, DECISIONS, AGENTS and README
+  only in your final integration commit, after merging the latest `master` into
+  your branch. Keep every other agent's entries when resolving conflicts.
+- **Integrate one at a time.** Merge the latest `origin/master` into your branch,
+  rerun the checks, then fast-forward `master`. If `master` moved meanwhile, repeat.
+- **Shared ports.** The browser suite always uses port 4179 and previews use 4183.
+  Check the port is free before starting and run one browser suite at a time.
+
 ## Start here
 
 - Start with this file and the compact [current handoff](docs/HANDOFF.md). Read applicable ancestor/local `AGENTS.md`, local README, and relevant sections of the sources below before code changes. Load detailed historical evidence only when needed; do not repeatedly ingest every document. Do not assume nested guidance was automatically loaded.
