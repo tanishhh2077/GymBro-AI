@@ -108,3 +108,33 @@ it('disables duplication at the routine limit', async () => {
   await render(); expect(button('Duplicate routine Upper day').disabled).toBe(true);
   expect(container.textContent).toContain('100 routines');
 });
+
+async function search(value: string) {
+  const input = container.querySelector('input[type="search"]'); expect(input).not.toBeNull();
+  await act(async () => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input, value);
+    input!.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+}
+it('filters routine and exercise names case-insensitively and clears an empty match without writes', async () => {
+  await store.getState().createRoutine({ name: 'Leg day', unit: 'lb', exercises: [{ name: 'Squat' }] });
+  await render(); const before = structuredClone(store.getState().data);
+  await search(' bEnCh ');
+  expect(container.querySelectorAll('section')).toHaveLength(1);
+  expect(button('Edit routine Upper day')).toBeDefined();
+  await search('LEG'); expect(button('Edit routine Leg day')).toBeDefined();
+  await search('missing'); expect(container.textContent).toContain('No routines match');
+  await click('Clear routine filters'); expect(container.querySelectorAll('section')).toHaveLength(2);
+  expect(store.getState().data).toEqual(before);
+});
+it('sorts a copy by name and restores saved creation order while retaining original editor records', async () => {
+  await store.getState().createRoutine({ name: 'Alpha', unit: 'lb', exercises: [{ name: 'Squat' }] });
+  await render(); const before = structuredClone(store.getState().data);
+  const names = () => [...container.querySelectorAll('h2')].map(el => el.textContent);
+  expect(names()).toEqual(['Upper day', 'Alpha']);
+  const select = container.querySelector('select')!;
+  await act(async () => { select.value = 'name'; select.dispatchEvent(new Event('change', { bubbles: true })); });
+  expect(names()).toEqual(['Alpha', 'Upper day']);
+  expect(store.getState().data).toEqual(before);
+  await click('Clear routine filters'); expect(names()).toEqual(['Upper day', 'Alpha']);
+});

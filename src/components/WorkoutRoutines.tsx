@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useStore } from 'zustand';
 import type { WorkoutRoutine } from '@/types/workout';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
@@ -9,8 +9,15 @@ export function WorkoutRoutines({ store, onStarted, onResume }: { store: Workout
   // Capture record and revision together; a later reload must not legitimize an old draft.
   const [editor, setEditor] = useState<{ routine?: WorkoutRoutine; revision: number } | null>(null);
   const [notice, setNotice] = useState('');
+  const filterId = useId();
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState('creation');
   const disabled = state.busy || state.needsReload || !state.loaded;
   const routines = state.data.routines ?? [];
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  const visibleRoutines = routines.filter(routine => [routine.name, ...routine.exercises.map(exercise => exercise.name)]
+    .some(name => name.toLocaleLowerCase().includes(normalizedQuery)));
+  if (sort === 'name') visibleRoutines.sort((a, b) => a.name.localeCompare(b.name));
   if (editor) return <RoutineEditor store={store} routine={editor.routine} expectedRevision={editor.revision}
     onClose={saved => { setEditor(null); setNotice(saved ? 'Routine saved.' : ''); }} />;
   return <div className="space-y-5">
@@ -26,8 +33,21 @@ export function WorkoutRoutines({ store, onStarted, onResume }: { store: Workout
         <p>Finish or discard the active workout before starting another routine.</p>
         <button type="button" className="mt-2 text-accent underline underline-offset-4" onClick={onResume}>Resume workout</button>
       </div>}
+      {!!routines.length && <div className="space-y-3">
+        <div><label htmlFor={`${filterId}-search`} className="mb-1 block text-sm text-slate-400">Search routines or exercises</label>
+          <input id={`${filterId}-search`} type="search" value={query} onChange={event => setQuery(event.target.value)}
+            className="w-full min-w-0 rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white" /></div>
+        <div><label htmlFor={`${filterId}-sort`} className="mb-1 block text-sm text-slate-400">Sort routines</label>
+          <select id={`${filterId}-sort`} value={sort} onChange={event => setSort(event.target.value)}
+            className="w-full rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white">
+            <option value="creation">Creation order</option><option value="name">Name (A–Z)</option>
+          </select></div>
+        <button type="button" className="btn-ghost" onClick={() => { setQuery(''); setSort('creation'); }}>Clear routine filters</button>
+        <p className="text-sm text-slate-400">{visibleRoutines.length} of {routines.length} routines match</p>
+      </div>}
       {!routines.length ? <p className="text-slate-400">Save a routine to reuse your exercise plan without retyping it.</p> :
-        <div className="space-y-4">{routines.map(routine => <section key={routine.id} aria-labelledby={`routine-${routine.id}`} className="card min-w-0 p-4 sm:p-5">
+        !visibleRoutines.length ? <p className="text-slate-400">No routines match these filters.</p> :
+        <div className="space-y-4">{visibleRoutines.map(routine => <section key={routine.id} aria-labelledby={`routine-${routine.id}`} className="card min-w-0 p-4 sm:p-5">
           <h2 id={`routine-${routine.id}`} className="break-words text-xl font-semibold text-white">{routine.name}</h2>
           <p className="mt-1 text-sm text-slate-400">{routine.exercises.length} exercises Â· weights in {routine.unit}</p>
           <ol className="my-4 list-inside list-decimal space-y-2 text-sm text-slate-300">{routine.exercises.map(e => <li key={e.id} className="break-words">
