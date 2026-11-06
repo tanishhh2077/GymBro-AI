@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useStore } from 'zustand';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
+import { isBenchPressName } from '@/core/setLinks';
+import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton';
 
-export function WorkoutHistory({ store, initialId }: { store: WorkoutStore; initialId?: string }) {
+export function WorkoutHistory({ store, initialId, analysis }: { store: WorkoutStore; initialId?: string; analysis?: SetAnalysisActions }) {
   const state = useStore(store);
   const [selectedId, setSelectedId] = useState(initialId);
   const [visible, setVisible] = useState(20);
@@ -14,8 +16,10 @@ export function WorkoutHistory({ store, initialId }: { store: WorkoutStore; init
     {selected.exercises.map(e => <section key={e.id} className="border-t border-white/10 pt-4">
       <h2 className="break-words text-xl font-semibold text-white">{e.name}</h2>
       <table className="mt-3 w-full text-left text-sm"><caption className="sr-only">Saved sets for {e.name}</caption>
-        <thead className="text-slate-400"><tr><th className="py-2">Set</th><th>Reps</th><th>Weight</th></tr></thead>
-        <tbody>{e.sets.map((set, i) => <tr key={set.id}><td className="py-2">{i + 1}</td><td>{set.reps}</td><td>{set.weight} {selected.unit}</td></tr>)}</tbody>
+        <thead className="text-slate-400"><tr><th className="py-2">Set</th><th>Reps</th><th>Weight</th>{analysis && isBenchPressName(e.name) && <th><span className="sr-only">Actions</span></th>}</tr></thead>
+        <tbody>{e.sets.map((set, i) => <tr key={set.id} id={`set-row-${set.id}`} tabIndex={-1}><td className="py-2">{i + 1}</td><td>{set.reps}</td><td>{set.weight} {selected.unit}</td>
+          {analysis && isBenchPressName(e.name) && <td className="text-right"><SetAnalysisButton link={{ workoutId: selected.id, exerciseId: e.id, setId: set.id }}
+            exerciseName={e.name} setNumber={i + 1} actions={analysis} disabled={state.busy || state.needsReload || !state.loaded} /></td>}</tr>)}</tbody>
       </table></section>)}
     <button type="button" disabled={state.busy || state.needsReload} className="btn-ghost text-danger" onClick={async () => {
       if (window.confirm(`Delete the saved workout ${selected.name}?`) && (await state.deleteWorkout(selected.id)).ok) setSelectedId(undefined);

@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { App as NativeApp } from '@capacitor/app';
 import { useStore } from 'zustand';
-import { useSessionStore } from '@/store/useSessionStore';
+import { useSessionStore, type SessionStore } from '@/store/useSessionStore';
+import { resolveSetLink } from '@/core/setLinks';
+import type { SetLink } from '@/types';
 import { workoutStore, type WorkoutStore } from '@/store/useWorkoutStore';
 import { connectNativeLifecycle } from '@/mobile/nativeLifecycle';
 import { AnalysisWorkspace } from '@/components/AnalysisWorkspace';
@@ -16,24 +18,55 @@ import { WorkoutBackup } from '@/components/WorkoutBackup';
 import { ShieldIcon } from '@/components/icons';
 
 type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines' | 'progress' | 'backup';
-export default function App({ workouts = workoutStore }: { workouts?: WorkoutStore } = {}) {
+export default function App({ workouts = workoutStore, session = useSessionStore }: { workouts?: WorkoutStore; session?: SessionStore } = {}) {
   useEffect(() => connectNativeLifecycle({
-    isNative: Capacitor.isNativePlatform(), app: NativeApp, session: useSessionStore, document,
-  }), []);
+    isNative: Capacitor.isNativePlatform(), app: NativeApp, session, document,
+  }), [session]);
   useEffect(() => { void workouts.getState().load(); }, [workouts]);
   const state = useStore(workouts);
   const [view, setView] = useState<View>('home');
   const [selected, setSelected] = useState<string | undefined>();
   const [notice, setNotice] = useState('');
+  const [pendingLink, setPendingLink] = useState<SetLink | undefined>();
+  const clips = session(s => s.clips);
+  const detachLink = session(s => s.detachLink);
   const main = useRef<HTMLElement>(null);
   const previousView = useRef<View>('home');
+  // A set row requested by Back to set; this parent effect runs after the new
+  // view's children render, so it can focus the row instead of <main>.
+  const focusSet = useRef<string | null>(null);
   useEffect(() => {
-    if (previousView.current !== view) main.current?.focus();
+    if (previousView.current !== view) {
+      const row = focusSet.current ? document.getElementById(`set-row-${focusSet.current}`) : null;
+      (row ?? main.current)?.focus();
+    }
+    focusSet.current = null;
     previousView.current = view;
   }, [view]);
-  function navigate(next: View) { setView(next); setNotice(''); }
-  function openHistory(id?: string) { setSelected(id); navigate('history'); }
   const available = state.loaded && !state.needsReload;
+  // Detach on any screen, before a later restore could bring back the same IDs.
+  // Unloaded data would make every link look deleted, so only loaded data counts.
+  useEffect(() => {
+    if (!available) return;
+    for (const clip of clips) if (clip.link && !resolveSetLink(state.data, clip.link)) detachLink(clip.id);
+  }, [available, clips, detachLink, state.data]);
+  function navigate(next: View) {
+    setView(next); setNotice('');
+    // A pending link only applies while its Analyze screen is showing.
+    if (next !== 'analysis') setPendingLink(undefined);
+  }
+  function openHistory(id?: string) { setSelected(id); navigate('history'); }
+  function backToSet(link: SetLink) {
+    const found = resolveSetLink(state.data, link);
+    if (!found) return;
+    focusSet.current = link.setId;
+    if (found.place === 'active') navigate('workout'); else openHistory(link.workoutId);
+  }
+  const analysis = {
+    openLink: clips[0]?.link,
+    onAnalyze: (link: SetLink) => { setPendingLink(link); setView('analysis'); setNotice(''); },
+    onView: () => navigate('analysis'),
+  };
   return <div className="app-safe-sides min-h-full">
     <Header />
     <nav aria-label="Main navigation" className="mx-auto flex w-full max-w-5xl gap-1 border-b border-white/10 px-4 py-2 sm:px-6">
@@ -53,9 +86,10 @@ export default function App({ workouts = workoutStore }: { workouts?: WorkoutSto
         onWorkout={() => navigate('workout')} onAnalyze={() => navigate('analysis')}
         onRoutines={() => navigate('routines')}
         onProgress={() => navigate('progress')} onBackup={() => navigate('backup')} onHistory={openHistory} />}
-      {view === 'workout' && <WorkoutEditor store={workouts} onFinished={() => { setView('home'); setNotice('Workout saved.'); }} />}
-      {view === 'history' && <WorkoutHistory store={workouts} initialId={selected} />}
-      {view === 'analysis' && <AnalysisWorkspace />}
+      {view === 'workout' && <WorkoutEditor store={workouts} analysis={analysis} onFinished={() => { setView('home'); setNotice('Workout saved.'); }} />}
+      {view === 'history' && <WorkoutHistory store={workouts} initialId={selected} analysis={analysis} />}
+      {view === 'analysis' && <AnalysisWorkspace session={session} data={state.data} available={available} pendingLink={pendingLink}
+        onClearPending={() => setPendingLink(undefined)} onBackToSet={backToSet} />}
       {view === 'routines' && <WorkoutRoutines store={workouts} onStarted={() => navigate('workout')} onResume={() => navigate('workout')} />}
       {view === 'progress' && <WorkoutProgress data={state.data} available={available} onHome={() => navigate('home')}
         onWorkout={() => navigate('workout')} onHistory={openHistory} />}

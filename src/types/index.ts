@@ -122,6 +122,8 @@ export interface Clip {
   processingMs?: number;
   /** The logged set this session-only analysis belongs to; never saved. */
   link?: SetLink;
+  /** Set when the linked set disappeared and the link was removed; it never returns. */
+  linkRemoved?: true;
 }
 
 /**

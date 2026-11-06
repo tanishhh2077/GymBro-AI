@@ -2,7 +2,7 @@ name: Mobile prototypes
 
 on:
   push:
-    branches: [feat/task6-mobile-app, feat/task14-workout-logging, feat/task15-rest-timer, feat/task16-saved-routines, feat/task17-workout-progress, feat/task18-workout-backup, master]
+    branches: [feat/task6-mobile-app, feat/task14-workout-logging, feat/task15-rest-timer, feat/task16-saved-routines, feat/task17-workout-progress, feat/task18-workout-backup, feat/task19-set-linked-analysis, master]
     paths:
       - .github/workflows/mobile-builds.yml
       - src/**

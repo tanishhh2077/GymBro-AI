@@ -33,8 +33,9 @@ and its tests. Signatures are in the design's Interfaces section.
 `.github/workflows/browser-checks.yml` and `mobile-builds.yml`. App and
 AnalysisWorkspace gain the `session` prop and the props listed in the design.
 
-- [ ] RED App tests for every design flow; implement; Chromium case; 390/1280
-  inspection; full checks and guarded sync; commit/push; hosted runs.
+- [x] RED App tests for every design flow (9 cases; missing row actions); implement;
+  Chromium case; 390/1280 inspection; 596 tests, all 23 browser cases, guarded
+  sync; commit/push. Detach runs in App so a restore cannot relink a clip first.
 
 ## Step 4: review and integration
 

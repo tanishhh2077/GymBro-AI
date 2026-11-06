@@ -261,7 +261,7 @@ export function createSessionStore(overrides: Partial<SessionDeps> = {}) {
 }
 
 function withoutLink(clip: Clip): Clip {
-  const copy = { ...clip };
+  const copy: Clip = { ...clip, linkRemoved: true };
   delete copy.link;
   return copy;
 }

@@ -2,7 +2,7 @@ name: Non-human browser checks
 
 on:
   push:
-    branches: [feat/task13-browser-checks, feat/task14-workout-logging, feat/task15-rest-timer, feat/task16-saved-routines, feat/task17-workout-progress, feat/task18-workout-backup, master]
+    branches: [feat/task13-browser-checks, feat/task14-workout-logging, feat/task15-rest-timer, feat/task16-saved-routines, feat/task17-workout-progress, feat/task18-workout-backup, feat/task19-set-linked-analysis, master]
     paths:
       - .github/workflows/browser-checks.yml
       - src/**

@@ -2,11 +2,12 @@ import { useId, useState, type FormEvent } from 'react';
 import { useStore } from 'zustand';
 import type { WeightUnit, WorkoutExercise } from '@/types/workout';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
+import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton';
 
 const inputClass = 'mt-1 w-full rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white';
 function numeric(value: string) { return value.trim() ? Number(value) : NaN; }
 
-export function WorkoutEditor({ store, onFinished }: { store: WorkoutStore; onFinished: () => void }) {
+export function WorkoutEditor({ store, onFinished, analysis }: { store: WorkoutStore; onFinished: () => void; analysis?: SetAnalysisActions }) {
   const state = useStore(store);
   const [name, setName] = useState('Workout');
   const [unit, setUnit] = useState<WeightUnit>('lb');
@@ -35,7 +36,7 @@ export function WorkoutEditor({ store, onFinished }: { store: WorkoutStore; onFi
       }}>Discard workout</button>
     </div>
     <fieldset disabled={disabled} className="min-w-0 space-y-6">
-      {workout.exercises.map(exercise => <ExerciseEditor key={exercise.id} exercise={exercise} unit={workout.unit} store={store} />)}
+      {workout.exercises.map(exercise => <ExerciseEditor key={exercise.id} workoutId={workout.id} exercise={exercise} unit={workout.unit} store={store} analysis={analysis} />)}
       <form aria-label="Add an exercise" className="border-t border-white/10 pt-5" onSubmit={async event => {
         event.preventDefault(); if ((await state.addExercise(exerciseName)).ok) setExerciseName('');
       }}>
@@ -49,7 +50,9 @@ export function WorkoutEditor({ store, onFinished }: { store: WorkoutStore; onFi
   </div>;
 }
 
-function ExerciseEditor({ exercise, unit, store }: { exercise: WorkoutExercise; unit: WeightUnit; store: WorkoutStore }) {
+function ExerciseEditor({ workoutId, exercise, unit, store, analysis }: {
+  workoutId: string; exercise: WorkoutExercise; unit: WeightUnit; store: WorkoutStore; analysis?: SetAnalysisActions;
+}) {
   const id = useId();
   const [reps, setReps] = useState('');
   const [weight, setWeight] = useState('');
@@ -67,9 +70,11 @@ function ExerciseEditor({ exercise, unit, store }: { exercise: WorkoutExercise; 
     </p>}
     {exercise.sets.length > 0 && <div className="mb-4 overflow-x-auto"><table className="w-full text-left text-sm">
       <caption className="sr-only">Logged sets for {exercise.name}</caption><thead className="text-slate-400"><tr><th className="py-2">Set</th><th>Reps</th><th>Weight</th><th><span className="sr-only">Actions</span></th></tr></thead>
-      <tbody className="divide-y divide-white/10">{exercise.sets.map((set, index) => <tr key={set.id}>
+      <tbody className="divide-y divide-white/10">{exercise.sets.map((set, index) => <tr key={set.id} id={`set-row-${set.id}`} tabIndex={-1}>
         <td className="py-3">{index + 1}</td><td>{set.reps}</td><td>{set.weight} {unit}</td>
-        <td className="text-right"><button type="button" className="px-2 py-2 text-accent" aria-label={`Edit set ${index + 1} for ${exercise.name}`} onClick={() => { setEditing(set.id); setReps(String(set.reps)); setWeight(String(set.weight)); }}>Edit</button>
+        <td className="text-right"><SetAnalysisButton link={{ workoutId, exerciseId: exercise.id, setId: set.id }} exerciseName={exercise.name}
+          setNumber={index + 1} actions={analysis} disabled={state.busy || state.needsReload || !state.loaded} />
+          <button type="button" className="px-2 py-2 text-accent" aria-label={`Edit set ${index + 1} for ${exercise.name}`} onClick={() => { setEditing(set.id); setReps(String(set.reps)); setWeight(String(set.weight)); }}>Edit</button>
           <button type="button" className="px-2 py-2 text-slate-400" aria-label={`Remove set ${index + 1} for ${exercise.name}`} onClick={async () => {
             if ((await state.removeSet(exercise.id, set.id)).ok && editing === set.id) setEditing(null);
           }}>Remove</button></td>

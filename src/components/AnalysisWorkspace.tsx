@@ -1,18 +1,68 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useSessionStore } from "@/store/useSessionStore";
+import { useSessionStore, type SessionStore } from "@/store/useSessionStore";
+import { resolveSetLink, type ResolvedSet } from "@/core/setLinks";
+import { emptyWorkoutData } from "@/core/workouts";
+import type { SetLink } from "@/types";
+import type { WorkoutData } from "@/types/workout";
 import { ANGLES, EXERCISES } from "@/core/exercises";
 import { ClipDropzone } from "@/components/ClipDropzone";
 import { VideoStage } from "@/components/VideoStage";
 import { TrashIcon } from "@/components/icons";
 
-export function AnalysisWorkspace() {
-  const exercise = useSessionStore((s) => s.exercise);
-  const clips = useSessionStore((s) => s.clips);
-  const processingState = useSessionStore((s) => s.processingState);
-  const startClip = useSessionStore((s) => s.startClip);
-  const removeClip = useSessionStore((s) => s.removeClip);
-  const retainClipMedia = useSessionStore((s) => s.retainClipMedia);
+const SESSION_NOTE =
+  "This video and its link last until you reload, close the app, or leave the app while it is still processing. They are not saved.";
+
+/** Logged values are the user's entries, kept visibly apart from pose observations (D-002). */
+function describeSet(prefix: string, found: ResolvedSet) {
+  const { setNumber, exercise, set, workout } = found;
+  return `${prefix} set ${setNumber} of ${exercise.name}: ${set.reps} reps × ${set.weight} ${workout.unit} (entered by you, not counted from the video), in ${workout.name}.`;
+}
+
+interface AnalysisWorkspaceProps {
+  session?: SessionStore;
+  /** Confirmed workout data used to describe links; never written from here. */
+  data?: WorkoutData;
+  /** False while workouts are not loaded, saving, loading or need a reload. */
+  available?: boolean;
+  /** A set chosen on a set row that the next admitted video will be linked to. */
+  pendingLink?: SetLink;
+  onClearPending?: () => void;
+  onBackToSet?: (link: SetLink) => void;
+}
+
+export function AnalysisWorkspace({
+  session = useSessionStore,
+  data = emptyWorkoutData(),
+  available = false,
+  pendingLink,
+  onClearPending,
+  onBackToSet,
+}: AnalysisWorkspaceProps = {}) {
+  const exercise = session((s) => s.exercise);
+  const clips = session((s) => s.clips);
+  const processingState = session((s) => s.processingState);
+  const startClip = session((s) => s.startClip);
+  const removeClip = session((s) => s.removeClip);
+  const retainClipMedia = session((s) => s.retainClipMedia);
+  const [refusal, setRefusal] = useState("");
+  // Resolved on every render, so a set deleted while it is pending shows at once.
+  const pending = pendingLink ? resolveSetLink(data, pendingLink) : null;
+
+  // The pending link is checked again at admission; admission is synchronous, so
+  // the data cannot change between this check and the store creating the clip.
+  const admit = (file: File) => {
+    setRefusal("");
+    if (!pendingLink) return startClip(file);
+    if (!resolveSetLink(data, pendingLink)) {
+      onClearPending?.();
+      setRefusal("That set is no longer in your workouts, so the video was not opened. Choose a set again, or choose a video to analyze it without a link.");
+      return null;
+    }
+    const issue = startClip(file, pendingLink);
+    if (!issue) onClearPending?.();
+    return issue;
+  };
 
   const { name: exerciseName, accent } = EXERCISES[exercise];
   const admissionBlocked = clips.length > 0 || processingState !== "idle";
@@ -53,9 +103,23 @@ export function AnalysisWorkspace() {
               {ANGLES.side.name} view
             </span>
           </div>
+          {pendingLink && (pending ? (
+            <div role="status" className="mb-4 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-slate-200">
+              <p>{describeSet("For your logged", pending)}</p>
+              {clips.length > 0 && <p className="mt-2 text-warn">Remove the open video to analyze set {pending.setNumber} of {pending.exercise.name}.</p>}
+              <button type="button" className="mt-2 underline underline-offset-4" onClick={onClearPending}>Analyze without linking</button>
+            </div>
+          ) : (
+            <div role="alert" className="mb-4 rounded-xl border border-warn/30 bg-warn/10 px-4 py-3 text-sm text-warn">
+              <p>That set is no longer in your workouts. Choose a set again, or analyze without linking.</p>
+              <button type="button" className="mt-2 underline underline-offset-4" onClick={onClearPending}>Analyze without linking</button>
+            </div>
+          ))}
+          {refusal && <div role="alert" className="mb-4 rounded-xl border border-warn/30 bg-warn/10 px-4 py-3 text-sm text-warn">{refusal}</div>}
+          {(pendingLink || clips.some((c) => c.link)) && <p className="mb-4 text-xs text-slate-500">{SESSION_NOTE}</p>}
           <RecordingGuide />
           <ClipDropzone
-            onSelect={startClip}
+            onSelect={admit}
             disabled={admissionBlocked}
             disabledMessage={releasing ? "Releasing the previous clip…" : undefined}
           />
@@ -109,6 +173,7 @@ export function AnalysisWorkspace() {
                           <TrashIcon width={16} />
                         </button>
                       </div>
+                      <ClipLink clip={clip} data={data} available={available} onBackToSet={onBackToSet} />
                       <VideoStage
                         clip={clip}
                         accent={accent}
@@ -122,6 +187,26 @@ export function AnalysisWorkspace() {
           )}
         </AnimatePresence>
       </div>
+    </div>
+  );
+}
+
+function ClipLink({ clip, data, available, onBackToSet }: {
+  clip: { link?: SetLink; linkRemoved?: true };
+  data: WorkoutData;
+  available: boolean;
+  onBackToSet?: (link: SetLink) => void;
+}) {
+  if (clip.linkRemoved) {
+    return <p role="status" className="mb-3 text-sm text-warn">The linked set was removed from your workouts, so this video is no longer linked.</p>;
+  }
+  const found = clip.link ? resolveSetLink(data, clip.link) : null;
+  if (!clip.link || !found) return null;
+  const link = clip.link;
+  return (
+    <div className="mb-3 flex flex-wrap items-center gap-3 text-sm text-slate-300">
+      <p className="min-w-0 flex-1">{describeSet("Linked to your logged", found)}</p>
+      <button type="button" className="btn-ghost" disabled={!available} onClick={() => onBackToSet?.(link)}>Back to set</button>
     </div>
   );
 }

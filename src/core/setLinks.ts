@@ -11,6 +11,10 @@ export function isBenchPressName(name: string): boolean {
   return BENCH_NAMES.has(name.toLowerCase().replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim());
 }
 
+export function sameSetLink(a: SetLink, b: SetLink): boolean {
+  return a.workoutId === b.workoutId && a.exerciseId === b.exerciseId && a.setId === b.setId;
+}
+
 export interface ResolvedSet {
   place: 'active' | 'history';
   workout: Workout;

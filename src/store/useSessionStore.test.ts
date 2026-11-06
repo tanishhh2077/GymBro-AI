@@ -500,9 +500,17 @@ describe("session store: one clip, owned job, leased media", () => {
 
     store.getState().detachLink(before.id);
     expect(store.getState().clips[0]).not.toHaveProperty("link");
-    expect(store.getState().clips[0]).toMatchObject({ id: before.id, status: "ready", url: before.url });
+    // The clip remembers that its link was removed, so the notice can outlive the screen.
+    expect(store.getState().clips[0]).toMatchObject({ id: before.id, status: "ready", url: before.url, linkRemoved: true });
     store.getState().detachLink(before.id);
     store.getState().detachLink("missing");
     expect(store.getState().clips[0]).not.toHaveProperty("link");
+
+    // A standalone clip has no link to remove, so it is never marked as unlinked.
+    store.getState().removeClip(before.id);
+    await settle();
+    store.getState().startClip(mp4());
+    store.getState().detachLink(store.getState().clips[0].id);
+    expect(store.getState().clips[0]).not.toHaveProperty("linkRemoved");
   });
 });
