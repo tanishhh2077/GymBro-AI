@@ -23,7 +23,7 @@ interface AnalysisWorkspaceProps {
   session?: SessionStore;
   /** Confirmed workout data used to describe links; never written from here. */
   data?: WorkoutData;
-  /** False while workouts are not loaded, saving, loading or need a reload. */
+  /** False while workouts are not loaded or need a reload. */
   available?: boolean;
   /** A set chosen on a set row that the next admitted video will be linked to. */
   pendingLink?: SetLink;

@@ -28,7 +28,10 @@ export default function App({ workouts = workoutStore, session = useSessionStore
   const [selected, setSelected] = useState<string | undefined>();
   const [notice, setNotice] = useState('');
   const [pendingLink, setPendingLink] = useState<SetLink | undefined>();
-  const clips = session(s => s.clips);
+  // The session holds at most one clip. Selecting only its ID and link keeps App
+  // from re-rendering on every processing progress update.
+  const openClipId = session(s => s.clips[0]?.id);
+  const openLink = session(s => s.clips[0]?.link);
   const detachLink = session(s => s.detachLink);
   const main = useRef<HTMLElement>(null);
   const previousView = useRef<View>('home');
@@ -47,9 +50,9 @@ export default function App({ workouts = workoutStore, session = useSessionStore
   // Detach on any screen, before a later restore could bring back the same IDs.
   // Unloaded data would make every link look deleted, so only loaded data counts.
   useEffect(() => {
-    if (!available) return;
-    for (const clip of clips) if (clip.link && !resolveSetLink(state.data, clip.link)) detachLink(clip.id);
-  }, [available, clips, detachLink, state.data]);
+    if (!available || !openClipId || !openLink) return;
+    if (!resolveSetLink(state.data, openLink)) detachLink(openClipId);
+  }, [available, openClipId, openLink, detachLink, state.data]);
   function navigate(next: View) {
     setView(next); setNotice('');
     // A pending link only applies while its Analyze screen is showing.
@@ -63,7 +66,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
     if (found.place === 'active') navigate('workout'); else openHistory(link.workoutId);
   }
   const analysis = {
-    openLink: clips[0]?.link,
+    openLink,
     onAnalyze: (link: SetLink) => { setPendingLink(link); setView('analysis'); setNotice(''); },
     onView: () => navigate('analysis'),
   };

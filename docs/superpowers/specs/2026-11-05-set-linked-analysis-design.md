@@ -39,7 +39,8 @@ spaces and runs of spaces collapsed, equals one of `bench press`, `bench`,
 - `src/core/setLinks.ts`: `isBenchPressName(name: string): boolean` and
   `resolveSetLink(data: WorkoutData, link: SetLink): ResolvedSet | null`, where
   `ResolvedSet = { place: 'active' | 'history'; workout; exercise; set; setNumber }`.
-- `src/types/index.ts`: `SetLink`; `Clip.link?: SetLink`.
+- `src/types/index.ts`: `SetLink`; `Clip.link?: SetLink`; `Clip.linkRemoved?: true`,
+  set by `detachLink` so the unlinked notice outlives the screen.
 - Session store: `startClip(file, link?)` copies the link onto the new clip in
   the same update that creates it; `detachLink(clipId)` removes a clip's link and
   can never add or change one. `reset()` and `removeClip()` drop it with the clip.
@@ -47,8 +48,9 @@ spaces and runs of spaces collapsed, equals one of `bench press`, `bench`,
   `AnalysisWorkspace`, as `workouts` already is; tests supply
   `createSessionStore` with fake engine and URL services.
 - `AnalysisWorkspace` props: `session`, `data`, `available`, `pendingLink`,
-  `onClearPending()`, `onBackToSet(link)`. The "set no longer available" refusal
-  renders as an alert inside its pending-link banner, not as a `SelectionIssue`.
+  `onClearPending()`, `onBackToSet(link)`. A refused admission clears the pending
+  link and shows its own alert above the recording guide, not a `SelectionIssue`.
+  `available` is `loaded && !needsReload`.
 
 ## Flow
 
@@ -95,7 +97,7 @@ data is the last confirmed save; after an unconfirmed save (`needsReload`) the
 link may later prove stale, which is a stale link, never a different set.
 
 - Removing the set or its exercise, discarding the active workout or deleting the
-  saved workout makes the link unresolved. AnalysisWorkspace then calls
+  saved workout makes the link unresolved. App, on any screen, then calls
   `detachLink`, so the clip stays open as a standalone analysis with "The linked
   set was removed from your workouts, so this video is no longer linked." The
   link stays detached even if a backup restore later brings back records with

@@ -2,8 +2,10 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { Capacitor } from '@capacitor/core';
 import { IDBFactory } from 'fake-indexeddb';
+import { MotionGlobalConfig } from 'framer-motion';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { createWorkoutBackup, parseWorkoutBackup } from '@/core/workoutBackup';
+import { emptyWorkoutData } from '@/core/workouts';
 import { createWorkoutRepository } from '@/store/workoutRepository';
 import { createWorkoutStore, type WorkoutStore } from '@/store/useWorkoutStore';
 import { createSessionStore, type SessionEngine, type SessionStore } from '@/store/useSessionStore';
@@ -35,6 +37,8 @@ function fakeSession(): SessionStore {
 }
 
 beforeEach(() => {
+  // Instant exit animations keep clip removal independent of animation timing.
+  MotionGlobalConfig.skipAnimations = true;
   vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(false);
   vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => {});
   vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
@@ -44,7 +48,10 @@ beforeEach(() => {
   session = fakeSession();
   container = document.createElement('div'); document.body.append(container); root = createRoot(container);
 });
-afterEach(async () => { await act(async () => root.unmount()); document.body.replaceChildren(); vi.restoreAllMocks(); });
+afterEach(async () => {
+  await act(async () => root.unmount()); document.body.replaceChildren(); vi.restoreAllMocks();
+  MotionGlobalConfig.skipAnimations = false;
+});
 
 function idle() {
   if (!store.getState().busy) return Promise.resolve();
@@ -102,8 +109,8 @@ function benchIds() {
 const clip = () => session.getState().clips[0];
 /**
  * Admission reopens only after a removed clip's player unmounts and releases its
- * video, which waits for the exit animation. React renders that unmount only
- * between act() scopes, so wait in short separate scopes, never inside one.
+ * video. React renders that unmount only between act() scopes, so wait in short
+ * separate scopes, never inside one.
  */
 async function untilReleased() {
   for (let i = 0; i < 100 && session.getState().processingState !== 'idle'; i++) {
@@ -237,4 +244,23 @@ it('refuses a video for a pending set that disappeared before admission', async 
   expect(container.textContent).toContain('That set is no longer in your workouts, so the video was not opened.');
   await chooseVideo();
   expect(clip()).not.toHaveProperty('link');
+});
+
+it('never detaches a link from unconfirmed data and keeps Back to set disabled until reload', async () => {
+  await benchWorkout();
+  const ids = benchIds();
+  await click('Analyze video for set 1 of Bench press'); await chooseVideo();
+  const confirmed = store.getState().data;
+
+  await act(async () => { store.setState({ needsReload: true }); });
+  expect(button('Back to set').disabled).toBe(true);
+  // Data that cannot be trusted, here missing the set, must not remove the link.
+  await act(async () => { store.setState({ data: { ...confirmed, active: null } }); });
+  expect(clip().link).toEqual(ids);
+  await act(async () => { store.setState({ loaded: false, needsReload: false, data: emptyWorkoutData() }); });
+  expect(clip().link).toEqual(ids);
+
+  await act(async () => { store.setState({ loaded: true, data: { ...confirmed, active: null } }); });
+  expect(clip()).not.toHaveProperty('link');
+  expect(clip().linkRemoved).toBe(true);
 });
