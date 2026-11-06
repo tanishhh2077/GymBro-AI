@@ -1,16 +1,22 @@
 import { emptyWorkoutData, validateWorkoutData, WorkoutError } from '@/core/workouts';
 import type { WorkoutData } from '@/types/workout';
+import { validateSharedSnapshot, type SharedWorkoutSnapshot } from '@/core/workoutSync';
 export interface WorkoutRepository {
   load: () => Promise<WorkoutData>;
   save: (expectedRevision: number, next: unknown) => Promise<WorkoutData>;
 }
-export function createWorkoutRepository(factory?: IDBFactory): WorkoutRepository {
-  function operation(expectedRevision?: number, next?: unknown): Promise<WorkoutData> {
+export interface SyncedWorkoutRepository extends WorkoutRepository {
+  loadSync: () => Promise<SharedWorkoutSnapshot>;
+  saveSync: (expectedRevision: number, next: unknown, shared: SharedWorkoutSnapshot) => Promise<WorkoutData>;
+}
+export function createWorkoutRepository(factory?: IDBFactory, databaseName = 'gymbro-workouts'): SyncedWorkoutRepository {
+  function operation(expectedRevision?: number, next?: unknown, shared?: SharedWorkoutSnapshot, readShared = false): Promise<{ data: WorkoutData; shared: SharedWorkoutSnapshot }> {
     return new Promise((resolve, reject) => {
       let settled = false;
       let database: IDBDatabase | undefined;
       let transaction: IDBTransaction | null = null;
       let result: WorkoutData = emptyWorkoutData();
+      let sharedResult: SharedWorkoutSnapshot = { revision: 0, data: emptyWorkoutData() };
       const fail = (error?: unknown) => {
         if (settled) return;
         settled = true; clearTimeout(timer);
@@ -23,6 +29,7 @@ export function createWorkoutRepository(factory?: IDBFactory): WorkoutRepository
       try {
         if (!factory) throw new WorkoutError('storage', 'Workout storage is unavailable on this device. Try reloading.');
         let candidate: WorkoutData | undefined;
+        const sharedCandidate = shared === undefined ? undefined : validateSharedSnapshot(shared);
         if (expectedRevision !== undefined) {
           const valid = validateWorkoutData(next);
           if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 0 ||
@@ -32,7 +39,7 @@ export function createWorkoutRepository(factory?: IDBFactory): WorkoutRepository
           // Capture a plain-data snapshot before asynchronous open/transaction events.
           candidate = validateWorkoutData({ ...JSON.parse(JSON.stringify(valid)) as WorkoutData, revision: expectedRevision + 1 });
         }
-        const request = factory.open('gymbro-workouts', 1);
+        const request = factory.open(databaseName, 1);
         request.onblocked = () => fail();
         request.onerror = () => fail();
         request.onupgradeneeded = () => {
@@ -49,7 +56,7 @@ export function createWorkoutRepository(factory?: IDBFactory): WorkoutRepository
             transaction.onabort = () => fail();
             transaction.oncomplete = () => {
               if (settled) return;
-              settled = true; clearTimeout(timer); database?.close(); resolve(result);
+              settled = true; clearTimeout(timer); database?.close(); resolve({ data: result, shared: sharedResult });
             };
             const store = transaction.objectStore('library');
             const read = store.get('current');
@@ -66,7 +73,19 @@ export function createWorkoutRepository(factory?: IDBFactory): WorkoutRepository
                   result = candidate;
                   const write = store.put(candidate, 'current');
                   write.onerror = () => fail();
+                  if (sharedCandidate) {
+                    const baseline = store.put(sharedCandidate, 'shared');
+                    baseline.onerror = () => fail();
+                  }
                 } else result = current;
+                if (readShared) {
+                  const baseline = store.get('shared');
+                  baseline.onerror = () => fail();
+                  baseline.onsuccess = () => {
+                    try { sharedResult = baseline.result === undefined ? sharedResult : validateSharedSnapshot(baseline.result); }
+                    catch { fail(new WorkoutError('storage', 'The sync baseline could not be opened. Local workouts are still available.')); }
+                  };
+                }
               } catch (error) { fail(error); }
             };
           } catch (error) { fail(error); }
@@ -74,7 +93,13 @@ export function createWorkoutRepository(factory?: IDBFactory): WorkoutRepository
       } catch (error) { fail(error); }
     });
   }
-  return { load: () => operation(), save: (revision, next) =>
-    Number.isSafeInteger(revision) && revision >= 0 ? operation(revision, next) :
-      Promise.reject(new WorkoutError('validation', 'The workout revision is invalid.')) };
+  function requireRevision(revision: number) {
+    if (!Number.isSafeInteger(revision) || revision < 0) throw new WorkoutError('validation', 'The workout revision is invalid.');
+  }
+  return {
+    load: async () => (await operation()).data,
+    save: async (revision, next) => { requireRevision(revision); return (await operation(revision, next)).data; },
+    loadSync: async () => (await operation(undefined, undefined, undefined, true)).shared,
+    saveSync: async (revision, next, shared) => { requireRevision(revision); return (await operation(revision, next, shared)).data; },
+  };
 }

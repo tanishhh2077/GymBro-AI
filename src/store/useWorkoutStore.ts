@@ -1,8 +1,9 @@
 import { createStore } from 'zustand/vanilla';
 import { emptyWorkoutData, validateSetValues, validateWorkoutData, WorkoutError } from '@/core/workouts';
 import type { RoutineInput, WeightUnit, Workout, WorkoutData, WorkoutExercise, WorkoutResult, WorkoutRoutine } from '@/types/workout';
-import { createWorkoutRepository, type WorkoutRepository } from './workoutRepository';
+import { createWorkoutRepository, type WorkoutRepository, type SyncedWorkoutRepository } from './workoutRepository';
 import { mergeWorkoutBackup, type WorkoutBackup } from '@/core/workoutBackup';
+import { mergeWorkoutSync, sameSyncData, syncSnapshot, validateSharedSnapshot, type SyncChoice, type SyncPreview, type WorkoutCloud } from '@/core/workoutSync';
 interface WorkoutDeps { id: () => string; now: () => number }
 export interface WorkoutState {
   data: WorkoutData; loaded: boolean; busy: boolean; needsReload: boolean; error: string | null;
@@ -21,6 +22,8 @@ export interface WorkoutState {
   deleteRoutine: (id: string) => Promise<WorkoutResult>;
   startRoutine: (id: string) => Promise<WorkoutResult>;
   restoreBackup: (backup: WorkoutBackup, expectedRevision: number) => Promise<WorkoutResult>;
+  previewSync: (cloud: WorkoutCloud) => Promise<SyncPreview>;
+  confirmSync: (preview: SyncPreview, choices: Readonly<Record<string, SyncChoice>>, cloud: WorkoutCloud) => Promise<WorkoutResult>;
 }
 const browserDeps: WorkoutDeps = {
   // getRandomValues also works on the trusted HTTP LAN used for phone testing.
@@ -55,7 +58,8 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
   return createStore<WorkoutState>()((set, get) => {
     let loading: Promise<WorkoutResult> | null = null;
     const blocked = (message: string): WorkoutResult => ({ ok: false, message });
-    async function commit(change: (data: WorkoutData) => WorkoutData): Promise<WorkoutResult> {
+    async function commit(change: (data: WorkoutData) => WorkoutData,
+      save = repository.save): Promise<WorkoutResult> {
       const current = get();
       if (current.busy) return blocked('Wait for the current save or load to finish.');
       if (!current.loaded || current.needsReload) return blocked('Reload saved workouts before editing.');
@@ -65,7 +69,7 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
         const next = validateWorkoutData(change(current.data));
         if (next === current.data) { set({ busy: false }); return { ok: true }; }
         writing = true;
-        const saved = await repository.save(current.data.revision, next);
+        const saved = await save(current.data.revision, next);
         set({ data: saved, busy: false, error: null, needsReload: false });
         return { ok: true };
       } catch (error) {
@@ -95,6 +99,36 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
     }
     return {
       data: emptyWorkoutData(), loaded: false, busy: false, needsReload: false, error: null, load,
+      previewSync: async cloud => {
+        const current = get();
+        if (current.busy || !current.loaded || current.needsReload) invalid('Wait for saved workouts to finish loading before previewing sync.');
+        const syncRepository = repository as SyncedWorkoutRepository;
+        if (!syncRepository.loadSync) invalid('Sync storage is unavailable.');
+        const [shared, remote] = await Promise.all([syncRepository.loadSync(), cloud.read()]);
+        const saved = await repository.load();
+        if (saved.revision !== current.data.revision || get().data.revision !== saved.revision) invalid('Workouts changed. Reload saved workouts and preview sync again.');
+        const preview = { localRevision: current.data.revision, local: syncSnapshot(current.data),
+          base: syncSnapshot(shared.data), remote: validateSharedSnapshot(remote) };
+        mergeWorkoutSync(preview.base, preview.local, preview.remote.data);
+        return preview;
+      },
+      confirmSync: (preview, choices, cloud) => commit(data => {
+        if (data.revision !== preview.localRevision) invalid('Workouts changed after the preview. Preview sync again.');
+        const merged = mergeWorkoutSync(preview.base, data, preview.remote.data, choices);
+        if (merged.conflicts.length) invalid('Choose a version for each conflict before confirming sync.');
+        return merged.data;
+      }, async (revision, next) => {
+        const syncRepository = repository as SyncedWorkoutRepository;
+        if (!syncRepository.saveSync) invalid('Sync storage is unavailable.');
+        let shared;
+        try {
+          shared = validateSharedSnapshot(await cloud.write(preview.remote.revision, syncSnapshot(validateWorkoutData(next))));
+          if (!sameSyncData(shared.data, validateWorkoutData(next))) invalid('The cloud confirmation did not match. Preview sync again.');
+        } catch (error) {
+          throw new WorkoutError('validation', error instanceof Error ? error.message : 'Sync could not be confirmed. Preview sync again.');
+        }
+        return syncRepository.saveSync(revision, next, shared);
+      }),
       restoreBackup: (backup, expectedRevision) => commit(data => {
         if (data.revision !== expectedRevision) invalid('The library changed after the preview. Choose the backup file again.');
         return mergeWorkoutBackup(data, backup).data;
