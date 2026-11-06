@@ -62,14 +62,41 @@ saveWorkoutBackup(text):Promise<'download'|'share'> validates outgoing content,
 serializes exports, uses native cache/share or a browser download with URL cleanup.
 WorkoutBackup consumes the existing WorkoutStore and onHome callback.
 
-- [ ] Write export/React tests and observe RED before implementation.
-- [ ] Implement browser/native export, Home entry, bounded read/preview/confirm/recovery.
-- [ ] Add synthetic browser round-trip, conflict/stale-preview and narrow-layout cases.
-- [ ] Full tests/lint/build/sync/browser suite and visual review, green Step2 commit/push.
+- [x] Write export/React tests and observe RED before implementation.
+- [x] Implement browser/native export, Home entry, bounded read/preview/confirm/recovery.
+- [x] Add synthetic browser round-trip, conflict/stale-preview and narrow-layout cases.
+- [x] Full tests/lint/build/sync/browser suite and visual review, green Step2 commit/push.
 
 ## Step3 review and integration
 
-- [ ] Fresh whole-feature review, resolve supported findings test-first.
+- [x] Fresh whole-feature review, resolve supported findings test-first.
 - [ ] Read actual hosted browser/native results, including native plugin compilation.
 - [ ] Final compact docs, reviewed master/original-checkout integration and checks.
 - [ ] Preserve previews, stop owned listeners, remove clean temporary tree, retain branches.
+
+## Execution evidence
+
+Baseline Node22.23.2, locked482-package install,511 tests/lint/build and owned
+loopback4183 health pass. Fresh design review is ready. Step1 observed core10,
+store7 and reader6 failing cases, then all31 focused and542 full tests pass.
+Step1 is committed as c78b58c. The build's newer Object.hasOwn usage was replaced
+with the existing target-compatible hasOwnProperty idiom after a compiler error.
+
+Step2 observed exporter6, React7 and native-resource1 failures before the feature
+was implemented. Three real-browser failures exposed live FileList clearing.
+Copying the selection before resetting input fixes the observed1-to-0 change.
+An absent-randomUUID regression then drove filenames to the app's existing
+getRandomValues strategy. Fresh review independently passes75tests/8files and
+exact4MiB/legacy-cap/multibyte probes, with no unresolved significant findings.
+
+Final local source passes562tests/34files,lint/build and guarded sync of13shared
+web files per platform, with three Capacitor plugins. Build435 modules, CSS
+index-D3AO3QCE, JSindex-BcFiZ8Aj. Vite reports its502.21kB chunk advisory.
+All four synthetic previews were inspected at390/1280px without overflow.
+The owned4183 preview was stopped after PID/command verification.
+
+The first full browser run passed21/22 cases, timing out at no-person.spec.ts:46
+after its session became empty. Live edits occurred during that run. A development
+reload is a hypothesis, with cause unconfirmed. With source frozen and the preview
+server stopped, all22 cases pass in3.4minutes, Chromium156.0.8078.4, GPU,120samples.
+No pose code or browser-test allowance changed in response.

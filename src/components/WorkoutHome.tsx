@@ -5,8 +5,9 @@ interface Props {
   onWorkout: () => void; onAnalyze: () => void; onHistory: (id?: string) => void;
   onRoutines: () => void;
   onProgress: () => void;
+  onBackup: () => void;
 }
-export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines, onProgress }: Props) {
+export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines, onProgress, onBackup }: Props) {
   const sets = data.history.reduce((total, w) => total + w.exercises.reduce((n, e) => n + e.sets.length, 0), 0);
   const history = [...data.history].sort((a, b) => b.finishedAt! - a.finishedAt!);
   return <div className="space-y-7">
@@ -49,6 +50,9 @@ export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHis
             <span className="text-sm text-slate-400">View</span>
           </button></li>)}</ul>}
     </section>}
-    <p className="text-xs leading-relaxed text-slate-500">Workout logs are saved on this device. Clearing this app or browser’s data removes them. Video analysis is available for bench press.</p>
+    <section className="space-y-3 border-t border-white/10 pt-5">
+      <button type="button" className="btn-ghost" onClick={onBackup}>Backup and restore</button>
+      <p className="text-xs leading-relaxed text-slate-500">Workout logs are saved on this device. Clearing this app or browser’s data removes them. Keep a backup file for recovery. Video analysis is available for bench press.</p>
+    </section>
   </div>;
 }
