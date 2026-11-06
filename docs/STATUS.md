@@ -10,6 +10,41 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Tasks32–37 implement accepted Q20–Q25 under D-051–D-056. Three parallel Codex
+workers each owned two features in isolated worktrees. One fresh independent
+Codex source reviewer inspected all three diffs and found no significant defects.
+Exact runtime model identifiers were unavailable.
+
+- Finished corrections use revision-bound drafts and atomic saves while retaining
+  IDs/order/unit/dates. Optional local-day calendar selection feeds existing
+  History filters. Routine search/sort is read-only. Timer alerts are session-only
+  opt-ins with supported/denied handling and resource cleanup.
+- Home's displayed rolling seven-day window derives actual completed counts,
+  elapsed duration and separate lb/kg entered-load volume including warm-ups.
+  CSV exports validated completed actual sets with precision, source identity,
+  quoting/formula protection and existing browser/native resource ownership.
+- Worker source commits are 6aecc3b/7063b2a/c692fed, 01751812 and
+  b8037dd/86c0054. Unpublished history/summary commits were cherry-picked into
+  the linear integration branch. Worker worktrees/branches remain intact.
+  All workers and coordinator verified process-local Node 22.23.2, clean npm ci
+  and owned loopback dev endpoints. Focused tests, source/browser types and scoped
+  lint passed before integration. Global Node selection remains unchanged.
+- Initial combined run passed 823 tests and failed an old test assuming Home had
+  exactly two dd elements. The coordinator scoped its assertions to the intended
+  Workouts saved/Sets logged labels. No product behavior was changed for that fix.
+  Final npm test -- --maxWorkers=4 passes 824 tests/67 files in 37.54 seconds.
+  Full lint/build pass. Vite transforms 503 modules, entry JS 299.54 kB/91.16 kB
+  gzip. Guarded native sync verifies 16 files/platform and 3 plugins.
+- All 36 Chromium 156.0.8078.4 browser cases pass in 3.7 minutes. New synthetic
+  narrow-screen cases cover corrections Save/Cancel/reload/stale-tab recovery,
+  local-day calendar filters, routine search/sort, alert opt-ins and actual CSV
+  download bytes. Existing GPU/120-sample no-person checks pass. One coordinator
+  owned port 4179 and source remained stable during the browser run.
+- Native compilation, physical iPhone alerts/sharing, live Supabase/email/sync
+  and real-bench acceptance remain unverified. No schema or server setup changed.
+  Dependency installation reported existing audit findings without dependency
+  upgrades. Product Q&A resumes at Q26. Shared docs update once at integration.
+
 Tasks30–31 add independent routine duplication (D-049) and expandable exercise
 history inside active workouts (D-050), selected from the handoff after the user
 requested further development. Two parallel Codex workers used separate sibling

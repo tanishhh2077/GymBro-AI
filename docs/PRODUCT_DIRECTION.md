@@ -27,6 +27,16 @@ and brief reason.
 | 17. Finding past workouts | A: workout/exercise-name search and completion-date filters |
 | 18. Progress periods | A: one/three/six months and All time |
 | 19. Barbell loading | A: optional calculator with editable bar weight and plate inventory |
+| 20. Finished workout corrections | A: name and existing logged set values with Save/Cancel |
+| 21. Routine organization | A: search and name/creation-order sorting |
+| 22. Rest completion | A: optional in-app sound/vibration where supported |
+| 23. Training summary | A: seven-day workouts, sets, duration and unit-separated volume |
+| 24. History browsing | A: optional calendar with day filtering |
+| 25. Spreadsheet export | A: completed actual sets as CSV with units and types |
+
+Q20–Q25 were accepted together with an explicit instruction to build all
+recommended options. Tasks32–37 implement them under D-051–D-056.
+Questions can resume at Q26.
 
 Q17–Q19 were accepted together. Tasks27–29 integrate their three separate agent
 branches under D-046–D-048. Questions can resume at Q20.

@@ -1,42 +1,34 @@
 # GymBro AI current handoff
 
 Updated 2026-11-06, America/Chicago. Read root/scoped AGENTS.md first.
-Follow D-024 and D-036. Detailed evidence is in [STATUS.md](STATUS.md).
+Follow D-024/D-036. Detailed evidence is in [STATUS.md](STATUS.md).
 
-## Completed follow-ups
+## Completed approved batch
 
-- Task30/D-049 adds Duplicate to each saved routine. Copies retain unit, order
-  and targets with fresh routine/exercise IDs and a bounded ` (copy)` name.
-  Save/reload/cap guards and confirmed success use the existing atomic store.
-- Task31/D-050 adds expandable exercise history inside an active workout.
-  Five-workout pages show exact name/unit matches, all matching exercise entries
-  and Regular/Warm-up actual sets. Only completions by the active workout's start
-  appear, newest first. Opening history preserves typed set values without writes.
-- Tasks27–29's history search/date filters, Progress ranges and plate calculator
-  remain integrated. The new combined browser case exercises copied routine
-  editing/start, history expansion, unchanged drafts and source preservation.
+Tasks32–37 implement all six recommended Q20–Q25 choices, D-051–D-056.
+- Finished workout name/set corrections with explicit Save/Cancel and stale-save recovery.
+- Routine name/exercise search and name/creation-order sorting.
+- Optional session-only rest sound/vibration, off by default and capability-dependent.
+- Home seven-day completed training summary, including warm-ups and separate lb/kg volume.
+- Optional local-completion-day History calendar using existing filters.
+- Completed actual-set CSV export through browser/native export ownership.
 
-Two parallel Codex workers implemented the follow-ups in separate worktrees.
-One fresh source reviewer found no significant defects. Combined checks pass
-790 tests/60 files with four workers, lint, build, guarded native sync and all
-32 Chromium cases. The default-worker run hit one loading timeout. Its isolated
-file and constrained full rerun passed with source/timeouts unchanged. See STATUS.
+Three parallel Codex workers implemented the batch. One fresh source reviewer
+found no significant defects. Final checks pass 824 tests/67 files with four
+workers, full lint/build, native asset sync and all 36 Chromium cases.
+An old global Home-statistics assertion was updated for the new summary.
+Actual iPhone sound/vibration/sharing and native compilation remain unverified.
 
 ## Next work
 
-Completed-workout correction remains proposed. Product Q&A resumes at Q20.
-Start the next approved task from updated origin/master with both follow-ups.
-Retain the worker worktrees/branches. The unpublished exercise-history source
-commit is represented by its integration commit as recorded in STATUS.
+Q&A resumes at Q26. Start the next approved task from updated origin/master.
+Preserve all worker branches/checkouts and the incomplete Task4 branch.
+Use isolated ownership and one browser suite on4179, previews on4183.
+Assign task/decision numbers at integration and update shared docs once.
 
-Use separate worktrees and branches. Assign task/decision numbers at integration.
-Update shared docs at final integration. Only one browser suite may use 4179,
-with previews on 4183. Merge one at a time. The incomplete Task4 branch requires
-explicit approval before integration.
-
-Supabase setup still needs the user's dashboard actions, both migrations and
-email-code configuration through [the guide](../supabase/README.md). Live email,
-real cross-device sync and physical-phone checks remain unverified.
+Supabase still needs user dashboard setup, both migrations and email-code
+configuration in [the guide](../supabase/README.md). Live email and real
+cross-device sync remain unverified. Phone/media work requires user presence.
 
 ## Phone and media boundaries
 

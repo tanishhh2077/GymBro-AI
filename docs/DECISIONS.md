@@ -699,6 +699,45 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   active workout's start. The screen explains that cutoff. Source changes reset
   paging. Opening history preserves typed set values and performs no writes.
 
+### D-051 Finished workout corrections
+
+- Q20 A authorizes Task32. Explicit Save/Cancel edits the finished workout name
+  and existing set reps/load/kind. Preserve IDs, order, units and timestamps.
+  Revision-bound drafts reject stale saves and retain failed inputs.
+
+### D-052 Routine search and sorting
+
+- Q21 A authorizes Task33. Case-insensitive routine/exercise-name search and
+  name/creation-order sorting are screen-local. Existing array order represents
+  creation order and remains the default. Sorting does not rewrite saved routines.
+
+### D-053 Optional rest completion alerts
+
+- Q22 A authorizes Task34. Sound/vibration are off by default, session-only,
+  opt-in and capability-dependent. Only a running timer completion alerts.
+  Builder defaults are a 200 ms tone and 200 ms vibration. Audio unlock follows
+  a user gesture. Failures are visible. No background delivery is promised.
+
+### D-054 Seven-day training summary
+
+- Q23 A authorizes Task35. Home derives completed workout/set counts, elapsed
+  duration and entered-load volume, separately for lb/kg and including warm-ups.
+  Builder choice is an inclusive seven-elapsed-day finish-time window captured
+  on Home entry, with displayed endpoints and future completions excluded.
+
+### D-055 Optional history calendar
+
+- Q24 A authorizes Task36. Calendar day selection feeds inclusive local-day
+  History date filters and retains text search. Builder defaults are hidden
+  calendar, newest completion month on opening and counts from full history.
+
+### D-056 Completed-set CSV export
+
+- Q25 A authorizes Task37. Export completed actual sets with source identities,
+  names, timestamps, unit, reps, load and set kind. Missing legacy kind is Regular.
+  Preserve numeric precision, quote CSV fields and protect formula-leading names.
+  Reuse browser/native export ownership. CSV is separate from JSON restoration.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
