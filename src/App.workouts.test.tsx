@@ -1,4 +1,4 @@
-import { act } from 'react';
+import { act, Profiler } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { Capacitor } from '@capacitor/core';
 import { IDBFactory } from 'fake-indexeddb';
@@ -221,4 +221,18 @@ it('stops automatic restarts when opted out and lets the current rest finish', a
   await autoRest(); await click('Repeat last set for Bench press');
   expect(container.querySelector('output')?.textContent).toBe('1:20');
   expect(button('Pause timer')).toBeTruthy();
+});
+
+it('keeps keyboard focus placed on a newly committed screen before passive effects run', async () => {
+  let choose: HTMLButtonElement | undefined;
+  await act(async () => root.render(<Profiler id="navigation" onRender={() => {
+    if (choose) return;
+    // A browser can focus the new control before React's passive effects run.
+    choose = [...container.querySelectorAll('button')].find(el => el.textContent?.trim() === 'Choose video');
+    choose?.focus();
+  }}><App workouts={store} /></Profiler>));
+  await act(idle);
+  await click('Analyze');
+  expect(choose).toBeDefined();
+  expect(document.activeElement).toBe(choose);
 });

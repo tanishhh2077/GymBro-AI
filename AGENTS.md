@@ -183,5 +183,5 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
   with three native plugins. Task19 (D-039, session-only set-linked bench
   analysis) brings it to 597 tests in 36 files and 23 browser cases. Read STATUS
   for actual hosted/device evidence.
-- Task21 workout convenience (D-040) passes 612 tests in 37 files and 24 local
+- Task21 workout convenience (D-040) passes 613 tests in 37 files and 24 local
   browser cases. Auto-rest is opt-in and session-only. See HANDOFF for next work.

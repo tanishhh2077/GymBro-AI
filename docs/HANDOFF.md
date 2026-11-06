@@ -16,10 +16,10 @@ Workout convenience is implemented under D-040 on
 - **Start rest automatically after logging a set** is opt-in per workout. New
   set saves restart the full selected duration. Edits/removals do not restart it.
   Navigation retains timer state; reload/new workouts reset the timer and option.
-- Local checks pass 612 tests in 37 files, lint, build, guarded native sync
-  (13 files per platform, 3 plugins) and all 24 Chromium cases in 3.7 minutes.
+- Local checks pass 613 tests in 37 files, lint, build, guarded native sync
+  (13 files per platform, 3 plugins) and all 24 Chromium cases in 2.9 minutes.
   The new flow fits 390 px. Ordinary UI/helper changes were self-reviewed.
-- The production build reports a 509.51 kB main-chunk advisory. Physical iPhone
+- The production build reports a 509.52 kB main-chunk advisory. Physical iPhone
   behavior remains unverified. See GitHub Actions for hosted results on the
   integrated commit. Task19's completed session-only set links and earlier
   feature evidence are recorded in STATUS.
@@ -36,10 +36,13 @@ loading (`8b336f4` observed). Check its current ownership/integration before
 assigning another task number. Phone testing needs the user present. Accounts/sync, persisted analysis
 results and live analysis remain future work.
 
-The old master browser run 41985529794 failed at input-validation.spec.ts:53.
-Cause remains unknown. The same case passes locally and in both new hosted runs
-(1.3 seconds hosted). No repeat-triggered fix was made. A future observed repeat
-requires a reproducing test, including checking keyboard focus, before a fix.
+The recurring keyboard-admission failure was observed again in master run
+42153259160 and reproduced in 5/25 local repeats. A new failing regression
+confirmed late navigation focus could steal button focus. App now focuses
+before paint. The browser test registers file-picker interception before the
+focus round trip and asserts focus before Enter. Diagnostic traces also showed
+an interception-event race with a correctly activated input. Final repeats pass
+25/25. Temporary diagnostics are removed. See STATUS for the evidence and limits.
 
 ## Phone and video boundaries
 

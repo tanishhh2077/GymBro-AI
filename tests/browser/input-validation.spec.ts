@@ -52,8 +52,10 @@ for (const [filename, message] of [
 
 test('reports real decode failure, blocks replacement, and restores keyboard admission', async ({ page }) => {
   const choose = page.getByRole('button', { name: 'Choose video' });
-  await choose.focus();
+  // Register interception before the focus round trip and verify keyboard focus.
   const chooserPromise = page.waitForEvent('filechooser');
+  await choose.focus();
+  await expect(choose).toBeFocused();
   await page.keyboard.press('Enter');
   await (await chooserPromise).setFiles(invalidVideo);
   await expect(page.getByRole('alert')).toContainText('The video could not be read');

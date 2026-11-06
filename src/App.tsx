@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { App as NativeApp } from '@capacitor/app';
 import { useStore } from 'zustand';
@@ -39,7 +39,8 @@ export default function App({ workouts = workoutStore, session = useSessionStore
   // A set row requested by Back to set; this parent effect runs after the new
   // view's children render, so it can focus the row instead of <main>.
   const focusSet = useRef<string | null>(null);
-  useEffect(() => {
+  // Set navigation focus before paint so a later effect cannot steal a user's focus.
+  useLayoutEffect(() => {
     if (previousView.current !== view) {
       const row = focusSet.current ? document.getElementById(`set-row-${focusSet.current}`) : null;
       (row ?? main.current)?.focus();
