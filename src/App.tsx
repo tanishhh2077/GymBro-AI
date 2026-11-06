@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { App as NativeApp } from '@capacitor/app';
 import { useStore } from 'zustand';
@@ -7,7 +7,6 @@ import { resolveSetLink } from '@/core/setLinks';
 import type { SetLink } from '@/types';
 import { workoutStore, type WorkoutStore } from '@/store/useWorkoutStore';
 import { connectNativeLifecycle } from '@/mobile/nativeLifecycle';
-import { AnalysisWorkspace } from '@/components/AnalysisWorkspace';
 import { WorkoutHome } from '@/components/WorkoutHome';
 import { WorkoutEditor } from '@/components/WorkoutEditor';
 import { WorkoutHistory } from '@/components/WorkoutHistory';
@@ -16,6 +15,23 @@ import { WorkoutRoutines } from '@/components/WorkoutRoutines';
 import { WorkoutProgress } from '@/components/WorkoutProgress';
 import { WorkoutBackup } from '@/components/WorkoutBackup';
 import { ShieldIcon } from '@/components/icons';
+
+// Loaded when Analyze first opens: the screen brings MediaPipe's player code and
+// framer-motion, which no other screen needs at start-up.
+const AnalysisWorkspace = lazy(() => import('@/components/AnalysisWorkspace').then(m => ({ default: m.AnalysisWorkspace })));
+
+/** Keeps the rest of the app usable if the analysis screen's code cannot load. */
+class AnalysisBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return <div role="alert" className="rounded-xl border border-warn/30 bg-warn/10 p-4 text-sm text-warn">
+      <p>Video analysis could not be opened. Reload the app to try again.</p>
+      <button type="button" className="mt-3 underline underline-offset-4" onClick={() => window.location.reload()}>Reload app</button>
+    </div>;
+  }
+}
 
 type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines' | 'progress' | 'backup';
 export default function App({ workouts = workoutStore, session = useSessionStore }: { workouts?: WorkoutStore; session?: SessionStore } = {}) {
@@ -91,8 +107,10 @@ export default function App({ workouts = workoutStore, session = useSessionStore
         onProgress={() => navigate('progress')} onBackup={() => navigate('backup')} onHistory={openHistory} />}
       {view === 'workout' && <WorkoutEditor store={workouts} analysis={analysis} onFinished={() => { setView('home'); setNotice('Workout saved.'); }} />}
       {view === 'history' && <WorkoutHistory store={workouts} initialId={selected} analysis={analysis} />}
-      {view === 'analysis' && <AnalysisWorkspace session={session} data={state.data} available={available} pendingLink={pendingLink}
-        onClearPending={() => setPendingLink(undefined)} onBackToSet={backToSet} />}
+      {view === 'analysis' && <AnalysisBoundary><Suspense fallback={<p role="status" className="text-sm text-slate-400">Opening video analysis…</p>}>
+        <AnalysisWorkspace session={session} data={state.data} available={available} pendingLink={pendingLink}
+          onClearPending={() => setPendingLink(undefined)} onBackToSet={backToSet} />
+      </Suspense></AnalysisBoundary>}
       {view === 'routines' && <WorkoutRoutines store={workouts} onStarted={() => navigate('workout')} onResume={() => navigate('workout')} />}
       {view === 'progress' && <WorkoutProgress data={state.data} available={available} onHome={() => navigate('home')}
         onWorkout={() => navigate('workout')} onHistory={openHistory} />}

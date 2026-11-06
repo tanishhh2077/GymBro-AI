@@ -52,11 +52,15 @@ chart library is not in the entry chunk.
 **Create:** `src/core/PoseEngine.lazy.test.ts`, `src/App.lazy.test.tsx`.
 **Modify:** `src/core/PoseEngine.ts`, `src/App.tsx`, App tests that open Analyze.
 
-- [ ] RED: MediaPipe is not loaded before a detector is created, and a failed
+- [x] RED: MediaPipe is not loaded before a detector is created, and a failed
   load is an `init` error; App does not load the analysis module before Analyze
   opens, shows the loading status, and shows the boundary message (other screens
   still work) when the module fails. Implement; full checks; browser suite;
   sizes; commit/push; hosted runs.
+  Result: entry 507.15 kB → 233.58 kB (gzip 159.09 → 72.79 kB); on-demand
+  `AnalysisWorkspace` 147.71 kB and `vision_bundle` 136.71 kB; no size warning.
+  A production-preview check saw no on-demand chunk at Home, only the screen
+  chunk on opening Analyze, and MediaPipe once a clip was processed.
 
 ## Step 3: review and integration
 

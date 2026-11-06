@@ -65,10 +65,17 @@ function button(name: string) {
   const found = findButton(name);
   if (!found) throw new Error(`Missing button: ${name}`); return found;
 }
-async function click(name: string) { await act(async () => { button(name).click(); await idle(); }); }
+/** The analysis screen loads on first use; wait in separate act() scopes until it shows. */
+async function settleLazy() {
+  for (let i = 0; i < 100 && container.textContent?.includes('Opening video analysis'); i++) {
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
+  }
+}
+async function click(name: string) { await act(async () => { button(name).click(); await idle(); }); await settleLazy(); }
 async function nav(name: string) {
   const found = [...container.querySelectorAll('nav button')].find(el => el.textContent?.trim() === name) as HTMLButtonElement;
   await act(async () => { found.click(); await idle(); });
+  await settleLazy();
 }
 async function fill(name: string, value: string) {
   const label = [...container.querySelectorAll('label')].find(el => el.textContent?.trim() === name);

@@ -5,7 +5,7 @@ smoke against only five fixed, checksummed non-human H.264 patterns. It uses
 Node from `.nvmrc`, the locked Playwright runner and installed Chromium on
 standard Ubuntu 24.04, one worker, bounded runtime, read-only token and the
 existing pinned checkout/setup-node actions. It runs on Task 13/master pushes
-with relevant changes. Task14 through Task19 feature pushes are included. No captures,
+with relevant changes. Task14 through Task20 feature pushes are included. No captures,
 caches, signing or artifact uploads.
 See [browser commands and limits](../../tests/browser/README.md). Hosted execution
 results belong in STATUS; this file's existence is not a passing run.
@@ -18,7 +18,7 @@ Node comes from `.nvmrc`; dependencies come from the lockfile. Third-party actio
 are pinned to exact release commits. No paid runner or Apple signing is used.
 
 Pushes to `feat/task6-mobile-app` or `master` trigger builds when relevant code,
-assets or build configuration change. Task14 through Task19 feature pushes trigger
+assets or build configuration change. Task14 through Task20 feature pushes trigger
 the same checks. Markdown-only changes do not. Manual
 dispatch is defined. GitHub's UI offers it only for workflows on the repository's
 default branch, which has been `master` since 2026-11-05, so the Actions page
