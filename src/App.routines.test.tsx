@@ -60,7 +60,11 @@ it('creates ordered targets and starts a workout with no completed sets or fabri
   await click('Start routine Upper day');
   expect(store.getState().data.active?.exercises.every(e => !e.sets.length)).toBe(true);
   expect(container.textContent).toContain('Planned target:'); expect(container.querySelector('tbody')).toBeNull();
-  await click('Home'); expect([...container.querySelectorAll('dd')].map(el => el.textContent)).toEqual(['0', '0']);
+  await click('Home');
+  for (const label of ['Workouts saved', 'Sets logged']) {
+    const term = [...container.querySelectorAll('dt')].find(el => el.textContent === label);
+    expect(term?.nextElementSibling?.textContent).toBe('0');
+  }
 });
 it('edits and confirms deletion without rewriting the active snapshot or resetting its timer', async () => {
   await draft(); await submit(); await click('Start routine Upper day');
