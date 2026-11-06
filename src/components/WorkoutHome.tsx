@@ -1,5 +1,6 @@
 import type { WorkoutData } from '@/types/workout';
 import type { ReactNode } from 'react';
+import { WeeklyTrainingSummary } from './WeeklyTrainingSummary';
 
 interface Props {
   data: WorkoutData; available: boolean; busy: boolean;
@@ -39,6 +40,7 @@ export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHis
         <div><dt className="text-sm text-slate-400">Sets logged</dt><dd className="mt-1 text-3xl font-semibold text-white">{sets}</dd></div>
       </dl>
     </section>}
+    {available && <WeeklyTrainingSummary data={data} />}
     {available && <section className="flex flex-wrap items-center justify-between gap-3" aria-label="Saved routines">
       <div><h2 className="text-lg font-semibold text-white">Your routines</h2>
         <p className="mt-1 text-sm text-slate-400">{data.routines?.length ?? 0} saved · exercise plans for a fresh workout</p></div>
