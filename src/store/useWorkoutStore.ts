@@ -5,6 +5,10 @@ import { createWorkoutRepository, type WorkoutRepository, type SyncedWorkoutRepo
 import { mergeWorkoutBackup, type WorkoutBackup } from '@/core/workoutBackup';
 import { mergeWorkoutSync, sameSyncData, syncSnapshot, validateSharedSnapshot, type SyncChoice, type SyncPreview, type WorkoutCloud } from '@/core/workoutSync';
 interface WorkoutDeps { id: () => string; now: () => number }
+export interface CompletedWorkoutCorrection {
+  name: string;
+  exercises: readonly { id: string; sets: readonly { id: string; reps: number; weight: number; kind?: SetKind }[] }[];
+}
 export interface WorkoutState {
   data: WorkoutData; loaded: boolean; busy: boolean; needsReload: boolean; error: string | null;
   load: () => Promise<WorkoutResult>;
@@ -17,6 +21,7 @@ export interface WorkoutState {
   finishWorkout: () => Promise<WorkoutResult>;
   discardWorkout: () => Promise<WorkoutResult>;
   deleteWorkout: (id: string) => Promise<WorkoutResult>;
+  correctCompletedWorkout: (id: string, expectedRevision: number, input: CompletedWorkoutCorrection) => Promise<WorkoutResult>;
   createRoutine: (input: RoutineInput) => Promise<WorkoutResult>;
   duplicateRoutine: (id: string) => Promise<WorkoutResult>;
   updateRoutine: (id: string, expectedRevision: number, input: RoutineInput) => Promise<WorkoutResult>;
@@ -175,6 +180,24 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
       deleteWorkout: id => commit(data => {
         if (!data.history.some(w => w.id === id)) invalid('This saved workout is no longer available.');
         return { ...data, history: data.history.filter(w => w.id !== id) };
+      }),
+      correctCompletedWorkout: (id, expectedRevision, input) => commit(data => {
+        if (data.revision !== expectedRevision) invalid('Saved workouts changed. Cancel and reopen this workout before saving your edits.');
+        const source = data.history.find(w => w.id === id);
+        if (!source) invalid('This completed workout is no longer available.');
+        if (!Array.isArray(input.exercises) || input.exercises.length !== source.exercises.length) invalid('Keep the existing exercises when correcting a workout.');
+        const updated = { ...source, name: cleanName(input.name), exercises: source.exercises.map((exercise, index) => {
+          const row = input.exercises[index];
+          if (row.id !== exercise.id || !Array.isArray(row.sets) || row.sets.length !== exercise.sets.length) invalid('Keep the existing exercises and sets when correcting a workout.');
+          return { ...exercise, sets: exercise.sets.map((saved, setIndex) => {
+            const set = row.sets[setIndex];
+            if (set.id !== saved.id) invalid('Keep the existing set order when correcting a workout.');
+            validateSetValues(set.reps, set.weight);
+            const kind = set.kind === undefined ? 'regular' : set.kind; validateSetKind(kind);
+            return { id: saved.id, reps: set.reps, weight: set.weight, ...(kind === 'warmup' ? { kind } : {}) };
+          }) };
+        }) };
+        return { ...data, history: data.history.map(w => w.id === id ? updated : w) };
       }),
       createRoutine: input => commit(data => {
         if ((data.routines?.length ?? 0) >= 100) invalid('You already have 100 routines. Delete one before adding another.');

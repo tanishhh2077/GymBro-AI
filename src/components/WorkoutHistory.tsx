@@ -4,6 +4,9 @@ import type { WorkoutStore } from '@/store/useWorkoutStore';
 import { isBenchPressName } from '@/core/setLinks';
 import { filterWorkoutHistory, type HistoryFilters } from '@/core/historyFilters';
 import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton';
+import type { Workout } from '@/types/workout';
+import { CompletedWorkoutEditor } from './CompletedWorkoutEditor';
+import { WorkoutCalendar } from './WorkoutCalendar';
 
 const inputClass = 'w-full min-w-0 rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white';
 
@@ -14,9 +17,12 @@ export function WorkoutHistory({ store, initialId, analysis, onSummary }: { stor
   const [filters, setFilters] = useState<HistoryFilters>({ query: '', from: '', to: '' });
   const filterId = useId();
   const [visible, setVisible] = useState(20);
+  const [editing, setEditing] = useState<{ workout: Workout; revision: number } | null>(null);
+  const [showCalendar, setShowCalendar] = useState(false);
   if (initialId !== requestedId) {
     setRequestedId(initialId);
     setSelectedId(initialId);
+    setEditing(null);
   }
   // Direct links resolve against all saved workouts, even when filters exclude them.
   const selected = state.data.history.find(w => w.id === selectedId);
@@ -25,10 +31,13 @@ export function WorkoutHistory({ store, initialId, analysis, onSummary }: { stor
     setFilters(current => ({ ...current, [field]: value }));
     setVisible(20);
   }
+  if (editing) return <CompletedWorkoutEditor store={store} workout={editing.workout} expectedRevision={editing.revision} onClose={() => setEditing(null)} />;
   if (selected) return <div className="space-y-5">
     <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={() => setSelectedId(undefined)}>Back to history</button>
     <div><h1 className="break-words text-3xl font-bold text-white">{selected.name}</h1><p className="mt-2 text-sm text-slate-400">{new Date(selected.finishedAt!).toLocaleString()} · weights in {selected.unit}</p></div>
     {onSummary && <button type="button" className="btn-ghost" onClick={() => onSummary(selected.id)}>View summary</button>}
+    <button type="button" className="btn-ghost" disabled={state.busy || state.needsReload || !state.loaded}
+      onClick={() => setEditing({ workout: selected, revision: state.data.revision })}>Edit completed workout</button>
     {selected.exercises.map(e => <section key={e.id} className="border-t border-white/10 pt-4">
       <h2 className="break-words text-xl font-semibold text-white">{e.name}</h2>
       <table className="mt-3 w-full text-left text-sm"><caption className="sr-only">Saved sets for {e.name}</caption>
@@ -42,6 +51,10 @@ export function WorkoutHistory({ store, initialId, analysis, onSummary }: { stor
     }}>Delete workout</button>
   </div>;
   return <div className="space-y-5"><h1 className="text-3xl font-bold text-white">Workout history</h1>
+    <button type="button" className="btn-ghost" aria-expanded={showCalendar} onClick={() => setShowCalendar(value => !value)}>{showCalendar ? 'Hide calendar' : 'Show calendar'}</button>
+    {showCalendar && <WorkoutCalendar history={state.data.history} from={filters.from} to={filters.to} onSelect={day => {
+      setFilters(current => ({ ...current, from: day, to: day })); setVisible(20);
+    }} />}
     <section aria-label="History filters" className="space-y-3">
       <div><label htmlFor={`${filterId}-search`} className="mb-1 block text-sm text-slate-400">Search workouts or exercises</label>
         <input id={`${filterId}-search`} type="search" className={inputClass} value={filters.query}
