@@ -10,6 +10,39 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task26 (D-045) implements recommended Q14–Q16 after the user's explicit start.
+Codex implemented the saved-workout finish/History summary, schema3 Regular/Warm-up
+sets and exact-name device-local rest defaults, scoped by guest/account. Summary
+volume includes all logged sets. Records use Regular sets. Rest defaults feed
+manual rest and opt-in auto-rest after confirmed new-set saves.
+
+- Test-first cases failed for schema3, labels, summary navigation and rest controls
+  before their implementation. Full checks pass 707 tests / 51 files. A later
+  legacy-sync regression failed before retaining normalized validation results.
+  The final 42 affected cases pass, covering the current 710-test inventory. A
+  resource-sensitive early App run timed out under load and passed with two
+  workers. The complete default-worker suite subsequently passed.
+- Full lint and affected reruns pass. Final build/type checks and guarded native
+  sync pass (492 modules, 16 files/platform, 3 plugins). Entry JS is 270.13 kB
+  / 83.15 kB gzip. All 30 Chromium 156.0.8078.4 cases pass in 3.6 minutes, including
+  the new 390 px workflow and the existing real no-person GPU/120-sample checks.
+  Files and other checks were held steady during this browser run.
+- PostgreSQL 17.11 tests apply both actual migrations and pass schema2/schema3
+  acceptance, Warm-up round trip, invalid/null/old-schema kind rejection plus
+  the previous isolation/concurrency checks. Owned test containers were removed.
+  Strict legacy reads retain their original stored size and avoid read-time writes.
+- Fresh independent read-only Codex review found no significant code defects.
+  It flagged the setup guide's missing second migration, now corrected. Source
+  review included the legacy-sync fix. The reviewer ran only a diff check and
+  inspected source/tests, with runtime model ID unavailable. No open review issue
+  remains. Rest defaults are deliberately device-local and excluded from backups.
+- Changes span manual contracts/validation/store, summary/editor/history/progress,
+  rest preference/timer glue, sync/backup identity, additive SQL and synthetic
+  tests. Cloud setup/email delivery, real cross-device sync, physical iPhone and
+  bench validation retain user-owned prerequisites. Next configure both migrations
+  using the setup guide, then user-present service/phone checks or Q&A from Q17.
+  Task25 81b4362 hosted browser42180714200 and native42180714184 both passed.
+
 Task25 (D-044) implements optional Supabase email-code accounts and manual
 workout/routine sync, authorized by the user on 2026-11-06. Codex implemented it
 (runtime model ID unavailable). Guest uses its established store/database;

@@ -8,8 +8,12 @@ The Home screen gives equal entry to a manual workout log and **one uploaded
 side-view barbell bench-press video** for analysis.
 
 The workout log supports per-workout lb/kg, manual exercises/sets/reps/weights,
-editing, reload/resume, finished history and explicit deletion. Records stay in
-local IndexedDB; clearing app/browser data removes them. Task25 adds optional
+editing, reload/resume, finished history and explicit deletion. Sets have
+Regular/Warm-up labels. Finish opens an elapsed-time, count
+and entered-load-volume summary, also available from History. Personal records
+use Regular sets. Exercise-specific rest defaults are remembered on the device,
+separately for guest and account libraries. Workout records live in
+local IndexedDB. Clearing app/browser data removes them. Task25 adds optional
 Supabase email-code accounts and explicit manual workout/routine sync after
 [service setup](supabase/README.md). An active workout also has a manual rest timer with duration
 choices, pause/resume/reset and in-app completion. It stays across screen changes

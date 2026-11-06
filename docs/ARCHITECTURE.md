@@ -1,6 +1,6 @@
 # System architecture
 
-Updated 2026-11-06 through Task25 accounts/sync. This map distinguishes
+Updated 2026-11-06 through Task26 workout flow. This map distinguishes
 observed implementation and accepted future direction.
 
 Task 13's `tests/browser/` exercises the existing development-server application
@@ -316,6 +316,29 @@ The backend migration restricts reads to `auth.uid()`, revokes direct writes and
 exposes one owner-bound, validated, revision-checked RPC with a fixed search path.
 `supabase/README.md` owns setup and verification boundaries. Cloud configuration,
 hosted email/API behavior and physical-device sync still require observation.
+
+## Workout summaries, set kinds and rest defaults (Task26)
+
+Current manual documents use schema3. Strict v1/v2 validation reads only their
+original fields, then changes the version digit without writes or added defaults.
+An optional `kind` marks Regular/Warm-up sets, with missing kind interpreted as
+Regular. Regular writes omit the field. Backup record identity and canonical sync
+include kinds. The second Supabase migration extends the owner-only validator to
+schema3 while preserving schema2 rows. Apply migrations in filename order.
+
+After a confirmed finish, App selects the saved workout ID and opens a derived
+summary. History can open the same summary. `core/workoutSummary` validates its
+finished source and derives elapsed wall time, counts and entered-load volume.
+Summary totals include warm-ups. Progress metrics skip marked warm-ups and
+previous-value suggestions match the selected kind. Repeat copies the last
+actual set's kind, while edit calls with an omitted kind preserve the saved kind.
+
+`useExerciseRest` keeps bounded exact-name duration preferences in separate
+guest/account localStorage keys. Settings failures retain session values with a
+notice. AccountRoot passes its identity scope into App. Exercise controls can
+start rest manually or provide the duration to opt-in auto-rest after a successful
+new-set save. The root timer keeps its existing deadline/cleanup behavior, with
+running state and auto-start reset on reload or workout/account change.
 
 ## Runtime reference sources
 

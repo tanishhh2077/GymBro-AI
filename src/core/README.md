@@ -1,5 +1,9 @@
 # Media and pose processing
 
+Task26's `workoutSummary` derives elapsed wall time, counts and entered-load volume
+from a validated finished workout. Regular-only progress and type-matched previous
+values use optional schema3 set kinds. Backup and sync retain these manual labels.
+
 Task25's `workoutSync.ts` merges manual libraries against their shared baseline
 and exposes explicit conflicts. `accountService.ts` owns optional email-code
 authentication and identity-bound Supabase requests. The SDK loads when account

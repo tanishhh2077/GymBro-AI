@@ -1,5 +1,10 @@
 # Interface components
 
+Task26 adds `WorkoutSummary` after a confirmed finish and through saved History.
+The editor logs/edits Regular and Warm-up kinds, repeats their actual type and
+shows type-matched previous values. Exercise-level rest controls save scoped
+device defaults and feed manual or opt-in automatic rest after a successful save.
+
 Task18's `WorkoutBackup.tsx` supplies Home export, bounded file selection,
 revision-bound previews, explicit confirmation and recovery. A synchronous store
 subscription invalidates previews even during same-revision reloads. Navigation

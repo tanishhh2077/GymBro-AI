@@ -53,3 +53,10 @@ read-only review because the set representation changes saved data.
 
 Live cloud configuration and physical-phone/bench testing retain their existing
 user-owned prerequisites. Local tests establish recorded-workout behavior.
+
+## Completed locally on 2026-11-06
+
+All four implementation/verification steps are complete. STATUS records full and
+affected test evidence, 30 passing browser cases, PostgreSQL checks, build/native
+sync and the independent review. The server setup guide now requires both
+migrations. Cloud configuration and physical-device verification remain open.

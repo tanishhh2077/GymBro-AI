@@ -78,6 +78,13 @@ precedence over older documentation, review and check-cadence requirements.
 
 ## Independent judgment
 
+- D-045 authorizes Q14–Q16's workout summary, Regular/Warm-up set kinds and
+  exact-name exercise rest defaults. Schema3 preserves strict v1/v2 reads without
+  writes or size growth. Carry kinds through backup/sync and apply both Supabase
+  migrations in order. Progress records use Regular sets. Summary volume includes
+  all logged sets. Rest defaults are device-local and guest/account scoped, with
+  session-only fallback. Timer clocks and auto-start remain session-only.
+
 - D-042 adds System/Light/Dark appearance and a device-local preference in
   `localStorage`, separate from workout records and backups. Follow the live
   system setting in System mode and report session-only fallback on storage errors.

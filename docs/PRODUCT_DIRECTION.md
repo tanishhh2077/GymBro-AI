@@ -21,6 +21,14 @@ and brief reason.
 | 11. Appearance | A: follow the phone's light/dark setting, with a manual override |
 | 12. Exercise entry | A: searchable built-in exercise list plus custom exercises |
 | 13. Next development priority | A: previous-set values, faster set entry and optional automatic rest timers |
+| 14. After finishing a workout | A: summary of duration, exercises, sets and logged volume |
+| 15. Set types | A: Regular and Warm-up |
+| 16. Rest defaults | A: remember a duration for each exercise |
+
+Q14–Q16 were accepted together on 2026-11-06 with "start with all the recommended".
+Task26 implements them under D-045. Rest defaults are device-local and scoped to
+guest/account use. Summary volume includes warm-ups and personal records use
+Regular sets. Continue questions at Q17.
 
 Q10–Q13 were answered together on 2026-11-05. They are accepted product choices.
 The next feature priority is everyday workout convenience from Q13. Theme

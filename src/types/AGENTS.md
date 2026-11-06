@@ -22,3 +22,6 @@ Inherit [source guidance](../AGENTS.md). Follow the
   other temporary runtime handles.
 - D-034 permits schema2 routine contracts and optional planned set/rep targets.
   Never represent a target as a logged set or a live link to workout history.
+- D-045 adds schema3 optional set kinds. Missing kind means Regular. Strict v1/v2
+  inputs normalize only the version digit. Reject kinds in older schemas and
+  carry Warm-up through saved records, backup/restore and cloud sync.

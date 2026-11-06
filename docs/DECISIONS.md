@@ -638,6 +638,24 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   iPhone verification remain pending. Automatic sync and account deletion are
   follow-on work. See the [Task25 plan](superpowers/plans/2026-11-06-account-sync.md).
 
+### D-045 Workout summary, set kinds and exercise rest defaults
+
+- The user selected all recommended Q14–Q16 choices on 2026-11-06 and authorized
+  implementation. Task26 adds a saved-workout finish summary, Regular/Warm-up
+  labels and a remembered rest duration per exercise.
+- Builder choices derive elapsed wall time, counts and total entered-load volume
+  from the saved workout. Volume sums reps × entered load across all logged sets,
+  including warm-ups. Progress records use Regular sets. Older unlabelled sets
+  count as Regular. Previous values match set type and repeats retain that type.
+- Schema3 adds optional set kinds and preserves strict v1/v2 reads by changing
+  only the version digit. Backup/sync retain labels. The additive server migration
+  accepts schema2/schema3. Existing projects apply migration002 before using the
+  updated client. Old app versions require updating to read schema3 records.
+- Rest defaults use existing duration presets, exact exercise names and a 90-second
+  fallback. They are saved on-device, separately for guest and each account, with
+  an explicit session-only fallback on settings errors. The timer and auto-start
+  remain session-only. Backups/sync carry manual records separately from defaults.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

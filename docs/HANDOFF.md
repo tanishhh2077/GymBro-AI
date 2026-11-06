@@ -2,48 +2,43 @@
 
 Updated 2026-11-06, America/Chicago. Read root/scoped `AGENTS.md` first.
 Follow D-024, briefly explain and proceed. D-036 keeps checks/plans/docs lean.
-Detailed evidence and history are in [STATUS.md](STATUS.md).
+Detailed evidence is in [STATUS.md](STATUS.md).
 
-## Task25 accounts and sync
+## Task26 workout flow
 
-The user authorized building optional accounts/sync and selected Supabase with
-email codes (D-044). Codex implemented the client, backend migration and setup
-guide. Cloud project/email configuration still belongs to the user. A pending
-chat question asked them to follow [supabase setup](../supabase/README.md).
-Check their reply before treating a live backend as configured.
+The user selected recommended Q14–Q16 and authorized all three (D-045).
+Codex implemented the finish/History summary, Regular/Warm-up labels and remembered
+exercise rest defaults. Summary volume includes every logged set. Progress records
+use Regular sets. Missing kinds in older data mean Regular.
 
-- Home → Account and sync offers email codes and explicit Preview/Confirm sync.
-  Guest keeps its established store/database. Each authenticated service/account
-  has a separate local library. Explicit guest copy uses backup merge/revision rules.
-- Whole-record three-way merging exposes concurrent edit/delete choices and
-  propagates independent edits. Two active workouts require finishing one first.
-  Remote revision checks and atomic local data/baseline commits preserve retries.
-  Account changes reset session video/links, screen drafts and rest timers.
-- Full checks passed 678 tests / 46 files, lint and build. After review/input fixes,
-  affected checks pass 46 tests / 6 files, covering the current 681-test/47-file
-  inventory. Guarded native sync passes 16 files/platform and 3 plugins. Browser
-  passes 28/29 plus 2/2 affected reruns after a development reload interrupted
-  portrait inference. All 29 cases have passing coverage. See STATUS for details.
-- Real PostgreSQL 17.11 authorization/concurrency/validation tests pass through
-  `npm run test:sync-db`. A real pinned-SDK/fake-HTTP test verifies protocol.
-  Fresh read-only review found one medium retry issue, corrected with explicit
-  app-reload recovery. No unresolved significant review findings remain.
+- Schema3 preserves strict v1/v2 reads without read-time writes or size growth.
+  Set kinds travel through backup/restore and sync. Existing cloud projects need
+  migration002. Apply both migrations in filename order for new projects, using
+  [Supabase setup](../supabase/README.md). Update old app clients before syncing.
+- Rest defaults use exact exercise names and existing duration presets, saved
+  separately for guest/account on the device. Storage failures use session values
+  with a notice. Timer clocks and auto-start remain session-only. Successful new
+  sets use the exercise default for opt-in auto-rest. Manual exercise rest works too.
+- Full checks passed 707 tests / 51 files. After compatibility/wording fixes,
+  42 affected cases pass, covering the current 710-test inventory. Lint, build,
+  guarded native sync (16 files/platform, 3 plugins), real PostgreSQL 17.11 and
+  all 30 Chromium cases pass. Independent source review found no significant code
+  defect and flagged the migration guide, now corrected. See STATUS for limits.
 
 ## Next work
 
 1. User configures Supabase URL/publishable key in ignored `.env.local`, applies
-   the migration and updates the email-code template using the setup guide.
-   Public signup also needs an appropriate email provider. Coordinate account,
-   plan/spending and dashboard actions. The live service needs verification.
-2. Verify real email sign-in and two-device workout sync, including conflicts,
-   offline edits and deletion. The iPhone portion runs only with the user present.
-3. Continue Q&A from Q14 or another approved feature. Automatic sync, account
+   the two migrations and sets the email-code template using the guide. Dashboard,
+   account and spending actions require coordination. Live service is unverified.
+2. Verify real email sign-in and PC–iPhone manual sync, including offline edits,
+   conflicts, labels and deletion. Phone work runs only with the user present.
+3. Continue Q&A from Q17 or another approved feature. Automatic sync, account
    deletion, persisted analysis and live analysis need their own bounded work.
 
-Tasks22–24 exercise library, appearance and on-demand analysis are complete.
-Task24 48d3918 hosted browser 42171205737 and native 42171205658 passed. Check
-Actions for the latest Task25 commit. Retain branches and the separate Task20
-worktree. The incomplete Task4 branch needs explicit approval before integration.
+Task25 optional accounts/manual sync is built. Its 81b4362 hosted browser
+42180714200 and native42180714184 passed. Check Actions for Task26 after integration.
+Retain branches and the separate Task20 worktree. Task4 is incomplete and needs
+explicit approval before integration.
 
 ## Phone and media boundaries
 

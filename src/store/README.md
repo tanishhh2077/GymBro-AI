@@ -1,5 +1,10 @@
 # Session state and media ownership
 
+Task26/D-045 stores optional set kinds in schema3. Strict v1/v2 reads change only
+the version digit, with no write or defaults. Missing kind means Regular.
+`useExerciseRest` keeps bounded exact-name durations in guest/account-scoped device
+localStorage, with session fallback. Timer running state stays in memory.
+
 Task25 adds account-scoped repository databases and a `shared` baseline beside
 the manual `current` document. `confirmSync` checks preview revisions, writes
 through the authenticated cloud adapter, then commits merged data and baseline

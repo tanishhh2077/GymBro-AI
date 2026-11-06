@@ -1,5 +1,10 @@
 # Session state and media lifecycle
 
+D-045 adds bounded exact-name rest preferences under account/guest-scoped
+`gymbro-ai:exercise-rest:` localStorage keys. Preserve unknown formats and use
+an explicit session-only fallback on storage errors. Keep these settings outside
+workout backups/sync. Schema3 stores set kinds with the existing atomic writes.
+
 Inherit [source guidance](../AGENTS.md). Follow the
 [product brief](../../docs/PRODUCT_BRIEF.md) and [decisions](../../docs/DECISIONS.md).
 
