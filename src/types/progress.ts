@@ -14,6 +14,8 @@ export interface ExerciseProgress {
   readonly key: string;
   readonly name: string;
   readonly unit: WeightUnit;
+  /** Present on groups of bodyweight exercises, whose weights are added load (negative for assistance). */
+  readonly bodyweight?: true;
   readonly loggedSetCount: number;
   readonly heaviestSet: RecordedSet;
   readonly mostRepsSet: RecordedSet;

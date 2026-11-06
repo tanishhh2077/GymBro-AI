@@ -5,6 +5,7 @@ interface ProgressAccumulator {
   key: string;
   name: string;
   unit: WeightUnit;
+  bodyweight: boolean;
   loggedSetCount: number;
   heaviestSet: RecordedSet;
   mostRepsSet: RecordedSet;
@@ -43,7 +44,9 @@ export function buildWorkoutProgress(history: readonly Workout[]): readonly Exer
   for (const sourceWorkout of history) {
     if (sourceWorkout.finishedAt === null) continue;
     for (const sourceExercise of sourceWorkout.exercises) {
-      const key = JSON.stringify([sourceExercise.name, sourceWorkout.unit]);
+      const bodyweight = sourceExercise.bodyweight === true;
+      // Added bodyweight load is not comparable with an external load, so bodyweight entries form their own group.
+      const key = JSON.stringify(bodyweight ? [sourceExercise.name, sourceWorkout.unit, 'bodyweight'] : [sourceExercise.name, sourceWorkout.unit]);
       for (const sourceSet of sourceExercise.sets) {
         if (sourceSet.kind === 'warmup') continue;
         const record: RecordedSet = {
@@ -61,6 +64,7 @@ export function buildWorkoutProgress(history: readonly Workout[]): readonly Exer
             key,
             name: sourceExercise.name,
             unit: sourceWorkout.unit,
+            bodyweight,
             loggedSetCount: 0,
             heaviestSet: record,
             mostRepsSet: record,
@@ -89,10 +93,12 @@ export function buildWorkoutProgress(history: readonly Workout[]): readonly Exer
     key: group.key,
     name: group.name,
     unit: group.unit,
+    ...(group.bodyweight ? { bodyweight: true as const } : {}),
     loggedSetCount: group.loggedSetCount,
     heaviestSet: group.heaviestSet,
     mostRepsSet: group.mostRepsSet,
     workouts: Array.from(group.workouts.values()).sort(compareOccurrence),
     repRecords: Array.from(group.repRecords.values()).sort((left, right) => right.weight - left.weight),
-  })).sort((left, right) => compareText(left.name, right.name) || compareText(left.unit, right.unit));
+  })).sort((left, right) => compareText(left.name, right.name) || compareText(left.unit, right.unit) ||
+    Number(left.bodyweight === true) - Number(right.bodyweight === true));
 }
