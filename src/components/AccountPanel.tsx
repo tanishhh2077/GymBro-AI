@@ -15,7 +15,7 @@ function RecordVersion({ value }: { value: Workout | WorkoutRoutine | null }) {
     <p>{value.name} · {value.unit}{'finishedAt' in value ? value.finishedAt === null ? ' · Active' : ' · Completed' : ' · Routine'}</p>
     <ul className="space-y-2">{value.exercises.map(exercise => <li key={exercise.id}>
       <span className="font-medium">{exercise.name}</span>
-      {'sets' in exercise && <span> · {exercise.sets.length ? exercise.sets.map(set => `${set.reps} reps × ${set.weight} ${value.unit}`).join(', ') : 'No logged sets'}</span>}
+      {'sets' in exercise && <span> · {exercise.sets.length ? exercise.sets.map(set => `${set.kind === 'warmup' ? 'Warm-up' : 'Regular'} ${set.reps} reps × ${set.weight} ${value.unit}`).join(', ') : 'No logged sets'}</span>}
       {!('sets' in exercise) && <span> · {exercise.targetSets ?? '—'} sets / {exercise.targetReps ?? '—'} reps planned</span>}
     </li>)}</ul>
   </div>;

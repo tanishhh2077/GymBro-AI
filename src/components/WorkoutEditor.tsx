@@ -1,6 +1,6 @@
 import { useId, useRef, useState, type FormEvent } from 'react';
 import { useStore } from 'zustand';
-import type { WeightUnit, WorkoutExercise } from '@/types/workout';
+import type { SetKind, WeightUnit, WorkoutExercise } from '@/types/workout';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
 import { findPreviousExercise } from '@/core/previousWorkout';
 import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton';
@@ -10,7 +10,7 @@ const inputClass = 'mt-1 w-full rounded-lg border border-white/15 bg-ink-900 px-
 function numeric(value: string) { return value.trim() ? Number(value) : NaN; }
 
 export function WorkoutEditor({ store, onFinished, onSetLogged, analysis }: {
-  store: WorkoutStore; onFinished: () => void; onSetLogged?: (workoutId: string) => void; analysis?: SetAnalysisActions;
+  store: WorkoutStore; onFinished: (workoutId: string) => void; onSetLogged?: (workoutId: string) => void; analysis?: SetAnalysisActions;
 }) {
   const state = useStore(store);
   const [name, setName] = useState('Workout');
@@ -49,7 +49,7 @@ export function WorkoutEditor({ store, onFinished, onSetLogged, analysis }: {
           <button type="submit" className="btn-ghost">Add exercise</button>
         </ExercisePicker>
       </form>
-      <button type="button" className="btn-primary w-full sm:w-auto" onClick={async () => { if ((await state.finishWorkout()).ok) onFinished(); }}>Finish workout</button>
+      <button type="button" className="btn-primary w-full sm:w-auto" onClick={async () => { if ((await state.finishWorkout()).ok) onFinished(workout.id); }}>Finish workout</button>
     </fieldset>
   </div>;
 }
@@ -62,9 +62,10 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
   const [reps, setReps] = useState('');
   const [weight, setWeight] = useState('');
   const [editing, setEditing] = useState<string | null>(null);
+  const [kind, setKind] = useState<SetKind>('regular');
   const repsInput = useRef<HTMLInputElement>(null);
   const state = useStore(store);
-  const previous = state.data.active ? findPreviousExercise(state.data.history, state.data.active, exercise.name) : null;
+  const previous = state.data.active ? findPreviousExercise(state.data.history, state.data.active, exercise.name, kind) : null;
   const lastSet = exercise.sets[exercise.sets.length - 1];
   function focusReps() { repsInput.current?.focus(); repsInput.current?.select(); }
   return <section className="rounded-xl border border-white/10 bg-ink-900/50 p-4" aria-label={exercise.name}>
@@ -90,10 +91,10 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
     {exercise.sets.length > 0 && <div className="mb-4 overflow-x-auto"><table className="w-full text-left text-sm">
       <caption className="sr-only">Logged sets for {exercise.name}</caption><thead className="text-slate-400"><tr><th className="py-2">Set</th><th>Reps</th><th>Weight</th><th><span className="sr-only">Actions</span></th></tr></thead>
       <tbody className="divide-y divide-white/10">{exercise.sets.map((set, index) => <tr key={set.id} id={`set-row-${set.id}`} tabIndex={-1}>
-        <td className="py-3">{index + 1}</td><td>{set.reps}</td><td>{set.weight} {unit}</td>
+        <td className="py-3">{index + 1}<span className="block text-xs text-slate-400">{set.kind === 'warmup' ? 'Warm-up' : 'Regular'}</span></td><td>{set.reps}</td><td>{set.weight} {unit}</td>
         <td className="text-right"><SetAnalysisButton link={{ workoutId, exerciseId: exercise.id, setId: set.id }} exerciseName={exercise.name}
           setNumber={index + 1} actions={analysis} disabled={state.busy || state.needsReload || !state.loaded} />
-          <button type="button" className="px-2 py-2 text-accent" aria-label={`Edit set ${index + 1} for ${exercise.name}`} onClick={() => { setEditing(set.id); setReps(String(set.reps)); setWeight(String(set.weight)); }}>Edit</button>
+          <button type="button" className="px-2 py-2 text-accent" aria-label={`Edit set ${index + 1} for ${exercise.name}`} onClick={() => { setEditing(set.id); setReps(String(set.reps)); setWeight(String(set.weight)); setKind(set.kind ?? 'regular'); }}>Edit</button>
           <button type="button" className="px-2 py-2 text-slate-400" aria-label={`Remove set ${index + 1} for ${exercise.name}`} onClick={async () => {
             if ((await state.removeSet(exercise.id, set.id)).ok && editing === set.id) setEditing(null);
           }}>Remove</button></td>
@@ -101,7 +102,7 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
     </table></div>}
     <form aria-label={`Log a set for ${exercise.name}`} className="space-y-3" onSubmit={async event => {
       event.preventDefault();
-      const result = editing ? await state.updateSet(exercise.id, editing, numeric(reps), numeric(weight)) : await state.addSet(exercise.id, numeric(reps), numeric(weight));
+      const result = editing ? await state.updateSet(exercise.id, editing, numeric(reps), numeric(weight), kind) : await state.addSet(exercise.id, numeric(reps), numeric(weight), kind);
       if (result.ok) {
         if (!editing) onSetLogged?.(workoutId);
         setEditing(null); focusReps();
@@ -111,9 +112,13 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
         <div><label htmlFor={`${id}-reps`} className="text-sm text-slate-300">Reps</label><input ref={repsInput} id={`${id}-reps`} type="number" inputMode="numeric" required min={1} max={1000} step={1} className={inputClass} value={reps} onChange={e => setReps(e.target.value)} /></div>
         <div><label htmlFor={`${id}-weight`} className="text-sm text-slate-300">Weight ({unit})</label><input id={`${id}-weight`} type="number" inputMode="decimal" required min={0} max={10000} step="any" className={inputClass} value={weight} onChange={e => setWeight(e.target.value)} /></div>
       </div>
+      <div className="max-w-xs"><label htmlFor={`${id}-kind`} className="text-sm text-slate-300">Set type</label>
+        <select id={`${id}-kind`} className={inputClass} value={kind} onChange={event => setKind(event.target.value as SetKind)}>
+          <option value="regular">Regular</option><option value="warmup">Warm-up</option>
+        </select></div>
       <div className="flex flex-wrap items-center gap-3"><button type="submit" className="btn-ghost">{editing ? 'Save set' : 'Log set'}</button>
         {!editing && lastSet && <button type="button" className="btn-ghost" aria-label={`Repeat last set for ${exercise.name}`} onClick={async () => {
-          if ((await state.addSet(exercise.id, lastSet.reps, lastSet.weight)).ok) { onSetLogged?.(workoutId); focusReps(); }
+          if ((await state.addSet(exercise.id, lastSet.reps, lastSet.weight, lastSet.kind ?? 'regular')).ok) { onSetLogged?.(workoutId); focusReps(); }
         }}>Repeat last set</button>}
         {editing && <button type="button" className="text-sm text-slate-400 underline" onClick={() => setEditing(null)}>Cancel edit</button>}
         <span className="text-xs text-slate-500">Use 0 for no added load.</span></div>

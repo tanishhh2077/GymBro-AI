@@ -25,7 +25,7 @@ export function WorkoutProgress({ data, available, onHome, onWorkout, onHistory 
     <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={onHome}>Back to Home</button>
     <div>
       <h1 className="text-3xl font-bold text-white">Progress</h1>
-      <p className="mt-2 text-sm text-slate-400">Personal records from completed workouts saved on this device.</p>
+      <p className="mt-2 text-sm text-slate-400">Personal records from regular sets in completed workouts saved on this device. Warm-ups are excluded.</p>
     </div>
     {!available && <p className="text-slate-400">Reload saved workouts to view progress.</p>}
     {available && !selected && <div className="space-y-4">

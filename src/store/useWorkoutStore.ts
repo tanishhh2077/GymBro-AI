@@ -1,6 +1,6 @@
 import { createStore } from 'zustand/vanilla';
-import { emptyWorkoutData, validateSetValues, validateWorkoutData, WorkoutError } from '@/core/workouts';
-import type { RoutineInput, WeightUnit, Workout, WorkoutData, WorkoutExercise, WorkoutResult, WorkoutRoutine } from '@/types/workout';
+import { emptyWorkoutData, validateSetKind, validateSetValues, validateWorkoutData, WorkoutError } from '@/core/workouts';
+import type { RoutineInput, SetKind, WeightUnit, Workout, WorkoutData, WorkoutExercise, WorkoutResult, WorkoutRoutine } from '@/types/workout';
 import { createWorkoutRepository, type WorkoutRepository, type SyncedWorkoutRepository } from './workoutRepository';
 import { mergeWorkoutBackup, type WorkoutBackup } from '@/core/workoutBackup';
 import { mergeWorkoutSync, sameSyncData, syncSnapshot, validateSharedSnapshot, type SyncChoice, type SyncPreview, type WorkoutCloud } from '@/core/workoutSync';
@@ -11,8 +11,8 @@ export interface WorkoutState {
   startWorkout: (name: string, unit: WeightUnit) => Promise<WorkoutResult>;
   addExercise: (name: string) => Promise<WorkoutResult>;
   removeExercise: (id: string) => Promise<WorkoutResult>;
-  addSet: (exerciseId: string, reps: number, weight: number) => Promise<WorkoutResult>;
-  updateSet: (exerciseId: string, setId: string, reps: number, weight: number) => Promise<WorkoutResult>;
+  addSet: (exerciseId: string, reps: number, weight: number, kind?: SetKind) => Promise<WorkoutResult>;
+  updateSet: (exerciseId: string, setId: string, reps: number, weight: number, kind?: SetKind) => Promise<WorkoutResult>;
   removeSet: (exerciseId: string, setId: string) => Promise<WorkoutResult>;
   finishWorkout: () => Promise<WorkoutResult>;
   discardWorkout: () => Promise<WorkoutResult>;
@@ -147,15 +147,17 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
         if (!draft.exercises.some(e => e.id === id)) invalid('This exercise is no longer in the active workout.');
         return { ...data, active: { ...draft, exercises: draft.exercises.filter(e => e.id !== id) } };
       }),
-      addSet: (exerciseId, reps, weight) => commit(data => editExercise(data, exerciseId, exercise => {
-        validateSetValues(reps, weight);
+      addSet: (exerciseId, reps, weight, kind = 'regular') => commit(data => editExercise(data, exerciseId, exercise => {
+        validateSetValues(reps, weight); validateSetKind(kind);
         if (exercise.sets.length >= 100) invalid('This exercise already has 100 sets. Remove one before adding another.');
-        return { ...exercise, sets: [...exercise.sets, { id: deps.id(), reps, weight }] };
+        return { ...exercise, sets: [...exercise.sets, { id: deps.id(), reps, weight, ...(kind === 'warmup' ? { kind } : {}) }] };
       })),
-      updateSet: (exerciseId, setId, reps, weight) => commit(data => editExercise(data, exerciseId, exercise => {
+      updateSet: (exerciseId, setId, reps, weight, kind) => commit(data => editExercise(data, exerciseId, exercise => {
         validateSetValues(reps, weight);
+        if (kind !== undefined) validateSetKind(kind);
         if (!exercise.sets.some(s => s.id === setId)) invalid('This set is no longer in the workout.');
-        return { ...exercise, sets: exercise.sets.map(s => s.id === setId ? { ...s, reps, weight } : s) };
+        return { ...exercise, sets: exercise.sets.map(s => s.id === setId ? { id: s.id, reps, weight,
+          ...((kind ?? s.kind) === 'warmup' ? { kind: 'warmup' as const } : {}) } : s) };
       })),
       removeSet: (exerciseId, setId) => commit(data => editExercise(data, exerciseId, exercise => {
         if (!exercise.sets.some(s => s.id === setId)) invalid('This set is no longer in the workout.');

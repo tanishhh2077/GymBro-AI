@@ -1,5 +1,6 @@
 export type WeightUnit = 'lb' | 'kg';
-export interface WorkoutSet { readonly id: string; readonly reps: number; readonly weight: number }
+export type SetKind = 'regular' | 'warmup';
+export interface WorkoutSet { readonly id: string; readonly reps: number; readonly weight: number; readonly kind?: SetKind }
 export interface RoutineTargets { readonly targetSets?: number; readonly targetReps?: number }
 export interface RoutineExerciseInput extends RoutineTargets { readonly name: string }
 export interface RoutineExercise extends RoutineExerciseInput { readonly id: string }
@@ -16,7 +17,7 @@ export interface Workout {
   readonly exercises: readonly WorkoutExercise[];
 }
 export interface WorkoutData {
-  readonly version: 2;
+  readonly version: 2 | 3;
   readonly revision: number;
   readonly active: Workout | null;
   readonly history: readonly Workout[];

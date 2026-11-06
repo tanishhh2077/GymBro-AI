@@ -16,6 +16,7 @@ import { WorkoutRestTimer, type WorkoutRestTimerHandle } from '@/components/Work
 import { WorkoutRoutines } from '@/components/WorkoutRoutines';
 import { WorkoutProgress } from '@/components/WorkoutProgress';
 import { WorkoutBackup } from '@/components/WorkoutBackup';
+import { WorkoutSummary } from '@/components/WorkoutSummary';
 import { ShieldIcon } from '@/components/icons';
 
 const AnalysisWorkspace = lazy(() => import('@/components/AnalysisWorkspace').then(module => ({ default: module.AnalysisWorkspace })));
@@ -33,7 +34,7 @@ class AnalysisBoundary extends Component<{ children: ReactNode }, { failed: bool
   }
 }
 
-type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines' | 'progress' | 'backup' | 'account';
+type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines' | 'progress' | 'backup' | 'account' | 'summary';
 export default function App({ workouts = workoutStore, session = useSessionStore, accountPanel, accountLabel }:
   { workouts?: WorkoutStore; session?: SessionStore; accountPanel?: ReactNode; accountLabel?: string } = {}) {
   const appearance = useAppearance();
@@ -113,8 +114,11 @@ export default function App({ workouts = workoutStore, session = useSessionStore
         appearance={<AppearanceControl settings={appearance} />} />}
       {view === 'workout' && <WorkoutEditor store={workouts} analysis={analysis} onSetLogged={workoutId => {
         if (workouts.getState().data.active?.id === workoutId) restTimer.current?.afterSetLogged();
-      }} onFinished={() => { setView('home'); setNotice('Workout saved.'); }} />}
-      {view === 'history' && <WorkoutHistory store={workouts} initialId={selected} analysis={analysis} />}
+      }} onFinished={id => { setSelected(id); setView('summary'); setNotice('Workout saved.'); }} />}
+      {view === 'history' && <WorkoutHistory store={workouts} initialId={selected} analysis={analysis}
+        onSummary={id => { setSelected(id); navigate('summary'); }} />}
+      {view === 'summary' && <WorkoutSummary data={state.data} id={selected} available={available}
+        onHome={() => navigate('home')} onHistory={openHistory} />}
       {view === 'analysis' && <AnalysisBoundary><Suspense fallback={<p role="status" className="text-sm text-slate-400">Opening video analysis…</p>}>
         <AnalysisWorkspace session={session} data={state.data} available={available} pendingLink={pendingLink}
           onClearPending={() => setPendingLink(undefined)} onBackToSet={backToSet} />

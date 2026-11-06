@@ -1,5 +1,5 @@
 import { execFile, execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { setTimeout } from 'node:timers/promises';
 import { promisify } from 'node:util';
 
@@ -27,7 +27,10 @@ try {
     grant usage on schema auth to anon, authenticated;
     grant execute on function auth.uid() to anon, authenticated;
     insert into auth.users values ('11111111-1111-4111-8111-111111111111'), ('22222222-2222-4222-8222-222222222222');`);
-  sql(readFileSync(new URL('../supabase/migrations/202611060001_workout_sync.sql', import.meta.url), 'utf8'));
+  const migrations = new URL('../supabase/migrations/', import.meta.url);
+  for (const file of readdirSync(migrations).filter(name => name.endsWith('.sql')).sort()) {
+    sql(readFileSync(new URL(file, migrations), 'utf8'));
+  }
   sql(readFileSync(new URL('../supabase/tests/sync.sql', import.meta.url), 'utf8'));
   sql("insert into auth.users values ('33333333-3333-4333-8333-333333333333')");
   const race = `set role authenticated; select set_config('request.jwt.claim.sub', '33333333-3333-4333-8333-333333333333', false);

@@ -41,3 +41,10 @@ select public.test_denied($q$select public.sync_workout_library(0, '{"version":2
 reset role;
 select public.test_assert((select revision=2 from public.workout_libraries where user_id='11111111-1111-4111-8111-111111111111'), 'foreign account left first library intact');
 select public.test_assert((select count(*)=2 from public.workout_libraries), 'two isolated accounts');
+set role authenticated;
+select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111111', false);
+select public.test_assert((public.sync_workout_library(2, '{"version":3,"revision":0,"active":null,"history":[{"id":"w","name":"Day","unit":"kg","startedAt":1,"finishedAt":2,"exercises":[{"id":"e","name":"Bench press","sets":[{"id":"s","reps":10,"weight":20,"kind":"warmup"}]}]}]}'::jsonb)->'data'->'history'->0->'exercises'->0->'sets'->0->>'kind')='warmup', 'schema3 warm-up round trip');
+select public.test_denied($q$select public.sync_workout_library(3, '{"version":3,"revision":0,"active":{"id":"w","name":"W","unit":"kg","startedAt":1,"finishedAt":null,"exercises":[{"id":"e","name":"Bench","sets":[{"id":"s","reps":8,"weight":20,"kind":"drop"}]}]},"history":[]}')$q$, 'invalid set kind');
+select public.test_denied($q$select public.sync_workout_library(3, '{"version":2,"revision":0,"active":{"id":"w","name":"W","unit":"kg","startedAt":1,"finishedAt":null,"exercises":[{"id":"e","name":"Bench","sets":[{"id":"s","reps":8,"weight":20,"kind":"warmup"}]}]},"history":[]}')$q$, 'kind rejected in schema2');
+select public.test_assert((select revision=3 from public.workout_libraries), 'invalid label writes preserve latest revision');
+reset role;

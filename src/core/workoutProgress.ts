@@ -45,6 +45,7 @@ export function buildWorkoutProgress(history: readonly Workout[]): readonly Exer
     for (const sourceExercise of sourceWorkout.exercises) {
       const key = JSON.stringify([sourceExercise.name, sourceWorkout.unit]);
       for (const sourceSet of sourceExercise.sets) {
+        if (sourceSet.kind === 'warmup') continue;
         const record: RecordedSet = {
           workoutId: sourceWorkout.id,
           workoutName: sourceWorkout.name,

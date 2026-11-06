@@ -1,4 +1,4 @@
-import type { Workout, WorkoutSet } from '@/types/workout';
+import type { SetKind, Workout, WorkoutSet } from '@/types/workout';
 
 interface PreviousExercise {
   readonly workoutId: string;
@@ -8,15 +8,17 @@ interface PreviousExercise {
 }
 
 /** Read validated history without changing entered names, units or set values. */
-export function findPreviousExercise(history: readonly Workout[], current: Workout, name: string): PreviousExercise | null {
+export function findPreviousExercise(history: readonly Workout[], current: Workout, name: string, kind: SetKind = 'regular'): PreviousExercise | null {
   let previous: PreviousExercise | null = null;
   for (const workout of history) {
     if (workout.finishedAt === null || workout.finishedAt > current.startedAt || workout.unit !== current.unit) continue;
-    const exercise = workout.exercises.find(item => item.name === name && item.sets.length > 0);
+    const exercise = workout.exercises.find(item => item.name === name && item.sets.some(set => (set.kind ?? 'regular') === kind));
     if (!exercise) continue;
     if (previous && (workout.finishedAt < previous.finishedAt ||
         (workout.finishedAt === previous.finishedAt && workout.id >= previous.workoutId))) continue;
-    previous = { workoutId: workout.id, workoutName: workout.name, finishedAt: workout.finishedAt, sets: exercise.sets };
+    const matching = exercise.sets.filter(set => (set.kind ?? 'regular') === kind);
+    previous = { workoutId: workout.id, workoutName: workout.name, finishedAt: workout.finishedAt,
+      sets: matching.length === exercise.sets.length ? exercise.sets : matching };
   }
   return previous;
 }

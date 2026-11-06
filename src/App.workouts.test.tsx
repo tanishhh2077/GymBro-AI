@@ -74,6 +74,7 @@ it('shows both Home actions and an actual saved workout after logging and finish
   expect(container.querySelector('tbody')?.textContent).toContain('60.5 kg');
   await click('Finish workout');
   expect(container.textContent).toContain('Workout saved.');
+  await click('Back to Home');
   expect(container.textContent).toContain('Upper body'); expect(button('Analyze video')).toBeTruthy();
   expect(store.getState().data.history[0].unit).toBe('kg');
 });
@@ -122,7 +123,7 @@ it('removes the timer only after finish saves, then gives a new workout a fresh 
   expect(container.querySelector('output[aria-label="Rest time remaining"]')).not.toBeNull();
   await click('Reload saved workouts'); await click('Finish workout');
   expect(container.querySelector('output[aria-label="Rest time remaining"]')).toBeNull();
-  await click('Start workout'); await fill('Workout name', 'Fresh workout'); await submit('Start a workout');
+  await click('Back to Home'); await click('Start workout'); await fill('Workout name', 'Fresh workout'); await submit('Start a workout');
   expect(container.querySelector('output')?.textContent).toBe('1:30'); expect(button('Start rest timer')).toBeTruthy();
   expect(container.querySelector<HTMLInputElement>('input[type=checkbox]')?.checked).toBe(false);
   vi.spyOn(window, 'confirm').mockReturnValue(true); await click('Discard workout');
