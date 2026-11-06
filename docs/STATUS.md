@@ -10,6 +10,25 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Tasks38–45 (Q26–Q33, D-057) are complete. Claude Code (Opus 5.5) ran three
+parallel agents: storage (`feat/notes-target-weight-storage`), Progress insights
+(`feat/training-insights`) and editing screens (`feat/workout-editing-ui`, built
+on storage), combined on `chore/integrate-q26-q33`.
+
+- Test-first in every branch; storage RED covered schema4 fields, actions and the
+  migration. A fresh storage review found no Blocker/High; two Medium (routine
+  editor dropping target weights, conflict cards hiding notes) and three Low
+  findings were fixed. SQL tests passed against a throwaway PostgreSQL 17.11.
+- Combined result under Node 22.23.2: clean install (493 packages); 900 tests /
+  74 files with `--maxWorkers=4`; lint; build (508 modules); `mobile:sync` (16
+  verified files per platform); Chromium 34 of 37 passed first, the 3 failures
+  were existing specs cancelling changed forms under the new discard prompt;
+  after they accept it, both affected spec files pass.
+- Limits: the Supabase project still needs all three migrations; live sync, iPhone
+  behaviour and native compilation remain unverified; note and correction saves
+  in the finished-workout view are two separate saves.
+
+
 Provider handover records Q26–Q33 all A approved for Claude Code under D-057.
 Implementation has not started. Handoff/product choices/decision updated, with
 local link and diff checks only. Existing 824-test/36-browser baseline applies

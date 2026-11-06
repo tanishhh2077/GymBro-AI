@@ -742,7 +742,7 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
 
 - The user accepted all recommended Q26–Q33 options and selected Claude Code
   to implement them. The exact choices are in PRODUCT_DIRECTION. They are
-  approved work, with implementation pending. Assign individual task numbers
+  implemented as Tasks38–45 (schema4 notes and target weights). Assign individual task numbers
   at integration. This approval includes the required bounded persistence
   extensions for workout notes and routine target weights. Preserve legacy
   records, backup/sync compatibility, atomic saves and planned/actual separation.

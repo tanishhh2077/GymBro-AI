@@ -44,7 +44,7 @@ and brief reason.
 
 Q20–Q25 were accepted together with an explicit instruction to build all
 recommended options. Tasks32–37 implement them under D-051–D-056.
-Q26–Q33 are approved for Claude Code implementation under D-057.
+Q26–Q33 are implemented as Tasks38–45 under D-057.
 Questions can resume at Q34.
 
 Q17–Q19 were accepted together. Tasks27–29 integrate their three separate agent

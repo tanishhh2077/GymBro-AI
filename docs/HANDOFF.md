@@ -5,33 +5,41 @@ Follow D-024/D-036. Detailed evidence is in [STATUS.md](STATUS.md).
 
 ## Completed approved batch
 
-Tasks32–37 implement all six recommended Q20–Q25 choices, D-051–D-056.
-- Finished workout name/set corrections with explicit Save/Cancel and stale-save recovery.
-- Routine name/exercise search and name/creation-order sorting.
-- Optional session-only rest sound/vibration, off by default and capability-dependent.
-- Home seven-day completed training summary, including warm-ups and separate lb/kg volume.
-- Optional local-completion-day History calendar using existing filters.
-- Completed actual-set CSV export through browser/native export ownership.
+Tasks38–45 implement all eight Q26–Q33 choices under D-057 (Claude Code, Opus 5.5,
+three parallel agents with separate file ownership, then one integration branch).
+- Workout notes (Q26): one optional note per workout, editable during and after
+  training, shown in history and the summary.
+- Reorder (Q27): Move up/down for active exercises; logged sets stay with them.
+- Repeat (Q28): a finished workout starts a fresh one with the same exercises
+  and targets, zero sets; previous-value hints appear automatically.
+- Exercise detail (Q29): Progress opens per exact name and unit records, chart and
+  completed-workout history.
+- Unsaved changes (Q30): changed forms ask "Discard unsaved changes?" before
+  navigation, Cancel or reload; unchanged and saved forms never ask.
+- Target weight (Q31): optional planned load per routine exercise, copied into
+  started workouts and shown apart from logged sets; never counted as actual work.
+- Weekly consistency (Q32): completed workouts per Sunday–Saturday local week for
+  the last 12 weeks on Progress.
+- Name suggestions (Q33): previous workout names offered, custom names allowed.
 
-Three parallel Codex workers implemented the batch. One fresh source reviewer
-found no significant defects. Final checks pass 824 tests/67 files with four
-workers, full lint/build, native asset sync and all 36 Chromium cases.
-An old global Home-statistics assertion was updated for the new summary.
-Actual iPhone sound/vibration/sharing and native compilation remain unverified.
+Storage is schema4 (notes, target weights). Versions 1–3 still read with only an
+in-memory version change; backup conflict checks and sync include the new fields.
+A fresh storage review found no Blocker/High; its findings are fixed (routine
+target weights kept on edit, conflict cards show notes/targets, revision-checked
+note saves, CRLF normalised, unpaired surrogates rejected). Combined checks: 900
+tests/74 files with four workers, lint, build, native sync (16 files per
+platform) and all 37 Chromium cases (three specs now accept the new discard
+prompt). **Supabase needs the third migration** `202611070001_notes_target_weight.sql`
+before sync: updated clients save schema4. Phone behaviour remains unverified.
 
 ## Next work
 
-Transfer to Claude Code. Q26–Q33 all A are approved under D-057, pending build.
-Read their eight exact choices in PRODUCT_DIRECTION. Q&A resumes at Q34.
-Plan shared saved-data extensions together before parallel UI work. Preserve
-legacy libraries, backup/sync, independent routines and actual logged values.
-Use fresh review for saved-data/export changes. Do not ask for approval again
-for the eight accepted features. Start from updated origin/master.
-Preserve all worker branches/checkouts and the incomplete Task4 branch.
-Use isolated ownership and one browser suite on4179, previews on4183.
-Assign task/decision numbers at integration and update shared docs once.
+No approved feature is pending. Q&A resumes at Q34 when the user asks. Preserve
+all worker branches/checkouts and the incomplete Task4 branch. Use isolated
+ownership, one browser suite on 4179 and previews on 4183, and assign
+task/decision numbers at integration.
 
-Supabase still needs user dashboard setup, both migrations and email-code
+Supabase still needs user dashboard setup, all three migrations and email-code
 configuration in [the guide](../supabase/README.md). Live email and real
 cross-device sync remain unverified. Phone/media work requires user presence.
 
