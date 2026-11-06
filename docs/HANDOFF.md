@@ -3,34 +3,35 @@
 Updated 2026-11-06, America/Chicago. Read root/scoped AGENTS.md first.
 Follow D-024 and D-036. Detailed evidence is in [STATUS.md](STATUS.md).
 
-## Integrated Tasks27–29
+## Completed follow-ups
 
-Q17–Q19's three user-managed agent branches are integrated together and checked.
+- Task30/D-049 adds Duplicate to each saved routine. Copies retain unit, order
+  and targets with fresh routine/exercise IDs and a bounded ` (copy)` name.
+  Save/reload/cap guards and confirmed success use the existing atomic store.
+- Task31/D-050 adds expandable exercise history inside an active workout.
+  Five-workout pages show exact name/unit matches, all matching exercise entries
+  and Regular/Warm-up actual sets. Only completions by the active workout's start
+  appear, newest first. Opening history preserves typed set values without writes.
+- Tasks27–29's history search/date filters, Progress ranges and plate calculator
+  remain integrated. The new combined browser case exercises copied routine
+  editing/start, history expansion, unchanged drafts and source preservation.
 
-- Task27/D-046 adds case-insensitive workout/exercise-name search and inclusive
-  local completion-date filters. Direct workout links resolve against full history.
-- Task28/D-047 adds All time and rolling one/three/six-calendar-month Progress.
-  Cards, charts, tables and counts share the selected period. The displayed cutoff
-  refreshes on mount/period changes. Empty periods preserve exercise/unit selection.
-- Task29/D-048 adds the collapsible plate calculator to WorkoutEditor. It uses
-  editable bar weight, target and plate-pair inventory in the workout unit. Exact
-  solutions minimize plates. Inputs remain local to the screen.
-
-Combined checks pass 763 tests/57 files, lint, build, guarded native sync
-(16 files/platform, 3 plugins) and all 31 Chromium cases. Three independent
-source-only reviews found no significant defects. The new browser case verifies
-all three features together. See STATUS for limits and source branch hashes.
+Two parallel Codex workers implemented the follow-ups in separate worktrees.
+One fresh source reviewer found no significant defects. Combined checks pass
+790 tests/60 files with four workers, lint, build, guarded native sync and all
+32 Chromium cases. The default-worker run hit one loading timeout. Its isolated
+file and constrained full rerun passed with source/timeouts unchanged. See STATUS.
 
 ## Next work
 
-The exercise-history agent can create a fresh branch/worktree from updated
-origin/master containing the calculator. Preserve its WorkoutEditor integration.
-Routine duplication and completed-workout correction are the other proposed
-agent tasks. Assign task/decision numbers only when integrating completed work.
+Completed-workout correction remains proposed. Product Q&A resumes at Q20.
+Start the next approved task from updated origin/master with both follow-ups.
+Retain the worker worktrees/branches. The unpublished exercise-history source
+commit is represented by its integration commit as recorded in STATUS.
 
-Use separate worktrees and branches. Shared docs update at final integration.
-Only one browser suite may use 4179, with previews on 4183. Merge one at a time.
-Retain existing worker worktrees and branches. The incomplete Task4 branch needs
+Use separate worktrees and branches. Assign task/decision numbers at integration.
+Update shared docs at final integration. Only one browser suite may use 4179,
+with previews on 4183. Merge one at a time. The incomplete Task4 branch requires
 explicit approval before integration.
 
 Supabase setup still needs the user's dashboard actions, both migrations and

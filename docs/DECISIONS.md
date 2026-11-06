@@ -678,6 +678,27 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   loading or explain invalid/unattainable input. The starter inventory is editable,
   initially one pair per listed denomination. Inputs are component-local drafts.
 
+### D-049 Independent routine duplication
+
+- Task30 follows the proposed routine-duplication task under the user's request
+  to continue development. Duplicate copies the current routine's unit, ordered
+  exercises and optional targets through the existing guarded atomic save.
+  Routine and exercise IDs are fresh. The source and existing workouts retain
+  their saved values. Existing library bounds and recovery rules apply.
+- Builder choice is a ` (copy)` suffix, with the source name shortened to fit
+  the existing 80-character limit. Success appears after save confirmation.
+
+### D-050 Exercise history during a workout
+
+- Task31 follows the proposed exercise-history task under the same request.
+  Each active exercise offers expandable, read-only completed actual sets for
+  its exact saved name and unit, including every duplicate-name exercise entry.
+  Regular and Warm-up sets keep their labels. Missing legacy kind means Regular.
+- Builder choices are five workouts per page, newest completion first with
+  ascending workout-ID ties, and the existing previous-values cutoff at the
+  active workout's start. The screen explains that cutoff. Source changes reset
+  paging. Opening history preserves typed set values and performs no writes.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

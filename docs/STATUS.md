@@ -10,6 +10,42 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Tasks30–31 add independent routine duplication (D-049) and expandable exercise
+history inside active workouts (D-050), selected from the handoff after the user
+requested further development. Two parallel Codex workers used separate sibling
+worktrees. One fresh read-only Codex reviewer inspected both implementations and
+found no significant defects. Runtime model identifiers were unavailable.
+
+- Routine source commit `ce3730b` changes WorkoutRoutines, useWorkoutStore and
+  their tests. Exercise-history source commit `c865394` changes the new core and
+  component/tests plus WorkoutEditor. The unpublished history commit was applied
+  as `d72393c` for linear integration. Original worker branches/checkouts remain.
+  Shared documents were updated after merging current origin/master.
+- Duplication reuses validation and atomic saves with fresh IDs, ordered targets,
+  a bounded ` (copy)` name and confirmed success. History shows five completed
+  workouts per page with exact name/unit matching, both set kinds and all matching
+  exercise entries. It uses the active-start cutoff and performs no writes.
+  Existing calculator, previous-value actions and typed set drafts are preserved.
+- Each worker verified Node 22.23.2, a clean install and an owned loopback dev
+  endpoint before code. Test-first failures identified the missing actions.
+  Focused checks passed 29 routine/store/App tests and 22 history/related tests.
+  The final history-fixture timestamp correction passed its 12 affected tests.
+- Initial default-worker full run passed 789 tests and timed out in the existing
+  App loading case. Its isolated file passed 20 tests. With source and timeouts
+  unchanged, `npm test -- --maxWorkers=4` passed all 790 tests/60 files in 30.81s.
+  This supports runner contention as the cause. Lint and the complete build pass.
+  Guarded native sync verifies 16 files/platform and 3 plugins. Vite transforms
+  498 modules, with entry JS 283.94 kB/87.11 kB gzip. Global Node is unchanged.
+- All 32 Chromium 156.0.8078.4 browser cases pass in 3.3 minutes, including the
+  new synthetic narrow-screen routine-copy/history flow, reload persistence,
+  independent source targets, zero unlogged actual sets and unchanged drafts.
+  The new case first failed at missing Duplicate, then missing Exercise history,
+  before passing with both features. Existing GPU/120-sample no-person checks
+  pass. One coordinator owned port 4179, with source/checks steady during the run.
+- This adds no schema, cloud or media-transfer change. Native compilation,
+  physical-phone behavior, real bench footage and live Supabase/email/sync remain
+  unverified. Completed-workout correction remains proposed. Q&A resumes at Q20.
+
 Tasks27–29 integrate Q17–Q19 from `feat/history-filters` (3dafdab),
 `feat/progress-ranges` (1d91e1e) and `feat/plate-calculator` (838581b), with
 decisions D-046–D-048 assigned at integration. Code arrived from user-managed
