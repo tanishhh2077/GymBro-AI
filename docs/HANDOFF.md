@@ -4,39 +4,37 @@ Updated 2026-11-05, America/Chicago. Read root/scoped `AGENTS.md` first.
 Follow D-024, briefly explain and proceed. Follow D-036, update docs at task end
 or tool handover. Detailed history is in [STATUS.md](STATUS.md).
 
-## Completed Task18
+## Completed Task19
 
-Backup and restore is implemented under D-038. Home exports validated history,
-routines and the active workout as a JSON file. Restore previews additions,
-skips identical IDs and rejects conflicts before an atomic save. Previews expire
-on load/source changes. The builder chose additive merges, format version 1,
-4 MiB admission and retained OS-managed successful-share cache files.
+Set-linked bench-press analysis is implemented under D-039 (Claude Code, Opus 5.5).
+Bench-press set rows in the workout editor and history detail offer **Analyze video
+for set N**. Analyze shows that set with the user's entered reps and weight,
+links the next video to it, and offers **Back to set**, which focuses the row.
+Standalone analysis is unchanged.
 
-- Reviewed source 070988e passes 562 tests in 34 files, lint, build and guarded
-  mobile sync. The original checkout passes all 22 Chromium cases in 4.4 minutes
-  and sequential tests/lint/build. Fresh code review passes 75 tests in 8 files with
-  no unresolved significant findings. Design/plan/reviews are in superpowers.
-- Feature browser 42134699804/native 42134699316 and master browser 42136735021/
-  native 42136734990 all pass. Native evidence covers Android/iOS compilation
-  and visible iPhone 17 Pro/iOS 26.4 startup with three plugins. Actual device
-  picker/share saving remains a phone-session requirement.
-- One initial browser video case timed out during live edits, with cause
-  unconfirmed. Frozen-source local/hosted runs pass. Original parallel checks
-  hit a test-output-directory race and one five-second unit timeout, then sequential
-  checks pass. The build reports a 502.21 kB entry-chunk advisory.
-- Original GymBro AI is the only worktree. All branches are retained, Task4 is
-  unmerged. Synthetic previews/script are preserved in ignored
-  build/visual-review/task18, hash-checked. Owned 4183 preview is stopped.
-- Prior tracking features include manual workouts/history, saved routines,
-  session rest timer and Progress/records. Video analysis remains the existing
-  local side-view pose/elbow workflow. Read STATUS for historical evidence.
+- A link is the workout, exercise and set IDs, copied onto the clip at admission.
+  Bench sets are an exact list of flat-barbell names. Links are session-only:
+  reload or app close ends them, and nothing is saved, backed up or uploaded.
+- If the set, exercise or workout disappears, App detaches the link on any
+  screen and the clip keeps a permanent "no longer linked" notice, so a restore
+  cannot relink it. Finishing a workout keeps the link (history detail).
+- Final source `e50b144`: 597 tests in 36 files, lint, build, guarded sync and all
+  23 Chromium cases pass. Fresh design review (2 Medium, 5 Low) and code review
+  (5 Low) were adopted. Hosted [browser 42152162079](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42152162079)
+  and [native 42152161985](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42152161985)
+  (shared checks, Android APK, iOS simulator startup) pass on `e50b144`; the
+  earlier `eab39bd` native run was cancelled by the newer push. No package
+  download or physical-device validation.
+- Synthetic previews are in the original checkout's ignored
+  `build/visual-review/task19/`. Task18's backup/restore and earlier tracking
+  features are unchanged; see STATUS for their history.
 
 ## Next work
 
 No further bounded implementation task has been selected. Continue with the
 phone session when the user is present, Q&A from Q10 when requested, or the next
 feature approved by the user. Q&A uses one MCQ at a time, with a recommendation
-and reason. Optional accounts/workout-record sync, set-linked persistence and
+and reason. Optional accounts/workout-record sync, saving analysis results with a set, and
 live analysis remain future work. Q1–Q9 are in PRODUCT_DIRECTION.
 
 The old master browser run 41985529794 failed at input-validation.spec.ts:53.

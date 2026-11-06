@@ -33,6 +33,7 @@ Q&A follow-up; the seven accepted answers and remaining scope are unchanged.
 Task 14 delivers manual, rep-based local workout logging and history, with Home
 actions and the existing standalone video screen. It does not claim the whole
 tracking wish list, set-linked analysis, live analysis, or validated bench findings.
+Task 19 (D-039) later added session-only set-linked analysis for bench-press sets.
 Builder defaults: existing visual tokens/system font; provisional three-view
 navigation; visible lb/kg selection for each new workout, initially lb (US-first
 direction), no conversion; local IndexedDB only. Q8 now selects guest use with

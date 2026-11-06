@@ -22,8 +22,10 @@ rewrite the active workout/history; media stays in memory.
 `useSessionStore.ts` exports `createSessionStore(deps)` and the app's single
 `useSessionStore`. The store holds at most one clip and owns its whole lifecycle:
 
-- `startClip(file)` rejects (`busy`) while a clip is loaded or cleanup is pending,
-  runs `validateSelection`, then creates the URL, hidden video, and a fresh engine.
+- `startClip(file, link?)` rejects (`busy`) while a clip is loaded or cleanup is
+  pending, runs `validateSelection`, then creates the URL, hidden video, and a
+  fresh engine. A given set link is copied onto the clip; `detachLink(id)` only
+  removes it and marks `linkRemoved`. Links are session-only and never saved.
 - Every update from a job checks that the job still owns the session, so late
   progress or results from a removed clip change nothing.
 - `removeClip`/`reset` abort the job; `processingState` stays `cancelling` until the

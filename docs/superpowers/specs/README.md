@@ -1,5 +1,9 @@
 # Feature designs
 
+[Set-linked analysis](2026-11-05-set-linked-analysis-design.md) defines Task19
+under D-039: bench-set identification, session-only three-ID links, deleted-set
+detachment and wrong-link protection. Its design and code reviews sit alongside.
+
 [Workout backup](2026-11-05-workout-backup-design.md) defines Task18 under D-038,
 with bounded JSON export/import, additive ID merges and atomic confirmation.
 Its fresh design/code reviews and implementation evidence are recorded alongside.

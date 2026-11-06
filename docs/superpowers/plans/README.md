@@ -1,5 +1,9 @@
 # Implementation plans
 
+Completed [Task19 set-linked analysis](2026-11-05-set-linked-analysis.md) under
+D-039: 597 tests, 23 browser cases, fresh design and code reviews (all findings
+adopted) and hosted checks on final source `e50b144`.
+
 Completed [Task18 workout backup](2026-11-05-workout-backup.md) under D-038.
 Reviewed source 070988e passes 562 tests, 22 browser cases, fresh reviews, guarded
 sync and feature/master hosted native checks. Physical file flows await the phone

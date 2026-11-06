@@ -10,6 +10,30 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Task19 set-linked bench analysis is complete under D-039, built by Claude Code
+(Opus 5.5) in sibling worktree `GymBro AI-task19` from master `94068fc`.
+
+- Baseline: locked install 485 packages; 562 tests / 34 files, lint, build (435
+  modules) under Node 22.23.2. Fresh design review: ready with changes (2 Medium,
+  5 Low), all adopted before code.
+- Test-first: 22 link-resolution and 3 store tests failed on the missing module,
+  unstored link and missing `detachLink`; nine App flow tests failed on missing row
+  actions; all pass. One test first waited inside `act()`, which blocks the exit
+  animation's unmount, causing intermittent full-suite failures; fixed by waiting in
+  separate scopes, then by instant animations in that file.
+- Fresh code review: no Blocker/High/Medium; Low fixes in `e50b144` (App selects only
+  the open clip's ID and link, so progress no longer re-renders every screen; a new
+  guard test fails when either availability guard is removed).
+- Final source `e50b144`: 597 tests / 36 files (three consecutive runs), lint, build
+  (437 modules), guarded sync (13 verified files per platform), all 23 local Chromium
+  cases in 3.0 minutes. Synthetic 390/1280 views without overflow. Hosted [browser 42152162079](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42152162079)
+  and [native 42152161985](https://github.com/tanishhh2077/GymBro-AI/actions/runs/42152161985)
+  (shared checks, Android APK, iOS simulator startup) pass on `e50b144`; the
+  earlier `eab39bd` native run was cancelled by the newer push. No package
+  download or physical-device validation.
+- Limits: session-only links; no saved analysis; no physical-device evidence; the
+  507 kB entry-chunk advisory remains (Task 20 candidate).
+
 Task18 backup/restore is complete under D-038, implemented by Codex after the
 user said "start with recommended". Reviewed/integrated source 070988e.
 

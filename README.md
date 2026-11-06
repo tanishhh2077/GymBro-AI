@@ -18,8 +18,9 @@ fresh workout with no completed sets; editing a routine keeps existing workouts
 unchanged. Routines use the same local library, including safe reads of earlier
 workout records. Home's View progress opens exercise/unit-specific personal records,
 heaviest-load charts and source-linked workout tables. Records use completed
-actual sets and update after deletion. Set-linked and live analysis remain future
-work. Accepted Q&A selects
+actual sets and update after deletion. A logged bench-press set can open video
+analysis and return to that set; the link lasts for the session only and is never
+saved. Live analysis remains future work. Accepted Q&A selects
 guest access with optional workout-record sync only, excluding videos; those
 services are not built. See [PRODUCT_DIRECTION](docs/PRODUCT_DIRECTION.md).
 

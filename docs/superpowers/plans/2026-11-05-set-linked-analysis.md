@@ -39,6 +39,7 @@ AnalysisWorkspace gain the `session` prop and the props listed in the design.
 
 ## Step 4: review and integration
 
-- [ ] Fresh read-only code review; fixes in their own commit.
-- [ ] Final docs (HANDOFF, STATUS, indexes), fast-forward master, bring Task 8
+- [x] Fresh read-only code review (no Blocker/High/Medium; five Low, four fixed in
+  `e50b144`, docs here); fixes in their own commit.
+- [x] Final docs (HANDOFF, STATUS, indexes), fast-forward master, bring Task 8
   up to master, remove the clean worktree; retain branches.

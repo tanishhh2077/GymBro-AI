@@ -34,7 +34,10 @@ or canceling the independent job; native app-background cancellation remains.
 No video, object URL, frame, landmark or form finding enters the workout database.
 Units are fixed per workout. History retains those units. The local tracking
 features include saved routines, a session-only rest timer and derived workout
-progress/records. Set-linked and live analysis remain future work.
+progress/records. Task 19 (D-039) links an analysis to a logged bench-press set for
+the session only: `src/core/setLinks.ts` resolves a link of workout, exercise and
+set IDs, the session store fixes it on the clip at admission, and App detaches it
+when the set disappears. Live analysis remains future work.
 
 Current data flow:
 
@@ -155,7 +158,7 @@ per-side unavailability do not certify a target person or anatomical accuracy.
 
 ## Session ownership
 
-- `startClip(file)` returns a `SelectionIssue` immediately or `null`. It rejects with `busy` while a clip is loaded (in any status) or while `processingState` is not `idle`, then applies `validateSelection` before creating any URL, video, or engine. To choose another clip, the user removes the current one first.
+- `startClip(file, link?)` returns a `SelectionIssue` immediately or `null`; an admitted clip keeps a copy of the optional set link, which `detachLink(id)` can only remove (setting `linkRemoved`). It rejects with `busy` while a clip is loaded (in any status) or while `processingState` is not `idle`, then applies `validateSelection` before creating any URL, video, or engine. To choose another clip, the user removes the current one first.
 - Each admitted clip gets a fresh `PoseEngine`, `AbortController`, and job object; the job object is the ownership token. Every progress, result, error, and `engineDelegate` update checks that its job still owns the session, so late callbacks from a removed job change nothing.
 - Outcomes: `ready` (at least one sampled frame had a pose), `no-pose` (completed, no pose detected; `pose` is kept, `error` is empty), or `error` with `errorKind` from the engine's failure kind.
 - Removing a clip (or `reset()`) removes it from the store at once, clears `engineDelegate`, and aborts its job. `processingState` stays `cancelling`, blocking admission, until the job has settled (engine closed, hidden video detached) and every lease on the URL is released; then the URL is revoked exactly once.

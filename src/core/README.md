@@ -1,5 +1,8 @@
 # Media and pose processing
 
+`setLinks.ts` (Task 19) owns the flat-barbell bench-name rule and
+`resolveSetLink`, which matches workout, exercise and set IDs together.
+
 `workoutBackup.ts` owns the versioned manual-record JSON format and additive,
 conflict-rejecting merges. `workoutBackupFile.ts` owns bounded strict UTF-8 reads,
 abort/timeout cleanup and the 4 MiB file limit. Both reuse workout validation.

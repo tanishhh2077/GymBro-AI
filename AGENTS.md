@@ -55,6 +55,9 @@
 
 ## Independent judgment
 
+- D-039 links a video analysis to a logged bench-press set for the session only.
+  Follow Task19's three-ID link, permanent detach and no-persistence rules.
+
 - D-038 authorizes manual JSON backup/restore of validated workout records and
   routines. Follow Task18's additive/conflict rules, revision-bound previews,
   bounded file reads and browser/native export ownership.
@@ -151,5 +154,7 @@ Vite copies every file in `public/` into the built site unchanged, where anyone 
 - Task17 adds derived Progress and source-linked records. Its current local
   checks pass 511 tests in 28 files and 19 browser cases. Read STATUS for hosted and
   physical-device evidence.
-- Task18's completed baseline is 562 tests in 34 files and 22 browser cases,
-  with three native plugins. Read STATUS for actual hosted/device evidence.
+- Task18's completed baseline was 562 tests in 34 files and 22 browser cases,
+  with three native plugins. Task19 (D-039, session-only set-linked bench
+  analysis) brings it to 597 tests in 36 files and 23 browser cases. Read STATUS
+  for actual hosted/device evidence.
