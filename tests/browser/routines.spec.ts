@@ -94,7 +94,7 @@ test('native IndexedDB legacy records stay unchanged on load and survive the fir
   await draft(page, 'Migration routine'); await page.getByRole('button', { name: 'Save routine', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Migration routine', exact: true })).toBeVisible();
   const upgraded = await library(page);
-  expect(upgraded.version).toBe(3); expect(upgraded.revision).toBe(8);
+  expect(upgraded.version).toBe(4); expect(upgraded.revision).toBe(8);
   expect(upgraded.active).toEqual(legacy.active); expect(upgraded.history).toEqual(legacy.history);
   await expect(page.getByRole('button', { name: 'Start routine Migration routine', exact: true })).toBeDisabled();
   await page.reload(); await page.getByRole('button', { name: 'View workout history', exact: true }).click();

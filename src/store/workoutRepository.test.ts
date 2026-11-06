@@ -33,20 +33,20 @@ describe('transactional workout repository', () => {
     expect(await repository.save(0, next())).toEqual({ ...next(), revision: 1 });
     expect(await createWorkoutRepository(factory).load()).toEqual({ ...next(), revision: 1 });
   });
-  it('normalizes legacy data without writing, then persists v3 only on explicit save', async () => {
+  it('normalizes legacy data without writing, then persists v4 only on explicit save', async () => {
     const legacy = { ...next(), version: 1, revision: 4 };
     await raw(legacy); const repository = createWorkoutRepository(factory);
     const normalized = await repository.load();
-    expect(normalized).toEqual({ ...legacy, version: 3 }); expect(await raw()).toEqual(legacy);
+    expect(normalized).toEqual({ ...legacy, version: 4 }); expect(await raw()).toEqual(legacy);
     await repository.save(4, normalized);
-    expect(await raw()).toEqual({ ...legacy, version: 3, revision: 5 });
+    expect(await raw()).toEqual({ ...legacy, version: 4, revision: 5 });
   });
   it('keeps legacy data readable and unchanged when the first upgraded write fails', async () => {
     const legacy = { ...next(), version: 1, revision: 4 }; await raw(legacy);
     const repository = createWorkoutRepository(factory); const normalized = await repository.load();
     vi.spyOn(IDBObjectStore.prototype, 'put').mockImplementationOnce(() => { throw new DOMException('quota', 'QuotaExceededError'); });
     await expect(repository.save(4, normalized)).rejects.toMatchObject({ kind: 'storage' });
-    expect(await raw()).toEqual(legacy); expect((await repository.load()).version).toBe(3);
+    expect(await raw()).toEqual(legacy); expect((await repository.load()).version).toBe(4);
   });
   it('serializes concurrent writers and rejects the stale revision', async () => {
     const results = await Promise.allSettled([
@@ -78,7 +78,7 @@ describe('transactional workout repository', () => {
     await raw(data);
     const repository = createWorkoutRepository(factory);
     expect((await repository.load()).revision).toBe(9);
-    expect((await repository.load()).version).toBe(3);
+    expect((await repository.load()).version).toBe(4);
     expect((await raw() as { version: number }).version).toBe(1);
     const result = await repository.save(9, data).then(() => ({ ok: true }), (error: unknown) => ({ ok: false, kind: (error as { kind: string }).kind }));
     expect(result).toEqual({ ok: false, kind: 'validation' });
