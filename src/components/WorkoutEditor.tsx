@@ -89,27 +89,44 @@ export function WorkoutEditor({ store, onFinished, onSetLogged, analysis, restSe
   </div>;
 }
 
-/** Explicit Save keeps a failed note in the field; saved text replaces the draft only when the draft was unchanged. */
+/**
+ * Explicit Save keeps a failed note in the field. The save carries the revision at which this editor last saw the
+ * stored note: unrelated active-workout saves (logged sets) advance it, but a note changed underneath a dirty draft
+ * (sync, restore, reload) does not, so the store refuses to overwrite it.
+ */
 function ActiveWorkoutNote({ store, workoutId, note }: { store: WorkoutStore; workoutId: string; note?: string }) {
   const id = useId();
   const storeError = useStore(store, s => s.error);
+  const revision = useStore(store, s => s.data.revision);
   const saved = note ?? '';
   const [draft, setDraft] = useState(saved);
   const [base, setBase] = useState(saved);
+  const [opened, setOpened] = useState(revision);
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
-  if (base !== saved) { setBase(saved); if (draft.trim() === base) setDraft(saved); }
+  const [conflict, setConflict] = useState(false);
+  if (saved !== base && draft.trim() === base) { setBase(saved); setDraft(saved); setOpened(revision); }
+  else if (saved === base && opened !== revision) setOpened(revision);
   const dirty = draft.trim() !== saved;
   useUnsavedChanges(dirty);
+  function reopen() { setDraft(saved); setBase(saved); setOpened(revision); setConflict(false); setError(''); setStatus(''); }
   return <form aria-label="Active workout note" className="space-y-2" onSubmit={async event => {
-    event.preventDefault(); setStatus(''); setError('');
-    const result = await store.getState().setWorkoutNote(workoutId, draft);
-    if (result.ok) setStatus(draft.trim() ? 'Note saved.' : 'Note removed.'); else setError(result.message);
+    event.preventDefault(); setStatus(''); setError(''); setConflict(false);
+    const result = await store.getState().setWorkoutNote(workoutId, draft, opened);
+    if (result.ok) {
+      const stored = store.getState().data.active?.note ?? '';
+      setBase(stored); setOpened(store.getState().data.revision);
+      setStatus(stored ? 'Note saved.' : 'Note removed.');
+    } else { setError(result.message); setConflict(saved !== base); }
   }}>
     <WorkoutNoteField id={id} value={draft} dirty={dirty} onChange={value => { setDraft(value); setStatus(''); }} />
     <div className="flex flex-wrap items-center gap-3"><button type="submit" className="btn-ghost" disabled={!dirty}>Save note</button>
       <span role="status" className="text-sm text-accent">{status}</span></div>
     {error && error !== storeError && <p role="alert" className="text-sm text-warn">{error}</p>}
+    {conflict && <div className="text-sm text-slate-300">
+      <p>Your typed note is still in the field. Copy anything you need, then load the saved note.</p>
+      <button type="button" className="mt-1 text-accent underline underline-offset-4" onClick={reopen}>Load current note</button>
+    </div>}
   </form>;
 }
 

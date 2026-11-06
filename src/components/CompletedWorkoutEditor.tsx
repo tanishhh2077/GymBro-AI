@@ -39,7 +39,7 @@ export function CompletedWorkoutEditor({ store, workout, expectedRevision, onClo
     if (!result.ok) { setError(result.message); return; }
     setRevision(store.getState().data.revision);
     // The store treats an unchanged note as a no-op, so this write only happens for an edited note.
-    const saved = await store.getState().setWorkoutNote(workout.id, note);
+    const saved = await store.getState().setWorkoutNote(workout.id, note, store.getState().data.revision);
     if (saved.ok) onClose();
     else { setRevision(store.getState().data.revision); setError(`Corrections were saved, but the note was not: ${saved.message}`); }
   }

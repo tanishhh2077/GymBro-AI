@@ -218,3 +218,21 @@ it('keeps an existing routine target weight when the routine is edited for anoth
   await fill('Routine name', 'Renamed day'); await submit('Save routine');
   expect(store.getState().data.routines![0]).toMatchObject({ name: 'Renamed day', exercises: [{ name: 'Squat', targetWeight: 100 }] });
 });
+
+it('saves a note typed before logging a set but refuses to overwrite a note changed underneath the draft', async () => {
+  await draft();
+  await fill('Workout note', 'Typed first');
+  await fill('Reps', '8'); await fill('Weight (kg)', '60'); await submit('Log a set for Bench press');
+  await click('Save note');
+  expect(store.getState().data.active?.note).toBe('Typed first');
+  await fill('Workout note', 'My draft');
+  // Simulates a sync or restore changing the stored note while this draft is open.
+  await act(async () => { await store.getState().setWorkoutNote(store.getState().data.active!.id, 'From the cloud'); });
+  expect((field('Workout note') as HTMLTextAreaElement).value).toBe('My draft');
+  await click('Save note');
+  expect(container.textContent).toContain('Saved workouts changed. Reopen the note before saving.');
+  expect(store.getState().data.active?.note).toBe('From the cloud');
+  expect((field('Workout note') as HTMLTextAreaElement).value).toBe('My draft');
+  await click('Load current note');
+  expect((field('Workout note') as HTMLTextAreaElement).value).toBe('From the cloud');
+});
