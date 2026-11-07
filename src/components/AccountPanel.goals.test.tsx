@@ -68,6 +68,26 @@ it('lists goal conflicts with both versions and confirms sync after a choice', a
   expect(store.getState().data.goals).toEqual([{ ...goal, weight: -10, reps: 8 }]);
 });
 
+it('resolves two goals created separately for one exercise', async () => {
+  // Same exercise, unit and bodyweight setting with a different ID in the cloud.
+  shared = { revision: shared.revision + 1, data: { ...shared.data, goals: [{ ...goal, id: 'g2', weight: 40, createdAt: 2 }] } };
+  await act(async () => root.render(<AccountPanel service={service()} account={{ id: 'a', email: 'lifter@example.test' }}
+    store={store} guest={createWorkoutRepository(new IDBFactory(), 'guest')} />));
+  await act(async () => button('Preview sync').click());
+  await settle();
+  const choice = container.querySelector<HTMLInputElement>('input[name="goal-key/[\\"Pull-up\\",\\"lb\\",true]"][value="cloud"]')!;
+  expect(choice.closest('fieldset')?.textContent).toContain('5 reps × +40 lb');
+  expect(button('Confirm sync').disabled).toBe(true);
+  await act(async () => choice.click());
+  // The cloud also deleted g1 while this device edited it: a second, ID-keyed conflict.
+  expect(button('Confirm sync').disabled).toBe(true);
+  await act(async () => container.querySelector<HTMLInputElement>('input[name="goal/g1"][value="cloud"]')!.click());
+  await act(async () => button('Confirm sync').click());
+  await settle();
+  expect(container.textContent).toContain('Sync complete.');
+  expect(store.getState().data.goals).toEqual([{ ...goal, id: 'g2', weight: 40, createdAt: 2 }]);
+});
+
 it('shows schema5 set details so workout versions differing only there are distinguishable', async () => {
   await act(async () => root.render(<RecordVersion value={{ id: 'w', name: 'Pull day', unit: 'lb', startedAt: 1, finishedAt: 2,
     exercises: [{ id: 'e', name: 'Pull-up', bodyweight: true, superset: 'pair1', sets: [{ id: 's', reps: 6, weight: -20, rpe: 8.5 }] }] }} />));

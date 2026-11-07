@@ -153,7 +153,8 @@ export function AccountPanel({ service, account, store, guest }: Props) {
           }); }}>Preview guest copy</button>
           {copy && <div className="space-y-3 rounded-xl border border-white/10 p-4">
             <p className="text-sm text-slate-300">Add {copy.merge.addedWorkouts} completed workouts, {copy.merge.addedRoutines} routines,
-              {' '}{copy.merge.addedGoals} {copy.merge.addedGoals === 1 ? 'goal' : 'goals'} and {copy.merge.addedActive ? 'one active workout' : 'no active workout'}. Skip {copy.merge.duplicates} identical records.</p>
+              {' '}{copy.merge.addedGoals} {copy.merge.addedGoals === 1 ? 'goal' : 'goals'} and {copy.merge.addedActive ? 'one active workout' : 'no active workout'}. Skip {copy.merge.duplicates} identical records.
+              {copy.merge.skippedGoals > 0 && ` Skip ${copy.merge.skippedGoals} guest ${copy.merge.skippedGoals === 1 ? 'goal' : 'goals'} because this account already has a goal for that exercise.`}</p>
             <button type="button" className="btn-primary" disabled={disabled || copy.revision !== state.data.revision} onClick={() => { void run(async () => {
               const result = await store.getState().restoreBackup(copy.backup, copy.revision); setCopy(null);
               if (!result.ok) throw new Error(result.message); return 'Guest records copied into this account’s local library.';

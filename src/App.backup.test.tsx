@@ -85,6 +85,12 @@ it('counts goals to add in the preview and restores them', async () => {
   await click('Restore additions');
   expect(store.getState().data.goals).toEqual(goals);
 });
+it('explains goals skipped because the library already has a goal for that exercise', async () => {
+  const mine = { id: 'mine', name: 'Bench', unit: 'kg' as const, weight: 100, reps: 5, createdAt: 1 };
+  await repository.save(0, { ...data(), goals: [mine] }); await render(); await click('Backup and restore');
+  await choose(createWorkoutBackup({ ...data(), goals: [{ ...mine, id: 'theirs', weight: 120 }] }, 1000));
+  expect(container.textContent).toContain('1 goal skipped: you already have a goal for that exercise.');
+});
 it('rejects malformed and conflicting files without changing the saved library', async () => {
   await repository.save(0, data()); await render(); await click('Backup and restore');
   const before = store.getState().data, save = vi.spyOn(repository, 'save');

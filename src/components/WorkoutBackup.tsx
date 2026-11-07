@@ -137,6 +137,8 @@ export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: 
         <div><dt className="text-slate-400">Active workout to add</dt><dd className="mt-1 text-white">{preview.merge.addedActive ? 'Yes' : 'No'}</dd></div>
         <div><dt className="text-slate-400">Identical records skipped</dt><dd className="mt-1 text-white">{preview.merge.duplicates}</dd></div>
       </dl>
+      {preview.merge.skippedGoals > 0 && <p className="text-sm text-slate-300">{preview.merge.skippedGoals === 1 ? '1 goal' : `${preview.merge.skippedGoals} goals`} skipped:
+        {' '}you already have a goal for that exercise. Your saved goal is kept.</p>}
       {preview.merge.data === preview.source ? <p className="text-sm text-slate-400">These records are already on this device.</p> :
         <button type="button" className="btn-primary" disabled={blocked} onClick={() => { void restore(); }}>Restore additions</button>}
       <button type="button" className="btn-ghost ml-2" onClick={() => setPreview(null)}>Cancel preview</button>
