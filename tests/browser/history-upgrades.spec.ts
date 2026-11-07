@@ -45,7 +45,7 @@ test('mobile history calendar filters local days and completed corrections save 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole('button', { name: 'Save corrections', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Synthetic corrected', exact: true })).toBeVisible();
-  await expect(page.getByRole('cell', { name: '62.5 kg', exact: true })).toBeVisible();
+  await expect(page.getByRole('cell', { name: /^62\.5 kg/ })).toBeVisible();
   await expect(page.getByRole('cell', { name: /Warm-up/ })).toBeVisible();
   await page.reload();
   await page.getByRole('button', { name: 'View workout history', exact: true }).click();

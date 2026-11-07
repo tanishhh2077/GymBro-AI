@@ -51,8 +51,8 @@ test('RPE, supersets, bodyweight loads and dual units work at phone width', asyn
   await page.getByRole('button', { name: 'View saved workout', exact: true }).click();
   await expect(page.getByText('Superset A', { exact: false }).first()).toBeVisible();
   await page.getByRole('button', { name: 'Edit completed workout', exact: true }).click();
-  await expect(page.getByLabel('Exercise 2 set 1 added weight (kg)', { exact: true })).toHaveValue('-20');
-  await page.getByLabel('Exercise 1 set 1 RPE', { exact: true }).fill('');
+  await expect(page.getByLabel('Exercise 3 set 1 added weight (kg)', { exact: true })).toHaveValue('-20');
+  await page.getByLabel('Exercise 2 set 1 RPE', { exact: true }).fill('');
   await page.getByRole('button', { name: 'Save corrections', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Synthetic detail day', level: 1 })).toBeVisible();
 });
