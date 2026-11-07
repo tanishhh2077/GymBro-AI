@@ -47,7 +47,15 @@ export function WorkoutRoutines({ store, onStarted, onResume }: { store: Workout
         <button type="button" className="btn-ghost" onClick={() => { setQuery(''); setSort('creation'); }}>Clear routine filters</button>
         <p className="text-sm text-slate-400">{visibleRoutines.length} of {routines.length} routines match</p>
       </div>}
-      {!routines.length ? <p className="text-slate-400">Save a routine to reuse your exercise plan without retyping it.</p> :
+      {!routines.length ? <section aria-labelledby="empty-routines-heading" className="card min-w-0 space-y-3 p-6 text-center">
+        <h2 id="empty-routines-heading" className="text-xl font-semibold text-white">No routines yet</h2>
+        <p className="mx-auto max-w-md text-sm text-slate-300">Save a routine to reuse your exercise plan without retyping it. Add target sets, reps, and weights to jump straight into your workouts.</p>
+        <div>
+          <button type="button" className="btn-primary" disabled={disabled} onClick={() => {
+            setNotice(''); setEditor({ revision: state.data.revision });
+          }}>Create routine</button>
+        </div>
+      </section> :
         !visibleRoutines.length ? <p className="text-slate-400">No routines match these filters.</p> :
         <div className="space-y-4">{visibleRoutines.map(routine => <section key={routine.id} aria-labelledby={`routine-${routine.id}`} className="card min-w-0 p-4 sm:p-5">
           <h2 id={`routine-${routine.id}`} className="break-words text-xl font-semibold text-white">{routine.name}</h2>

@@ -138,3 +138,33 @@ it('sorts a copy by name and restores saved creation order while retaining origi
   expect(store.getState().data).toEqual(before);
   await click('Clear routine filters'); expect(names()).toEqual(['Upper day', 'Alpha']);
 });
+
+it('shows a friendly empty state with a create routine action when no routines exist', async () => {
+  const emptyRepository = createWorkoutRepository(new IDBFactory());
+  const emptyStore = createWorkoutStore(emptyRepository, { id: () => 'id-1', now: () => 1000 });
+  await emptyStore.getState().load();
+  await act(async () => root.render(<WorkoutRoutines store={emptyStore} onStarted={() => {}} onResume={() => {}} />));
+
+  expect(container.textContent).toContain('No routines yet');
+  expect(container.textContent).toContain('Save a routine to reuse your exercise plan');
+  const createBtn = button('Create routine');
+  expect(createBtn).toBeDefined();
+  expect(createBtn.disabled).toBe(false);
+
+  await act(async () => { createBtn.click(); });
+  expect(container.querySelector('form')).not.toBeNull();
+  const label = [...container.querySelectorAll('label')].find(el => el.textContent === 'Routine name')!;
+  const name = document.getElementById(label.htmlFor) as HTMLInputElement;
+  expect(name.value).toBe('');
+});
+
+it('disables the empty-state create routine button when library is unavailable', async () => {
+  const emptyRepository = createWorkoutRepository(new IDBFactory());
+  const emptyStore = createWorkoutStore(emptyRepository, { id: () => 'id-1', now: () => 1000 });
+  await emptyStore.getState().load();
+  emptyStore.setState({ busy: true });
+  await act(async () => root.render(<WorkoutRoutines store={emptyStore} onStarted={() => {}} onResume={() => {}} />));
+
+  expect(button('Create routine').disabled).toBe(true);
+});
+
