@@ -3,10 +3,11 @@ import { useStore } from 'zustand';
 import type { Account, AccountService } from '@/core/accountService';
 import { mergeWorkoutSync, type SyncChoice, type SyncPreview } from '@/core/workoutSync';
 import { mergeWorkoutBackup, type WorkoutBackup, type BackupMerge } from '@/core/workoutBackup';
-import type { Workout, WorkoutRoutine } from '@/types/workout';
+import type { Workout, WorkoutData, WorkoutGoal, WorkoutRoutine } from '@/types/workout';
 import type { WorkoutRepository } from '@/store/workoutRepository';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
 import { plannedTarget } from './plannedTarget';
+import { groupLabel, weightParts } from './weightText';
 
 interface Props { service: AccountService | null; account: Account | null; store: WorkoutStore; guest: WorkoutRepository }
 const inputClass = 'mt-2 w-full rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white disabled:opacity-60';
@@ -18,11 +19,23 @@ export function RecordVersion({ value }: { value: Workout | WorkoutRoutine | nul
     {'note' in value && value.note && <p className="whitespace-pre-wrap">Note: {value.note}</p>}
     <ul className="space-y-2">{value.exercises.map(exercise => <li key={exercise.id}>
       <span className="font-medium">{exercise.name}</span>
-      {'sets' in exercise && <span> · {exercise.sets.length ? exercise.sets.map(set => `${set.kind === 'warmup' ? 'Warm-up' : 'Regular'} ${set.reps} reps × ${set.weight} ${value.unit}`).join(', ') : 'No logged sets'}</span>}
+      {exercise.bodyweight && <span> · Bodyweight</span>}
+      {exercise.superset && <span> · Superset {exercise.superset}</span>}
+      {'sets' in exercise && <span> · {exercise.sets.length ? exercise.sets.map(set => `${set.kind === 'warmup' ? 'Warm-up' : 'Regular'} ${set.reps} reps × ${weightParts(set.weight, value.unit, exercise.bodyweight === true).text}${set.rpe !== undefined ? ` RPE ${set.rpe}` : ''}`).join(', ') : 'No logged sets'}</span>}
       {'sets' in exercise && plannedTarget(exercise, value.unit) && <span> · Planned: {plannedTarget(exercise, value.unit)}</span>}
       {!('sets' in exercise) && <span> · {exercise.targetSets ?? '—'} sets / {exercise.targetReps ?? '—'} reps{exercise.targetWeight !== undefined ? ` / ${exercise.targetWeight} ${value.unit}` : ''} planned</span>}
     </li>)}</ul>
   </div>;
+}
+/** One side of a goal conflict, with every synced goal field. */
+export function GoalVersion({ value }: { value: WorkoutGoal | null }) {
+  if (!value) return <p className="text-sm text-slate-400">Deleted</p>;
+  return <p className="break-words text-sm text-slate-300">{groupLabel(value)} · {value.reps} {value.reps === 1 ? 'rep' : 'reps'} × {weightParts(value.weight, value.unit, value.bodyweight === true).text}
+    {' '}· Created {new Date(value.createdAt).toLocaleDateString()}</p>;
+}
+function counts(data: WorkoutData): string {
+  const goals = data.goals?.length ?? 0;
+  return `${data.history.length} completed workouts, ${data.routines?.length ?? 0} routines and ${goals} ${goals === 1 ? 'goal' : 'goals'}`;
 }
 export function AccountPanel({ service, account, store, guest }: Props) {
   const state = useStore(store);
@@ -45,9 +58,13 @@ export function AccountPanel({ service, account, store, guest }: Props) {
   const current = preview?.localRevision === state.data.revision ? preview : null;
   let merged: ReturnType<typeof mergeWorkoutSync> | undefined;
   let mergeError = '';
+  // Conflicts listed without choices, so a chosen conflict stays visible with its selected radio.
+  let unchosen: Pick<ReturnType<typeof mergeWorkoutSync>, 'conflicts' | 'goalConflicts'> = { conflicts: [], goalConflicts: [] };
   if (current) {
-    try { merged = mergeWorkoutSync(current.base, state.data, current.remote.data, choices); }
-    catch (failure) { mergeError = failure instanceof Error ? failure.message : 'Preview sync again.'; }
+    try {
+      merged = mergeWorkoutSync(current.base, state.data, current.remote.data, choices);
+      unchosen = mergeWorkoutSync(current.base, state.data, current.remote.data);
+    } catch (failure) { mergeError = failure instanceof Error ? failure.message : 'Preview sync again.'; }
   }
   function submitCode(event: FormEvent) {
     event.preventDefault();
@@ -60,7 +77,7 @@ export function AccountPanel({ service, account, store, guest }: Props) {
   return <div className="max-w-2xl space-y-6">
     <div><h1 className="text-3xl font-bold text-white">Account and sync</h1>
       <p className="mt-2 text-sm text-slate-400">Use guest mode or sign in to sync your workout records across devices.</p></div>
-    <p className="text-sm text-slate-400">Sync includes workout logs and routines. Video processing stays on your device.</p>
+    <p className="text-sm text-slate-400">Sync includes workout logs, routines and goals. Video processing stays on your device.</p>
     {error && <p role="alert" className="break-words text-sm text-warn">{error}</p>}
     <p role="status" aria-live="polite" className="text-sm text-accent">{busy ? 'Working…' : notice}</p>
     {!service ? <div className="card p-5"><h2 className="font-semibold text-white">Accounts are not configured</h2>
@@ -91,12 +108,12 @@ export function AccountPanel({ service, account, store, guest }: Props) {
         {preview && !current && <p role="status" className="text-sm text-warn">Workouts changed after the preview. Preview sync again.</p>}
         {current && <section aria-label="Sync preview" className="space-y-4 rounded-xl border border-white/10 p-4">
           <h2 className="font-semibold text-white">Sync preview</h2>
-          <p className="text-sm text-slate-400">This device has {state.data.history.length} completed workouts and {state.data.routines?.length ?? 0} routines.
-            {' '}Cloud has {current.remote.data.history.length} completed workouts and {current.remote.data.routines?.length ?? 0} routines.</p>
+          <p className="text-sm text-slate-400">This device has {counts(state.data)}.
+            {' '}Cloud has {counts(current.remote.data)}.</p>
           {mergeError && <p role="alert" className="text-sm text-warn">{mergeError}</p>}
-          {merged && <p className="text-sm text-slate-300">Merged result has {merged.data.history.length} completed workouts,
-            {' '}{merged.data.routines?.length ?? 0} routines and {merged.data.active ? 'one active workout' : 'no active workout'}.</p>}
-          {mergeWorkoutSync(current.base, state.data, current.remote.data).conflicts.map(conflict =>
+          {merged && <p className="text-sm text-slate-300">Merged result has {counts(merged.data)},
+            {' '}and {merged.data.active ? 'one active workout' : 'no active workout'}.</p>}
+          {unchosen.conflicts.map(conflict =>
             <fieldset key={conflict.key} className="min-w-0 space-y-3 rounded-lg border border-warn/30 p-3">
               <legend className="max-w-full break-words px-1 text-sm font-semibold text-white">Conflict · {conflict.name}</legend>
               {(['device', 'cloud'] as const).map(source => <div key={source} className="space-y-2">
@@ -106,7 +123,17 @@ export function AccountPanel({ service, account, store, guest }: Props) {
                 <RecordVersion value={conflict[source]} />
               </div>)}
             </fieldset>)}
-          <div className="flex flex-wrap gap-3"><button type="button" className="btn-primary" disabled={disabled || !merged || !!merged.conflicts.length} onClick={() => { void run(async () => {
+          {unchosen.goalConflicts.map(conflict =>
+            <fieldset key={conflict.key} className="min-w-0 space-y-3 rounded-lg border border-warn/30 p-3">
+              <legend className="max-w-full break-words px-1 text-sm font-semibold text-white">Goal conflict · {conflict.name}</legend>
+              {(['device', 'cloud'] as const).map(source => <div key={source} className="space-y-2">
+                <label className="flex items-center gap-2 text-sm text-white"><input type="radio" name={conflict.key} value={source}
+                  disabled={disabled} checked={choices[conflict.key] === source} onChange={() => setChoices(value => ({ ...value, [conflict.key]: source }))} />
+                  {source === 'device' ? 'Keep device goal' : 'Keep cloud goal'}</label>
+                <GoalVersion value={conflict[source]} />
+              </div>)}
+            </fieldset>)}
+          <div className="flex flex-wrap gap-3"><button type="button" className="btn-primary" disabled={disabled || !merged || !!merged.conflicts.length || !!merged.goalConflicts.length} onClick={() => { void run(async () => {
             const result = await store.getState().confirmSync(current, choices, service.cloud(account.id));
             setPreview(null);
             if (!result.ok) throw new Error(result.message);
@@ -125,8 +152,8 @@ export function AccountPanel({ service, account, store, guest }: Props) {
             return 'Guest copy preview ready.';
           }); }}>Preview guest copy</button>
           {copy && <div className="space-y-3 rounded-xl border border-white/10 p-4">
-            <p className="text-sm text-slate-300">Add {copy.merge.addedWorkouts} completed workouts, {copy.merge.addedRoutines} routines
-              {' '}and {copy.merge.addedActive ? 'one active workout' : 'no active workout'}. Skip {copy.merge.duplicates} identical records.</p>
+            <p className="text-sm text-slate-300">Add {copy.merge.addedWorkouts} completed workouts, {copy.merge.addedRoutines} routines,
+              {' '}{copy.merge.addedGoals} {copy.merge.addedGoals === 1 ? 'goal' : 'goals'} and {copy.merge.addedActive ? 'one active workout' : 'no active workout'}. Skip {copy.merge.duplicates} identical records.</p>
             <button type="button" className="btn-primary" disabled={disabled || copy.revision !== state.data.revision} onClick={() => { void run(async () => {
               const result = await store.getState().restoreBackup(copy.backup, copy.revision); setCopy(null);
               if (!result.ok) throw new Error(result.message); return 'Guest records copied into this account’s local library.';
