@@ -175,3 +175,34 @@ it('lists goals read-only when no store is connected', async () => {
   expect(goalCard('Bench press (lb)')).not.toBeNull();
   expect(container.querySelector('button[aria-label="Edit goal for Bench press (lb)"]')).toBeNull();
 });
+
+it('suggests catalog and previously logged exercise names via a datalist while allowing custom names', async () => {
+  await render([
+    workout('w1', [{ reps: 8, weight: 100 }], { name: 'Custom Cable Crossover' }),
+  ]);
+  await click('Add goal');
+  const input = field('Exercise name') as HTMLInputElement;
+  const listId = input.getAttribute('list');
+  expect(listId).toBeTruthy();
+
+  const datalist = container.querySelector<HTMLDataListElement>('datalist');
+  expect(datalist).toBeTruthy();
+  expect(datalist!.id).toBe(listId);
+
+  const options = [...datalist!.querySelectorAll('option')].map(opt => opt.value);
+  // Catalog exercises are suggested
+  expect(options).toContain('Bench press');
+  expect(options).toContain('Back squat');
+  expect(options).toContain('Deadlift');
+  // Previously logged exercise names are suggested
+  expect(options).toContain('Custom Cable Crossover');
+
+  // Custom name not in catalog or previous exercises is still allowed
+  await type('Exercise name', 'My Special Lift');
+  await type('Goal weight (lb)', '150');
+  await type('Goal reps', '10');
+  await submit();
+
+  expect(store.getState().data.goals).toMatchObject([{ name: 'My Special Lift', unit: 'lb', weight: 150, reps: 10 }]);
+  expect(goalCard('My Special Lift (lb)')).not.toBeNull();
+});
