@@ -72,9 +72,11 @@ export function validateWorkoutNote(value: unknown): asserts value is string {
   requireValue(!/\p{Cs}/u.test(value), 'Remove unsupported characters from the workout note.');
 }
 function targets(item: Record<string, unknown>) {
+  // A bodyweight target is added load, so a negative value plans assistance.
   if (Object.prototype.hasOwnProperty.call(item, 'targetWeight')) requireValue(typeof item.targetWeight === 'number' &&
-    Number.isFinite(item.targetWeight) && item.targetWeight >= 0 && item.targetWeight <= 10000,
-  'Enter a target weight from 0 to 10000, or leave it blank.');
+    Number.isFinite(item.targetWeight) && item.targetWeight >= (item.bodyweight === true ? -1000 : 0) && item.targetWeight <= 10000,
+  item.bodyweight === true ? 'Enter a target added weight from -1000 to 10000, or leave it blank.'
+    : 'Enter a target weight from 0 to 10000, or leave it blank.');
   for (const [key, max] of [['targetSets', 100], ['targetReps', 1000]] as const) {
     if (Object.prototype.hasOwnProperty.call(item, key)) requireValue(typeof item[key] === 'number' &&
       Number.isInteger(item[key]) && item[key] >= 1 && item[key] <= max,
