@@ -12,7 +12,7 @@ export function createWorkoutCsv(data: WorkoutData): string {
   validateWorkoutData(data);
   const rows: (string | number)[][] = [[
     'workout_id', 'workout_name', 'started_at', 'finished_at', 'exercise_id', 'exercise_name',
-    'set_id', 'set_number', 'unit', 'reps', 'weight', 'kind',
+    'set_id', 'set_number', 'unit', 'reps', 'weight', 'kind', 'rpe', 'bodyweight',
   ]];
   const history = [...data.history].sort((a, b) => a.finishedAt! - b.finishedAt!);
   for (const workout of history) {
@@ -20,6 +20,8 @@ export function createWorkoutCsv(data: WorkoutData): string {
       exercise.sets.forEach((set, index) => rows.push([
         workout.id, workout.name, new Date(workout.startedAt).toISOString(), new Date(workout.finishedAt!).toISOString(),
         exercise.id, exercise.name, set.id, index + 1, workout.unit, set.reps, set.weight, set.kind ?? 'regular',
+        // On a bodyweight exercise weight is added load, so a negative number records assistance.
+        set.rpe ?? '', exercise.bodyweight ? 'yes' : 'no',
       ]));
     }
   }

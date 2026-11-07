@@ -49,10 +49,10 @@ test('seven-day totals and actual CSV download preserve the synthetic library at
     const chunks: Buffer[] = [];
     for await (const chunk of stream) chunks.push(Buffer.from(chunk));
     const text = Buffer.concat(chunks).toString('utf8');
-    expect(text).toContain('workout_id,workout_name,started_at,finished_at,exercise_id,exercise_name,set_id,set_number,unit,reps,weight,kind\r\n');
+    expect(text).toContain('workout_id,workout_name,started_at,finished_at,exercise_id,exercise_name,set_id,set_number,unit,reps,weight,kind,rpe,bodyweight\r\n');
     expect(text).toContain('recent,"\'=SUM(""x,y"")",');
-    expect(text).toContain("e-recent,'@Row,regular,2,kg,3,22.125,regular\r\n");
-    expect(text).toContain("e-recent,'@Row,warm,1,kg,10,20,warmup\r\n");
+    expect(text).toContain("e-recent,'@Row,regular,2,kg,3,22.125,regular,,no\r\n");
+    expect(text).toContain("e-recent,'@Row,warm,1,kg,10,20,warmup,,no\r\n");
     expect(text).not.toContain('active');
     expect(text.indexOf('old,')).toBeLessThan(text.indexOf('boundary,'));
     expect(text.indexOf('boundary,')).toBeLessThan(text.indexOf('recent,'));
