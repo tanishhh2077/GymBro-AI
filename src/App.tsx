@@ -19,6 +19,8 @@ import { WorkoutProgress } from '@/components/WorkoutProgress';
 import { WorkoutBackup } from '@/components/WorkoutBackup';
 import { WorkoutSummary } from '@/components/WorkoutSummary';
 import { ShieldIcon } from '@/components/icons';
+import { FirstRunIntro, ShowIntroAgain } from '@/components/FirstRunIntro';
+import { useFirstRunIntro } from '@/components/useFirstRunIntro';
 import { confirmDiscard, createUnsavedChanges, UnsavedChangesContext } from '@/components/unsavedChanges';
 
 const AnalysisWorkspace = lazy(() => import('@/components/AnalysisWorkspace').then(module => ({ default: module.AnalysisWorkspace })));
@@ -41,6 +43,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
   { workouts?: WorkoutStore; session?: SessionStore; accountPanel?: ReactNode; accountLabel?: string; restScope?: string } = {}) {
   const appearance = useAppearance();
   const restSettings = useExerciseRest(restScope);
+  const intro = useFirstRunIntro();
   useEffect(() => connectNativeLifecycle({
     isNative: Capacitor.isNativePlatform(), app: NativeApp, session, document,
   }), [session]);
@@ -79,6 +82,16 @@ export default function App({ workouts = workoutStore, session = useSessionStore
     focusSet.current = null;
     previousView.current = view;
   }, [view]);
+  // Return focus to Home's heading after the intro closes, not to <body>.
+  const introWasOpen = useRef(intro.open);
+  useEffect(() => {
+    if (introWasOpen.current && !intro.open) {
+      const heading = main.current?.querySelector('h1');
+      if (heading && !heading.hasAttribute('tabindex')) heading.tabIndex = -1;
+      (heading ?? main.current)?.focus();
+    }
+    introWasOpen.current = intro.open;
+  }, [intro.open]);
   const available = state.loaded && !state.needsReload;
   // Detach on any screen, before a later restore could bring back the same IDs.
   // Unloaded data would make every link look deleted, so only loaded data counts.
@@ -108,7 +121,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
     onAnalyze: (link: SetLink) => { if (!leave()) return; setPendingLink(link); setView('analysis'); setNotice(''); },
     onView: () => navigate('analysis'),
   };
-  return <UnsavedChangesContext.Provider value={unsaved}><div className="app-safe-sides min-h-full">
+  return <UnsavedChangesContext.Provider value={unsaved}><div className="app-safe-sides min-h-full" aria-hidden={intro.open || undefined}>
     <Header />
     <nav aria-label="Main navigation" className="mx-auto flex w-full max-w-5xl gap-1 border-b border-white/10 px-4 py-2 sm:px-6">
       {([['home', 'Home'], ['workout', 'Workout'], ['analysis', 'Analyze'], ['routines', 'Routines']] as const).map(([target, label]) =>
@@ -129,7 +142,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
         onRoutines={() => navigate('routines')}
         onProgress={() => navigate('progress')} onBackup={() => navigate('backup')} onHistory={openHistory}
         onAccount={accountPanel ? () => navigate('account') : undefined} accountLabel={accountLabel}
-        appearance={<AppearanceControl settings={appearance} />} />}
+        appearance={<><AppearanceControl settings={appearance} /><ShowIntroAgain intro={intro} /></>} />}
       {view === 'workout' && <WorkoutEditor store={workouts} analysis={analysis} restSettings={restSettings}
         onRest={(name, seconds) => restTimer.current?.startForExercise(seconds, name)} onSetLogged={(workoutId, name, seconds) => {
         if (workouts.getState().data.active?.id === workoutId) restTimer.current?.afterSetLogged(seconds, name);
@@ -148,7 +161,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
       {view === 'backup' && <WorkoutBackup store={workouts} onHome={() => navigate('home')} />}
       {view === 'account' && accountPanel}
     </main>
-  </div></UnsavedChangesContext.Provider>;
+  </div>{intro.open && <FirstRunIntro onClose={intro.close} />}</UnsavedChangesContext.Provider>;
 }
 
 function Header() {
