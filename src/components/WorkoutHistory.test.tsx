@@ -119,3 +119,26 @@ it('deletes a filtered workout only after confirmation and updates matching coun
   expect(rows()).toEqual([]); expect(container.textContent).toContain('0 of 2 workouts match');
   expect((await repository.load()).history.map(w => w.id)).toEqual(['w0', 'w1']);
 });
+
+it('clears only the search query when Clear search is clicked, preserving date bounds', async () => {
+  await seed();
+  await fill('From', '2026-11-02');
+  await fill('Search workouts or exercises', 'bench');
+  expect(rows()).toEqual(['Upper 2', 'Upper 1']);
+  await click('Clear search');
+  expect(rows()).toEqual(['Upper 2', 'Upper 1']);
+  expect(container.textContent).toContain('2 of 3 workouts match');
+  const searchInput = container.querySelector<HTMLInputElement>('input[type="search"]');
+  expect(searchInput?.value).toBe('');
+  expect(container.querySelector('button[aria-label="Clear search"]')).toBeNull();
+});
+
+it('shows clear search button when search matches nothing and clears to restore workouts', async () => {
+  await seed();
+  await fill('Search workouts or exercises', 'nonexistent workout');
+  expect(container.textContent).toContain('No workouts match these filters.');
+  expect(container.textContent).toContain('0 of 3 workouts match');
+  await click('Clear search');
+  expect(rows()).toEqual(['Upper 2', 'Upper 1', 'Lower day']);
+  expect(container.textContent).toContain('3 of 3 workouts match');
+});

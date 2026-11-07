@@ -54,3 +54,10 @@ it('keeps stable newest-first order without changing saved objects or input orde
   expect(result.workouts[0]).toBe(b);
   expect(history).toEqual([a, b, c]);
 });
+
+it('gracefully excludes workouts without a finished timestamp', () => {
+  const unfinished: Workout = { id: 'unfin', name: 'In progress', unit: 'kg', startedAt: local(5), finishedAt: null, exercises: [] };
+  const history = [workout('a', 'Done', local(5)), unfinished];
+  const result = filterWorkoutHistory(history, filters);
+  expect(result.workouts.map(w => w.id)).toEqual(['a']);
+});

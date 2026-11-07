@@ -81,8 +81,12 @@ export function WorkoutHistory({ store, initialId, analysis, onSummary, onWorkou
     }} />}
     <section aria-label="History filters" className="space-y-3">
       <div><label htmlFor={`${filterId}-search`} className="mb-1 block text-sm text-slate-400">Search workouts or exercises</label>
-        <input id={`${filterId}-search`} type="search" className={inputClass} value={filters.query}
-          onChange={event => changeFilter('query', event.target.value)} /></div>
+        <div className="flex gap-2">
+          <input id={`${filterId}-search`} type="search" className={`${inputClass} flex-1`} value={filters.query}
+            placeholder="Search by workout or exercise"
+            onChange={event => changeFilter('query', event.target.value)} />
+          {filters.query && <button type="button" className="btn-ghost shrink-0" onClick={() => changeFilter('query', '')}>Clear search</button>}
+        </div></div>
       <p id={`${filterId}-dates`} className="text-xs text-slate-400">Completion dates, inclusive, in your local time.</p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {(['from', 'to'] as const).map(field => <div key={field} className="min-w-0">
