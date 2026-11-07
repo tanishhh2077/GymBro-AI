@@ -1,16 +1,13 @@
 import { useId } from 'react';
 import type { RecordedSet } from '@/types/progress';
 import type { WeightUnit } from '@/types/workout';
-import { formatWeight } from '@/core/weightDisplay';
+import { weightParts } from './weightText';
 
 const axisNumber = new Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 });
 
 function tickAlternate(weight: number, unit: WeightUnit, bodyweight: boolean): string {
-  const other: WeightUnit = unit === 'kg' ? 'lb' : 'kg';
-  if (bodyweight && weight === 0) return `0 ${other}`;
-  const full = formatWeight(weight, unit, { bodyweight, alternate: true });
-  const alt = full.split(' · ')[1]?.replace(/ assist$/, '');
-  return alt ?? `0 ${other}`;
+  // Plain bodyweight zero has no converted text; show an honest zero in the other unit.
+  return weightParts(weight, unit, bodyweight).alternate ?? `0 ${unit === 'kg' ? 'lb' : 'kg'}`;
 }
 
 export function WorkoutProgressChart({ workouts, unit, bodyweight = false }: {
@@ -50,7 +47,7 @@ export function WorkoutProgressChart({ workouts, unit, bodyweight = false }: {
           const alternate = tickAlternate(tick.value, unit, bodyweight);
           return <span key={tick.position} className="absolute right-0 -translate-y-1/2 leading-tight" style={{ top: `${tick.position}%` }}>
             <span className="block">{primary}</span>
-            <span className="block text-[10px] text-slate-500 whitespace-nowrap">≈ {alternate}</span>
+            <span className="block text-[11px] text-slate-400 whitespace-nowrap">≈ {alternate}</span>
           </span>;
         })}
       </div>
