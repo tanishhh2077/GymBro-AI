@@ -1,7 +1,8 @@
 import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
 import { REST_DURATIONS } from '@/store/useExerciseRest';
 
-type Rest = { phase: 'idle' } | { phase: 'running'; endsAt: number } | { phase: 'paused'; remainingMs: number };
+type Rest = { phase: 'idle' } | { phase: 'running'; endsAt: number; maximumMs: number } | { phase: 'paused'; remainingMs: number };
+const MAX_REST_SECONDS = 3600;
 function clock(seconds: number) { return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; }
 
 export interface WorkoutRestTimerHandle {
@@ -12,6 +13,13 @@ export interface WorkoutRestTimerHandle {
 export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function WorkoutRestTimer(_props, ref) {
   const id = useId();
   const [duration, setDuration] = useState(90);
+  const [custom, setCustom] = useState(false);
+  const [minutes, setMinutes] = useState('1');
+  const [seconds, setSeconds] = useState('30');
+  const customSeconds = Number(minutes) * 60 + Number(seconds);
+  const validCustom = /^\d+$/.test(minutes) && /^\d+$/.test(seconds)
+    && Number(seconds) < 60 && customSeconds >= 1 && customSeconds <= MAX_REST_SECONDS;
+  const selectedDuration = custom && validCustom ? customSeconds : duration;
   const [rest, setRest] = useState<Rest>({ phase: 'idle' });
   const [now, setNow] = useState(0);
   const [autoStart, setAutoStart] = useState(false);
@@ -24,18 +32,20 @@ export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function Work
   const releaseTone = useRef<(() => void) | null>(null);
   const armed = useRef(false);
   const didVibrate = useRef(false);
-  const remainingMs = rest.phase === 'idle' ? duration * 1000 : rest.phase === 'paused' ? rest.remainingMs
-    : Math.max(0, Math.min(duration * 1000, rest.endsAt - now));
+  const remainingMs = rest.phase === 'idle' ? selectedDuration * 1000 : rest.phase === 'paused' ? rest.remainingMs
+    : Math.max(0, Math.min(rest.maximumMs, rest.endsAt - now));
   const complete = rest.phase !== 'idle' && remainingMs === 0;
   const counting = rest.phase === 'running' && !complete;
   const paused = rest.phase === 'paused' && !complete;
 
   const begin = useCallback((seconds: number, name: string) => {
-    if (!REST_DURATIONS.includes(seconds)) return;
+    if (!Number.isInteger(seconds) || seconds < 1 || seconds > MAX_REST_SECONDS) return;
     armed.current = true;
     const current = Date.now();
     setDuration(seconds); setExerciseName(name); setNow(current);
-    setRest({ phase: 'running', endsAt: current + seconds * 1000 });
+    setCustom(!REST_DURATIONS.includes(seconds));
+    setMinutes(String(Math.floor(seconds / 60))); setSeconds(String(seconds % 60));
+    setRest({ phase: 'running', endsAt: current + seconds * 1000, maximumMs: seconds * 1000 });
   }, []);
   useImperativeHandle(ref, () => ({
     afterSetLogged(seconds = duration, name = '') { if (autoStart) begin(seconds, name); },
@@ -119,17 +129,28 @@ export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function Work
   }
 
   function start() {
+    if (custom && !validCustom && !paused) return;
     armed.current = true;
     const current = Date.now();
-    const remaining = paused && rest.phase === 'paused' ? rest.remainingMs : duration * 1000;
-    setNow(current); setRest({ phase: 'running', endsAt: current + remaining });
+    const remaining = paused && rest.phase === 'paused' ? rest.remainingMs : selectedDuration * 1000;
+    if (!paused) setDuration(selectedDuration);
+    setNow(current); setRest({ phase: 'running', endsAt: current + remaining, maximumMs: remaining });
   }
   function pause() {
     armed.current = false;
     if (rest.phase !== 'running') return;
     const current = Date.now();
     setNow(current);
-    setRest({ phase: 'paused', remainingMs: Math.max(0, Math.min(duration * 1000, rest.endsAt - current)) });
+    setRest({ phase: 'paused', remainingMs: Math.max(0, Math.min(rest.maximumMs, rest.endsAt - current)) });
+  }
+  function adjust(deltaSeconds: number) {
+    if (!counting || rest.phase !== 'running') return;
+    const current = Date.now();
+    const remaining = Math.max(0, Math.min(rest.maximumMs, rest.endsAt - current));
+    // An unseen expiry must complete rather than resurrect the old run.
+    const next = remaining === 0 ? 0 : Math.max(0, Math.min(MAX_REST_SECONDS * 1000, remaining + deltaSeconds * 1000));
+    setNow(current);
+    setRest({ phase: 'running', endsAt: current + next, maximumMs: next });
   }
 
   return <section aria-labelledby={`${id}-title`} aria-describedby={`${id}-limits`} className="card mb-6 p-4 sm:p-5">
@@ -142,24 +163,48 @@ export const WorkoutRestTimer = forwardRef<WorkoutRestTimerHandle>(function Work
         </p>
       </div>
       <output aria-label="Rest time remaining" aria-live="off" className="font-mono text-3xl font-semibold tabular-nums text-white">
-        {clock(Math.ceil(remainingMs / 1000))}
+        {rest.phase === 'idle' && custom && !validCustom ? '--:--' : clock(Math.ceil(remainingMs / 1000))}
       </output>
     </div>
     <div className="mt-4 flex flex-wrap items-end gap-3">
       <div>
         <label htmlFor={`${id}-duration`} className="mb-1 block text-xs text-slate-400">Rest duration</label>
-        <select id={`${id}-duration`} value={duration} disabled={counting || paused}
+        <select id={`${id}-duration`} value={custom ? 'custom' : duration} disabled={counting || paused}
           className="rounded-lg border border-white/10 bg-ink-950 px-3 py-2.5 text-sm text-white disabled:opacity-50"
           onChange={event => {
+            if (event.target.value === 'custom') { setCustom(true); setExerciseName(''); setRest({ phase: 'idle' }); return; }
             const next = Number(event.target.value);
-            if (REST_DURATIONS.includes(next)) { setDuration(next); setExerciseName(''); setRest({ phase: 'idle' }); }
+            if (REST_DURATIONS.includes(next)) { setCustom(false); setDuration(next); setExerciseName(''); setRest({ phase: 'idle' }); }
           }}>
           {REST_DURATIONS.map(seconds => <option key={seconds} value={seconds}>{clock(seconds)}</option>)}
+          <option value="custom">Custom</option>
         </select>
       </div>
+      {custom && <fieldset disabled={counting || paused} className="flex flex-wrap gap-3">
+        <legend className="text-xs text-slate-400">Custom duration</legend>
+        <label className="text-xs text-slate-400">Minutes
+          <input aria-label="Custom minutes" type="number" inputMode="numeric" min="0" max="60" step="1" value={minutes}
+            aria-invalid={!validCustom} aria-describedby={`${id}-custom-help`}
+            onChange={event => { setMinutes(event.target.value); setRest({ phase: 'idle' }); }}
+            className="mt-1 block w-20 rounded-lg border border-white/10 bg-ink-950 px-3 py-2.5 text-sm text-white" />
+        </label>
+        <label className="text-xs text-slate-400">Seconds
+          <input aria-label="Custom seconds" type="number" inputMode="numeric" min="0" max="59" step="1" value={seconds}
+            aria-invalid={!validCustom} aria-describedby={`${id}-custom-help`}
+            onChange={event => { setSeconds(event.target.value); setRest({ phase: 'idle' }); }}
+            className="mt-1 block w-20 rounded-lg border border-white/10 bg-ink-950 px-3 py-2.5 text-sm text-white" />
+        </label>
+      </fieldset>}
       {counting ? <button type="button" className="btn-ghost" onClick={pause}>Pause timer</button>
-        : <button type="button" className="btn-primary" onClick={start}>{paused ? 'Resume timer' : 'Start rest timer'}</button>}
+        : <button type="button" className="btn-primary" disabled={!paused && custom && !validCustom} onClick={start}>{paused ? 'Resume timer' : 'Start rest timer'}</button>}
       {rest.phase !== 'idle' && <button type="button" className="btn-ghost" onClick={() => { armed.current = false; setRest({ phase: 'idle' }); }}>Reset timer</button>}
+    </div>
+    {custom && <p id={`${id}-custom-help`} role={validCustom ? undefined : 'alert'} className="mt-2 text-xs text-slate-400">
+      Enter whole minutes and seconds (0–59), totaling 1 second to 60 minutes. Select Start to begin.
+    </p>}
+    <div className="mt-3 flex flex-wrap gap-3">
+      <button type="button" className="btn-ghost" disabled={!counting} onClick={() => adjust(-15)}>-15 seconds</button>
+      <button type="button" className="btn-ghost" disabled={!counting} onClick={() => adjust(15)}>+15 seconds</button>
     </div>
     <label className="mt-4 flex items-center gap-3 text-sm text-slate-300">
       <input type="checkbox" checked={autoStart} onChange={event => setAutoStart(event.target.checked)} className="h-4 w-4 accent-accent" />

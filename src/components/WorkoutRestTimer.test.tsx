@@ -30,6 +30,20 @@ async function duration(seconds: number) {
     select!.dispatchEvent(new Event('change', { bubbles: true }));
   });
 }
+async function custom(minutes: string, seconds: string) {
+  const select = container.querySelector('select')!;
+  await act(async () => {
+    select.value = 'custom'; select.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  for (const [label, value] of [['Custom minutes', minutes], ['Custom seconds', seconds]]) {
+    const input = container.querySelector(`input[aria-label="${label}"]`);
+    expect(input, `Missing ${label}`).toBeTruthy();
+    await act(async () => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input, value);
+      input!.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  }
+}
 async function jump(ms: number, event: 'focus' | 'visibilitychange' = 'focus') {
   await act(async () => {
     vi.setSystemTime(ms);
@@ -185,4 +199,53 @@ it('does not alert when pause observes an already expired deadline', async () =>
   await duration(30); await click('Start rest timer');
   vi.setSystemTime(epoch + 31_000); await click('Pause timer');
   expect(oscillator.start).not.toHaveBeenCalled();
+});
+
+it('adjusts the current deadline with fractional elapsed time and preserves pause and reset', async () => {
+  expect(button('+15 seconds')?.disabled).toBe(true);
+  await duration(30); await click('Start rest timer');
+  vi.setSystemTime(epoch + 450); await click('+15 seconds');
+  expect(remaining()).toBe('0:45');
+  await jump(epoch + 1_100); expect(remaining()).toBe('0:44');
+  await click('-15 seconds'); expect(remaining()).toBe('0:29');
+  await click('Pause timer'); expect(button('+15 seconds')?.disabled).toBe(true);
+  await jump(epoch + 61_100); await click('Resume timer');
+  await jump(epoch + 90_000); expect(remaining()).toBe('0:00');
+  await click('Reset timer'); expect(remaining()).toBe('0:30');
+});
+it('completes a shortened rest once with opted-in alerts and cannot extend an unseen expired rest', async () => {
+  const { oscillator } = mockAudio();
+  await act(async () => checkbox('Sound on completion').click());
+  await duration(30); await click('Start rest timer');
+  await jump(epoch + 20_000); await click('-15 seconds');
+  expect(remaining()).toBe('0:00'); expect(oscillator.start).toHaveBeenCalledTimes(1);
+  expect(button('+15 seconds')?.disabled).toBe(true);
+  await click('Start rest timer');
+  vi.setSystemTime(epoch + 60_000); await click('+15 seconds');
+  expect(remaining()).toBe('0:00'); expect(oscillator.start).toHaveBeenCalledTimes(2);
+  await jump(epoch + 80_000); expect(oscillator.start).toHaveBeenCalledTimes(2);
+});
+it('starts custom minutes and seconds explicitly, keeps presets and resets custom choice on remount', async () => {
+  await custom('2', '13'); expect(remaining()).toBe('2:13'); expect(vi.getTimerCount()).toBe(0);
+  await click('Start rest timer'); await jump(epoch + 1_000); expect(remaining()).toBe('2:12');
+  await click('Reset timer'); expect(remaining()).toBe('2:13');
+  await duration(60); expect(remaining()).toBe('1:00');
+  await act(async () => root.render(null)); await act(async () => root.render(<WorkoutRestTimer />));
+  expect(remaining()).toBe('1:30');
+});
+it.each([['', '1'], ['1', ''], ['0', '0'], ['-1', '0'], ['0', '60'], ['60', '1'], ['1.5', '0'], ['61', '0']])(
+  'rejects invalid custom duration %s:%s without starting', async (minutes, seconds) => {
+    await custom(minutes, seconds);
+    expect(button('Start rest timer')?.disabled).toBe(true);
+    expect(remaining()).toBe('--:--');
+    expect(container.querySelector('[role=alert]')?.textContent).toContain('1 second to 60 minutes');
+    expect(vi.getTimerCount()).toBe(0);
+  },
+);
+it('supports one-second custom rests and caps extensions at sixty minutes', async () => {
+  await custom('0', '1'); await click('Start rest timer');
+  await jump(epoch + 1_000); expect(remaining()).toBe('0:00');
+  await custom('60', '0'); await click('Start rest timer'); await click('+15 seconds');
+  expect(remaining()).toBe('60:00');
+  await jump(epoch + 2_000); expect(remaining()).toBe('59:59');
 });
