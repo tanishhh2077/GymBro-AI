@@ -56,12 +56,7 @@ describe("theme contrast (WCAG 2.x, normal text needs 4.5:1)", () => {
           if (ratio < 4.5) below[`${text} on ${surface}`] = ratio;
         }
       }
-      // Known gap, reported rather than restyled: the dark "subtle" hint colour is
-      // 3.65-4.23:1. When it is lightened this list must shrink, so the test then
-      // fails and asks for the exception to be removed. It must never get worse.
-      const known = theme === "dark" ? surfaces.map((surface) => `subtle on ${surface}`) : [];
-      expect(Object.keys(below).sort()).toEqual([...known].sort());
-      for (const [pair, ratio] of Object.entries(below)) expect(ratio, pair).toBeGreaterThanOrEqual(3.5);
+      expect(below).toEqual({});
     });
 
     it(`${theme}: button text is readable on the accent colour`, () => {
