@@ -61,6 +61,6 @@ it('shows the other unit in small display-only text next to records', async () =
   await render();
   await open('Pull-up (lb)');
   expect(container.querySelector('[aria-label="Heaviest logged set"]')?.textContent).toContain('100 lb × 5 reps');
-  expect(container.querySelector('[aria-label="Heaviest logged set"] .text-xs')?.textContent).toBe('· 45.5 kg');
+  expect(container.querySelector('[aria-label="Heaviest logged set"] .text-xs')?.textContent).toBe('≈ 45.5 kg');
   expect(container.querySelector('table[aria-label="Workout progress history"]')?.textContent).toContain('45.5 kg');
 });

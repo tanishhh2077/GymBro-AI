@@ -5,5 +5,5 @@ import { weightParts } from './weightText';
 export function AlternateWeight({ weight, unit, bodyweight = false }: { weight: number; unit: WeightUnit; bodyweight?: boolean }) {
   const { alternate } = weightParts(weight, unit, bodyweight);
   if (!alternate) return null;
-  return <span className="ml-1 text-xs font-normal text-slate-500">· {alternate}</span>;
+  return <span className="ml-1 text-xs font-normal text-slate-500">≈ {alternate}</span>;
 }
