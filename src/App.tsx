@@ -156,7 +156,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
           onClearPending={() => setPendingLink(undefined)} onBackToSet={backToSet} />
       </Suspense></AnalysisBoundary>}
       {view === 'routines' && <WorkoutRoutines store={workouts} onStarted={() => navigate('workout')} onResume={() => navigate('workout')} />}
-      {view === 'progress' && <WorkoutProgress data={state.data} available={available} onHome={() => navigate('home')}
+      {view === 'progress' && <WorkoutProgress data={state.data} available={available} store={workouts} onHome={() => navigate('home')}
         onWorkout={() => navigate('workout')} onHistory={openHistory} />}
       {view === 'backup' && <WorkoutBackup store={workouts} onHome={() => navigate('home')} />}
       {view === 'account' && accountPanel}

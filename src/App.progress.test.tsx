@@ -144,3 +144,8 @@ it('shows reload recovery when saved progress becomes unavailable', async () => 
   await click('Reload saved workouts');
   expect(container.querySelector('svg[role="img"]')).not.toBeNull();
 });
+
+it('lets the running app add goals from Progress', async () => {
+  await render(); await click('View progress');
+  expect(button('Add goal')).toBeTruthy();
+});
