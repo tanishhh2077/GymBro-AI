@@ -81,12 +81,17 @@ export function buildExerciseLibrary(data: WorkoutData): readonly ExerciseOption
   return [...options.values()].sort((left, right) => left.name.localeCompare(right.name));
 }
 
-export function searchExerciseLibrary(library: readonly ExerciseOption[], query: string): readonly ExerciseOption[] {
+export const EXERCISE_EQUIPMENT = [...new Set(BUILT_IN_EXERCISES.map(exercise => exercise.equipment))].sort();
+
+export function searchExerciseLibrary(library: readonly ExerciseOption[], query: string, equipment = '', favorites: readonly string[] = []): readonly ExerciseOption[] {
   const normalized = query.trim().toLowerCase();
   const terms = normalized.split(/\s+/).filter(Boolean);
+  const favoriteNames = new Set(favorites);
   return library.filter(exercise => {
+    if (equipment && exercise.source === 'Built-in' && exercise.equipment !== equipment) return false;
     const text = [exercise.name, exercise.muscle, exercise.equipment, ...(exercise.aliases ?? [])].join(' ').toLowerCase();
     return terms.every(term => text.includes(term));
-  }).sort((left, right) => Number(right.name.toLowerCase() === normalized) - Number(left.name.toLowerCase() === normalized) ||
+  }).sort((left, right) => Number(favoriteNames.has(right.name)) - Number(favoriteNames.has(left.name)) ||
+    Number(right.name.toLowerCase() === normalized) - Number(left.name.toLowerCase() === normalized) ||
     left.name.localeCompare(right.name));
 }

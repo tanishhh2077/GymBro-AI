@@ -2,6 +2,17 @@ import { expect, it } from 'vitest';
 import { emptyWorkoutData } from './workouts';
 import { buildExerciseLibrary, searchExerciseLibrary } from './exerciseCatalog';
 
+it('filters built-in equipment, retains custom names and ranks matching favorites first', () => {
+  const data = { ...emptyWorkoutData(), routines: [{ id: 'routine', name: 'Plan', unit: 'kg' as const,
+    exercises: [{ id: 'one', name: 'Custom press' }] }] };
+  const library = buildExerciseLibrary(data);
+  const names = searchExerciseLibrary(library, 'press', 'Dumbbell', ['Incline dumbbell press', 'Bench press']).map(item => item.name);
+  expect(names[0]).toBe('Incline dumbbell press');
+  expect(names).toContain('Custom press');
+  expect(names).not.toContain('Bench press');
+  expect(searchExerciseLibrary(library, 'zzzz', 'Dumbbell', ['Bench press'])).toEqual([]);
+});
+
 it('searches equipment and muscle groups with case-insensitive words in any order', () => {
   const library = buildExerciseLibrary(emptyWorkoutData());
   const names = searchExerciseLibrary(library, ' DUMBBELL   chest ').map(exercise => exercise.name);
