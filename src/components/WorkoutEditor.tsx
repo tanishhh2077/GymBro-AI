@@ -176,6 +176,7 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
   const [editing, setEditing] = useState<string | null>(null);
   const [kind, setKind] = useState<SetKind>('regular');
   const [bodyweightError, setBodyweightError] = useState('');
+  const [pendingBodyweight, setPendingBodyweight] = useState<boolean | null>(null);
   // Values last saved or loaded into the entry form; typing away from them is unsaved input.
   const [base, setBase] = useState({ reps: '', weight: '', rpe: '' });
   const entryDirty = reps !== base.reps || weight !== base.weight || rpe !== base.rpe;
@@ -208,14 +209,17 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
       }}>Remove</button></div>
     <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-300">
       <label className="flex items-center gap-2" htmlFor={`${id}-bodyweight`}>
-        <input id={`${id}-bodyweight`} type="checkbox" checked={bodyweight} onChange={async event => {
-          setBodyweightError('');
-          const result = await state.setExerciseBodyweight(exercise.id, event.target.checked);
+        {/* Show the clicked state while saving; the stored value takes over once the save settles. */}
+        <input id={`${id}-bodyweight`} type="checkbox" checked={pendingBodyweight ?? bodyweight} onChange={async event => {
+          const on = event.target.checked;
+          setBodyweightError(''); setPendingBodyweight(on);
+          const result = await state.setExerciseBodyweight(exercise.id, on);
+          setPendingBodyweight(null);
           if (!result.ok) setBodyweightError(result.message);
         }} />Bodyweight exercise</label>
-      {onSelect && <label className="flex items-center gap-2" htmlFor={`${id}-select`}>
-        <input id={`${id}-select`} type="checkbox" checked={!!selected} onChange={event => onSelect(event.target.checked)} />
-        Select {exercise.name} for superset</label>}
+      {onSelect && <label className="flex min-w-0 items-center gap-2" htmlFor={`${id}-select`}>
+        <input id={`${id}-select`} type="checkbox" className="shrink-0" checked={!!selected} onChange={event => onSelect(event.target.checked)} />
+        <span className="min-w-0 [overflow-wrap:anywhere]">Select {exercise.name} for superset</span></label>}
     </div>
     {bodyweightError && <p className="mb-4 text-sm text-warn">{bodyweightError}</p>}
     {count > 1 && <div className="mb-4 flex flex-wrap gap-2">
