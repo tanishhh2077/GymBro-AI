@@ -1,8 +1,17 @@
 import { useId } from 'react';
 import type { RecordedSet } from '@/types/progress';
 import type { WeightUnit } from '@/types/workout';
+import { formatWeight } from '@/core/weightDisplay';
 
 const axisNumber = new Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 });
+
+function tickAlternate(weight: number, unit: WeightUnit, bodyweight: boolean): string {
+  const other: WeightUnit = unit === 'kg' ? 'lb' : 'kg';
+  if (bodyweight && weight === 0) return `0 ${other}`;
+  const full = formatWeight(weight, unit, { bodyweight, alternate: true });
+  const alt = full.split(' · ')[1]?.replace(/ assist$/, '');
+  return alt ?? `0 ${other}`;
+}
 
 export function WorkoutProgressChart({ workouts, unit, bodyweight = false }: {
   workouts: readonly RecordedSet[];
@@ -35,10 +44,15 @@ export function WorkoutProgressChart({ workouts, unit, bodyweight = false }: {
     <p className="mt-1 text-sm text-slate-400">Each point is one completed workout, evenly spaced in finish order.</p>
     <p className="mb-3 mt-3 text-xs text-slate-400">{bodyweight ? `Added weight (${unit}); negative values are assistance` : `Logged weight (${unit})`}</p>
     <div className="flex items-start gap-3">
-      <div aria-hidden="true" className="relative h-44 w-14 shrink-0 text-right text-xs tabular-nums text-slate-400">
-        {ticks.map(tick => <span key={tick.position} className="absolute right-0 -translate-y-1/2" style={{ top: `${tick.position}%` }}>
-          {bodyweight && tick.value !== 0 ? `${tick.value > 0 ? '+' : '−'}${axisNumber.format(Math.abs(tick.value))}` : axisNumber.format(tick.value)}
-        </span>)}
+      <div aria-hidden="true" className="relative h-44 w-16 shrink-0 text-right text-xs tabular-nums text-slate-400">
+        {ticks.map(tick => {
+          const primary = bodyweight && tick.value !== 0 ? `${tick.value > 0 ? '+' : '−'}${axisNumber.format(Math.abs(tick.value))}` : axisNumber.format(tick.value);
+          const alternate = tickAlternate(tick.value, unit, bodyweight);
+          return <span key={tick.position} className="absolute right-0 -translate-y-1/2 leading-tight" style={{ top: `${tick.position}%` }}>
+            <span className="block">{primary}</span>
+            <span className="block text-[10px] text-slate-500 whitespace-nowrap">≈ {alternate}</span>
+          </span>;
+        })}
       </div>
       <div className="min-w-0 flex-1">
         <svg role="img" aria-labelledby={`${id}-title`} aria-describedby={`${id}-description`}
