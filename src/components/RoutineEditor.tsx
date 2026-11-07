@@ -105,7 +105,7 @@ export function RoutineEditor({ store, routine, expectedRevision, onClose }: {
           <input id={`${id}-${row.key}-reps`} type="number" inputMode="numeric" min={1} max={1000} step={1} placeholder="Optional"
             className={inputClass} value={row.reps} onChange={e => change(row.key, 'reps', e.target.value)} /></div>
         <div className="col-span-2"><label htmlFor={`${id}-${row.key}-weight`} className="text-xs text-slate-400">Target {row.bodyweight ? 'added weight' : 'weight'} for exercise {index + 1} ({unit})</label>
-          <input id={`${id}-${row.key}-weight`} type="number" inputMode="decimal" min={0} max={10000} step="any" placeholder="Optional"
+          <input id={`${id}-${row.key}-weight`} type="number" inputMode="decimal" min={row.bodyweight ? -1000 : 0} max={10000} step="any" placeholder="Optional"
             className={inputClass} value={row.weight} onChange={e => change(row.key, 'weight', e.target.value)} /></div>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -151,7 +151,7 @@ export function RoutineEditor({ store, routine, expectedRevision, onClose }: {
           const key = `draft:${++sequence.current}`; setRows(current => [...current, blankRow(key)]);
         }}>Add routine exercise</button>
         <div className="flex flex-wrap items-center gap-3"><button type="submit" className="btn-primary" disabled={!rows.length}>Save routine</button>
-          <span className="text-xs text-slate-500">Targets: 1–100 sets, 1–1000 reps, 0–10000 {unit}, or leave blank.</span></div>
+          <span className="text-xs text-slate-500">Targets: 1–100 sets, 1–1000 reps, 0–10000 {unit} (−1000 to 10000 added weight for bodyweight exercises, negative for assistance), or leave blank.</span></div>
       </fieldset>
     </form>
     <button type="button" className="text-sm text-slate-400 underline underline-offset-4" disabled={state.busy} onClick={() => { if (confirmDiscard(dirty)) onClose(false); }}>Cancel routine edit</button>

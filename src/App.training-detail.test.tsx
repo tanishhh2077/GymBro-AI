@@ -172,3 +172,18 @@ it('saves routine supersets and bodyweight, keeps them through an edit and start
   expect(container.querySelector('[role="group"][aria-label="Superset A"]')).toBeTruthy();
   expect((field('Bodyweight exercise', section('Pull-up')) as HTMLInputElement).checked).toBe(true);
 });
+
+it('accepts a negative target added weight only for bodyweight routine exercises and shows it as assistance', async () => {
+  await render(); await click('Routines'); await click('New routine');
+  await fill('Routine name', 'Assisted'); await fill('Routine weight unit', 'kg');
+  await fill('Exercise 1 name', 'Pull-up');
+  expect(field('Target weight for exercise 1 (kg)')).toMatchObject({ min: '0' });
+  await check('Bodyweight exercise for exercise 1');
+  expect(field('Target added weight for exercise 1 (kg)')).toMatchObject({ min: '-1000' });
+  await fill('Target added weight for exercise 1 (kg)', '-20');
+  await act(async () => { container.querySelector('form[aria-label="Save routine"]')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); await idle(); });
+  expect(store.getState().data.routines![0].exercises[0]).toMatchObject({ bodyweight: true, targetWeight: -20 });
+  expect(container.textContent).toContain('−20 kg assist');
+  await click('Start routine Assisted');
+  expect(section('Pull-up').textContent).toContain('Planned target: −20 kg assist.');
+});
