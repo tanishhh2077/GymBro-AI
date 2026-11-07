@@ -1,0 +1,45 @@
+import { act } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { BackupReminder } from './BackupReminder';
+import { readReminder, saveReminder, WEEK, DAY } from '@/core/localUtilities';
+(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+let root: Root, host: HTMLDivElement;
+beforeEach(() => { localStorage.clear(); host = document.createElement('div'); document.body.append(host); root = createRoot(host); vi.useFakeTimers(); vi.setSystemTime(100000); });
+afterEach(async () => { await act(async () => root.unmount()); host.remove(); vi.useRealTimers(); });
+const button = (name: string) => [...host.querySelectorAll('button')].find(b => b.textContent === name)!;
+it('opts in with first due in a week, then snoozes one day', async () => {
+  await act(async () => root.render(<BackupReminder blocked={false} onBackup={async () => true} />));
+  expect(host.querySelector('input')!.checked).toBe(false);
+  await act(async () => host.querySelector('input')!.click());
+  expect(readReminder().value.nextDue).toBe(100000 + WEEK);
+  await act(async () => vi.advanceTimersByTime(WEEK));
+  expect(button('Back up now')).toBeTruthy();
+  await act(async () => button('Snooze 1 day').click());
+  expect(readReminder().value.nextDue).toBe(Date.now() + DAY);
+});
+it('guards repeated export and keeps failed requests due', async () => {
+  saveReminder({ enabled: true, nextDue: 0 });
+  let finish!: (success: boolean) => void;
+  const exportFile = vi.fn(() => new Promise<boolean>(resolve => { finish = resolve; }));
+  await act(async () => root.render(<BackupReminder blocked={false} onBackup={exportFile} />));
+  await act(async () => { button('Back up now').click(); button('Back up now').click(); });
+  expect(exportFile).toHaveBeenCalledTimes(1);
+  await act(async () => finish(false));
+  expect(button('Back up now')).toBeTruthy();
+  await act(async () => button('Dismiss for 1 week').click());
+  expect(readReminder().value.nextDue).toBe(Date.now() + WEEK);
+});
+it('respects disabled export and postpones only after a request succeeds', async () => {
+  saveReminder({ enabled: true, nextDue: 0 });
+  const exportFile = vi.fn(async () => true);
+  await act(async () => root.render(<BackupReminder blocked onBackup={exportFile} />));
+  expect(button('Back up now').disabled).toBe(true);
+  await act(async () => root.render(<BackupReminder blocked={false} onBackup={exportFile} />));
+  await act(async () => button('Back up now').click());
+  expect(exportFile).toHaveBeenCalledTimes(1);
+  expect(readReminder().value.nextDue).toBe(Date.now() + WEEK);
+  expect(button('Back up now')).toBeUndefined();
+  await act(async () => host.querySelector('input')!.click());
+  expect(readReminder().value).toEqual({ enabled: false, nextDue: null });
+});

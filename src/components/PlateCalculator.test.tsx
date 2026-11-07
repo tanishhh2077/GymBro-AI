@@ -71,3 +71,13 @@ it('is integrated without modifying workout records or logging a set', async () 
   expect(JSON.stringify(store.getState().data)).toBe(before);
   expect(await repository.load()).toEqual(store.getState().data);
 });
+it('saves and explicitly loads equipment while preserving the target draft', async () => {
+  localStorage.clear(); await render();
+  await input('Equipment profile name', 'Garage');
+  await input('Bar weight (lb)', '35');
+  await act(async () => [...container.querySelectorAll('button')].find(b => b.textContent === 'Save equipment profile')!.click());
+  await input('Bar weight (lb)', '45'); await input('Total target weight (lb)', '135');
+  await act(async () => [...container.querySelectorAll('button')].find(b => b.textContent === 'Load Garage')!.click());
+  expect([...container.querySelectorAll('input')].find(i => i.labels?.[0]?.textContent === 'Bar weight (lb)')!.value).toBe('35');
+  expect([...container.querySelectorAll('input')].find(i => i.labels?.[0]?.textContent === 'Total target weight (lb)')!.value).toBe('135');
+});

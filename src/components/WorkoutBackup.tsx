@@ -7,6 +7,8 @@ import { saveWorkoutBackup, saveWorkoutCsv } from '@/mobile/workoutBackupExport'
 import type { WorkoutStore } from '@/store/useWorkoutStore';
 import type { WorkoutData } from '@/types/workout';
 
+import { BackupReminder } from './BackupReminder';
+
 interface Preview { backup: BackupFile; source: WorkoutData; merge: BackupMerge; filename: string }
 
 export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: () => void }) {
@@ -18,6 +20,7 @@ export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: 
   const [notice, setNotice] = useState('');
   const reader = useRef<AbortController | null>(null);
   const mounted = useRef(false);
+  const exportPending = useRef(false);
   const available = state.loaded && !state.needsReload;
   const blocked = !available || state.busy || reading || exporting;
 
@@ -59,7 +62,8 @@ export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: 
   }
 
   async function exportRecords(format: 'json' | 'csv' = 'json') {
-    if (blocked) return;
+    if (blocked || exportPending.current) return false;
+    exportPending.current = true;
     setExporting(true); setError(''); setNotice('');
     try {
       const data = store.getState().data;
@@ -71,10 +75,12 @@ export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: 
           share: 'Backup share sheet closed. Keep your saved file for recovery.' },
       };
       if (mounted.current) setNotice(notices[format][mode]);
+      return true;
     } catch (failure) {
       if (mounted.current) setError(failure instanceof WorkoutError ? failure.message :
         `${format === 'csv' ? 'CSV' : 'Backup'} export was not confirmed. Try again when ready.`);
-    } finally { if (mounted.current) setExporting(false); }
+      return false;
+    } finally { exportPending.current = false; if (mounted.current) setExporting(false); }
   }
 
   async function restore() {
@@ -94,6 +100,7 @@ export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: 
       <h1 className="text-3xl font-bold text-white">Backup and restore</h1>
       <p className="mt-2 text-sm text-slate-400">Keep a recovery copy of your workouts and routines.</p>
     </div>
+    <BackupReminder blocked={blocked} onBackup={() => exportRecords()} />
     {!available && <p className="text-slate-400">Reload saved workouts to use backup and restore.</p>}
     <section aria-labelledby="backup-export-title" className="card space-y-3 p-4 sm:p-5">
       <h2 id="backup-export-title" className="text-lg font-semibold text-white">Save a backup</h2>
