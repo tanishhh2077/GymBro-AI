@@ -41,11 +41,21 @@ and brief reason.
 | 31. Routine target weights | A: optional target weight per exercise, separate from actual results |
 | 32. Training consistency | A: weekly completed-workout counts for the last 12 weeks |
 | 33. Workout names | A: suggest previous names while allowing custom names |
+| 34. Effort per set | A: optional RPE 1–10 per set |
+| 35. Supersets | A: group adjacent exercises as a superset |
+| 36. Bodyweight exercises | A: optional weight; added or assisted load |
+| 37. Progress goals | A: optional goal per exercise, progress from actual sets |
+| 38. Rep counting from video | A: not yet; validate on the user's own videos first |
+| 39. First-run onboarding | A: short skippable three-screen intro |
+| 40. Unit display | A: converted unit shown beside weights, display only |
+| 41. Health app export | A: not now; revisit after the phone session |
 
 Q20–Q25 were accepted together with an explicit instruction to build all
 recommended options. Tasks32–37 implement them under D-051–D-056.
 Q26–Q33 are implemented as Tasks38–45 under D-057.
-Questions can resume at Q34.
+Q34–Q41 were accepted with "start with recommended" (D-058); Q34–Q37, Q39 and
+Q40 are implemented as Tasks46–51. Q38 and Q41 are deferred. Questions can
+resume at Q42.
 
 Q17–Q19 were accepted together. Tasks27–29 integrate their three separate agent
 branches under D-046–D-048. Questions can resume at Q20.

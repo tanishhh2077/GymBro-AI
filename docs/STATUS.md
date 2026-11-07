@@ -10,6 +10,25 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Tasks46–51 (Q34–Q37, Q39, Q40; D-058) are complete. Claude Code (Opus 5.5) ran
+five agent branches: schema5 storage, first-run intro, workout editor UI and
+Progress/goals UI, combined on `chore/integrate-q34-q41`.
+
+- A fresh schema5 storage review found no Blocker/High. Fixed: duplicate goals
+  blocking restore/sync, goal conflicts hidden in the sync screen, bodyweight
+  entries mixing in history/previous values/volume, routine edits dropping
+  supersets/bodyweight, and assisted routine targets.
+- Integration fixes: Progress received no store (goals read-only), the
+  bodyweight checkbox reverted on click until saved, a superset label widened
+  the page at 390 px, and two converted-unit styles were unified.
+- Combined result under Node 22.23.2: 990 tests / 83 files with four workers;
+  lint; build (518 modules); native sync (16 files per platform); database tests
+  on PostgreSQL 17.11; all 40 Chromium cases (existing exact weight checks now
+  match the logged value as a prefix).
+- Limits: Supabase needs four migrations; live sync, iPhone behaviour and native
+  compilation remain unverified.
+
+
 Tasks38–45 (Q26–Q33, D-057) are complete. Claude Code (Opus 5.5) ran three
 parallel agents: storage (`feat/notes-target-weight-storage`), Progress insights
 (`feat/training-insights`) and editing screens (`feat/workout-editing-ui`, built

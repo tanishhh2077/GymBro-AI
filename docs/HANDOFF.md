@@ -5,41 +5,34 @@ Follow D-024/D-036. Detailed evidence is in [STATUS.md](STATUS.md).
 
 ## Completed approved batch
 
-Tasks38–45 implement all eight Q26–Q33 choices under D-057 (Claude Code, Opus 5.5,
-three parallel agents with separate file ownership, then one integration branch).
-- Workout notes (Q26): one optional note per workout, editable during and after
-  training, shown in history and the summary.
-- Reorder (Q27): Move up/down for active exercises; logged sets stay with them.
-- Repeat (Q28): a finished workout starts a fresh one with the same exercises
-  and targets, zero sets; previous-value hints appear automatically.
-- Exercise detail (Q29): Progress opens per exact name and unit records, chart and
-  completed-workout history.
-- Unsaved changes (Q30): changed forms ask "Discard unsaved changes?" before
-  navigation, Cancel or reload; unchanged and saved forms never ask.
-- Target weight (Q31): optional planned load per routine exercise, copied into
-  started workouts and shown apart from logged sets; never counted as actual work.
-- Weekly consistency (Q32): completed workouts per Sunday–Saturday local week for
-  the last 12 weeks on Progress.
-- Name suggestions (Q33): previous workout names offered, custom names allowed.
+Tasks46–51 implement Q34–Q37, Q39 and Q40 under D-058 (Claude Code, Opus 5.5;
+five agent branches with separate file ownership, one integration branch).
+- RPE (Q34): optional 1–10 effort per set; never changes records or volume.
+- Supersets (Q35): group adjacent exercises; moves keep a group together.
+- Bodyweight (Q36): weight is added load, negative for assistance; records,
+  history and previous values keep bodyweight and loaded entries apart.
+- Goals (Q37): one goal per exercise, unit and bodyweight setting, with progress
+  from actual Regular sets only.
+- First-run intro (Q39): three skippable screens; "Show intro again" on Home.
+- Unit display (Q40): converted weight shown as "≈ …", display only.
+Q38 rep counting and Q41 health export are deferred (see D-058).
 
-Storage is schema4 (notes, target weights). Versions 1–3 still read with only an
-in-memory version change; backup conflict checks and sync include the new fields.
-A fresh storage review found no Blocker/High; its findings are fixed (routine
-target weights kept on edit, conflict cards show notes/targets, revision-checked
-note saves, CRLF normalised, unpaired surrogates rejected). Combined checks: 900
-tests/74 files with four workers, lint, build, native sync (16 files per
-platform) and all 37 Chromium cases (three specs now accept the new discard
-prompt). **Supabase needs the third migration** `202611070001_notes_target_weight.sql`
-before sync: updated clients save schema4. Phone behaviour remains unverified.
+Storage is schema5. Fresh storage reviews of schema4 and schema5 found no
+Blocker/High; their findings are fixed. Combined checks: 990 tests/83 files
+with four workers, lint, build, native sync (16 files per platform), database
+tests and all 40 Chromium cases. **Supabase needs all four migrations in
+order** before sync; updated clients save schema5. Phone behaviour unverified.
 
 ## Next work
 
-No approved feature is pending. Q&A resumes at Q34 when the user asks. Preserve
-all worker branches/checkouts and the incomplete Task4 branch. Use isolated
-ownership, one browser suite on 4179 and previews on 4183, and assign
-task/decision numbers at integration.
+No approved feature is pending. Q&A resumes at Q42 when the user asks. Q38 needs
+the user present with their private bench videos (kept outside the repository).
+Backlog: removing one member of a two-exercise superset drops the other's unsaved
+set entry without a prompt; goal edits refuse after any other save while open.
+Preserve all worker branches/checkouts and the incomplete Task4 branch; use
+isolated ownership, one browser suite on 4179 and assign numbers at integration.
 
-Supabase still needs user dashboard setup, all three migrations and email-code
+Supabase still needs user dashboard setup, all four migrations and email-code
 configuration in [the guide](../supabase/README.md). Live email and real
 cross-device sync remain unverified. Phone/media work requires user presence.
 

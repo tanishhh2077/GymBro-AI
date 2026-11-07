@@ -750,6 +750,23 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   sequence shared storage changes and obtain fresh review of persistence changes.
   No additional phone/account/service setup is implied.
 
+### D-058 Training detail, goals and onboarding
+
+- On 2026-11-07 the user accepted all recommended Q34–Q41 options with "start
+  with recommended". Claude Code implemented Q34–Q37, Q39 and Q40 as Tasks46–51.
+- Schema5 adds set RPE (1–10 in 0.5 steps), superset groups of two or more
+  adjacent exercises, bodyweight exercises whose weight is added load (−1000 to
+  10000, negative for assistance) and library goals unique per exercise name,
+  unit and bodyweight setting. Versions 1–4 stay readable without writes.
+  Backup restores skip a duplicate goal for an exercise instead of failing;
+  sync turns two devices' goals for one exercise into a choice. A fourth
+  Supabase migration accepts schema5.
+- Goal progress, records and volume use only actual logged Regular sets;
+  bodyweight sets are left out of load volume. Converted units are display
+  only. The intro preference is device-local and separate from workout data.
+- Q38 (video rep counting) waits for validation on the user's own private
+  videos, with the user present; Q41 (health export) waits for the phone session.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
