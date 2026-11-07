@@ -1,5 +1,6 @@
 import { useId, useMemo, useState, type FormEvent } from 'react';
 import { useStore } from 'zustand';
+import { buildExerciseLibrary } from '@/core/exerciseCatalog';
 import { goalProgress, type GoalProgress } from '@/core/goalProgress';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
 import type { WeightUnit, WorkoutData, WorkoutGoal, WorkoutGoalInput } from '@/types/workout';
@@ -18,6 +19,14 @@ interface Editing { id: string | null; revision: number; draft: Draft }
 
 function draftOf(goal: WorkoutGoal): Draft {
   return { name: goal.name, unit: goal.unit, bodyweight: goal.bodyweight === true, weight: String(goal.weight), reps: String(goal.reps) };
+}
+function exerciseSuggestions(data: WorkoutData): readonly string[] {
+  const library = buildExerciseLibrary(data);
+  const names = new Set(library.map(e => e.name));
+  for (const goal of data.goals ?? []) {
+    names.add(goal.name);
+  }
+  return [...names].sort((a, b) => a.localeCompare(b));
 }
 // Blank fields become NaN so the store rejects them with its own message instead of saving zero.
 const numeric = (value: string) => value.trim() === '' ? Number.NaN : Number(value);
@@ -102,6 +111,8 @@ function GoalForm({ store, editing, onReopen, onClose }: {
 }) {
   const state = useStore(store);
   const id = useId();
+  const listId = `${id}-exercise-suggestions`;
+  const suggestions = useMemo(() => exerciseSuggestions(state.data), [state.data]);
   const [draft, setDraft] = useState(editing.draft);
   const [error, setError] = useState('');
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(editing.draft), [draft, editing.draft]);
@@ -125,7 +136,9 @@ function GoalForm({ store, editing, onReopen, onClose }: {
     <fieldset disabled={disabled} className="min-w-0 space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div><label htmlFor={`${id}-name`} className="text-sm text-slate-300">Exercise name</label>
-          <input id={`${id}-name`} required maxLength={80} className={inputClass} value={draft.name} onChange={e => change('name', e.target.value)} /></div>
+          <input id={`${id}-name`} required maxLength={80} className={inputClass} value={draft.name} onChange={e => change('name', e.target.value)}
+            list={suggestions.length ? listId : undefined} autoComplete="off" />
+          {suggestions.length > 0 && <datalist id={listId}>{suggestions.map(name => <option key={name} value={name} />)}</datalist>}</div>
         <div><label htmlFor={`${id}-unit`} className="text-sm text-slate-300">Weight unit</label>
           <select id={`${id}-unit`} className={inputClass} value={draft.unit} onChange={e => change('unit', e.target.value)}>
             <option value="lb">Pounds (lb)</option><option value="kg">Kilograms (kg)</option>
