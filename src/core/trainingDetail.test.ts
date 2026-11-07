@@ -131,7 +131,8 @@ it('round-trips every schema5 field through backup and treats field-only differe
     const edited = clone(data) as unknown as Loose; change(edited);
     expect(() => mergeWorkoutBackup(validateWorkoutData(JSON.parse(JSON.stringify(edited))), backup)).toThrow(/conflict/i);
   }
-  expect(() => mergeWorkoutBackup(library({ goals: [goal({ id: 'mine' })] }), backup)).toThrow(/two goals for "Pull-up"/);
+  // A goal for the same exercise is skipped rather than refusing the whole restore.
+  expect(mergeWorkoutBackup(library({ goals: [goal({ id: 'mine' })] }), backup)).toMatchObject({ skippedGoals: 1, addedGoals: 0 });
 });
 it('adds backup goals to a library without goals and still restores schema4 backups', () => {
   const backup = parseWorkoutBackup(createWorkoutBackup(library({ goals: [goal()] }), 1));
@@ -156,7 +157,35 @@ it('merges goals through sync as records and exposes concurrent goal edits', () 
   const rpe = clone(base) as unknown as Loose; (((rpe.history as unknown as Loose[])[0].exercises as unknown as Loose[])[0].sets as unknown as Loose[])[0].rpe = 6;
   expect(mergeWorkoutSync(base, rpe as unknown as WorkoutData, clone(base) as WorkoutData).data.history[0].exercises[0].sets[0].rpe).toBe(6);
 });
-it('explains goals for the same exercise created on two devices', () => {
-  expect(() => mergeWorkoutSync(library(), library({ goals: [goal({ id: 'one' })] }), library({ goals: [goal({ id: 'two' })] })))
-    .toThrow(/Two goals for "Pull-up" \(kg, bodyweight\)/);
+it('offers a choice when two devices created goals for the same exercise', () => {
+  const device = library({ goals: [goal({ id: 'one', weight: 10 })] });
+  const cloud = library({ goals: [goal({ id: 'two', weight: 20 })] });
+  const open = mergeWorkoutSync(library(), device, cloud);
+  expect(open.goalConflicts).toEqual([{ key: 'goal-key/["Pull-up","kg",true]', name: 'Pull-up',
+    device: device.goals![0], cloud: cloud.goals![0] }]);
+  const keepCloud = mergeWorkoutSync(library(), device, cloud, { 'goal-key/["Pull-up","kg",true]': 'cloud' });
+  expect(keepCloud.goalConflicts).toEqual([]);
+  expect(keepCloud.data.goals).toEqual([cloud.goals![0]]);
+  const keepDevice = mergeWorkoutSync(library(), device, cloud, { 'goal-key/["Pull-up","kg",true]': 'device' });
+  expect(keepDevice.data.goals).toEqual([device.goals![0]]);
+});
+
+it('skips a backup goal for an exercise that already has a goal instead of refusing the restore', () => {
+  const current = library({ goals: [goal({ id: 'mine', weight: 10 })] });
+  const backup = parseWorkoutBackup(createWorkoutBackup(library({ history: [workout()], goals: [goal({ id: 'theirs', weight: 30 })] }), 1));
+  const merged = mergeWorkoutBackup(current, backup);
+  expect(merged.data.goals).toEqual(current.goals);
+  expect(merged.data.history).toHaveLength(1);
+  expect(merged).toMatchObject({ addedWorkouts: 1, addedGoals: 0, skippedGoals: 1 });
+});
+
+it('allows an assisted (negative) target weight only on a bodyweight routine exercise', () => {
+  const assisted = library({ routines: [{ id: 'r', name: 'Pull', unit: 'kg', exercises: [
+    { id: 'e', name: 'Pull-up', bodyweight: true, targetWeight: -20 }] }] });
+  expect(validateWorkoutData(assisted).routines![0].exercises[0].targetWeight).toBe(-20);
+  const plain = library({ routines: [{ id: 'r', name: 'Pull', unit: 'kg', exercises: [{ id: 'e', name: 'Row', targetWeight: -20 }] }] });
+  expect(() => validateWorkoutData(plain)).toThrow(/target weight from 0 to 10000/);
+  const tooLow = library({ routines: [{ id: 'r', name: 'Pull', unit: 'kg', exercises: [
+    { id: 'e', name: 'Pull-up', bodyweight: true, targetWeight: -1001 }] }] });
+  expect(() => validateWorkoutData(tooLow)).toThrow(/-1000 to 10000/);
 });

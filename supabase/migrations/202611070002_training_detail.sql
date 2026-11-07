@@ -122,7 +122,9 @@ begin
     if value ? 'superset' and not public.gymbro_id(value->'superset') then return false; end if;
     if value ? 'bodyweight' and value->'bodyweight' <> 'true'::jsonb then return false; end if;
     if value ? 'targetSets' and (not public.gymbro_number(value->'targetSets', 100) or (value->>'targetSets')::numeric < 1) then return false; end if;
-    if value ? 'targetWeight' and not public.gymbro_number(value->'targetWeight', 10000, false) then return false; end if;
+    -- A bodyweight target is added load; negative values plan assistance down to -1000.
+    if value ? 'targetWeight' and value ? 'bodyweight' and (jsonb_typeof(value->'targetWeight') <> 'number' or (value->>'targetWeight')::numeric not between -1000 and 10000) then return false; end if;
+    if value ? 'targetWeight' and not (value ? 'bodyweight') and not public.gymbro_number(value->'targetWeight', 10000, false) then return false; end if;
     if value ? 'targetReps' and (not public.gymbro_number(value->'targetReps', 1000) or (value->>'targetReps')::numeric < 1) then return false; end if;
     if kind = 'exercise' then
       if jsonb_typeof(value->'sets') <> 'array' or jsonb_array_length(value->'sets') > 100
