@@ -78,16 +78,23 @@ export function mergeWorkoutSync(base: WorkoutData, device: WorkoutData, cloud: 
   const workouts = (data: WorkoutData) => [...data.history, ...(data.active ? [data.active] : [])];
   const merged = records('workout', workouts(base), workouts(device), workouts(cloud), item => conflicts.push(item));
   const routines = records('routine', base.routines ?? [], device.routines ?? [], cloud.routines ?? [], item => conflicts.push(item));
-  const goals = records('goal', base.goals ?? [], device.goals ?? [], cloud.goals ?? [], item => goalConflicts.push(item));
-  const goalKeys = new Map<string, string>();
-  for (const goal of goals) {
-    const key = JSON.stringify([goal.name, goal.unit, goal.bodyweight === true]), other = goalKeys.get(key);
-    // Separate IDs for one exercise mean each device created its own goal; merging cannot pick one silently.
-    if (other !== undefined && other !== goal.id) {
-      throw new WorkoutError('conflict', `Two goals for "${goal.name}" (${goal.unit}${goal.bodyweight ? ', bodyweight' : ''}) were created on different devices. ` +
-        'Delete one of them on this device, then preview sync again.');
-    }
-    goalKeys.set(key, goal.id);
+  const mergedGoals = records('goal', base.goals ?? [], device.goals ?? [], cloud.goals ?? [], item => goalConflicts.push(item));
+  // Two goals with different IDs for one exercise mean each device created its own;
+  // the user chooses one under the key `goal-key/<[name, unit, bodyweight]>`.
+  const byKey = new Map<string, WorkoutGoal[]>();
+  for (const goal of mergedGoals) {
+    const key = JSON.stringify([goal.name, goal.unit, goal.bodyweight === true]);
+    byKey.set(key, [...(byKey.get(key) ?? []), goal]);
+  }
+  const deviceIds = new Set((device.goals ?? []).map(goal => goal.id));
+  const goals: WorkoutGoal[] = [];
+  for (const [key, group] of byKey) {
+    if (group.length === 1) { goals.push(group[0]); continue; }
+    const mine = group.find(goal => deviceIds.has(goal.id)) ?? group[0];
+    const theirs = group.find(goal => goal !== mine)!;
+    const choiceKey = `goal-key/${key}`;
+    if (!choices[choiceKey]) goalConflicts.push({ key: choiceKey, name: mine.name, device: mine, cloud: theirs });
+    goals.push(choices[choiceKey] === 'cloud' ? theirs : mine);
   }
   const active = merged.filter(value => value.finishedAt === null);
   if (active.length > 1) throw new WorkoutError('conflict', 'There are two different active workouts. Finish one on its device, then preview sync again.');

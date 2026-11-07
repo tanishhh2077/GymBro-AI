@@ -14,6 +14,8 @@ export interface BackupMerge {
   readonly addedWorkouts: number;
   readonly addedRoutines: number;
   readonly addedGoals: number;
+  /** Incoming goals dropped because this library already has a goal for that exercise. */
+  readonly skippedGoals: number;
   readonly addedActive: boolean;
   readonly duplicates: number;
 }
@@ -75,17 +77,22 @@ export function mergeWorkoutBackup(current: WorkoutData, backup: WorkoutBackup):
     [...destination.history, ...(destination.active ? [destination.active] : [])],
     [...incoming.history, ...(incoming.active ? [incoming.active] : [])], 'workout');
   const routines = mergeRecords(destination.routines ?? [], incoming.routines ?? [], 'routine');
-  const goals = mergeRecords(destination.goals ?? [], incoming.goals ?? [], 'goal');
+  // One goal per exercise: keep the destination's goal and report skipped incoming ones.
+  const goalKey = (goal: WorkoutGoal) => JSON.stringify([goal.name, goal.unit, goal.bodyweight === true]);
+  const ownKeys = new Map((destination.goals ?? []).map(goal => [goalKey(goal), goal.id]));
+  const incomingGoals = (incoming.goals ?? []).filter(goal => (ownKeys.get(goalKey(goal)) ?? goal.id) === goal.id);
+  const skippedGoals = (incoming.goals?.length ?? 0) - incomingGoals.length;
+  const goals = mergeRecords(destination.goals ?? [], incomingGoals, 'goal');
   const active = workouts.find(item => item.finishedAt === null) ?? null;
   const history = workouts.filter(item => item.finishedAt !== null);
   const addedWorkouts = history.length - destination.history.length;
   const addedRoutines = routines.length - (destination.routines?.length ?? 0);
   const addedGoals = goals.length - (destination.goals?.length ?? 0);
   const addedActive = destination.active === null && active !== null;
-  const duplicates = incoming.history.length + (incoming.routines?.length ?? 0) + (incoming.goals?.length ?? 0) +
+  const duplicates = incoming.history.length + (incoming.routines?.length ?? 0) + incomingGoals.length +
     Number(incoming.active !== null) - addedWorkouts - addedRoutines - addedGoals - Number(addedActive);
   const data = addedWorkouts || addedRoutines || addedGoals || addedActive ? validateWorkoutData({
     ...destination, active, history, ...(routines.length ? { routines } : {}), ...(goals.length ? { goals } : {}),
   }) : destination;
-  return { data, addedWorkouts, addedRoutines, addedGoals, addedActive, duplicates };
+  return { data, addedWorkouts, addedRoutines, addedGoals, skippedGoals, addedActive, duplicates };
 }
