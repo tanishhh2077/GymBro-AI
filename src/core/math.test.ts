@@ -34,6 +34,21 @@ describe('vector operations', () => {
       expect(sub(a, zero)).toEqual(a);
       expect(sub(zero, a)).toEqual({ x: 1, y: -2, z: 3 });
     });
+
+    it('propagates NaN and handles infinite coordinates', () => {
+      const a = { x: NaN, y: 1, z: 2 };
+      const b = { x: 3, y: 4, z: 5 };
+      const result = sub(a, b);
+      expect(result.x).toBeNaN();
+      expect(result.y).toBe(-3);
+      expect(result.z).toBe(-3);
+
+      const inf = { x: Infinity, y: 0, z: -Infinity };
+      const diff = sub(inf, { x: 1, y: 0, z: 1 });
+      expect(diff.x).toBe(Infinity);
+      expect(diff.y).toBe(0);
+      expect(diff.z).toBe(-Infinity);
+    });
   });
 
   describe('dot', () => {
@@ -57,11 +72,17 @@ describe('vector operations', () => {
       // 1*4 + 2*(-5) + 3*6 = 4 - 10 + 18 = 12
       expect(dot(a, b)).toBe(12);
     });
+
+    it('returns NaN if any coordinate is NaN and handles Infinity', () => {
+      expect(dot({ x: NaN, y: 0, z: 0 }, { x: 1, y: 2, z: 3 })).toBeNaN();
+      expect(dot({ x: 1, y: 0, z: 0 }, { x: Infinity, y: 0, z: 0 })).toBe(Infinity);
+    });
   });
 
   describe('norm', () => {
     it('returns 0 for the zero vector', () => {
       expect(norm({ x: 0, y: 0, z: 0 })).toBe(0);
+      expect(norm({ x: -0, y: -0, z: -0 })).toBe(0);
     });
 
     it('returns unit length for axis unit vectors', () => {
@@ -76,8 +97,9 @@ describe('vector operations', () => {
       expect(norm({ x: 1, y: 2, z: 2 })).toBe(3);
     });
 
-    it('returns NaN when coordinates contain NaN', () => {
+    it('returns NaN when coordinates contain NaN and Infinity when containing Infinity', () => {
       expect(norm({ x: NaN, y: 0, z: 0 })).toBeNaN();
+      expect(norm({ x: Infinity, y: 0, z: 0 })).toBe(Infinity);
     });
   });
 
@@ -105,6 +127,13 @@ describe('vector operations', () => {
       expect(cross(a, a)).toEqual({ x: 0, y: 0, z: 0 });
       expect(cross(a, { x: 0, y: 0, z: 0 })).toEqual({ x: 0, y: 0, z: 0 });
     });
+
+    it('propagates NaN when coordinates contain NaN', () => {
+      const result = cross({ x: NaN, y: 0, z: 0 }, { x: 0, y: 1, z: 0 });
+      expect(result.x).toBe(0);
+      expect(result.y).toBeNaN();
+      expect(result.z).toBeNaN();
+    });
   });
 
   describe('midpoint', () => {
@@ -117,6 +146,13 @@ describe('vector operations', () => {
     it('returns the same point if both vectors are identical', () => {
       const p = { x: -3.5, y: 7.2, z: 0 };
       expect(midpoint(p, p)).toEqual(p);
+    });
+
+    it('propagates NaN when coordinates contain NaN', () => {
+      const result = midpoint({ x: NaN, y: 2, z: 4 }, { x: 0, y: 2, z: 4 });
+      expect(result.x).toBeNaN();
+      expect(result.y).toBe(2);
+      expect(result.z).toBe(4);
     });
   });
 });
@@ -143,6 +179,22 @@ describe('clamp', () => {
     expect(clamp(-15, -10, -5)).toBe(-10);
     expect(clamp(-7, -10, -5)).toBe(-7);
     expect(clamp(-2, -10, -5)).toBe(-5);
+  });
+
+  it('returns NaN when any parameter is NaN', () => {
+    expect(clamp(NaN, 0, 10)).toBeNaN();
+    expect(clamp(5, NaN, 10)).toBeNaN();
+    expect(clamp(5, 0, NaN)).toBeNaN();
+  });
+
+  it('handles degenerate identical bounds (lo === hi)', () => {
+    expect(clamp(3, 5, 5)).toBe(5);
+    expect(clamp(5, 5, 5)).toBe(5);
+    expect(clamp(7, 5, 5)).toBe(5);
+  });
+
+  it('returns hi when range is inverted (lo > hi)', () => {
+    expect(clamp(5, 10, 0)).toBe(0);
   });
 });
 
@@ -199,6 +251,19 @@ describe('angleAt', () => {
     const b = { x: 0, y: 0, z: 0 };
     const c = { x: 0, y: 1, z: 0 };
     expect(angleAt(a, b, c)).toBeNaN();
+    expect(angleAt(b, a, c)).toBeNaN();
+    expect(angleAt(b, c, a)).toBeNaN();
+  });
+
+  it('clamps dot product to [-1, 1] avoiding NaN from float precision inaccuracies', () => {
+    // For identical 3D vector (1,1,1), norm * norm = sqrt(3)*sqrt(3) which can slightly round to < 3,
+    // making dot / denom slightly > 1 without clamping.
+    const v = { x: 1, y: 1, z: 1 };
+    const origin = { x: 0, y: 0, z: 0 };
+    expect(angleAt(v, origin, v)).toBeCloseTo(0, 5);
+
+    const negV = { x: -1, y: -1, z: -1 };
+    expect(angleAt(v, origin, negV)).toBeCloseTo(180, 5);
   });
 });
 
@@ -244,6 +309,7 @@ describe('angleFromVertical', () => {
     const a = { x: NaN, y: 0, z: 0 };
     const b = { x: 0, y: 5, z: 0 };
     expect(angleFromVertical(a, b)).toBeNaN();
+    expect(angleFromVertical(b, a)).toBeNaN();
   });
 });
 
@@ -253,7 +319,10 @@ describe('meanFinite', () => {
   });
 
   it('returns NaN if array contains only NaNs or Infinities', () => {
+    expect(meanFinite([NaN])).toBeNaN();
     expect(meanFinite([NaN, NaN])).toBeNaN();
+    expect(meanFinite([Infinity])).toBeNaN();
+    expect(meanFinite([-Infinity])).toBeNaN();
     expect(meanFinite([Infinity, -Infinity, NaN])).toBeNaN();
   });
 
@@ -263,9 +332,17 @@ describe('meanFinite', () => {
     expect(meanFinite([42])).toBe(42);
   });
 
-  it('handles negative numbers correctly', () => {
+  it('handles negative numbers and zeros correctly', () => {
     expect(meanFinite([-10, 0, 10])).toBe(0);
     expect(meanFinite([-20, -10])).toBe(-15);
+    expect(meanFinite([0, -0])).toBe(0);
+  });
+
+  it('handles sparse arrays with empty slots', () => {
+    const sparse: number[] = [];
+    sparse[0] = 10;
+    sparse[2] = 20;
+    expect(meanFinite(sparse)).toBe(15);
   });
 });
 
@@ -273,9 +350,11 @@ describe('stdFinite', () => {
   it('returns 0 for arrays with fewer than 2 finite numbers', () => {
     expect(stdFinite([])).toBe(0);
     expect(stdFinite([5])).toBe(0);
+    expect(stdFinite([NaN])).toBe(0);
     expect(stdFinite([NaN, NaN])).toBe(0);
     expect(stdFinite([NaN, 42, NaN])).toBe(0);
     expect(stdFinite([Infinity, -Infinity])).toBe(0);
+    expect(stdFinite([Infinity, 42])).toBe(0);
   });
 
   it('returns 0 for arrays of identical finite numbers', () => {
@@ -293,6 +372,13 @@ describe('stdFinite', () => {
 
   it('filters out non-finite values before calculating std', () => {
     expect(stdFinite([NaN, 1, Infinity, 5, -Infinity, NaN])).toBe(2);
+  });
+
+  it('handles sparse arrays with empty slots', () => {
+    const sparse: number[] = [];
+    sparse[0] = 1;
+    sparse[2] = 5;
+    expect(stdFinite(sparse)).toBe(2);
   });
 });
 
@@ -312,6 +398,17 @@ describe('smooth', () => {
     expect(smooth([], 2)).toEqual([]);
   });
 
+  it('handles single-element and two-element arrays', () => {
+    expect(smooth([42], 1)).toEqual([42]);
+
+    const smoothedNaN = smooth([NaN], 1);
+    expect(smoothedNaN).toHaveLength(1);
+    expect(smoothedNaN[0]).toBeNaN();
+
+    // Two elements with radius 1: each index averages [10, 20] -> 15
+    expect(smooth([10, 20], 1)).toEqual([15, 15]);
+  });
+
   it('computes centered moving average with window radius 1', () => {
     const values = [10, 20, 30, 40];
     const smoothed = smooth(values, 1);
@@ -322,7 +419,7 @@ describe('smooth', () => {
     expect(smoothed).toEqual([15, 20, 30, 35]);
   });
 
-  it('ignores NaNs in the smoothing window and outputs NaN when no finite numbers are in range', () => {
+  it('ignores NaNs and Infinities in the smoothing window and outputs NaN when no finite numbers are in range', () => {
     const values = [10, NaN, 30];
     const smoothed = smooth(values, 1);
     // index 0: [10, NaN] -> 10 / 1 = 10
@@ -330,12 +427,25 @@ describe('smooth', () => {
     // index 2: [NaN, 30] -> 30 / 1 = 30
     expect(smoothed).toEqual([10, 20, 30]);
 
+    const withInfinities = [10, Infinity, 30];
+    expect(smooth(withInfinities, 1)).toEqual([10, 20, 30]);
+
     const allNaN = [NaN, NaN, NaN];
     const smoothedNaN = smooth(allNaN, 1);
     expect(smoothedNaN).toHaveLength(3);
     for (const v of smoothedNaN) {
       expect(v).toBeNaN();
     }
+
+    const allInfinite = [Infinity, -Infinity];
+    const smoothedInf = smooth(allInfinite, 1);
+    expect(smoothedInf).toHaveLength(2);
+    expect(smoothedInf[0]).toBeNaN();
+    expect(smoothedInf[1]).toBeNaN();
+  });
+
+  it('spreads a single finite value surrounded by NaNs across its window radius', () => {
+    expect(smooth([NaN, 10, NaN], 1)).toEqual([10, 10, 10]);
   });
 
   it('handles window radius larger than the array length', () => {
@@ -343,11 +453,27 @@ describe('smooth', () => {
     // radius 5 covers the entire array for all indices -> mean is 20 for all
     expect(smooth(values, 5)).toEqual([20, 20, 20]);
   });
+
+  it('does not mutate the input array', () => {
+    const values = [1, 2, 3];
+    smooth(values, 1);
+    expect(values).toEqual([1, 2, 3]);
+  });
 });
 
 describe('fillGaps', () => {
   it('handles empty arrays', () => {
     expect(fillGaps([])).toEqual([]);
+  });
+
+  it('handles single-element arrays', () => {
+    expect(fillGaps([42])).toEqual([42]);
+
+    const singleNaN = fillGaps([NaN]);
+    expect(singleNaN).toHaveLength(1);
+    expect(singleNaN[0]).toBeNaN();
+
+    expect(fillGaps([Infinity])).toEqual([Infinity]);
   });
 
   it('returns identical copy if array has no finite values', () => {
@@ -357,6 +483,9 @@ describe('fillGaps', () => {
     expect(result[0]).toBeNaN();
     expect(result[1]).toBeNaN();
     expect(result).not.toBe(allNaN);
+
+    const allInf = [Infinity, -Infinity];
+    expect(fillGaps(allInf)).toEqual(allInf);
   });
 
   it('returns identical copy if array has no NaNs', () => {
@@ -366,12 +495,14 @@ describe('fillGaps', () => {
     expect(result).not.toBe(input);
   });
 
-  it('fills leading NaNs with the first finite value', () => {
+  it('fills leading NaNs and Infinities with the first finite value', () => {
     expect(fillGaps([NaN, NaN, 10, 20])).toEqual([10, 10, 10, 20]);
+    expect(fillGaps([Infinity, -Infinity, 10, 20])).toEqual([10, 10, 10, 20]);
   });
 
-  it('fills trailing NaNs with the last finite value', () => {
+  it('fills trailing NaNs and Infinities with the last finite value', () => {
     expect(fillGaps([10, 20, NaN, NaN])).toEqual([10, 20, 20, 20]);
+    expect(fillGaps([10, 20, Infinity, -Infinity])).toEqual([10, 20, 20, 20]);
   });
 
   it('fills single finite value surrounded by NaNs', () => {
@@ -379,11 +510,22 @@ describe('fillGaps', () => {
   });
 
   it('linearly interpolates intermediate gaps of length 1 and greater', () => {
-    // Gap of 1: span = 2
+    // Gap of 1: span = 2 (positive slope)
     expect(fillGaps([10, NaN, 20])).toEqual([10, 15, 20]);
 
-    // Gap of 2: span = 3
+    // Gap of 2: span = 3 (positive slope)
     expect(fillGaps([10, NaN, NaN, 40])).toEqual([10, 20, 30, 40]);
+
+    // Negative slope
+    expect(fillGaps([20, NaN, 10])).toEqual([20, 15, 10]);
+    expect(fillGaps([30, NaN, NaN, 0])).toEqual([30, 20, 10, 0]);
+
+    // Flat gap (zero slope)
+    expect(fillGaps([10, NaN, NaN, 10])).toEqual([10, 10, 10, 10]);
+
+    // Interpolation over Infinities
+    expect(fillGaps([10, Infinity, 20])).toEqual([10, 15, 20]);
+    expect(fillGaps([20, -Infinity, 10])).toEqual([20, 15, 10]);
   });
 
   it('handles complex sequences with leading, intermediate, and trailing gaps', () => {
@@ -410,10 +552,13 @@ describe('rounding helpers', () => {
       expect(round1(12.36)).toBe(12.4);
       expect(round1(0)).toBe(0);
       expect(round1(-12.34)).toBe(-12.3);
+      expect(round1(-12.36)).toBe(-12.4);
     });
 
-    it('returns NaN for NaN input', () => {
+    it('returns NaN for NaN input and preserves Infinities', () => {
       expect(round1(NaN)).toBeNaN();
+      expect(round1(Infinity)).toBe(Infinity);
+      expect(round1(-Infinity)).toBe(-Infinity);
     });
   });
 
@@ -423,10 +568,14 @@ describe('rounding helpers', () => {
       expect(round0(12.6)).toBe(13);
       expect(round0(0)).toBe(0);
       expect(round0(-12.4)).toBe(-12);
+      expect(round0(-12.6)).toBe(-13);
+      expect(round0(-1.5)).toBe(-1); // standard JS Math.round behavior towards +Infinity
     });
 
-    it('returns NaN for NaN input', () => {
+    it('returns NaN for NaN input and preserves Infinities', () => {
       expect(round0(NaN)).toBeNaN();
+      expect(round0(Infinity)).toBe(Infinity);
+      expect(round0(-Infinity)).toBe(-Infinity);
     });
   });
 });
@@ -436,6 +585,8 @@ describe('ramp', () => {
     expect(ramp(5, 5, 5)).toBe(1);
     expect(ramp(6, 5, 5)).toBe(1);
     expect(ramp(4, 5, 5)).toBe(0);
+    // When hi === lo and value is NaN, NaN >= hi is false -> 0
+    expect(ramp(NaN, 5, 5)).toBe(0);
   });
 
   it('maps value proportionally between lo and hi, clamped between 0 and 1', () => {
@@ -451,10 +602,22 @@ describe('ramp', () => {
     expect(ramp(15, 0, 10)).toBe(1);
   });
 
+  it('returns NaN when value or bounds are NaN (with hi !== lo)', () => {
+    expect(ramp(NaN, 0, 10)).toBeNaN();
+    expect(ramp(5, NaN, 10)).toBeNaN();
+    expect(ramp(5, 0, NaN)).toBeNaN();
+  });
+
   it('supports negative ranges', () => {
     // [-50, -10], width = 40. value = -20 -> (-20 - (-50)) / 40 = 30 / 40 = 0.75
     expect(ramp(-20, -50, -10)).toBe(0.75);
     expect(ramp(-60, -50, -10)).toBe(0);
     expect(ramp(0, -50, -10)).toBe(1);
+  });
+
+  it('computes inverted ramp when lo > hi', () => {
+    expect(ramp(5, 10, 0)).toBe(0.5);
+    expect(ramp(12, 10, 0)).toBe(0);
+    expect(ramp(-2, 10, 0)).toBe(1);
   });
 });
