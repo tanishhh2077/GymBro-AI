@@ -37,13 +37,14 @@ function read<T>(key: string, initial: T, validate: (v: unknown) => v is T): Pre
     return { value: parsed.value, notice: '' };
   } catch { return { value: initial, notice: fallback }; }
 }
-function save<T>(key: string, value: T, initial: T, validate: (v: unknown) => v is T): Preference<T> {
+function save<T>(key: string, value: T, initial: T, validate: (v: unknown) => v is T, screenOnly = false): Preference<T> {
   if (!validate(value)) throw new Error('Check the name and equipment values. Use at most 20 profiles with unique names per unit.');
-  if (read(key, initial, validate).notice) return { value, notice: fallback };
+  // Once a screen enters fallback, never overwrite newer data from another tab.
+  if (screenOnly || read(key, initial, validate).notice) return { value, notice: fallback };
   try { localStorage.setItem(key, JSON.stringify({ version: 1, value })); return { value, notice: '' }; }
   catch { return { value, notice: fallback }; }
 }
 export const readProfiles = () => read(PROFILE_KEY, [], validProfiles);
-export const saveProfiles = (value: EquipmentProfile[]) => save(PROFILE_KEY, value, [], validProfiles);
+export const saveProfiles = (value: EquipmentProfile[], screenOnly = false) => save(PROFILE_KEY, value, [], validProfiles, screenOnly);
 export const readReminder = () => read(REMINDER_KEY, { enabled: false, nextDue: null }, validReminder);
-export const saveReminder = (value: ReminderPreference) => save(REMINDER_KEY, value, { enabled: false, nextDue: null }, validReminder);
+export const saveReminder = (value: ReminderPreference, screenOnly = false) => save(REMINDER_KEY, value, { enabled: false, nextDue: null }, validReminder, screenOnly);

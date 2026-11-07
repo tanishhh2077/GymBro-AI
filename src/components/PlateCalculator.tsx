@@ -11,7 +11,7 @@ export function PlateCalculator({ unit }: { unit: WeightUnit }) {
   const [profileName, setProfileName] = useState('');
   const [profileError, setProfileError] = useState('');
   function persistProfiles(next: EquipmentProfile[]) {
-    try { setProfiles(saveProfiles(next)); setProfileError(''); }
+    try { setProfiles(saveProfiles(next, Boolean(profiles.notice))); setProfileError(''); }
     catch (error) { setProfileError(error instanceof Error ? error.message : 'Equipment could not be saved.'); }
   }
   const [target, setTarget] = useState('');

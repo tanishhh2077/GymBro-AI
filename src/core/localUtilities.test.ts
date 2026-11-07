@@ -50,3 +50,15 @@ it('handles denied reads without erasing existing data', () => {
   expect(saveProfiles([profile]).notice).toContain('screen');
   expect(write).not.toHaveBeenCalled();
 });
+it('screen-only mode keeps valid storage untouched but still validates edits', () => {
+  saveProfiles([profile]);
+  saveReminder({ enabled: true, nextDue: WEEK });
+  const write = vi.spyOn(Storage.prototype, 'setItem');
+  expect(saveProfiles([], true).notice).toContain('screen');
+  expect(saveReminder({ enabled: false, nextDue: null }, true).notice).toContain('screen');
+  expect(() => saveProfiles([profile, profile], true)).toThrow();
+  expect(() => saveReminder({ enabled: true, nextDue: null }, true)).toThrow();
+  expect(write).not.toHaveBeenCalled();
+  expect(readProfiles().value).toEqual([profile]);
+  expect(readReminder().value).toEqual({ enabled: true, nextDue: WEEK });
+});

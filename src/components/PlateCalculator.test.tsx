@@ -1,6 +1,7 @@
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
-import { afterEach, beforeEach, expect, it } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { PROFILE_KEY, saveProfiles } from '@/core/localUtilities';
 import { PlateCalculator } from './PlateCalculator';
 import { WorkoutEditor } from './WorkoutEditor';
 import { createWorkoutStore } from '@/store/useWorkoutStore';
@@ -11,7 +12,7 @@ import { createWorkoutRepository } from '@/store/workoutRepository';
 let root: Root;
 let container: HTMLDivElement;
 beforeEach(() => { container = document.createElement('div'); document.body.append(container); root = createRoot(container); });
-afterEach(async () => { await act(async () => root.unmount()); document.body.replaceChildren(); });
+afterEach(async () => { await act(async () => root.unmount()); document.body.replaceChildren(); vi.restoreAllMocks(); localStorage.clear(); });
 async function render(unit: 'lb' | 'kg' = 'lb') { await act(async () => root.render(<PlateCalculator unit={unit} />)); }
 async function input(label: string, value: string) {
   const field = [...container.querySelectorAll('input')].find(el => el.labels?.[0]?.textContent === label);
@@ -80,4 +81,28 @@ it('saves and explicitly loads equipment while preserving the target draft', asy
   await act(async () => [...container.querySelectorAll('button')].find(b => b.textContent === 'Load Garage')!.click());
   expect([...container.querySelectorAll('input')].find(i => i.labels?.[0]?.textContent === 'Bar weight (lb)')!.value).toBe('35');
   expect([...container.querySelectorAll('input')].find(i => i.labels?.[0]?.textContent === 'Total target weight (lb)')!.value).toBe('135');
+});
+it.each(['save', 'delete'])('never resumes profile writes after fallback on %s', async operation => {
+  localStorage.clear();
+  await render();
+  const click = async (name: string) => act(async () => { [...container.querySelectorAll('button')].find(b => b.textContent === name)!.click(); });
+  await input('Equipment profile name', 'Screen only');
+  const failingWrite = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('quota'); });
+  await click('Save equipment profile');
+  expect(container.textContent).toContain('Changes last only while this screen is open');
+  failingWrite.mockRestore();
+  saveProfiles([{ name: 'Other tab', unit: 'lb', bar: '45', inventory: [] }]);
+  const persisted = localStorage.getItem(PROFILE_KEY);
+  const write = vi.spyOn(Storage.prototype, 'setItem');
+  if (operation === 'save') {
+    await input('Equipment profile name', 'Another local');
+    await click('Save equipment profile');
+    expect(container.textContent).toContain('Load Another local');
+  } else {
+    await click('Delete Screen only');
+    expect(container.textContent).not.toContain('Load Screen only');
+  }
+  expect(write).not.toHaveBeenCalled();
+  expect(localStorage.getItem(PROFILE_KEY)).toBe(persisted);
+  expect(container.textContent).toContain('Changes last only while this screen is open');
 });
