@@ -3,6 +3,8 @@ import { useStore } from 'zustand';
 import type { WorkoutRoutine } from '@/types/workout';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
 import { RoutineEditor } from './RoutineEditor';
+import { supersetNames } from './trainingDetailText';
+import { formatWeight } from '@/core/weightDisplay';
 
 export function WorkoutRoutines({ store, onStarted, onResume }: { store: WorkoutStore; onStarted: () => void; onResume: () => void }) {
   const state = useStore(store);
@@ -53,7 +55,9 @@ export function WorkoutRoutines({ store, onStarted, onResume }: { store: Workout
           <ol className="my-4 list-inside list-decimal space-y-2 text-sm text-slate-300">{routine.exercises.map(e => <li key={e.id} className="break-words">
             {e.name}{e.targetSets !== undefined && <span className="text-slate-400"> · {e.targetSets} sets</span>}
             {e.targetReps !== undefined && <span className="text-slate-400"> · {e.targetReps} reps per set</span>}
-            {e.targetWeight !== undefined && <span className="text-slate-400"> · {e.targetWeight} {routine.unit}</span>}
+            {e.targetWeight !== undefined && <span className="text-slate-400"> · {formatWeight(e.targetWeight, routine.unit, { bodyweight: e.bodyweight === true })}</span>}
+            {e.bodyweight && <span className="text-slate-400"> · Bodyweight</span>}
+            {e.superset !== undefined && <span className="text-accent"> · {supersetNames(routine.exercises).get(e.superset)}</span>}
           </li>)}</ol>
           <div className="flex flex-wrap gap-2">
             <button type="button" className="btn-primary" aria-label={`Start routine ${routine.name}`} disabled={disabled || !!state.data.active}

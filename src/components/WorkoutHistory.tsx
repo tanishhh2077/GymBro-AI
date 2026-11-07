@@ -7,6 +7,8 @@ import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton'
 import type { Workout } from '@/types/workout';
 import { CompletedWorkoutEditor } from './CompletedWorkoutEditor';
 import { WorkoutCalendar } from './WorkoutCalendar';
+import { RpeText, WeightText } from './trainingDetail';
+import { supersetNames } from './trainingDetailText';
 
 const inputClass = 'w-full min-w-0 rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white';
 
@@ -59,9 +61,12 @@ export function WorkoutHistory({ store, initialId, analysis, onSummary, onWorkou
     </section>}
     {selected.exercises.map(e => <section key={e.id} className="border-t border-white/10 pt-4">
       <h2 className="break-words text-xl font-semibold text-white">{e.name}</h2>
+      {(e.superset !== undefined || e.bodyweight) && <p className="text-xs text-accent">
+        {[e.superset !== undefined ? supersetNames(selected.exercises).get(e.superset) : '', e.bodyweight ? 'Bodyweight exercise' : ''].filter(Boolean).join(' · ')}</p>}
       <table className="mt-3 w-full text-left text-sm"><caption className="sr-only">Saved sets for {e.name}</caption>
-        <thead className="text-slate-400"><tr><th className="py-2">Set</th><th>Reps</th><th>Weight</th>{analysis && isBenchPressName(e.name) && <th><span className="sr-only">Actions</span></th>}</tr></thead>
-        <tbody>{e.sets.map((set, i) => <tr key={set.id} id={`set-row-${set.id}`} tabIndex={-1}><td className="py-2">{i + 1}<span className="block text-xs text-slate-400">{set.kind === 'warmup' ? 'Warm-up' : 'Regular'}</span></td><td>{set.reps}</td><td>{set.weight} {selected.unit}</td>
+        <thead className="text-slate-400"><tr><th className="py-2">Set</th><th>Reps</th><th>{e.bodyweight ? 'Added weight' : 'Weight'}</th><th>RPE</th>{analysis && isBenchPressName(e.name) && <th><span className="sr-only">Actions</span></th>}</tr></thead>
+        <tbody>{e.sets.map((set, i) => <tr key={set.id} id={`set-row-${set.id}`} tabIndex={-1}><td className="py-2">{i + 1}<span className="block text-xs text-slate-400">{set.kind === 'warmup' ? 'Warm-up' : 'Regular'}</span></td><td>{set.reps}</td>
+          <td><WeightText weight={set.weight} unit={selected.unit} bodyweight={e.bodyweight} /></td><td><RpeText rpe={set.rpe} /></td>
           {analysis && isBenchPressName(e.name) && <td className="text-right"><SetAnalysisButton link={{ workoutId: selected.id, exerciseId: e.id, setId: set.id }}
             exerciseName={e.name} setNumber={i + 1} actions={analysis} disabled={state.busy || state.needsReload || !state.loaded} /></td>}</tr>)}</tbody>
       </table></section>)}

@@ -137,7 +137,7 @@ it('copies a previous set into editable fields without recording a set', async (
   expect(container.textContent).toContain('8 reps × 60.5 kg');
   await click('Use previous set 2 for Bench press');
   const inputs = [...container.querySelectorAll<HTMLInputElement>('input[type=number]')];
-  expect(inputs.map(input => input.value)).toEqual(['6', '65']);
+  expect(inputs.map(input => input.value)).toEqual(['6', '65', '']);
   expect(document.activeElement).toBe(inputs[0]);
   expect(store.getState().data.active!.exercises[0].sets).toHaveLength(0);
   await submit('Log a set for Bench press');
@@ -164,7 +164,7 @@ it('repeats the latest actual set with a new ID and supports zero added load', a
   expect(sets[1].id).not.toBe(sets[0].id);
   expect(container.querySelector('output')?.textContent).toBe('1:30');
   expect(button('Start rest timer')).toBeTruthy();
-  expect([...container.querySelectorAll<HTMLInputElement>('input[type=number]')].map(input => input.value)).toEqual(['12', '40']);
+  expect([...container.querySelectorAll<HTMLInputElement>('input[type=number]')].map(input => input.value)).toEqual(['12', '40', '']);
 });
 
 it('starts optional auto-rest only after a new set save is confirmed', async () => {
@@ -217,7 +217,7 @@ it('keeps the timer and entered values when an auto-rest set save fails', async 
   expect(container.querySelector('[role=alert]')?.textContent).toContain('Reload required');
   expect(button('Start rest timer')).toBeTruthy();
   expect(store.getState().data.active!.exercises[0].sets).toHaveLength(0);
-  expect([...container.querySelectorAll<HTMLInputElement>('input[type=number]')].map(input => input.value)).toEqual(['8', '50']);
+  expect([...container.querySelectorAll<HTMLInputElement>('input[type=number]')].map(input => input.value)).toEqual(['8', '50', '']);
 });
 
 it('stops automatic restarts when opted out and lets the current rest finish', async () => {
