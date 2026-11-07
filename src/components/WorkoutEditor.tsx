@@ -90,6 +90,7 @@ export function WorkoutEditor({ store, onFinished, onSetLogged, analysis, restSe
         const editors = block.items.map((exercise, offset) => <ExerciseEditor key={exercise.id} workoutId={workout.id} exercise={exercise}
           unit={workout.unit} index={block.start + offset} count={workout.exercises.length}
           first={block.start === 0} last={block.start + block.items.length === workout.exercises.length} groupName={label}
+          groupSize={block.group === undefined ? undefined : block.items.length}
           selected={label === undefined ? choosable.includes(exercise.id) : undefined}
           onSelect={label === undefined ? checked => setSelected(current => checked ? [...current, exercise.id] : current.filter(id => id !== exercise.id)) : undefined}
           store={store} analysis={analysis} onSetLogged={onSetLogged} restSettings={restSettings} onRest={onRest} />);
@@ -162,14 +163,15 @@ function ActiveWorkoutNote({ store, workoutId, note }: { store: WorkoutStore; wo
 }
 
 function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogged, restSettings, onRest, index, count, first, last,
-  groupName, selected, onSelect }: {
+  groupName, groupSize, selected, onSelect }: {
   workoutId: string; exercise: WorkoutExercise; unit: WeightUnit; store: WorkoutStore; analysis?: SetAnalysisActions; index: number; count: number;
   /** Whether this exercise's block (itself, or its whole superset) is first or last; Move steps whole blocks. */
-  first: boolean; last: boolean; groupName?: string; selected?: boolean; onSelect?: (checked: boolean) => void;
+  first: boolean; last: boolean; groupName?: string; groupSize?: number; selected?: boolean; onSelect?: (checked: boolean) => void;
   onSetLogged?: (workoutId: string, name: string, seconds: number) => void;
   restSettings?: ExerciseRestSettings; onRest?: (name: string, seconds: number) => void;
 }) {
   const id = useId();
+  const confirmLeave = useConfirmLeave();
   const [reps, setReps] = useState('');
   const [weight, setWeight] = useState('');
   const [rpe, setRpe] = useState('');
@@ -205,6 +207,7 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
       {groupName && <p className="text-xs text-accent">In {groupName}</p>}
     </div>
       <button type="button" className="shrink-0 text-sm text-slate-400 underline underline-offset-4" aria-label={`Remove exercise ${exercise.name}`} onClick={async () => {
+        if (groupSize === 2 && !confirmLeave()) return;
         if (window.confirm(`Remove ${exercise.name} and its logged sets?`)) await state.removeExercise(exercise.id);
       }}>Remove</button></div>
     <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-300">
