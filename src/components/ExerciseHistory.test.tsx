@@ -130,3 +130,31 @@ it('keeps set drafts, calculator and previous-value actions intact without write
   expect(container.textContent).toContain('Yesterday');
   expect(reps.value).toBe('7'); expect(weight.value).toBe('63.5');
 });
+
+it('lists bodyweight and loaded entries of one name separately, with added and assisted loads labelled', async () => {
+  const pulls: Workout = { ...saved, exercises: [{ id: 'loaded', name: 'Pull-up', sets: [{ id: 'l', reps: 5, weight: 40 }] },
+    { id: 'bw', name: 'Pull-up', bodyweight: true, sets: [{ id: 'a', reps: 8, weight: -20 }, { id: 'b', reps: 6, weight: 0 }] }] };
+  await act(async () => root.render(<ExerciseHistory history={[pulls]} name="Pull-up" unit="kg" bodyweight startedAt={5_000} />));
+  await click('Exercise history');
+  expect(container.textContent).toContain('8 reps × −20 kg assist'); expect(container.textContent).toContain('6 reps × Bodyweight');
+  expect(container.textContent).not.toContain('40 kg');
+  await render([pulls], 'Pull-up');
+  expect(container.textContent).toContain('5 reps × 40 kg'); expect(container.textContent).not.toContain('assist');
+});
+
+it('offers previous values only from entries with the same bodyweight setting', async () => {
+  const repository = createWorkoutRepository(new IDBFactory());
+  let id = 0, now = 1_000;
+  const store = createWorkoutStore(repository, { id: () => `id-${++id}`, now: () => now++ });
+  await store.getState().load();
+  await store.getState().startWorkout('Yesterday', 'kg');
+  await store.getState().addExercise('Pull-up');
+  await store.getState().addSet(store.getState().data.active!.exercises[0].id, 5, 40);
+  await store.getState().finishWorkout();
+  await store.getState().startWorkout('Today', 'kg');
+  await store.getState().addExercise('Pull-up');
+  await act(async () => root.render(<WorkoutEditor store={store} onFinished={() => {}} />));
+  expect(container.querySelector('[aria-label="Use previous set 1 for Pull-up"]')).not.toBeNull();
+  await act(async () => { await store.getState().setExerciseBodyweight(store.getState().data.active!.exercises[0].id, true); });
+  expect(container.querySelector('[aria-label="Use previous set 1 for Pull-up"]')).toBeNull();
+});
