@@ -2,6 +2,7 @@ import { useId, useState, type FormEvent } from 'react';
 import { useStore } from 'zustand';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
 import type { SetKind, Workout } from '@/types/workout';
+import { formatDurationLine } from '@/core/workoutClock';
 import { WorkoutNoteField } from './WorkoutEditor';
 import { confirmDiscard, useUnsavedChanges } from './unsavedChanges';
 import { AlternateWeightHint } from './trainingDetail';
@@ -13,6 +14,7 @@ export function CompletedWorkoutEditor({ store, workout, expectedRevision, onClo
 }) {
   const state = useStore(store);
   const id = useId();
+  const duration = formatDurationLine(workout.startedAt, workout.finishedAt);
   const [name, setName] = useState(workout.name);
   const [exercises, setExercises] = useState(() => workout.exercises.map(exercise => ({ ...exercise,
     sets: exercise.sets.map(set => ({ id: set.id, reps: String(set.reps), weight: String(set.weight), kind: set.kind ?? 'regular',
@@ -51,6 +53,7 @@ export function CompletedWorkoutEditor({ store, workout, expectedRevision, onClo
   return <div className="space-y-5">
     <h1 className="text-3xl font-bold text-white">Edit completed workout</h1>
     <p className="text-sm text-slate-400">Correct the name, note and logged set values. Weights in {workout.unit}. Progress and summaries use the saved corrections.</p>
+    {duration && <p className="text-sm text-slate-400">{duration} <span className="text-xs text-slate-500">(includes rests and time away)</span></p>}
     {stale && <p role="alert" className="text-sm text-warn">Saved workouts changed. Cancel and reopen this workout before saving your edits.</p>}
     {(error || state.error) && <p role="alert" className="text-sm text-warn">{error || state.error}</p>}
     <form aria-label="Correct completed workout" onSubmit={save}>
