@@ -25,6 +25,7 @@ const AnalysisWorkspace = lazy(() => import('@/components/AnalysisWorkspace').th
 
 // Progress and Backup are opened rarely, so they load on demand and keep the first screen small.
 const WorkoutProgress = lazy(() => import('@/components/WorkoutProgress').then(module => ({ default: module.WorkoutProgress })));
+const BodyLog = lazy(() => import('@/components/BodyLog'));
 const WorkoutBackup = lazy(() => import('@/components/WorkoutBackup').then(module => ({ default: module.WorkoutBackup })));
 
 /** Keep logging available if an optional screen cannot be loaded. */
@@ -40,7 +41,7 @@ class AnalysisBoundary extends Component<{ children: ReactNode; screen?: string 
   }
 }
 
-type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines' | 'progress' | 'backup' | 'account' | 'summary';
+type View = 'home' | 'workout' | 'analysis' | 'history' | 'routines' | 'progress' | 'backup' | 'account' | 'summary' | 'body';
 export default function App({ workouts = workoutStore, session = useSessionStore, accountPanel, accountLabel, restScope = 'guest' }:
   { workouts?: WorkoutStore; session?: SessionStore; accountPanel?: ReactNode; accountLabel?: string; restScope?: string } = {}) {
   const appearance = useAppearance();
@@ -142,7 +143,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
       {view === 'home' && <WorkoutHome data={state.data} available={available} busy={state.busy}
         onWorkout={() => navigate('workout')} onAnalyze={() => navigate('analysis')}
         onRoutines={() => navigate('routines')}
-        onProgress={() => navigate('progress')} onBackup={() => navigate('backup')} onHistory={openHistory}
+        onBodyLog={() => navigate('body')} onProgress={() => navigate('progress')} onBackup={() => navigate('backup')} onHistory={openHistory}
         onRepeatLast={async id => { if ((await workouts.getState().repeatWorkout(id)).ok) navigate('workout'); }}
         onAccount={accountPanel ? () => navigate('account') : undefined} accountLabel={accountLabel}
         appearance={<><AppearanceControl settings={appearance} /><ShowIntroAgain intro={intro} /></>} />}
@@ -165,6 +166,9 @@ export default function App({ workouts = workoutStore, session = useSessionStore
       </Suspense></AnalysisBoundary>}
       {view === 'backup' && <AnalysisBoundary screen="Backup and restore"><Suspense fallback={<p role="status" className="text-sm text-slate-400">Opening backupâ€¦</p>}>
         <WorkoutBackup store={workouts} onHome={() => navigate('home')} />
+      </Suspense></AnalysisBoundary>}
+      {view === 'body' && <AnalysisBoundary screen="Body log"><Suspense fallback={<p role="status" className="text-sm text-slate-400">Opening body log…</p>}>
+        <BodyLog store={workouts} onHome={() => navigate('home', true)} />
       </Suspense></AnalysisBoundary>}
       {view === 'account' && accountPanel}
     </main>

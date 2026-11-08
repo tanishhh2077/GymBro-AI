@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { lazy, Suspense, useId, useState } from 'react';
 import { useStore } from 'zustand';
 import type { WorkoutRoutine } from '@/types/workout';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
@@ -6,11 +6,16 @@ import { RoutineEditor } from './RoutineEditor';
 import { supersetNames } from './trainingDetailText';
 import { formatWeight } from '@/core/weightDisplay';
 
+const RoutineShare = lazy(() => import('./RoutineShare').then(module => ({ default: module.RoutineShare })).catch(() => ({
+  default: () => <p role="alert" className="text-sm text-warn">Routine sharing could not be opened. Reload the app to try again.</p>,
+})));
+
 export function WorkoutRoutines({ store, onStarted, onResume }: { store: WorkoutStore; onStarted: () => void; onResume: () => void }) {
   const state = useStore(store);
   // Capture record and revision together; a later reload must not legitimize an old draft.
   const [editor, setEditor] = useState<{ routine?: WorkoutRoutine; revision: number } | null>(null);
   const [notice, setNotice] = useState('');
+  const [sharing, setSharing] = useState<{ id?: string } | null>(null);
   const filterId = useId();
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('creation');
@@ -29,6 +34,11 @@ export function WorkoutRoutines({ store, onStarted, onResume }: { store: Workout
         setNotice(''); setEditor({ revision: state.data.revision });
       }}>New routine</button>
     </div>
+    <button type="button" className="btn-ghost" disabled={disabled} onClick={() => setSharing({})}>Import routine file</button>
+    {sharing && <section aria-label="Routine sharing" className="space-y-3">
+      <button type="button" className="btn-ghost" onClick={() => setSharing(null)}>Close routine sharing</button>
+      <Suspense fallback={<p role="status">Opening routine sharing…</p>}><RoutineShare key={sharing.id ?? 'import'} store={store} routine={routines.find(routine => routine.id === sharing.id)} /></Suspense>
+    </section>}
     {notice && <p role="status" className="text-sm text-accent">{notice}</p>}
     {!state.loaded ? <p className="text-slate-400">Open saved workouts to view routines.</p> : <>
       {state.data.active && <div className="rounded-xl border border-accent/20 bg-accent/5 p-4 text-sm text-slate-300">
@@ -73,6 +83,7 @@ export function WorkoutRoutines({ store, onStarted, onResume }: { store: Workout
             <button type="button" className="btn-ghost" aria-label={`Edit routine ${routine.name}`} disabled={disabled} onClick={() => {
               setNotice(''); setEditor({ routine, revision: state.data.revision });
             }}>Edit</button>
+            <button type="button" className="btn-ghost" aria-label={`Share routine ${routine.name}`} disabled={disabled} onClick={() => setSharing({ id: routine.id })}>Share</button>
             <button type="button" className="btn-ghost" aria-label={`Duplicate routine ${routine.name}`} disabled={disabled || routines.length >= 100} onClick={async () => {
               setNotice('');
               if ((await state.duplicateRoutine(routine.id)).ok) setNotice('Routine duplicated.');

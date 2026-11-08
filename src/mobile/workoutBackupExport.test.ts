@@ -4,7 +4,7 @@ import { Share } from '@capacitor/share';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { createWorkoutBackup } from '@/core/workoutBackup';
 import { emptyWorkoutData } from '@/core/workouts';
-import { saveWorkoutBackup, saveWorkoutCsv } from './workoutBackupExport';
+import { saveRoutineFile, saveWorkoutBackup, saveWorkoutCsv } from './workoutBackupExport';
 
 vi.mock('@capacitor/filesystem', () => ({ Directory: { Cache: 'CACHE' }, Encoding: { UTF8: 'utf8' },
   Filesystem: { writeFile: vi.fn(), deleteFile: vi.fn() } }));
@@ -207,4 +207,12 @@ it('cleans up anchor, URL, and lock when web CSV download throws during click', 
   expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:backup');
   expect(document.querySelector('a')).toBeNull();
   expect(await saveWorkoutCsv(emptyWorkoutData(), 1000)).toBe('download');
+});
+
+it('shares a validated routine through native cache without any workout records', async () => {
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+  const routine = JSON.stringify({ format: 'gymbro-ai-routine', version: 1, routine: { name: 'Synthetic upper', unit: 'kg', exercises: [{ name: 'Row' }] } });
+  expect(await saveRoutineFile(routine)).toBe('share');
+  expect(Filesystem.writeFile).toHaveBeenCalledWith(expect.objectContaining({ path: expect.stringMatching(/^gymbro-routine-synthetic-upper-.*\.json$/), data: routine }));
+  expect(Share.share).toHaveBeenCalledWith(expect.objectContaining({ title: 'GymBro AI routine', files: ['file:///app/cache/backup.json'] }));
 });

@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useStore } from 'zustand';
 import type { Account, AccountService } from '@/core/accountService';
-import { mergeWorkoutSync, type SyncChoice, type SyncPreview } from '@/core/workoutSync';
+import { hasSyncConflicts, mergeWorkoutSync, type SyncChoice, type SyncPreview } from '@/core/workoutSync';
 import { mergeWorkoutBackup, type WorkoutBackup, type BackupMerge } from '@/core/workoutBackup';
 import type { Workout, WorkoutData, WorkoutGoal, WorkoutRoutine } from '@/types/workout';
 import type { WorkoutRepository } from '@/store/workoutRepository';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
+import { BackupBodyNoteCounts, BodyNoteConflicts } from './BodyNoteConflicts';
 import { plannedTarget } from './plannedTarget';
 import { groupLabel, weightParts } from './weightText';
 
@@ -59,7 +60,7 @@ export function AccountPanel({ service, account, store, guest }: Props) {
   let merged: ReturnType<typeof mergeWorkoutSync> | undefined;
   let mergeError = '';
   // Conflicts listed without choices, so a chosen conflict stays visible with its selected radio.
-  let unchosen: Pick<ReturnType<typeof mergeWorkoutSync>, 'conflicts' | 'goalConflicts'> = { conflicts: [], goalConflicts: [] };
+  let unchosen: Pick<ReturnType<typeof mergeWorkoutSync>, 'conflicts' | 'goalConflicts' | 'bodyConflicts' | 'noteConflicts'> = { conflicts: [], goalConflicts: [], bodyConflicts: [], noteConflicts: [] };
   if (current) {
     try {
       merged = mergeWorkoutSync(current.base, state.data, current.remote.data, choices);
@@ -77,7 +78,7 @@ export function AccountPanel({ service, account, store, guest }: Props) {
   return <div className="max-w-2xl space-y-6">
     <div><h1 className="text-3xl font-bold text-white">Account and sync</h1>
       <p className="mt-2 text-sm text-slate-400">Use guest mode or sign in to sync your workout records across devices.</p></div>
-    <p className="text-sm text-slate-400">Sync includes workout logs, routines and goals. Video processing stays on your device.</p>
+    <p className="text-sm text-slate-400">Sync includes workout logs, routines, goals, body log and exercise notes. Video processing stays on your device.</p>
     {error && <p role="alert" className="break-words text-sm text-warn">{error}</p>}
     <p role="status" aria-live="polite" className="text-sm text-accent">{busy ? 'Working…' : notice}</p>
     {!service ? <div className="card p-5"><h2 className="font-semibold text-white">Accounts are not configured</h2>
@@ -133,7 +134,9 @@ export function AccountPanel({ service, account, store, guest }: Props) {
                 <GoalVersion value={conflict[source]} />
               </div>)}
             </fieldset>)}
-          <div className="flex flex-wrap gap-3"><button type="button" className="btn-primary" disabled={disabled || !merged || !!merged.conflicts.length || !!merged.goalConflicts.length} onClick={() => { void run(async () => {
+          <fieldset disabled={disabled} className="min-w-0"><BodyNoteConflicts bodyConflicts={unchosen.bodyConflicts} noteConflicts={unchosen.noteConflicts}
+            choices={choices} onChoose={(key, choice) => setChoices(value => ({ ...value, [key]: choice }))} /></fieldset>
+          <div className="flex flex-wrap gap-3"><button type="button" className="btn-primary" disabled={disabled || !merged || hasSyncConflicts(merged)} onClick={() => { void run(async () => {
             const result = await store.getState().confirmSync(current, choices, service.cloud(account.id));
             setPreview(null);
             if (!result.ok) throw new Error(result.message);
@@ -155,6 +158,7 @@ export function AccountPanel({ service, account, store, guest }: Props) {
             <p className="text-sm text-slate-300">Add {copy.merge.addedWorkouts} completed workouts, {copy.merge.addedRoutines} routines,
               {' '}{copy.merge.addedGoals} {copy.merge.addedGoals === 1 ? 'goal' : 'goals'} and {copy.merge.addedActive ? 'one active workout' : 'no active workout'}. Skip {copy.merge.duplicates} identical records.
               {copy.merge.skippedGoals > 0 && ` Skip ${copy.merge.skippedGoals} guest ${copy.merge.skippedGoals === 1 ? 'goal' : 'goals'} because this account already has a goal for that exercise.`}</p>
+            <BackupBodyNoteCounts merge={copy.merge} />
             <button type="button" className="btn-primary" disabled={disabled || copy.revision !== state.data.revision} onClick={() => { void run(async () => {
               const result = await store.getState().restoreBackup(copy.backup, copy.revision); setCopy(null);
               if (!result.ok) throw new Error(result.message); return 'Guest records copied into this account’s local library.';

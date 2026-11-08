@@ -248,12 +248,12 @@ it('keeps keyboard focus placed on a newly committed screen before passive effec
 
 it('searches the exercise library and selects a name without recording it until Add', async () => {
   await draft();
-  await act(async () => container.querySelector('summary')!.click());
+  await act(async () => [...container.querySelectorAll('summary')].find(item => item.textContent === 'Browse exercise library')!.click());
   await fill('Search exercise library', 'incline dumbbell');
   await click('Use Incline dumbbell press');
   expect(store.getState().data.active!.exercises).toHaveLength(1);
   expect((document.getElementById('exercise-name') as HTMLInputElement).value).toBe('Incline dumbbell press');
-  expect(container.querySelector('details')?.open).toBe(false);
+  expect([...container.querySelectorAll('summary')].find(item => item.textContent === 'Browse exercise library')!.parentElement?.hasAttribute('open')).toBe(false);
   await submit('Add an exercise');
   expect(store.getState().data.active!.exercises.map(exercise => exercise.name)).toEqual(['Bench press', 'Incline dumbbell press']);
 });
@@ -261,7 +261,7 @@ it('searches the exercise library and selects a name without recording it until 
 it('reuses a saved custom exercise name after the workout editor is reopened', async () => {
   await draft(); await fill('Exercise name', 'My cable press'); await submit('Add an exercise');
   await click('Home'); await click('Workout');
-  await act(async () => container.querySelector('summary')!.click());
+  await act(async () => [...container.querySelectorAll('summary')].find(item => item.textContent === 'Browse exercise library')!.click());
   await fill('Search exercise library', 'my cable'); await click('Use My cable press');
   expect((document.getElementById('exercise-name') as HTMLInputElement).value).toBe('My cable press');
   expect(store.getState().data.active!.exercises).toHaveLength(2);
@@ -269,7 +269,7 @@ it('reuses a saved custom exercise name after the workout editor is reopened', a
 
 it('uses a custom search name as an editable draft and preserves it after a failed save', async () => {
   await draft();
-  await act(async () => container.querySelector('summary')!.click());
+  await act(async () => [...container.querySelectorAll('summary')].find(item => item.textContent === 'Browse exercise library')!.click());
   await fill('Search exercise library', 'My unusual press'); await click('Use custom exercise My unusual press');
   vi.spyOn(repository, 'save').mockRejectedValueOnce(new WorkoutError('storage', 'Reload required'));
   await submit('Add an exercise');

@@ -2,7 +2,7 @@ import type { RoutineExerciseInput, RoutineInput, WeightUnit, WorkoutRoutine } f
 import { WorkoutError } from './workouts';
 
 export const ROUTINE_SHARE_FORMAT = 'gymbro-ai-routine' as const;
-export const ROUTINE_SHARE_VERSION = 1 as const;
+export const ROUTINE_SHARE_VERSION = 2 as const;
 export const MAX_ROUTINE_SHARE_BYTES = 64 * 1024; // 64 KiB
 
 export interface RoutineShareExercise {
@@ -10,7 +10,7 @@ export interface RoutineShareExercise {
   readonly targetSets?: number;
   readonly targetReps?: number;
   readonly targetWeight?: number;
-  readonly superset?: boolean;
+  readonly superset?: boolean | number;
   readonly bodyweight?: boolean;
 }
 
@@ -81,17 +81,19 @@ export function createRoutineShare(routine: WorkoutRoutine): string {
     'Add 1 to 100 named exercises to each routine.',
   );
 
+  const groups = new Map<string, number>();
   const exercises: RoutineShareExercise[] = routine.exercises.map(exercise => {
     validateName(exercise.name, 'Exercise name');
     const isBodyweight = exercise.bodyweight === true;
     validateTargets(exercise as Record<string, unknown>, isBodyweight);
 
+    if (exercise.superset && !groups.has(exercise.superset)) groups.set(exercise.superset, groups.size + 1);
     const shareEx: RoutineShareExercise = {
       name: exercise.name,
       ...(exercise.targetSets !== undefined ? { targetSets: exercise.targetSets } : {}),
       ...(exercise.targetReps !== undefined ? { targetReps: exercise.targetReps } : {}),
       ...(exercise.targetWeight !== undefined ? { targetWeight: exercise.targetWeight } : {}),
-      ...(exercise.superset !== undefined && exercise.superset !== '' ? { superset: true } : {}),
+      ...(exercise.superset !== undefined && exercise.superset !== '' ? { superset: groups.get(exercise.superset) } : {}),
       ...(exercise.bodyweight ? { bodyweight: true } : {}),
     };
     return shareEx;
@@ -138,7 +140,7 @@ export function parseRoutineShare(text: string): RoutineInput {
   );
 
   requireValidation(
-    envelope.format === ROUTINE_SHARE_FORMAT && envelope.version === ROUTINE_SHARE_VERSION,
+    envelope.format === ROUTINE_SHARE_FORMAT && (envelope.version === 1 || envelope.version === ROUTINE_SHARE_VERSION),
     'This routine format or version is unsupported. Choose a valid GymBro AI routine file.',
   );
 
@@ -186,42 +188,26 @@ export function parseRoutineShare(text: string): RoutineInput {
     validateTargets(ex, isBodyweight);
 
     if (Object.prototype.hasOwnProperty.call(ex, 'superset')) {
-      requireValidation(typeof ex.superset === 'boolean', `Exercise ${i + 1} superset setting must be a boolean.`);
+      requireValidation(envelope.version === 1 ? typeof ex.superset === 'boolean' : Number.isSafeInteger(ex.superset) && (ex.superset as number) >= 1 && (ex.superset as number) <= 50,
+        `Exercise ${i + 1} superset setting must be ${envelope.version === 1 ? 'a boolean' : 'a group number from 1 to 50'}.`);
     }
   }
 
-  // Validate superset groupings: must be 2 or more adjacent exercises with superset: true
-  let currentGroupNumber = 0;
-  let activeRun = 0;
+  // v1 boolean runs remain readable. v2 group numbers preserve adjacent pairs.
   const groupIds: (string | undefined)[] = new Array(rawExercises.length).fill(undefined);
-
-  for (let i = 0; i < rawExercises.length; i++) {
-    const ex = rawExercises[i] as { superset?: boolean };
-    if (ex.superset === true) {
-      activeRun++;
-    } else {
-      if (activeRun === 1) {
-        throw new WorkoutError('validation', 'Keep each superset to two or more neighbouring exercises.');
-      }
-      if (activeRun >= 2) {
-        currentGroupNumber++;
-        const gid = `share-group-${currentGroupNumber}`;
-        for (let j = i - activeRun; j < i; j++) {
-          groupIds[j] = gid;
-        }
-      }
-      activeRun = 0;
-    }
-  }
-  if (activeRun === 1) {
-    throw new WorkoutError('validation', 'Keep each superset to two or more neighbouring exercises.');
-  }
-  if (activeRun >= 2) {
-    currentGroupNumber++;
-    const gid = `share-group-${currentGroupNumber}`;
-    for (let j = rawExercises.length - activeRun; j < rawExercises.length; j++) {
-      groupIds[j] = gid;
-    }
+  const seenGroups = new Set<number | boolean>();
+  let groupNumber = 0;
+  for (let start = 0; start < rawExercises.length;) {
+    const token = (rawExercises[start] as RoutineShareExercise).superset;
+    if (!token) { start++; continue; }
+    let end = start + 1;
+    while (end < rawExercises.length && (rawExercises[end] as RoutineShareExercise).superset === token) end++;
+    requireValidation(end - start >= 2, 'Keep each superset to two or more neighbouring exercises.');
+    requireValidation(envelope.version === 1 || !seenGroups.has(token), 'Keep each superset group together in neighbouring exercises.');
+    seenGroups.add(token);
+    const group = `share-group-${++groupNumber}`;
+    for (let index = start; index < end; index++) groupIds[index] = group;
+    start = end;
   }
 
   const exercises: RoutineExerciseInput[] = rawExercises.map((raw, idx) => {

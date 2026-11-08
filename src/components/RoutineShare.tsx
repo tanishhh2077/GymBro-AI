@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from 'zustand';
 import { createRoutineShare, readRoutineShareFile, routineShareFilename } from '@/core/routineShare';
+import { saveRoutineFile } from '@/mobile/workoutBackupExport';
 import { WorkoutError } from '@/core/workouts';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
+import type { WorkoutData } from '@/types/workout';
 import type { RoutineExerciseInput, RoutineInput, WorkoutRoutine } from '@/types/workout';
 
 export interface RoutineShareProps {
@@ -14,6 +16,7 @@ export interface RoutineShareProps {
 interface Preview {
   readonly routine: RoutineInput;
   readonly filename: string;
+  readonly source: WorkoutData;
 }
 
 function formatExerciseTargets(ex: RoutineExerciseInput, unit: string): string {
@@ -31,26 +34,13 @@ function formatExerciseTargets(ex: RoutineExerciseInput, unit: string): string {
   return parts.length > 0 ? parts.join(' ') : 'No targets specified';
 }
 
-function downloadRoutineBlob(text: string, filename: string): void {
-  const url = URL.createObjectURL(new Blob([text], { type: 'application/json;charset=utf-8' }));
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = filename;
-  anchor.hidden = true;
-  try {
-    document.body.append(anchor);
-    anchor.click();
-  } finally {
-    anchor.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-}
-
 export function RoutineShare({ store, routine, onExport }: RoutineShareProps) {
   const state = useStore(store);
   const [preview, setPreview] = useState<Preview | null>(null);
   const [reading, setReading] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const exportPending = useRef(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
@@ -59,7 +49,7 @@ export function RoutineShare({ store, routine, onExport }: RoutineShareProps) {
   const mounted = useRef(false);
 
   const available = state.loaded && !state.needsReload;
-  const blocked = !available || state.busy || reading || importing;
+  const blocked = !available || state.busy || reading || importing || exporting;
 
   useEffect(() => {
     mounted.current = true;
@@ -68,6 +58,7 @@ export function RoutineShare({ store, routine, onExport }: RoutineShareProps) {
         reader.current?.abort();
         reader.current = null;
         setReading(false);
+        setPreview(null);
       }
     });
     return () => {
@@ -78,8 +69,9 @@ export function RoutineShare({ store, routine, onExport }: RoutineShareProps) {
     };
   }, [store]);
 
-  function exportRoutine() {
-    if (!routine || blocked) return;
+  async function exportRoutine() {
+    if (!routine || blocked || exportPending.current) return;
+    exportPending.current = true; setExporting(true);
     setError('');
     setNotice('');
     try {
@@ -89,12 +81,12 @@ export function RoutineShare({ store, routine, onExport }: RoutineShareProps) {
         onExport(text, filename);
         setNotice(`Exported ${filename}.`);
       } else {
-        downloadRoutineBlob(text, filename);
-        setNotice(`Routine export requested: ${filename}`);
+        const mode = await saveRoutineFile(text);
+        if (mounted.current) setNotice(mode === 'share' ? 'Routine share sheet closed. Check your chosen destination for the file.' : `Routine export requested: ${filename}`);
       }
     } catch (failure) {
-      setError(failure instanceof Error ? failure.message : 'The routine could not be exported.');
-    }
+      if (mounted.current) setError(failure instanceof Error ? failure.message : 'The routine could not be exported.');
+    } finally { exportPending.current = false; if (mounted.current) setExporting(false); }
   }
 
   async function chooseFile(file: File) {
@@ -113,7 +105,7 @@ export function RoutineShare({ store, routine, onExport }: RoutineShareProps) {
       if (!current.loaded || current.needsReload || current.busy) {
         throw new WorkoutError('validation', 'Reload saved workouts, then choose the routine file again.');
       }
-      setPreview({ routine: parsed, filename: file.name });
+      setPreview({ routine: parsed, filename: file.name, source: current.data });
     } catch (failure) {
       if (mounted.current && reader.current === controller && !controller.signal.aborted) {
         setError(failure instanceof Error ? failure.message : 'The routine file could not be read. Choose it again.');
@@ -128,6 +120,9 @@ export function RoutineShare({ store, routine, onExport }: RoutineShareProps) {
 
   async function confirmImport() {
     if (!preview || blocked) return;
+    if (store.getState().data !== preview.source) {
+      setPreview(null); setError('Saved records changed. Choose the routine file again.'); return;
+    }
     setImporting(true);
     setError('');
     setNotice('');
@@ -174,7 +169,7 @@ export function RoutineShare({ store, routine, onExport }: RoutineShareProps) {
             className="btn-primary"
             disabled={blocked}
             aria-label={`Export routine ${routine.name}`}
-            onClick={exportRoutine}
+            onClick={() => { void exportRoutine(); }}
           >
             Export routine
           </button>
@@ -194,7 +189,7 @@ export function RoutineShare({ store, routine, onExport }: RoutineShareProps) {
           id="routine-share-file-input"
           type="file"
           accept=".json,application/json"
-          disabled={!available || state.busy || reading || importing}
+          disabled={blocked}
           className="block w-full min-w-0 max-w-full text-sm text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
           onChange={event => {
             const files = Array.from(event.currentTarget.files ?? []);
@@ -211,7 +206,7 @@ export function RoutineShare({ store, routine, onExport }: RoutineShareProps) {
       </section>
 
       <p role="status" aria-live="polite" className="text-sm text-accent">
-        {reading ? 'Reading routine file…' : importing ? 'Importing routine…' : notice}
+        {reading ? 'Reading routine file...' : importing ? 'Importing routine...' : exporting ? 'Opening routine export...' : notice}
       </p>
 
       {error && (

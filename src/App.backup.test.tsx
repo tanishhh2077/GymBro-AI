@@ -154,3 +154,15 @@ it('cancels a pending file read on navigation and ignores its stale result', asy
   expect(container.textContent).not.toContain('Restore preview');
   expect(container.textContent).not.toContain('Reading backup');
 });
+
+it('previews schema6 body and note additions and explains skipped notes', async () => {
+  await repository.save(0, { ...data(), exerciseNotes: { Bench: 'Device note' } });
+  await render(); await click('Backup and restore');
+  await choose(createWorkoutBackup({ ...data(), bodyLog: [{ id: 'body', date: 1000, weight: 80, unit: 'kg' }], exerciseNotes: { Bench: 'Other note', Row: 'Seat 2' } }, 1000));
+  expect(container.textContent).toContain('1 body entry added.');
+  expect(container.textContent).toContain('1 exercise note added.');
+  expect(container.textContent).toContain('1 exercise note skipped: you already have a note for that exercise.');
+  await click('Restore additions');
+  expect(store.getState().data.bodyLog).toHaveLength(1);
+  expect(store.getState().data.exerciseNotes).toEqual({ Bench: 'Device note', Row: 'Seat 2' });
+});

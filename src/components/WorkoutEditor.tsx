@@ -6,6 +6,7 @@ import { findPreviousExercise } from '@/core/previousWorkout';
 import { heaviestWeight } from '@/core/warmupRamp';
 import { formatWeight } from '@/core/weightDisplay';
 import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton';
+import { ExerciseNoteField } from './ExerciseNoteField';
 import { ExercisePicker } from './ExercisePicker';
 import { ExerciseHistory } from './ExerciseHistory';
 import { PlateCalculator } from './PlateCalculator';
@@ -261,6 +262,7 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
       </li>)}</ul>
       <p className="mt-2 text-xs text-slate-500">Same exercise name, unit and bodyweight setting. Review copied values before logging.</p>
     </div>}
+    <ExerciseNoteField store={store} name={exercise.name} />
     {state.data.active && <ExerciseHistory history={state.data.history} name={exercise.name} unit={unit} bodyweight={bodyweight}
       startedAt={state.data.active.startedAt} />}
     {exercise.sets.length > 0 && <div className="mb-4 overflow-x-auto"><table className="w-full text-left text-sm">

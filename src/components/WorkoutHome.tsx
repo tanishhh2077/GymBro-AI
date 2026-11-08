@@ -10,13 +10,14 @@ interface Props {
   onRoutines: () => void;
   onProgress: () => void;
   onBackup: () => void;
+  onBodyLog?: () => void;
   /** Starts a fresh workout from a finished one; the editor opens when it succeeds. */
   onRepeatLast?: (id: string) => void;
   appearance?: ReactNode;
   onAccount?: () => void;
   accountLabel?: string;
 }
-export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines, onProgress, onBackup, onRepeatLast, appearance, onAccount, accountLabel }: Props) {
+export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines, onProgress, onBackup, onBodyLog, onRepeatLast, appearance, onAccount, accountLabel }: Props) {
   const [helpOpen, setHelpOpen] = useState(false);
   if (helpOpen) return <HelpCenter onClose={() => setHelpOpen(false)} />;
   const sets = data.history.reduce((total, w) => total + w.exercises.reduce((n, e) => n + e.sets.length, 0), 0);
@@ -52,6 +53,7 @@ export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHis
         <div><dt className="text-sm text-slate-400">Sets logged</dt><dd className="mt-1 text-3xl font-semibold text-white">{sets}</dd></div>
       </dl>
     </section>}
+    {onBodyLog && <button type="button" className="btn-ghost" disabled={!available || busy} onClick={onBodyLog}>Body log</button>}
     {available && <WeeklyTrainingSummary data={data} />}
     <BackupReminder showSettings={false} blocked={!available || busy} onBackup={async () => { onBackup(); return false; }} />
     {available && <section className="flex flex-wrap items-center justify-between gap-3" aria-label="Saved routines">

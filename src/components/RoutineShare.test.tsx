@@ -303,3 +303,20 @@ describe('RoutineShare', () => {
     expect(container.scrollWidth).toBeLessThanOrEqual(420);
   });
 });
+it('clears a routine preview when saved records reload at the same revision', async () => {
+  await act(async () => root.render(<RoutineShare store={store} />));
+  const input = container.querySelector<HTMLInputElement>('input[type="file"]')!;
+  const read = FileReader.prototype.readAsArrayBuffer;
+  const loaded = new Promise<void>(resolve => vi.spyOn(FileReader.prototype, 'readAsArrayBuffer').mockImplementationOnce(function (this: FileReader, file) {
+    this.addEventListener('loadend', () => resolve(), { once: true }); read.call(this, file);
+  }));
+  await act(async () => {
+    Object.defineProperty(input, 'files', { configurable: true, value: [new File([createRoutineShare(sampleRoutine())], 'routine.json')] });
+    input.dispatchEvent(new Event('change', { bubbles: true })); await loaded;
+  });
+  expect(container.textContent).toContain('Routine preview');
+  const revision = store.getState().data.revision;
+  await act(async () => { await store.getState().load(); });
+  expect(store.getState().data.revision).toBe(revision);
+  expect(container.textContent).not.toContain('Routine preview');
+});

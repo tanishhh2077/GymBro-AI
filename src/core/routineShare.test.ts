@@ -59,8 +59,8 @@ describe('createRoutineShare', () => {
         name: 'Upper Body Power',
         unit: 'lb',
         exercises: [
-          { name: 'Bench Press', targetSets: 3, targetReps: 8, targetWeight: 200, superset: true },
-          { name: 'Dumbbell Row', targetSets: 3, targetReps: 8, targetWeight: 80, superset: true },
+          { name: 'Bench Press', targetSets: 3, targetReps: 8, targetWeight: 200, superset: 1 },
+          { name: 'Dumbbell Row', targetSets: 3, targetReps: 8, targetWeight: 80, superset: 1 },
           { name: 'Dip', targetSets: 3, targetReps: 12, targetWeight: 25, bodyweight: true },
           { name: 'Bicep Curl' },
         ],
@@ -71,7 +71,7 @@ describe('createRoutineShare', () => {
     expect(parsed.routine.id).toBeUndefined();
     expect(parsed.routine.exercises[0].id).toBeUndefined();
     expect(parsed.routine.exercises[1].id).toBeUndefined();
-    expect(parsed.routine.exercises[0].superset).toBe(true);
+    expect(parsed.routine.exercises[0].superset).toBe(1);
   });
 
   it('omits optional fields when undefined', () => {
@@ -121,7 +121,7 @@ describe('parseRoutineShare', () => {
   it('assigns superset group IDs to adjacent exercises marked with superset: true', () => {
     const shareObj = {
       format: ROUTINE_SHARE_FORMAT,
-      version: ROUTINE_SHARE_VERSION,
+      version: 1,
       routine: {
         name: 'Superset Routine',
         unit: 'kg',
@@ -222,7 +222,7 @@ describe('parseRoutineShare', () => {
 
     expect(() => parseRoutineShare(JSON.stringify({ ...base, extra: 'forbidden' }))).toThrow(/unknown/i);
     expect(() => parseRoutineShare(JSON.stringify({ ...base, format: 'wrong-format' }))).toThrow(/unsupported/i);
-    expect(() => parseRoutineShare(JSON.stringify({ ...base, version: 2 }))).toThrow(/unsupported/i);
+    expect(() => parseRoutineShare(JSON.stringify({ ...base, version: 99 }))).toThrow(/unsupported/i);
   });
 
   it('rejects invalid or unknown routine properties', () => {
@@ -326,4 +326,11 @@ describe('readRoutineShareFile', () => {
     await vi.advanceTimersByTimeAsync(10_000);
     expect(await failure).toMatchObject({ message: expect.stringMatching(/timed out/i) });
   });
+});
+it('preserves distinct adjacent superset groups through export and import', () => {
+  const routine = sampleRoutine({ exercises: ['A', 'B', 'C', 'D'].map((name, i) => ({ id: name, name, superset: i < 2 ? 'one' : 'two' })) });
+  const imported = parseRoutineShare(createRoutineShare(routine));
+  expect(imported.exercises[0].superset).toBe(imported.exercises[1].superset);
+  expect(imported.exercises[2].superset).toBe(imported.exercises[3].superset);
+  expect(imported.exercises[0].superset).not.toBe(imported.exercises[2].superset);
 });

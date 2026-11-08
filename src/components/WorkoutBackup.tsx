@@ -7,6 +7,7 @@ import { saveWorkoutBackup, saveWorkoutCsv } from '@/mobile/workoutBackupExport'
 import type { WorkoutStore } from '@/store/useWorkoutStore';
 import type { WorkoutData } from '@/types/workout';
 
+import { BackupBodyNoteCounts } from './BodyNoteConflicts';
 import { BackupReminder } from './BackupReminder';
 
 interface Preview { backup: BackupFile; source: WorkoutData; merge: BackupMerge; filename: string }
@@ -98,13 +99,13 @@ export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: 
     <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={onHome}>Back to Home</button>
     <div>
       <h1 className="text-3xl font-bold text-white">Backup and restore</h1>
-      <p className="mt-2 text-sm text-slate-400">Keep a recovery copy of your workouts, routines and goals.</p>
+      <p className="mt-2 text-sm text-slate-400">Keep a recovery copy of your workouts, routines, goals, body log and exercise notes.</p>
     </div>
     <BackupReminder blocked={blocked} onBackup={() => exportRecords()} />
     {!available && <p className="text-slate-400">Reload saved workouts to use backup and restore.</p>}
     <section aria-labelledby="backup-export-title" className="card space-y-3 p-4 sm:p-5">
       <h2 id="backup-export-title" className="text-lg font-semibold text-white">Save a backup</h2>
-      <p className="text-sm text-slate-400">Includes completed workouts, routines, goals and your active workout. The file contains readable JSON workout records.</p>
+      <p className="text-sm text-slate-400">Includes completed workouts, routines, goals, body log, exercise notes and your active workout. The file contains readable JSON workout records.</p>
       <p className="text-sm text-slate-400">Your browser downloads the file. In the installed app, choose a destination in the share sheet, such as Save to Files. Keep the file somewhere you trust.</p>
       <button type="button" className="btn-primary" disabled={blocked} onClick={() => { void exportRecords(); }}>{exporting ? 'Opening export…' : 'Export backup'}</button>
     </section>
@@ -144,6 +145,7 @@ export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: 
         <div><dt className="text-slate-400">Active workout to add</dt><dd className="mt-1 text-white">{preview.merge.addedActive ? 'Yes' : 'No'}</dd></div>
         <div><dt className="text-slate-400">Identical records skipped</dt><dd className="mt-1 text-white">{preview.merge.duplicates}</dd></div>
       </dl>
+      <BackupBodyNoteCounts merge={preview.merge} />
       {preview.merge.skippedGoals > 0 && <p className="text-sm text-slate-300">{preview.merge.skippedGoals === 1 ? '1 goal' : `${preview.merge.skippedGoals} goals`} skipped:
         {' '}you already have a goal for that exercise. Your saved goal is kept.</p>}
       {preview.merge.data === preview.source ? <p className="text-sm text-slate-400">These records are already on this device.</p> :
