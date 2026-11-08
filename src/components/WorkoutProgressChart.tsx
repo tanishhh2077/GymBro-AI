@@ -52,8 +52,8 @@ export function WorkoutProgressChart({ workouts, unit, bodyweight = false }: {
         })}
       </div>
       <div className="min-w-0 flex-1">
-        <svg role="img" aria-labelledby={`${id}-title`} aria-describedby={`${id}-description`}
-          viewBox="0 0 100 100" preserveAspectRatio="none" className="block h-44 w-full">
+        <svg role="img" tabIndex={0} aria-labelledby={`${id}-title`} aria-describedby={`${id}-description`}
+          viewBox="0 0 100 100" preserveAspectRatio="none" className="block h-44 w-full focus:outline-none focus:ring-1 focus:ring-accent rounded">
           <title id={`${id}-title`}>Heaviest logged {measure} per completed workout ({unit})</title>
           <desc id={`${id}-description`}>{workouts.length} completed workouts in finish order. Exact values and source links appear in the workout table.</desc>
           {ticks.map(tick => <line key={tick.position} x1={4} x2={96} y1={tick.position} y2={tick.position}
