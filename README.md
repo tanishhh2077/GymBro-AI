@@ -193,8 +193,8 @@ inference still need platform checks.
 
 ### Automated tests
 
-The automated test suite currently passes **1,082 tests / 88 files**, lint and
-guarded mobile sync. Manual-workout schema/repository/store and App-flow tests
+The automated test suite, lint and guarded mobile sync pass on master; current
+counts are in [STATUS](docs/STATUS.md). Manual-workout schema/repository/store and App-flow tests
 supplement the media tests below. The browser suite additionally checks
 synthetic logging, two-tab conflicts, and feature workflows; consult STATUS for
 the latest full-browser/hosted/native results.
@@ -221,7 +221,7 @@ The test suite covers:
   labels, supersets, notes), session-only rest timer with auto-rest, routine
   templates, and previous-workout autofill.
 - **Progress & records**: exercise history filtering, calendar navigation,
-  personal records, estimated 1RM, load charts, and plate calculator.
+  personal records, load charts, and plate calculator.
 - **Backup & sync**: JSON file backup/restore (web download and native share
   sheet) and Supabase database sync protocols.
 - **Native & accessibility**: mobile config validation, asset integrity,
