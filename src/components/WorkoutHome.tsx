@@ -1,6 +1,8 @@
 import type { WorkoutData } from '@/types/workout';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { WeeklyTrainingSummary } from './WeeklyTrainingSummary';
+import { HelpCenter } from './HelpCenter';
+import { BackupReminder } from './BackupReminder';
 
 interface Props {
   data: WorkoutData; available: boolean; busy: boolean;
@@ -13,6 +15,8 @@ interface Props {
   accountLabel?: string;
 }
 export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines, onProgress, onBackup, appearance, onAccount, accountLabel }: Props) {
+  const [helpOpen, setHelpOpen] = useState(false);
+  if (helpOpen) return <HelpCenter onClose={() => setHelpOpen(false)} />;
   const sets = data.history.reduce((total, w) => total + w.exercises.reduce((n, e) => n + e.sets.length, 0), 0);
   const history = [...data.history].sort((a, b) => b.finishedAt! - a.finishedAt!);
   return <div className="space-y-7">
@@ -41,6 +45,7 @@ export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHis
       </dl>
     </section>}
     {available && <WeeklyTrainingSummary data={data} />}
+    <BackupReminder showSettings={false} blocked={!available || busy} onBackup={async () => { onBackup(); return false; }} />
     {available && <section className="flex flex-wrap items-center justify-between gap-3" aria-label="Saved routines">
       <div><h2 className="text-lg font-semibold text-white">Your routines</h2>
         <p className="mt-1 text-sm text-slate-400">{data.routines?.length ?? 0} saved · exercise plans for a fresh workout</p></div>
@@ -61,6 +66,7 @@ export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHis
       {onAccount && <div className="space-y-2"><button type="button" className="btn-ghost" onClick={onAccount}>Account and sync</button>
         <p className="break-words text-xs text-slate-500">{accountLabel}</p></div>}
       <button type="button" className="btn-ghost" onClick={onBackup}>Backup and restore</button>
+      <button type="button" className="btn-ghost" onClick={() => setHelpOpen(true)}>Help</button>
       <p className="text-xs leading-relaxed text-slate-500">Workout logs are saved on this device. Clearing this app or browser’s data removes them. Keep a backup file for recovery. Video analysis is available for bench press.</p>
     </section>
   </div>;
