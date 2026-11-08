@@ -34,6 +34,13 @@ status selector was scoped (1 passed). Task A separately passed all 50 cases.
 Actual phones, native sharing, live accounts/sync and real-bench accuracy remain
 unverified. No human footage was used or uploaded.
 
+## Vision scope direction (user, 2026-11-08)
+
+The vision feature should cover six exercises next: bench press, machine chest
+press, seated cable row, biceps curl, triceps pushdown and shoulder press. This
+needs a design/plan and DECISIONS entry before code. Search results on datasets,
+models and licences: [vision data and models](research/2026-11-08-vision-data-and-models.md).
+
 ## Next work and boundaries
 
 The mandatory screens/import/account-fix work is complete. Task C muscle diagram
