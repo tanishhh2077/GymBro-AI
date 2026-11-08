@@ -54,3 +54,22 @@ it('keeps stable newest-first order without changing saved objects or input orde
   expect(result.workouts[0]).toBe(b);
   expect(history).toEqual([a, b, c]);
 });
+
+it('gracefully excludes workouts without a finished timestamp or with invalid timestamps', () => {
+  const unfinished: Workout = { id: 'unfin', name: 'In progress', unit: 'kg', startedAt: local(5), finishedAt: null, exercises: [] };
+  const negative: Workout = { id: 'neg', name: 'Negative', unit: 'kg', startedAt: 0, finishedAt: -1, exercises: [] };
+  const zero: Workout = { id: 'zero', name: 'Zero', unit: 'kg', startedAt: 0, finishedAt: 0, exercises: [] };
+  const nanTime: Workout = { id: 'nan', name: 'NaN', unit: 'kg', startedAt: 0, finishedAt: NaN, exercises: [] };
+  const history = [workout('a', 'Done', local(5)), unfinished, negative, zero, nanTime];
+  const result = filterWorkoutHistory(history, filters);
+  expect(result.workouts.map(w => w.id)).toEqual(['a']);
+});
+
+it('safely matches workouts when exercises have empty or missing names', () => {
+  const corrupt: Workout = {
+    id: 'corrupt', name: 'Corrupt exercise', unit: 'kg', startedAt: local(5), finishedAt: local(5),
+    exercises: [{ id: 'ce1', name: '', sets: [] }, { id: 'ce2', name: undefined as unknown as string, sets: [] }],
+  };
+  expect(filterWorkoutHistory([corrupt], { ...filters, query: 'corrupt' }).workouts.map(w => w.id)).toEqual(['corrupt']);
+  expect(filterWorkoutHistory([corrupt], { ...filters, query: 'bench' }).workouts).toEqual([]);
+});
