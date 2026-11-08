@@ -20,6 +20,31 @@ describe("service worker build", () => {
     ])).toEqual(["", "assets/index-a1.js", "assets/index-b2.css", "icons/icon-192.png", "manifest.webmanifest"]);
   });
 
+  it("produces deterministic shell versions regardless of map key insertion order", () => {
+    const map1 = new Map<string, string>([["a.js", "1"], ["b.css", "2"], ["index.html", "3"]]);
+    const map2 = new Map<string, string>([["index.html", "3"], ["b.css", "2"], ["a.js", "1"]]);
+    expect(shellVersion(map1, "code")).toBe(shellVersion(map2, "code"));
+
+    const binaryMap1 = new Map<string, Uint8Array>([["a.bin", new Uint8Array([1, 2, 3])]]);
+    const binaryMap2 = new Map<string, Uint8Array>([["a.bin", new Uint8Array([1, 2, 4])]]);
+    expect(shellVersion(binaryMap1, "code")).not.toBe(shellVersion(binaryMap2, "code"));
+  });
+
+  it("handles edge cases in precache selection including deep nesting, maps, and alternative html", () => {
+    expect(selectPrecache([])).toEqual([]);
+    expect(selectPrecache([
+      "404.html",
+      "index.html",
+      "assets/sub/deep/chunk.js",
+      "assets/sub/deep/chunk.js.map",
+      "assets/sw.js",
+      "sw-register.js",
+      "sw.js",
+      "models/sub/weights.bin",
+      "wasm/sub/runtime.wasm",
+    ])).toEqual(["", "404.html", "assets/sub/deep/chunk.js", "assets/sw.js", "sw-register.js"]);
+  });
+
   it("emits a classic script that starts the worker with the embedded configuration", async () => {
     const config = { version: "v1", runtimeVersion: "r1", precache: ["", "assets/a.js"] };
     const source = await buildServiceWorkerSource(config);

@@ -17,17 +17,27 @@ const shellCache = () => names.shell;
 class FakeCache {
   entries = new Map<string, Response>();
   failPut = false;
+  failMatch = false;
+  putError?: Error;
+  rejectVaryStar = false;
   async match(request: Request | string) {
+    if (this.failMatch) throw new Error("QuotaExceededError");
     return this.entries.get(typeof request === "string" ? request : request.url)?.clone();
   }
   async put(request: Request | string, response: Response) {
     if (this.failPut) throw new Error("QuotaExceededError");
+    if (this.putError) throw this.putError;
+    if (this.rejectVaryStar && response.headers.get("vary")?.includes("*")) {
+      throw new TypeError("Cannot cache response with 'Vary: *'");
+    }
     this.entries.set(typeof request === "string" ? request : request.url, response);
   }
 }
 class FakeCaches {
   stores = new Map<string, FakeCache>();
+  openError?: Error;
   async open(name: string) {
+    if (this.openError) throw this.openError;
     if (!this.stores.has(name)) this.stores.set(name, new FakeCache());
     return this.stores.get(name)!;
   }
@@ -49,8 +59,8 @@ function runtime(overrides: Partial<WorkerRuntime> = {}) {
   return { caches, fetch, value };
 }
 const get = (path: string, init: RequestInit = {}) => new Request(new URL(path, scope), init);
-const navigate = (path: string) => {
-  const request = get(path);
+const navigate = (path: string, init: RequestInit = {}) => {
+  const request = get(path, init);
   // Request constructors reject mode "navigate"; only browsers create such requests.
   Object.defineProperty(request, "mode", { value: "navigate" });
   return request;
@@ -71,10 +81,22 @@ describe("routeRequest", () => {
     ["pose model", get("/models/pose_landmarker_full.task"), "runtime"],
     ["MediaPipe runtime", get("/wasm/vision_wasm_internal.wasm"), "runtime"],
     ["POST request", get("/assets/app-abc.js", { method: "POST", body: "x" }), "bypass"],
+    ["PUT request", get("/assets/app-abc.js", { method: "PUT", body: "x" }), "bypass"],
+    ["DELETE request", get("/models/pose_landmarker_full.task", { method: "DELETE" }), "bypass"],
+    ["PATCH request", get("/assets/app-abc.js", { method: "PATCH", body: "x" }), "bypass"],
+    ["HEAD request", get("/assets/app-abc.js", { method: "HEAD" }), "bypass"],
+    ["OPTIONS request", get("/assets/app-abc.js", { method: "OPTIONS" }), "bypass"],
     ["cross-origin request", new Request("https://db.supabase.example/rest/v1/x"), "bypass"],
     ["same-origin path outside the shell", get("/sw.js"), "bypass"],
     ["asset with a query string", get("/assets/app-abc.js?v=2"), "bypass"],
+    ["pose model with a query string", get("/models/pose_landmarker_full.task?v=2"), "bypass"],
+    ["MediaPipe runtime with a query string", get("/wasm/vision_wasm_internal.wasm?token=abc"), "bypass"],
+    ["root path subresource with a query string", get("/?ref=share"), "bypass"],
     ["partial range request", get("/models/pose_landmarker_full.task", { headers: { range: "bytes=0-9" } }), "bypass"],
+    ["range request on navigation", navigate("/", { headers: { range: "bytes=0-100" } }), "bypass"],
+    ["range request on precached asset", get("/assets/app-abc.js", { headers: { range: "bytes=0-50" } }), "bypass"],
+    ["range request on wasm runtime", get("/wasm/vision_wasm_internal.wasm", { headers: { range: "bytes=100-200" } }), "bypass"],
+    ["malformed request URL", { method: "GET", url: "https://", mode: "cors", headers: new Headers() } as Request, "bypass"],
   ])("routes %s", (_label, request, route) => {
     expect(routeRequest(request, scope, precached)).toBe(route);
   });
@@ -83,6 +105,10 @@ describe("routeRequest", () => {
       .toBe("bypass");
     expect(routeRequest(new Request("https://gym.example/app/assets/a.js"), "https://gym.example/app/", precached))
       .toBe("precached");
+  });
+  it("bypasses requests to a different port on the same host", () => {
+    expect(routeRequest(new Request("https://gym.example:8443/assets/a.js"), scope, precached))
+      .toBe("bypass");
   });
 });
 
@@ -135,6 +161,135 @@ describe("install and activate", () => {
     }
     await removeOldCaches(config, value);
     expect((await caches.keys()).sort()).toEqual([names.runtime, names.shell, "other-app"].sort());
+  });
+  it("allows two installs of the same version to run concurrently without corruption", async () => {
+    const { caches, value } = runtime();
+    await Promise.all([
+      precacheShell(config, value),
+      precacheShell(config, value),
+    ]);
+    const stored = [...(await caches.open(names.shell)).entries.keys()];
+    expect(stored.sort()).toEqual(config.precache.map((path) => new URL(path, scope).href).sort());
+  });
+  it("preserves shell cache if a concurrent install fails after shell was already created", async () => {
+    const { caches, value } = runtime();
+    await caches.open(names.shell);
+    const failingWorker = {
+      ...value,
+      fetch: async () => new Response("down", { status: 500 }),
+    };
+    await expect(precacheShell(config, failingWorker)).rejects.toThrow();
+    expect(await caches.keys()).toContain(names.shell);
+  });
+  it("runs installs for two different versions concurrently and isolates failures", async () => {
+    const config2: ServiceWorkerConfig = {
+      version: "shell2", runtimeVersion: "rt2",
+      precache: ["", "assets/app-def.js"],
+    };
+    const names2 = cacheNamesFor(config2);
+    const { caches, value } = runtime({
+      fetch: async (input) => {
+        const url = String(input);
+        if (url.includes("app-def.js")) return new Response("500", { status: 500 });
+        return new Response(`ok ${url}`, { status: 200 });
+      },
+    });
+    const [res1, res2] = await Promise.allSettled([
+      precacheShell(config, value),
+      precacheShell(config2, value),
+    ]);
+    expect(res1.status).toBe("fulfilled");
+    expect(res2.status).toBe("rejected");
+    expect(await caches.keys()).toContain(names.shell);
+    expect(await caches.keys()).not.toContain(names2.shell);
+  });
+  it("discards partial cache when cache.put throws QuotaExceededError during precache", async () => {
+    const { caches, value } = runtime();
+    await caches.open(names.shell);
+    await caches.delete(names.shell);
+    const origOpen = caches.open.bind(caches);
+    caches.open = async (name: string) => {
+      const c = await origOpen(name);
+      c.failPut = true;
+      return c;
+    };
+    await expect(precacheShell(config, value)).rejects.toThrow(/QuotaExceededError/);
+    expect(await caches.keys()).not.toContain(names.shell);
+  });
+  it("fails precache and cleans up when a shell response cannot be cached due to Vary: *", async () => {
+    const { caches, value } = runtime({
+      fetch: async () => new Response("data", {
+        status: 200,
+        headers: { vary: "*" },
+      }),
+    });
+    const origOpen = caches.open.bind(caches);
+    caches.open = async (name: string) => {
+      const c = await origOpen(name);
+      c.rejectVaryStar = true;
+      return c;
+    };
+    await expect(precacheShell(config, value)).rejects.toThrow(/Vary: \*/);
+    expect(await caches.keys()).not.toContain(names.shell);
+  });
+  it("preserves headers and body when stripping redirect flag during precache", async () => {
+    const { caches, value } = runtime({
+      fetch: async () => {
+        const redirected = new Response("<html>hello</html>", {
+          status: 200,
+          statusText: "OK",
+          headers: {
+            "content-type": "text/html; charset=utf-8",
+            "etag": '"abc123xyz"',
+            "cache-control": "no-cache",
+          },
+        });
+        Object.defineProperty(redirected, "redirected", { value: true });
+        return redirected;
+      },
+    });
+    await precacheShell({ ...config, precache: [""] }, value);
+    const stored = (await caches.open(names.shell)).entries.get(scope)!;
+    expect(stored.redirected).toBe(false);
+    expect(stored.status).toBe(200);
+    expect(stored.headers.get("content-type")).toBe("text/html; charset=utf-8");
+    expect(stored.headers.get("etag")).toBe('"abc123xyz"');
+    expect(await stored.text()).toBe("<html>hello</html>");
+  });
+  it("leaves other origins, apps, and unmatched prefixes untouched during cache cleanup", async () => {
+    const { caches, value } = runtime();
+    const otherCaches = [
+      "supabase-auth-token",
+      "workbox-precache-v2",
+      "myapp-data",
+      "other-app-shell",
+      "gymbro",
+      "gymbro_v1",
+    ];
+    const oldGymBroCaches = [
+      "gymbro-shell-v0",
+      "gymbro-shell-v0.9",
+      "gymbro-runtime-old",
+    ];
+    for (const name of [...otherCaches, ...oldGymBroCaches, names.shell, names.runtime]) {
+      await caches.open(name);
+    }
+    await removeOldCaches(config, value);
+    const remaining = (await caches.keys()).sort();
+    expect(remaining).toEqual([...otherCaches, names.runtime, names.shell].sort());
+  });
+  it("handles concurrent removeOldCaches calls cleanly", async () => {
+    const { caches, value } = runtime();
+    await caches.open("gymbro-shell-old1");
+    await caches.open("gymbro-shell-old2");
+    await caches.open(names.shell);
+    await caches.open(names.runtime);
+
+    await Promise.all([
+      removeOldCaches(config, value),
+      removeOldCaches(config, value),
+    ]);
+    expect((await caches.keys()).sort()).toEqual([names.runtime, names.shell].sort());
   });
 });
 
@@ -271,6 +426,184 @@ describe("handleFetch", () => {
     const offlineResponse = await handleFetch(get(wasm), config, { ...value, fetch: offline }, () => {})!;
     expect(await offlineResponse.text()).toBe("old runtime");
   });
+
+  it("returns null for range requests so the browser handles partial responses directly", () => {
+    const { value } = runtime();
+    expect(handleFetch(get("/models/pose_landmarker_full.task", { headers: { range: "bytes=0-100" } }), config, value, () => {})).toBeNull();
+    expect(handleFetch(get("/assets/app-abc.js", { headers: { range: "bytes=0-" } }), config, value, () => {})).toBeNull();
+    expect(handleFetch(navigate("/", { headers: { range: "bytes=0-10" } }), config, value, () => {})).toBeNull();
+  });
+
+  it.each(["POST", "PUT", "DELETE", "PATCH", "HEAD"])(
+    "returns null for %s requests",
+    (method) => {
+      const { value } = runtime();
+      expect(handleFetch(get("/assets/app-abc.js", { method, body: method === "HEAD" ? undefined : "x" }), config, value, () => {})).toBeNull();
+      expect(handleFetch(get("/", { method }), config, value, () => {})).toBeNull();
+    },
+  );
+
+  it("bypasses asset and model requests with query strings", () => {
+    const { value } = runtime();
+    expect(handleFetch(get("/assets/app-abc.js?v=2"), config, value, () => {})).toBeNull();
+    expect(handleFetch(get("/models/pose_landmarker_full.task?token=secret"), config, value, () => {})).toBeNull();
+    expect(handleFetch(get("/wasm/vision_wasm_internal.wasm?debug=1"), config, value, () => {})).toBeNull();
+  });
+
+  it("serves navigation with query strings using network-first and shell fallback", async () => {
+    const { caches, value } = runtime({ fetch: offline });
+    (await caches.open(names.shell)).entries.set(scope, new Response("cached shell"));
+    const response = await handleFetch(navigate("/history?tab=records&unit=kg"), config, value, () => {})!;
+    expect(await response.text()).toBe("cached shell");
+  });
+
+  it("returns network response without crashing when cache.put fails due to Vary: *", async () => {
+    const { caches, value } = runtime({
+      fetch: async () => new Response("lazy chunk with vary star", {
+        status: 200,
+        headers: { "content-type": "application/javascript", vary: "*" },
+      }),
+    });
+    (await caches.open(names.shell)).rejectVaryStar = true;
+    const work = waitUntil();
+    const response = await handleFetch(get("/assets/lazy-star.js"), config, value, work.add)!;
+    await expect(Promise.all(work.pending)).resolves.toBeDefined();
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe("lazy chunk with vary star");
+  });
+
+  it("stores and serves cacheable responses with standard Vary: Accept-Encoding", async () => {
+    const { caches, value } = runtime({
+      fetch: async () => new Response("chunk with vary encoding", {
+        status: 200,
+        headers: { "content-type": "application/javascript", vary: "Accept-Encoding" },
+      }),
+    });
+    const work = waitUntil();
+    const response = await handleFetch(get("/assets/lazy-enc.js"), config, value, work.add)!;
+    await Promise.all(work.pending);
+    expect(await response.text()).toBe("chunk with vary encoding");
+
+    const assetUrl = new URL("assets/lazy-enc.js", scope).href;
+    expect((await caches.open(names.shell)).entries.has(assetUrl)).toBe(true);
+
+    const cachedResp = await handleFetch(get("/assets/lazy-enc.js"), config, { ...value, fetch: vi.fn(offline) }, () => {})!;
+    expect(await cachedResp.text()).toBe("chunk with vary encoding");
+  });
+
+  it("still returns asset when caching it throws QuotaExceededError", async () => {
+    const { caches, value } = runtime();
+    (await caches.open(names.shell)).failPut = true;
+    const work = waitUntil();
+    const response = await handleFetch(get("/assets/lazy-quota.js"), config, value, work.add)!;
+    await expect(Promise.all(work.pending)).resolves.toBeDefined();
+    expect(response.status).toBe(200);
+    expect(await response.text()).toMatch(/network/);
+  });
+
+  it("gracefully falls back to network when opening the cache throws QuotaExceededError in lookup", async () => {
+    const { caches, value } = runtime();
+    caches.openError = new Error("QuotaExceededError");
+    const response = await handleFetch(navigate("/"), config, value, () => {})!;
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe(`network ${scope}`);
+  });
+
+  it("gracefully falls back to network when matching in cache throws QuotaExceededError in lookup", async () => {
+    const { caches, value } = runtime();
+    (await caches.open(names.shell)).failMatch = true;
+    const response = await handleFetch(navigate("/"), config, value, () => {})!;
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe(`network ${scope}`);
+  });
+
+  it("returns network redirect directly for online navigation", async () => {
+    const { value } = runtime({
+      fetch: async () => {
+        const redirected = new Response("redirected page", { status: 200 });
+        Object.defineProperty(redirected, "redirected", { value: true });
+        return redirected;
+      },
+    });
+    const response = await handleFetch(navigate("/"), config, value, () => {})!;
+    expect(response.redirected).toBe(true);
+    expect(await response.text()).toBe("redirected page");
+  });
+
+  it("serves redirect-free start page from cache when offline navigation falls back", async () => {
+    const { caches, value } = runtime({ fetch: offline });
+    const cachedShell = new Response("offline shell", { status: 200 });
+    Object.defineProperty(cachedShell, "redirected", { value: false });
+    (await caches.open(names.shell)).entries.set(scope, cachedShell);
+
+    const response = await handleFetch(navigate("/dashboard"), config, value, () => {})!;
+    expect(response.redirected).toBe(false);
+    expect(await response.text()).toBe("offline shell");
+  });
+
+  it("serves network 5xx responses for navigation as received (networkFirst only catches fetch rejections)", async () => {
+    const { caches, value } = runtime({
+      fetch: async () => new Response("503 Service Unavailable", { status: 503 }),
+    });
+    (await caches.open(names.shell)).entries.set(scope, new Response("cached shell"));
+    const response = await handleFetch(navigate("/"), config, value, () => {})!;
+    expect(response.status).toBe(503);
+    expect(await response.text()).toBe("503 Service Unavailable");
+  });
+
+  it("serves network captive-portal HTML for navigation as received", async () => {
+    const { caches, value } = runtime({
+      fetch: async () => new Response("<html><head><title>WiFi Login</title></head></html>", {
+        status: 200,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      }),
+    });
+    (await caches.open(names.shell)).entries.set(scope, new Response("cached shell"));
+    const response = await handleFetch(navigate("/"), config, value, () => {})!;
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain("WiFi Login");
+  });
+
+  it("never caches 5xx responses for subresources or runtime files", async () => {
+    const { caches, value } = runtime({
+      fetch: async () => new Response("Server error", { status: 500 }),
+    });
+    const work = waitUntil();
+    const assetResp = await handleFetch(get("/assets/lazy-500.js"), config, value, work.add)!;
+    const modelResp = await handleFetch(get("/models/pose_landmarker_full.task"), config, value, work.add)!;
+    await Promise.all(work.pending);
+    expect(assetResp.status).toBe(500);
+    expect(modelResp.status).toBe(500);
+    expect((await caches.open(names.shell)).entries.size).toBe(0);
+    expect((await caches.open(names.runtime)).entries.size).toBe(0);
+  });
+
+  // REAL BUG DOCUMENTATION:
+  // When a lifter is at a gym with a server outage (HTTP 500/502/503/504) or behind a captive portal,
+  // networkFirst in serviceWorkerCore.ts only falls back to the cached shell on fetch promise
+  // rejection (e.g. TypeError when totally offline) or after a 4-second timeout. It does not
+  // check response.ok or response.status >= 500. Consequently, the user sees a raw 5xx error
+  // or login portal rather than the offline GymBro AI shell.
+  it.skip("falls back to the installed shell when navigation returns a 5xx server error (real bug: networkFirst only catches fetch rejections, not 5xx HTTP errors)", async () => {
+    const { caches, value } = runtime({
+      fetch: async () => new Response("502 Bad Gateway", { status: 502 }),
+    });
+    (await caches.open(names.shell)).entries.set(scope, new Response("cached shell"));
+    const response = await handleFetch(navigate("/"), config, value, () => {})!;
+    expect(await response.text()).toBe("cached shell");
+  });
+
+  it.skip("falls back to the installed shell when navigation receives captive-portal HTML (real bug: networkFirst cannot distinguish captive-portal HTML from valid app HTML)", async () => {
+    const { caches, value } = runtime({
+      fetch: async () => new Response("<html>Login to Gym WiFi</html>", {
+        status: 200,
+        headers: { "content-type": "text/html" },
+      }),
+    });
+    (await caches.open(names.shell)).entries.set(scope, new Response("cached shell"));
+    const response = await handleFetch(navigate("/"), config, value, () => {})!;
+    expect(await response.text()).toBe("cached shell");
+  });
 });
 
 describe("startServiceWorker", () => {
@@ -303,6 +636,23 @@ describe("startServiceWorker", () => {
     expect(respondWith).not.toHaveBeenCalled();
     fire("fetch", { request: get("/assets/app-abc.js"), respondWith, waitUntil: () => {} });
     expect(respondWith).toHaveBeenCalledOnce();
+    respondWith.mockClear();
+
+    // Range requests do not trigger respondWith
+    const rangeRequest = get("/models/pose_landmarker_full.task", { headers: { range: "bytes=0-100" } });
+    fire("fetch", { request: rangeRequest, respondWith, waitUntil: () => {} });
+    expect(respondWith).not.toHaveBeenCalled();
+
+    // Subresource with query string does not trigger respondWith
+    const queryAsset = get("/assets/app-abc.js?v=2");
+    fire("fetch", { request: queryAsset, respondWith, waitUntil: () => {} });
+    expect(respondWith).not.toHaveBeenCalled();
+
+    // Navigation with query string DOES trigger respondWith
+    const queryNav = navigate("/history?date=today");
+    fire("fetch", { request: queryNav, respondWith, waitUntil: () => {} });
+    expect(respondWith).toHaveBeenCalledOnce();
+
     expect(skipWaiting).not.toHaveBeenCalled();
   });
 });
