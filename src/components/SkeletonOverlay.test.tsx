@@ -22,10 +22,11 @@ let nextFrame: number;
 const observers = new Set<ControlledResizeObserver>();
 
 class ControlledResizeObserver implements ResizeObserver {
+  observedElements = new Set<Element>();
   constructor(private callback: ResizeObserverCallback) { observers.add(this); }
-  observe() {}
-  unobserve() {}
-  disconnect() { observers.delete(this); }
+  observe(target: Element) { this.observedElements.add(target); }
+  unobserve(target: Element) { this.observedElements.delete(target); }
+  disconnect() { observers.delete(this); this.observedElements.clear(); }
   notify() { this.callback([], this); }
 }
 
@@ -35,7 +36,11 @@ function points(x = .25, visibility: number | undefined = .8): NormalizedLandmar
   return result;
 }
 
-function render(frames: PoseFrame[], targetFps = 30) {
+function render(
+  frames: PoseFrame[],
+  targetFps = 30,
+  props: { minVisibility?: number; color?: string; className?: string } = {},
+) {
   const attach = (element: HTMLVideoElement | null) => {
     videoRef.current = element;
     if (!element) return;
@@ -50,7 +55,7 @@ function render(frames: PoseFrame[], targetFps = 30) {
     });
   };
   act(() => root.render(
-    <div><video ref={attach} /><SkeletonOverlay videoRef={videoRef} frames={frames} targetFps={targetFps} /></div>,
+    <div><video ref={attach} /><SkeletonOverlay videoRef={videoRef} frames={frames} targetFps={targetFps} {...props} /></div>,
   ));
 }
 
@@ -218,5 +223,209 @@ describe("SkeletonOverlay", () => {
     act(() => root.render(null));
     expect(observers.size).toBe(0);
     for (const [type, listener] of added.mock.calls) expect(removed).toHaveBeenCalledWith(type, listener);
+  });
+
+  it("skips undefined points in landmarks array and draws remaining valid joints/bones", () => {
+    const p = points();
+    (p as (NormalizedLandmark | undefined)[])[11] = undefined;
+    p[12] = { x: .5, y: .5, z: 0, visibility: .8 };
+    render([{ index: 0, time: 0, landmarks: p, worldLandmarks: null }]);
+    paint();
+    expect(ctx.arc).toHaveBeenCalledWith(40, 70, 4.5, 0, Math.PI * 2);
+  });
+
+  it("clears canvas and does not draw when frame landmarks array is empty", () => {
+    render([{ index: 0, time: 0, landmarks: [], worldLandmarks: null }]);
+    paint();
+    expect(ctx.clearRect).toHaveBeenCalled();
+    expect(ctx.arc).not.toHaveBeenCalled();
+  });
+
+  it("gracefully handles landmarks array with fewer than 33 elements without error", () => {
+    const shortLandmarks = [
+      { x: .5, y: .5, z: 0, visibility: .9 },
+      { x: .6, y: .6, z: 0, visibility: .9 },
+    ];
+    render([{ index: 0, time: 0, landmarks: shortLandmarks, worldLandmarks: null }]);
+    paint();
+    expect(ctx.clearRect).toHaveBeenCalled();
+    expect(ctx.arc).not.toHaveBeenCalled();
+  });
+
+  it("clears and does not draw when frame landmarks is null", () => {
+    render([{ index: 0, time: 0, landmarks: null, worldLandmarks: null }]);
+    paint();
+    expect(ctx.clearRect).toHaveBeenCalled();
+    expect(ctx.arc).not.toHaveBeenCalled();
+  });
+
+  it("draws bone when both connected landmarks are visible, and skips bone when one is low visibility", () => {
+    const p = points();
+    p[11] = { x: .25, y: .25, z: 0, visibility: .8 };
+    p[12] = { x: .75, y: .75, z: 0, visibility: .8 };
+    render([{ index: 0, time: 0, landmarks: p, worldLandmarks: null }]);
+    paint();
+    expect(ctx.moveTo).toHaveBeenCalled();
+    expect(ctx.lineTo).toHaveBeenCalled();
+    expect(ctx.stroke).toHaveBeenCalled();
+
+    ctx.moveTo.mockClear();
+    ctx.lineTo.mockClear();
+    p[12].visibility = .2;
+    render([{ index: 0, time: 0, landmarks: p, worldLandmarks: null }]);
+    paint();
+    expect(ctx.moveTo).not.toHaveBeenCalled();
+    expect(ctx.lineTo).not.toHaveBeenCalled();
+  });
+
+  it("does not draw joints or bones when landmark visibility is below default 0.3 floor", () => {
+    const p = points(.25, .29);
+    render([{ index: 0, time: 0, landmarks: p, worldLandmarks: null }]);
+    paint();
+    expect(ctx.arc).not.toHaveBeenCalled();
+  });
+
+  it("filters joints by custom minVisibility prop", () => {
+    const p = points(.25, .55);
+    render([{ index: 0, time: 0, landmarks: p, worldLandmarks: null }], 30, { minVisibility: 0.6 });
+    paint();
+    expect(ctx.arc).not.toHaveBeenCalled();
+
+    ctx.arc.mockClear();
+    render([{ index: 0, time: 0, landmarks: p, worldLandmarks: null }], 30, { minVisibility: 0.5 });
+    paint();
+    expect(ctx.arc).toHaveBeenCalledWith(20, 58.75, 4.5, 0, Math.PI * 2);
+  });
+
+  it("does not draw when video bounding rect width or height is zero or negative", () => {
+    videoBox = new DOMRect(20, 50, 0, 140);
+    render([pose()]);
+    paint();
+    expect(ctx.arc).not.toHaveBeenCalled();
+    const canvas = container.querySelector("canvas")!;
+    expect(canvas.width).toBe(0);
+
+    videoBox = new DOMRect(20, 50, -80, -140);
+    render([pose()]);
+    paint();
+    expect(ctx.arc).not.toHaveBeenCalled();
+  });
+
+  it("does not draw when video source width or height is zero or negative", () => {
+    media.sourceW = 0;
+    media.sourceH = 900;
+    render([pose()]);
+    paint();
+    expect(ctx.clearRect).toHaveBeenCalled();
+    expect(ctx.arc).not.toHaveBeenCalled();
+
+    ctx.arc.mockClear();
+    media.sourceW = 1600;
+    media.sourceH = -900;
+    render([pose()]);
+    paint();
+    expect(ctx.arc).not.toHaveBeenCalled();
+  });
+
+  it("observes the video element with ResizeObserver and triggers redraw on observer notification", () => {
+    render([pose()]);
+    paint();
+    expect(observers.size).toBe(1);
+    const observer = [...observers][0];
+    expect(observer.observedElements.has(video)).toBe(true);
+
+    ctx.arc.mockClear();
+    videoBox = new DOMRect(20, 50, 160, 280);
+    act(() => { observer.notify(); });
+    const canvas = container.querySelector("canvas")!;
+    expect(canvas.style.width).toBe("160px");
+    expect(canvas.style.height).toBe("280px");
+    expect(ctx.arc).toHaveBeenCalled();
+  });
+
+  it("triggers redraw when window resize event fires", () => {
+    render([pose()]);
+    paint();
+    ctx.arc.mockClear();
+
+    videoBox = new DOMRect(10, 10, 100, 200);
+    act(() => { window.dispatchEvent(new Event("resize")); });
+    const canvas = container.querySelector("canvas")!;
+    expect(canvas.style.width).toBe("100px");
+    expect(canvas.style.height).toBe("200px");
+    expect(ctx.arc).toHaveBeenCalled();
+  });
+
+  it("triggers redraw when window orientationchange event fires", () => {
+    render([pose()]);
+    paint();
+    ctx.arc.mockClear();
+
+    act(() => { window.dispatchEvent(new Event("orientationchange")); });
+    expect(ctx.arc).toHaveBeenCalled();
+  });
+
+  it("draws pose at t=0 when first frame is at t=0", () => {
+    media.time = 0;
+    render([pose(0, .25)]);
+    paint();
+    expect(ctx.arc).toHaveBeenCalled();
+  });
+
+  it("holds first frame at t=0 when first frame is within endpoint hold", () => {
+    media.time = 0;
+    render([pose(.02, .25)]);
+    paint();
+    expect(ctx.arc).toHaveBeenCalled();
+  });
+
+  it("does not draw at t=0 when first frame is beyond endpoint hold", () => {
+    media.time = 0;
+    render([pose(.05, .25)]);
+    paint();
+    expect(ctx.arc).not.toHaveBeenCalled();
+  });
+
+  it("draws when t is before first frame within endpoint hold, and hides when beyond", () => {
+    const frames = [pose(1, .25), pose(1.05, .75)];
+    media.time = .98;
+    render(frames);
+    paint();
+    expect(ctx.arc).toHaveBeenCalled();
+
+    ctx.arc.mockClear();
+    media.time = .95;
+    notify("seeked");
+    paint();
+    expect(ctx.arc).not.toHaveBeenCalled();
+  });
+
+  it("draws when t is after last frame within endpoint hold, and hides when beyond", () => {
+    const frames = [pose(1, .25), pose(1.05, .75)];
+    media.time = 1.07;
+    render(frames);
+    paint();
+    expect(ctx.arc).toHaveBeenCalled();
+
+    ctx.arc.mockClear();
+    media.time = 1.12;
+    notify("seeked");
+    paint();
+    expect(ctx.arc).not.toHaveBeenCalled();
+  });
+
+  it("interpolates across short gaps (span <= 2 intervals) and hides skeleton across long gaps (span > 2 intervals)", () => {
+    const shortGap = [pose(0, .25), { ...pose(2 / 30, .75), index: 1 }];
+    media.time = 1 / 30;
+    render(shortGap, 30);
+    paint();
+    expect(ctx.arc).toHaveBeenCalled();
+
+    ctx.arc.mockClear();
+    const longGap = [pose(0, .25), { ...pose(.1, .75), index: 1 }];
+    media.time = .05;
+    render(longGap, 30);
+    paint();
+    expect(ctx.arc).not.toHaveBeenCalled();
   });
 });
