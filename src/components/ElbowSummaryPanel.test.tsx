@@ -68,6 +68,7 @@ describe('ElbowSummaryPanel', () => {
     expect(container.textContent).toContain('Missing samples are excluded');
     expect(container.textContent).toContain('tracking errors');
     expect(container.textContent).toContain('not per-repetition range of motion');
+    expect(container.textContent).toContain('validated bench technique');
     expect(container.textContent).not.toMatch(/confidence|form score/i);
   });
   it('replaces displayed extrema and callbacks when given a new summary', () => {
