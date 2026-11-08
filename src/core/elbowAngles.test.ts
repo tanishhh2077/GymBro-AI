@@ -134,3 +134,202 @@ describe('observed sample selection and discontinuous evidence', () => {
     expect(adjacentElbowSample(s, NaN, 'next')).toBeNull();
   });
 });
+
+describe('edge cases: geometry, visibility, coordinates and missingness', () => {
+  describe('collinear and coincident geometry', () => {
+    it.each([
+      ['vertical straight (180 deg)', { x: .5, y: .2 }, { x: .5, y: .5 }, { x: .5, y: .8 }, 180],
+      ['vertical folded (0 deg)', { x: .5, y: .2 }, { x: .5, y: .8 }, { x: .5, y: .2 }, 0],
+      ['diagonal straight (180 deg)', { x: .2, y: .2 }, { x: .5, y: .5 }, { x: .8, y: .8 }, 180],
+      ['diagonal folded (0 deg)', { x: .2, y: .2 }, { x: .5, y: .5 }, { x: .3, y: .3 }, 0],
+      ['horizontal folded arm (0 deg)', { x: .3, y: .5 }, { x: .7, y: .5 }, { x: .4, y: .5 }, 0],
+    ])('computes exact collinear angle for %s', (_, shoulder, elbow, wrist, expected) => {
+      const f = frame();
+      Object.assign(f.landmarks![11], shoulder);
+      Object.assign(f.landmarks![13], elbow);
+      Object.assign(f.landmarks![15], wrist);
+      expect(measureElbows(pose([f])).samples[0].left.degrees).toBeCloseTo(expected, 4);
+    });
+
+    it('computes 0 degrees when shoulder and wrist are coincident but elbow is distinct', () => {
+      const f = frame();
+      Object.assign(f.landmarks![11], { x: .2, y: .4 });
+      Object.assign(f.landmarks![13], { x: .2, y: .8 });
+      Object.assign(f.landmarks![15], { x: .2, y: .4 });
+      const sample = measureElbows(pose([f])).samples[0];
+      expect(sample.left).toEqual({ degrees: 0, reason: null });
+    });
+
+    it.each([
+      ['elbow coincident with wrist', 13, 15],
+      ['elbow coincident with shoulder', 13, 11],
+      ['all three joints coincident', -1, -1],
+    ])('abstains with degenerate-geometry when %s', (_, j1, j2) => {
+      const f = frame();
+      if (j1 === -1) {
+        Object.assign(f.landmarks![11], { x: .3, y: .3 });
+        Object.assign(f.landmarks![13], { x: .3, y: .3 });
+        Object.assign(f.landmarks![15], { x: .3, y: .3 });
+      } else {
+        Object.assign(f.landmarks![j1], { ...f.landmarks![j2] });
+      }
+      expect(measureElbows(pose([f])).samples[0].left).toEqual({ degrees: null, reason: 'degenerate-geometry' });
+    });
+
+    it('measures right side collinear 0 and 180 degrees', () => {
+      const f180 = frame();
+      Object.assign(f180.landmarks![12], { x: .1, y: .5 });
+      Object.assign(f180.landmarks![14], { x: .5, y: .5 });
+      Object.assign(f180.landmarks![16], { x: .9, y: .5 });
+      expect(measureElbows(pose([f180])).samples[0].right.degrees).toBeCloseTo(180);
+
+      const f0 = frame();
+      Object.assign(f0.landmarks![12], { x: .1, y: .5 });
+      Object.assign(f0.landmarks![14], { x: .5, y: .5 });
+      Object.assign(f0.landmarks![16], { x: .2, y: .5 });
+      expect(measureElbows(pose([f0])).samples[0].right.degrees).toBeCloseTo(0);
+    });
+  });
+
+  describe('coordinate validation: NaN, Infinity and outside-image bounds', () => {
+    it.each([
+      ['wrist y = NaN', 15, 'y', NaN, 'invalid-coordinate'],
+      ['wrist y = Infinity', 15, 'y', Infinity, 'invalid-coordinate'],
+      ['wrist y = -Infinity', 15, 'y', -Infinity, 'invalid-coordinate'],
+      ['wrist x = -Infinity', 15, 'x', -Infinity, 'invalid-coordinate'],
+      ['elbow x = NaN', 13, 'x', NaN, 'invalid-coordinate'],
+      ['elbow y = Infinity', 13, 'y', Infinity, 'invalid-coordinate'],
+      ['shoulder x = NaN', 11, 'x', NaN, 'invalid-coordinate'],
+      ['shoulder y = -Infinity', 11, 'y', -Infinity, 'invalid-coordinate'],
+      ['wrist y = -0.01 (outside)', 15, 'y', -0.01, 'outside-image'],
+      ['wrist y = 1.01 (outside)', 15, 'y', 1.01, 'outside-image'],
+      ['elbow x = -0.1 (outside)', 13, 'x', -0.1, 'outside-image'],
+      ['shoulder x = 1.05 (outside)', 11, 'x', 1.05, 'outside-image'],
+    ] as const)('abstains with %s for joint %s.%s = %s', (_, jointIdx, axis, val, expectedReason) => {
+      const f = frame();
+      f.landmarks![jointIdx][axis] = val;
+      expect(measureElbows(pose([f])).samples[0].left).toEqual({ degrees: null, reason: expectedReason });
+    });
+  });
+
+  describe('missing landmarks and partial landmark arrays', () => {
+    it('abstains with missing-joint if landmark array is completely empty', () => {
+      const f = frame();
+      f.landmarks = [];
+      expect(measureElbows(pose([f])).samples[0].left).toEqual({ degrees: null, reason: 'missing-joint' });
+      expect(measureElbows(pose([f])).samples[0].right).toEqual({ degrees: null, reason: 'missing-joint' });
+    });
+
+    it.each([
+      ['shoulder is undefined', 11],
+      ['elbow is undefined', 13],
+      ['wrist is undefined', 15],
+    ])('abstains with missing-joint when %s', (_, jointIndex) => {
+      const f = frame();
+      delete (f.landmarks as unknown as Record<number, unknown>)[jointIndex];
+      expect(measureElbows(pose([f])).samples[0].left).toEqual({ degrees: null, reason: 'missing-joint' });
+      expect(measureElbows(pose([f])).samples[0].right.degrees).toBeCloseTo(90);
+    });
+
+    it('abstains on right side only when right wrist (16) is missing', () => {
+      const f = frame();
+      f.landmarks = f.landmarks!.slice(0, 16);
+      const sample = measureElbows(pose([f])).samples[0];
+      expect(sample.left.degrees).toBeCloseTo(90);
+      expect(sample.right).toEqual({ degrees: null, reason: 'missing-joint' });
+    });
+  });
+
+  describe('visibility edge cases and exact threshold cutoffs', () => {
+    it('accepts landmark with visibility exactly equal to the default cutoff 0.5', () => {
+      const f = frame();
+      f.landmarks![13].visibility = 0.5;
+      expect(measureElbows(pose([f])).samples[0].left.degrees).toBeCloseTo(90);
+    });
+
+    it('rejects landmark with visibility just below cutoff (0.499999)', () => {
+      const f = frame();
+      f.landmarks![13].visibility = 0.499999;
+      expect(measureElbows(pose([f])).samples[0].left).toEqual({ degrees: null, reason: 'low-visibility' });
+    });
+
+    it('allows cutoff = 0 and admits visibility = 0', () => {
+      const f = frame();
+      f.landmarks![11].visibility = 0;
+      f.landmarks![13].visibility = 0;
+      f.landmarks![15].visibility = 0;
+      expect(measureElbows(pose([f]), 0).samples[0].left.degrees).toBeCloseTo(90);
+    });
+
+    it('enforces cutoff = 1 requiring perfect visibility = 1.0', () => {
+      const f = frame();
+      f.landmarks![13].visibility = 0.9999;
+      expect(measureElbows(pose([f]), 1).samples[0].left).toEqual({ degrees: null, reason: 'low-visibility' });
+
+      f.landmarks![13].visibility = 1.0;
+      expect(measureElbows(pose([f]), 1).samples[0].left.degrees).toBeCloseTo(90);
+    });
+
+    it.each([11, 13, 15])('reports low-visibility when only joint %i is below cutoff', (jointIdx) => {
+      const f = frame();
+      f.landmarks![jointIdx].visibility = 0.3;
+      expect(measureElbows(pose([f])).samples[0].left).toEqual({ degrees: null, reason: 'low-visibility' });
+    });
+  });
+
+  describe('single-sample series behavior', () => {
+    it('produces exactly one sample and queries nearest/adjacent samples correctly', () => {
+      const p = pose([frame(0.2, 5)]);
+      const s = measureElbows(p);
+      expect(s.samples).toHaveLength(1);
+      expect(s.samples[0]).toMatchObject({ frameIndex: 5, time: 0.2 });
+
+      expect(nearestElbowSample(s, 0.2)?.frameIndex).toBe(5);
+      expect(nearestElbowSample(s, 0.2 + 1 / 30)?.frameIndex).toBe(5);
+      expect(nearestElbowSample(s, 0.2 + 1 / 30 + 0.001)).toBeNull();
+
+      expect(adjacentElbowSample(s, 0.2, 'next')).toBeNull();
+      expect(adjacentElbowSample(s, 0.2, 'previous')).toBeNull();
+
+      expect(elbowSegments(s, 'left')).toEqual([[{ time: 0.2, degrees: 90 }]]);
+    });
+
+    it('returns empty segments for a single unavailable sample', () => {
+      const f = frame(0.1, 0);
+      f.landmarks = null;
+      const s = measureElbows(pose([f]));
+      expect(elbowSegments(s, 'left')).toEqual([]);
+      expect(nearestElbowSample(s, 0.1)?.left.reason).toBe('no-pose');
+    });
+  });
+
+  describe('all-missing clip behavior', () => {
+    it('handles series where every frame has missing pose across entire clip', () => {
+      const frames = [frame(0, 0), frame(0.1, 1), frame(0.2, 2)];
+      for (const f of frames) f.landmarks = null;
+      const s = measureElbows(pose(frames));
+
+      expect(s.samples).toHaveLength(3);
+      for (const sample of s.samples) {
+        expect(sample.left).toEqual({ degrees: null, reason: 'no-pose' });
+        expect(sample.right).toEqual({ degrees: null, reason: 'no-pose' });
+      }
+
+      expect(elbowSegments(s, 'left')).toEqual([]);
+      expect(elbowSegments(s, 'right')).toEqual([]);
+      expect(adjacentElbowSample(s, 0, 'next')).toBeNull();
+      expect(adjacentElbowSample(s, 0.2, 'previous')).toBeNull();
+      expect(nearestElbowSample(s, 0.1)?.frameIndex).toBe(1);
+    });
+
+    it('handles series where left side is completely obscured but right is measurable', () => {
+      const frames = [frame(0, 0), frame(1 / 30, 1), frame(2 / 30, 2)];
+      for (const f of frames) f.landmarks![13].visibility = 0.1;
+      const s = measureElbows(pose(frames));
+
+      expect(elbowSegments(s, 'left')).toEqual([]);
+      expect(elbowSegments(s, 'right')).toHaveLength(1);
+      expect(elbowSegments(s, 'right')[0]).toHaveLength(3);
+    });
+  });
+});
