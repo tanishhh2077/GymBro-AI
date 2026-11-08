@@ -67,6 +67,16 @@ also verifies the visible iPhone-simulator interface. Physical-device video
 handling is unverified. Optional account services need the setup above. See [iOS](ios/README.md),
 [Android](android/README.md) and the [mobile plan](docs/superpowers/plans/2026-11-03-mobile-prototype.md).
 
+## Install as an app
+
+Open the deployed HTTPS site in Safari (iPhone) or Chrome (Android and desktop). On
+iPhone, **export a backup first** (Backup and restore), because an installed home
+screen app may keep its workouts separate from Safari; then Share, "Add to Home
+Screen", open it once online, and run one video analysis online so the pose model is
+saved for offline use. Updates arrive on the next online launch of the app. To
+remove it, back up, delete the icon, then clear the site's data in the browser
+settings. The native Capacitor apps do not use the service worker.
+
 ## Project context and development
 
 - [Current handoff](docs/HANDOFF.md): start here in Claude Code or Codex; includes the exact test baseline and next task.

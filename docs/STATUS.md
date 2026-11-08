@@ -10,6 +10,14 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Q49–Q56 phase 1 (D-059) is integrated on master: warm-up suggestions, workout time,
+display settings, weekly target, schema6 storage and the installable app. Two fresh
+reviews (schema6, installable app) found no Blocker/High; their Medium and Low
+findings were fixed. Combined: 1314 tests/106 files, lint, native sync, database tests,
+42 Chromium cases. Analysis-loading tests now use a 30 s timeout after a cold-cache
+flake. Unverified: real-browser install, offline start and offline analysis, iOS
+storage separation between Safari and an installed app, any phone behaviour.
+
 Tasks46–51 (Q34–Q37, Q39, Q40; D-058) are complete. Claude Code (Opus 5.5) ran
 five agent branches: schema5 storage, first-run intro, workout editor UI and
 Progress/goals UI, combined on `chore/integrate-q34-q41`.

@@ -767,6 +767,25 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
 - Q38 (video rep counting) waits for validation on the user's own private
   videos, with the user present; Q41 (health export) waits for the phone session.
 
+### D-059 Body log, exercise notes, installable app and small conveniences
+
+- On 2026-11-07 the user accepted Q49–Q56: Q49 A (installable web app), Q50 C
+  (body weight plus measurements), Q51 A, Q52 A, Q53 A, Q54 A, Q55 A and Q56 A.
+- Schema6 adds a library `bodyLog` (weight and eight fixed measurements, units
+  stored only with their values) and `exerciseNotes` keyed by exact exercise name.
+  Versions 1–5 stay readable without writes. A backup note that differs from a
+  saved note is skipped and counted; sync turns body and note differences into
+  choosable conflicts. A fifth Supabase migration accepts schema6. Body data never
+  feeds records, progress, volume or CSV.
+- The web app is installable: `public/manifest.webmanifest`, `public/icons/`, and a
+  generated `sw.js` that works offline after the first visit. It never handles
+  other origins, uploads or video, never registers in the native app (removed from
+  native copies by `mobile:sync`) and never calls `skipWaiting`. iOS may keep an
+  installed app's storage separate from Safari, so users should back up first.
+- Warm-up suggestions, elapsed workout time, reduced motion, a text-size choice
+  and a weekly workout target are UI or device-local only. Q55 routine sharing and
+  the body log and notes screens are still to be built.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

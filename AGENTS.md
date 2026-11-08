@@ -178,7 +178,7 @@ task. They must not interfere with one another:
 
 Vite copies every file in `public/` into the built site unchanged, where anyone can request it. For that reason `public/` holds no Markdown or instruction files; these rules replace its former local guidance ([D-017](docs/DECISIONS.md#d-017-repository-structure-fixes)).
 
-- Keep only files the running app serves: `public/models/pose_landmarker_full.task` (the local pose model), `public/wasm/` (the MediaPipe JavaScript loaders and WebAssembly runtime), and static SVG files. Images imported by source code belong in `src/assets/`.
+- Keep only files the running app serves: `public/models/pose_landmarker_full.task` (the local pose model), `public/wasm/` (the MediaPipe JavaScript loaders and WebAssembly runtime), static SVG files, and the installable-app files `public/manifest.webmanifest` and `public/icons/` ([D-059](docs/DECISIONS.md#d-059-body-log-exercise-notes-installable-app-and-small-conveniences)); the service worker `sw.js` is generated at build time and is never committed or copied into native bundles. Images imported by source code belong in `src/assets/`.
 - Never place workout footage, personal data, credentials, or secrets here.
 - Treat the model and runtime as vendor files and never hand-edit them. `@mediapipe/tasks-vision` is pinned to an exact version in `package.json`, and `public/wasm/` must be a byte-identical copy of that package's `wasm/` folder. Upgrade the package, the runtime copy, and the model compatibility check together in one reviewed change, recording source, version, license, and checksum.
 - Keep runtime loading local. A remote model or runtime URL changes network and privacy behavior and needs an accepted decision.

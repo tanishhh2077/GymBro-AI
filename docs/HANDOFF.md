@@ -3,36 +3,37 @@
 Updated 2026-11-06, America/Chicago. Read root/scoped AGENTS.md first.
 Follow D-024/D-036. Detailed evidence is in [STATUS.md](STATUS.md).
 
-## Completed approved batch
+## Completed approved work (Q49–Q56 phase 1, D-059)
 
-Tasks46–51 implement Q34–Q37, Q39 and Q40 under D-058 (Claude Code, Opus 5.5;
-five agent branches with separate file ownership, one integration branch).
-- RPE (Q34): optional 1–10 effort per set; never changes records or volume.
-- Supersets (Q35): group adjacent exercises; moves keep a group together.
-- Bodyweight (Q36): weight is added load, negative for assistance; records,
-  history and previous values keep bodyweight and loaded entries apart.
-- Goals (Q37): one goal per exercise, unit and bodyweight setting, with progress
-  from actual Regular sets only.
-- First-run intro (Q39): three skippable screens; "Show intro again" on Home.
-- Unit display (Q40): converted weight shown as "≈ …", display only.
-Q38 rep counting and Q41 health export are deferred (see D-058).
+Claude Code (Opus 5.5) built these with separate agents and worktrees, each
+merged after its checks; storage and the installable app also got a fresh review.
+- Warm-up suggestions (Q52) and elapsed workout time (Q53).
+- Reduced motion, text size (Q56) and a weekly workout target (Q54), all device-local.
+- Schema6 storage (Q50, Q51): body log and exercise notes, backup, sync and the
+  fifth Supabase migration. **No screens use it yet.**
+- Installable web app (Q49): manifest, icons, offline-start service worker.
+Gemini (Antigravity) delivered small test and accessibility branches, reviewed and
+merged. Q38 rep counting and Q41 health export are deferred (D-058).
 
-Storage is schema5. Fresh storage reviews of schema4 and schema5 found no
-Blocker/High; their findings are fixed. Combined checks: 990 tests/83 files
-with four workers, lint, build, native sync (16 files per platform), database
-tests and all 40 Chromium cases. **Supabase needs all four migrations in
-order** before sync; updated clients save schema5. Phone behaviour unverified.
+Checks on the integrated master: 1314 tests/106 files with four workers, lint,
+native sync (20 files per platform), database tests and all 42 Chromium cases.
+**Supabase needs all five migrations in order** before sync. Not verified in a real
+browser or on a phone: installing, offline start, offline analysis, iOS storage.
 
 ## Next work
 
-No approved feature is pending. Q&A resumes at Q42 when the user asks. Q38 needs
-the user present with their private bench videos (kept outside the repository).
-Backlog: removing one member of a two-exercise superset drops the other's unsaved
-set entry without a prompt; goal edits refuse after any other save while open.
-Preserve all worker branches/checkouts and the incomplete Task4 branch; use
-isolated ownership, one browser suite on 4179 and assign numbers at integration.
+1. Screens for schema6: body log (weight, measurements, trend), exercise notes in
+   the editor, sync-conflict choosers for body and note conflicts in AccountPanel,
+   and the new backup counts in the restore preview (`addedBodyEntries`,
+   `addedExerciseNotes`, `skippedExerciseNotes`).
+2. Q55: export and import one routine as a small file.
+3. Codex's local Q42–Q48 batch (Help, favourites, equipment, backup reminders,
+   custom rest) is unmerged; it must renumber its decision (D-058 is taken) and
+   merge master first. App.tsx, WorkoutHome.tsx and WorkoutBackup.tsx wait for it.
+Q&A resumes at Q57. Q38 needs the user present with private bench videos. Preserve
+all worker branches and the incomplete Task4 branch; one browser suite on 4179.
 
-Supabase still needs user dashboard setup, all four migrations and email-code
+Supabase still needs user dashboard setup, all five migrations and email-code
 configuration in [the guide](../supabase/README.md). Live email and real
 cross-device sync remain unverified. Phone/media work requires user presence.
 
