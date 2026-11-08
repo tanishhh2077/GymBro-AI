@@ -10,11 +10,13 @@ interface Props {
   onRoutines: () => void;
   onProgress: () => void;
   onBackup: () => void;
+  /** Starts a fresh workout from a finished one; the editor opens when it succeeds. */
+  onRepeatLast?: (id: string) => void;
   appearance?: ReactNode;
   onAccount?: () => void;
   accountLabel?: string;
 }
-export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines, onProgress, onBackup, appearance, onAccount, accountLabel }: Props) {
+export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHistory, onRoutines, onProgress, onBackup, onRepeatLast, appearance, onAccount, accountLabel }: Props) {
   const [helpOpen, setHelpOpen] = useState(false);
   if (helpOpen) return <HelpCenter onClose={() => setHelpOpen(false)} />;
   const sets = data.history.reduce((total, w) => total + w.exercises.reduce((n, e) => n + e.sets.length, 0), 0);
@@ -34,6 +36,12 @@ export function WorkoutHome({ data, available, busy, onWorkout, onAnalyze, onHis
         <span className="mt-2 block text-sm text-slate-300">Side-view bench press review</span>
       </button>
     </div>
+    {available && onRepeatLast && !data.active && history.length > 0 && <button type="button" disabled={busy}
+      aria-label="Repeat last workout" onClick={() => onRepeatLast(history[0].id)}
+      className="flex w-full min-w-0 items-center justify-between gap-3 rounded-xl border border-white/10 px-4 py-3 text-left transition hover:bg-white/5 disabled:opacity-50">
+      <span className="min-w-0"><span className="block font-semibold text-white">Repeat last workout</span>
+        <span className="block break-words text-sm text-slate-400">{history[0].name} · same exercises, no sets logged</span></span>
+    </button>}
     {available && <section aria-label="Training totals" className="space-y-4 border-y border-white/10 py-5">
       <div className="flex items-center justify-between gap-3">
         <h2 className="font-semibold text-white">Training totals</h2>

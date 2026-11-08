@@ -141,6 +141,7 @@ export default function App({ workouts = workoutStore, session = useSessionStore
         onWorkout={() => navigate('workout')} onAnalyze={() => navigate('analysis')}
         onRoutines={() => navigate('routines')}
         onProgress={() => navigate('progress')} onBackup={() => navigate('backup')} onHistory={openHistory}
+        onRepeatLast={async id => { if ((await workouts.getState().repeatWorkout(id)).ok) navigate('workout'); }}
         onAccount={accountPanel ? () => navigate('account') : undefined} accountLabel={accountLabel}
         appearance={<><AppearanceControl settings={appearance} /><ShowIntroAgain intro={intro} /></>} />}
       {view === 'workout' && <WorkoutEditor store={workouts} analysis={analysis} restSettings={restSettings}
