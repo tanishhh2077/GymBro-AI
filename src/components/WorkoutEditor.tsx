@@ -3,11 +3,14 @@ import { useStore } from 'zustand';
 import type { SetKind, WeightUnit, Workout, WorkoutExercise } from '@/types/workout';
 import type { WorkoutStore } from '@/store/useWorkoutStore';
 import { findPreviousExercise } from '@/core/previousWorkout';
+import { heaviestWeight } from '@/core/warmupRamp';
 import { formatWeight } from '@/core/weightDisplay';
 import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton';
 import { ExercisePicker } from './ExercisePicker';
 import { ExerciseHistory } from './ExerciseHistory';
 import { PlateCalculator } from './PlateCalculator';
+import { WarmupSuggestion } from './WarmupSuggestion';
+import { WorkoutElapsed } from './WorkoutElapsed';
 import { REST_DURATIONS, type ExerciseRestSettings } from '@/store/useExerciseRest';
 import { confirmDiscard, useConfirmLeave, useUnsavedChanges } from './unsavedChanges';
 import { plannedTarget } from './plannedTarget';
@@ -71,7 +74,8 @@ export function WorkoutEditor({ store, onFinished, onSetLogged, analysis, restSe
   const groups = supersetNames(workout.exercises);
   return <div className="space-y-6">
     <div className="flex flex-wrap items-start justify-between gap-3">
-      <div className="min-w-0 flex-1"><h1 className="break-words text-3xl font-bold text-white">{workout.name}</h1><p className="mt-2 text-sm text-slate-400">Active workout · weights in {workout.unit}</p></div>
+      <div className="min-w-0 flex-1"><h1 className="break-words text-3xl font-bold text-white">{workout.name}</h1><p className="mt-2 text-sm text-slate-400">Active workout · weights in {workout.unit}</p>
+        <WorkoutElapsed startedAt={workout.startedAt} /></div>
       <button type="button" className="btn-ghost text-danger" disabled={disabled} onClick={async () => {
         if (window.confirm('Discard this workout and its logged sets?')) await state.discardWorkout();
       }}>Discard workout</button>
@@ -276,6 +280,9 @@ function ExerciseEditor({ workoutId, exercise, unit, store, analysis, onSetLogge
           }}>Remove</button></td>
       </tr>)}</tbody>
     </table></div>}
+    {!bodyweight && <WarmupSuggestion name={exercise.name} unit={unit} disabled={state.busy || state.needsReload || !state.loaded}
+      prefill={state.data.active ? heaviestWeight(findPreviousExercise(state.data.history, state.data.active, exercise.name, 'regular', false)?.sets ?? []) : undefined}
+      addWarmup={(warmupReps, warmupWeight) => state.addSet(exercise.id, warmupReps, warmupWeight, 'warmup')} />}
     <form aria-label={`Log a set for ${exercise.name}`} className="space-y-3" onSubmit={async event => {
       event.preventDefault();
       // Blank RPE means none: omitted on a new set, cleared (null) when editing.
