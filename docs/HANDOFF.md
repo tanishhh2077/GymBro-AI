@@ -37,8 +37,10 @@ unverified. No human footage was used or uploaded.
 ## Vision scope direction (user, 2026-11-08)
 
 The vision feature should cover six exercises next: bench press, machine chest
-press, seated cable row, biceps curl, triceps pushdown and shoulder press. This
-needs a design/plan and DECISIONS entry before code. Search results on datasets,
+press, seated cable row, biceps curl, triceps pushdown and shoulder press. The
+proposed [design](superpowers/specs/2026-11-08-multi-exercise-analysis-design.md) and
+[plan](superpowers/plans/2026-11-08-multi-exercise-analysis.md) (D-061) await user approval and
+answers to three open questions before code. Search results on datasets,
 models and licences: [vision data and models](research/2026-11-08-vision-data-and-models.md).
 
 ## Next work and boundaries

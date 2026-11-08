@@ -809,6 +809,20 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   session fallback. Device-local utilities remain separate from the schema6
   workout library.
 
+### D-061 Six-exercise video analysis direction
+
+- On 2026-11-08 the user chose six exercises for the vision feature: bench press,
+  machine chest press, seated cable row, biceps curl, triceps pushdown and shoulder
+  press. Other exercises wait until these work. This widens D-014's bench-only scope
+  for planning.
+- Proposed, not accepted: the [design](superpowers/specs/2026-11-08-multi-exercise-analysis-design.md)
+  and [plan](superpowers/plans/2026-11-08-multi-exercise-analysis.md). These cover
+  per-repetition 2D observations, with the exercise picked by the user, no form
+  score, and session-only results. Code waits for the user to approve them and
+  answer their three open questions.
+- No downloaded model fits; MediaPipe stays the pose model. Non-commercial
+  datasets may be used only privately for evaluation, never committed or shipped.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.
