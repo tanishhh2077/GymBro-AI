@@ -10,6 +10,39 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+Tasks46–52 implement Q42–Q48 under D-058 in separate Codex worktrees while
+Claude's Q34–Q41 branches remain pending. Three workers implemented local
+profiles/reminders, rest controls and favorites/filter/help. Root integrated Home
+entries. Implementation/review used Codex, with root model gpt-6-astra.
+
+- Named equipment profiles, device-local favorites, built-in equipment filters,
+  custom rest and live 15-second adjustments are available through existing UI.
+  Home opens searchable Help and shows due backup reminders. Backup settings
+  enable weekly reminders, snooze one day or dismiss seven days. Navigation to
+  Backup leaves reminders due until an actual export request succeeds.
+- A fresh source reviewer found one P2 profile recovery overwrite. Regression
+  tests reproduced save/delete after failure plus another tab's save. Sticky
+  screen-only fallback fixed it, and re-review confirmed resolution. Reminder
+  fallback uses the same rule. No other confirmed review defects remained.
+- Process-local Node22.23.2, clean installs and owned dev endpoints were verified.
+  Final full tests with four workers pass 945 cases/79 files in 53.82 seconds.
+  Lint/build pass. Native sync verifies 16 files/platform and three plugins.
+  Vite transforms 512 modules, entry JS 334.90 kB/101.06 kB gzip.
+- The full Chromium156.0.8078.4 run passed 42 of 43 cases in 4.6 minutes. Its
+  remaining old test counted every labelled section, including the new profile
+  section. Scoping it to the two intended exercise regions passed the affected
+  rerun (1 case/9.6 seconds), browser TypeScript and scoped lint. Thus every
+  browser case has passing evidence across the full run and affected rerun.
+  GPU/120-sample no-person checks passed. Synthetic new cases cover favorites,
+  filters, profiles, reminders, Help and rest controls at 390px. Source remained
+  steady during each browser run and one coordinator owned port4179.
+- Verification used the clean integration worktree. Original-checkout Claude
+  edits in previousWorkout.ts, workoutCsv.ts and workoutSummary.ts were retained.
+  Pending schema5/training UI/goals/onboarding branches were not integrated.
+  No saved-workout schema or service settings changed. Physical-phone behavior,
+  live cloud sync and real-bench validation remain open. Shared docs updated at
+  final integration, with local link/diff checks.
+
 Tasks38–45 (Q26–Q33, D-057) are complete. Claude Code (Opus 5.5) ran three
 parallel agents: storage (`feat/notes-target-weight-storage`), Progress insights
 (`feat/training-insights`) and editing screens (`feat/workout-editing-ui`, built

@@ -750,6 +750,25 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   sequence shared storage changes and obtain fresh review of persistence changes.
   No additional phone/account/service setup is implied.
 
+### D-058 Independent utility batch Q42–Q48
+
+- The user approved all seven recommended options while reserving Claude's
+  unfinished Q34–Q41 work. Tasks46–52 implement Q42–Q48 respectively.
+- Named equipment profiles save unit, bar weight and inventory locally. Builder
+  bounds are 20 profiles, with explicit load/delete and target drafts preserved.
+- Running rest supports minus/plus 15 seconds. Custom whole minutes/seconds
+  accept 1 second through 60 minutes and remain session-only.
+- Exact-name favorites are saved on this device. Built-in equipment filtering
+  retains custom-name search. These preferences stay outside workout backup/sync.
+- Searchable Help opens from Home and describes implemented logging, routines,
+  backup and current bench-video requirements without new analysis claims.
+- Weekly reminders are opt-in and device-local, first due seven days after
+  enabling. Builder choices are one-day snooze and seven-day dismissal. Due
+  reminders appear on Home and Backup. Navigation does not claim an export.
+- Malformed/unsupported settings are preserved. Profile/reminder storage failure
+  retains explicit screen-only fallback until unmount. Favorites use a shared
+  session fallback. Saved workout schema and Claude-owned files are unaffected.
+
 ## Specification-author defaults and later acceptance
 
 The numeric input bounds, timeouts, and sampling/display tolerances in [spec.md](../spec.md) were specification-author proposals, accepted as initial configurable guardrails with D-013. They remain engineering choices, not performance measurements or validated confidence thresholds.

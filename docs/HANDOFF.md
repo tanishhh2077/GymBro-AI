@@ -3,45 +3,41 @@
 Updated 2026-11-06, America/Chicago. Read root/scoped AGENTS.md first.
 Follow D-024/D-036. Detailed evidence is in [STATUS.md](STATUS.md).
 
-## Completed approved batch
+## Completed utility batch
 
-Tasks38–45 implement all eight Q26–Q33 choices under D-057 (Claude Code, Opus 5.5,
-three parallel agents with separate file ownership, then one integration branch).
-- Workout notes (Q26): one optional note per workout, editable during and after
-  training, shown in history and the summary.
-- Reorder (Q27): Move up/down for active exercises; logged sets stay with them.
-- Repeat (Q28): a finished workout starts a fresh one with the same exercises
-  and targets, zero sets; previous-value hints appear automatically.
-- Exercise detail (Q29): Progress opens per exact name and unit records, chart and
-  completed-workout history.
-- Unsaved changes (Q30): changed forms ask "Discard unsaved changes?" before
-  navigation, Cancel or reload; unchanged and saved forms never ask.
-- Target weight (Q31): optional planned load per routine exercise, copied into
-  started workouts and shown apart from logged sets; never counted as actual work.
-- Weekly consistency (Q32): completed workouts per Sunday–Saturday local week for
-  the last 12 weeks on Progress.
-- Name suggestions (Q33): previous workout names offered, custom names allowed.
+Tasks46–52 implement Q42–Q48 under D-058.
+- Named device-local equipment profiles in the plate calculator.
+- Running rest minus/plus 15 seconds and custom durations from 1 second to 60 minutes.
+- Device-local exercise favorites and built-in equipment filters.
+- Searchable Help accessible from Home.
+- Optional weekly backup reminders, due on Home/Backup with one-day snooze
+  and seven-day dismissal. Export requests remain distinct from confirmed files.
 
-Storage is schema4 (notes, target weights). Versions 1–3 still read with only an
-in-memory version change; backup conflict checks and sync include the new fields.
-A fresh storage review found no Blocker/High; its findings are fixed (routine
-target weights kept on edit, conflict cards show notes/targets, revision-checked
-note saves, CRLF normalised, unpaired surrogates rejected). Combined checks: 900
-tests/74 files with four workers, lint, build, native sync (16 files per
-platform) and all 37 Chromium cases (three specs now accept the new discard
-prompt). **Supabase needs the third migration** `202611070001_notes_target_weight.sql`
-before sync: updated clients save schema4. Phone behaviour remains unverified.
+Three isolated Codex workers and one fresh source review completed this batch.
+A profile recovery overwrite was reproduced, fixed and independently re-reviewed.
+945 tests/79 files, lint/build and native sync pass. Browser evidence covers all
+43 cases across the full run (42 passed) and one affected test rerun after its
+broad section-count assertion was scoped to actual exercise regions.
 
-## Next work
+## Transfer back to Claude
 
-No approved feature is pending. Q&A resumes at Q34 when the user asks. Preserve
-all worker branches/checkouts and the incomplete Task4 branch. Use isolated
-ownership, one browser suite on 4179 and previews on 4183, and assign
-task/decision numbers at integration.
+Q34–Q41 remain Claude's unfinished batch. Preserve schema5/training-detail UI,
+progress-goals UI and onboarding branches and their worktrees. They were not
+merged by this utility batch. Inspect their current changes before resuming.
+Tasks46–52 and D-058 are now allocated to utilities. Assign later task/decision
+numbers from current master at integration. Further product questions start Q49.
 
-Supabase still needs user dashboard setup, all three migrations and email-code
-configuration in [the guide](../supabase/README.md). Live email and real
-cross-device sync remain unverified. Phone/media work requires user presence.
+The original checkout retains Claude edits in src/core/previousWorkout.ts,
+src/core/workoutCsv.ts and src/core/workoutSummary.ts. Do not accidentally stage
+these with unrelated work. Utility verification used an isolated clean checkout.
+Integrate against current origin/master, preserving utility additions. App.tsx,
+workout storage/schema and unfinished Claude source files were left to Claude.
+Keep worker branches/checkouts and incomplete Task4. Use one browser suite on4179.
+
+Master still uses schema4. Supabase setup needs user dashboard actions, all three
+integrated migrations and email-code configuration in [the guide](../supabase/README.md).
+Claude's pending schema5 migration needs verification with that later integration.
+Phone, native sharing/alerts and real cloud sync remain unverified.
 
 ## Phone and media boundaries
 

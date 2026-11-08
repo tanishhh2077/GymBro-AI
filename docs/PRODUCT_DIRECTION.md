@@ -41,6 +41,18 @@ and brief reason.
 | 31. Routine target weights | A: optional target weight per exercise, separate from actual results |
 | 32. Training consistency | A: weekly completed-workout counts for the last 12 weeks |
 | 33. Workout names | A: suggest previous names while allowing custom names |
+| 42. Calculator equipment | A: named device-local bar/plate profiles |
+| 43. Running rest adjustment | A: minus/plus 15 seconds |
+| 44. Custom rest | A: custom minutes/seconds alongside presets |
+| 45. Favorite exercises | A: device-local starred exercises first |
+| 46. Equipment filtering | A: built-in equipment filters, custom names searchable |
+| 47. Permanent help | A: searchable logging/routines/backup/video reference |
+| 48. Backup reminders | A: optional weekly in-app reminder with backup/snooze/dismiss |
+
+Q34–Q41 are reserved for Claude's unfinished effort/superset/bodyweight/goals,
+video-validation/onboarding/unit-display/health-export batch. Inspect its existing
+branches and edits before resuming. Q42–Q48 were separately approved and are
+implemented as Tasks46–52 under D-058. Further questions can start at Q49.
 
 Q20–Q25 were accepted together with an explicit instruction to build all
 recommended options. Tasks32–37 implement them under D-051–D-056.
