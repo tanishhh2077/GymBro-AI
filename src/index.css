@@ -163,3 +163,16 @@
     scrollbar-width: none;
   }
 }
+
+/* Device-local text size: every rem-based size scales from the root. */
+html[data-text-size="large"] { font-size: 112.5%; }
+html[data-text-size="larger"] { font-size: 125%; }
+
+/* Respect the system "reduce motion" setting: no animated or eased movement. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { useSessionStore, type SessionStore } from "@/store/useSessionStore";
 import { resolveSetLink, type ResolvedSet } from "@/core/setLinks";
 import { emptyWorkoutData } from "@/core/workouts";
@@ -77,6 +77,8 @@ export function AnalysisWorkspace({
   };
 
   return (
+    // "user" makes every animation below, including the video stage, follow the system reduce-motion setting.
+    <MotionConfig reducedMotion="user">
     <div className="relative min-h-full">
       <BackdropFX accent={accent} />
 
@@ -188,6 +190,7 @@ export function AnalysisWorkspace({
         </AnimatePresence>
       </div>
     </div>
+    </MotionConfig>
   );
 }
 
