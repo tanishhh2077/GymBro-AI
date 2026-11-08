@@ -39,7 +39,8 @@ export function ElbowSummaryPanel({ summary, onSeek }: ElbowSummaryPanelProps) {
       </div>
       <p className="mt-3 text-xs leading-relaxed text-slate-400">
         Missing samples are excluded. Extremes may reflect tracking errors;
-        these are observed 2D values, not per-repetition range of motion.
+        these are observed 2D values, not per-repetition range of motion or
+        validated bench technique.
       </p>
     </section>
   );
