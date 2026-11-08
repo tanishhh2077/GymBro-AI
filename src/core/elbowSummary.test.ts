@@ -92,3 +92,208 @@ describe('clip elbow summary', () => {
     expect(() => summarizeElbows(s)).toThrow(RangeError);
   });
 });
+
+describe('edge cases: single sample, all-missing clips, ties, and 0/180 degrees', () => {
+  describe('single-sample clip behavior', () => {
+    it('summarizes a single measurable sample where lowest and highest coincide', () => {
+      const result = summarizeElbows(series([sample(0.5, 3, 90, 120)]));
+      expect(result).toEqual({
+        totalSamples: 1,
+        left: {
+          measurableSamples: 1,
+          unavailableSamples: 0,
+          lowest: { degrees: 90, time: 0.5, frameIndex: 3 },
+          highest: { degrees: 90, time: 0.5, frameIndex: 3 },
+        },
+        right: {
+          measurableSamples: 1,
+          unavailableSamples: 0,
+          lowest: { degrees: 120, time: 0.5, frameIndex: 3 },
+          highest: { degrees: 120, time: 0.5, frameIndex: 3 },
+        },
+      });
+    });
+
+    it('summarizes a single unavailable sample with null extrema', () => {
+      const result = summarizeElbows(series([sample(0.5, 3, null, null)]));
+      expect(result).toEqual({
+        totalSamples: 1,
+        left: { measurableSamples: 0, unavailableSamples: 1, lowest: null, highest: null },
+        right: { measurableSamples: 0, unavailableSamples: 1, lowest: null, highest: null },
+      });
+    });
+
+    it('summarizes a single asymmetric sample where only one side is measurable', () => {
+      const result = summarizeElbows(series([sample(0.1, 0, null, 75)]));
+      expect(result.left).toEqual({ measurableSamples: 0, unavailableSamples: 1, lowest: null, highest: null });
+      expect(result.right).toEqual({
+        measurableSamples: 1,
+        unavailableSamples: 0,
+        lowest: { degrees: 75, time: 0.1, frameIndex: 0 },
+        highest: { degrees: 75, time: 0.1, frameIndex: 0 },
+      });
+    });
+  });
+
+  describe('all-missing clip behavior', () => {
+    it('summarizes multi-frame clips where all frames are unavailable on both sides', () => {
+      const s = series([
+        sample(0.1, 1, null, null),
+        sample(0.2, 2, null, null),
+        sample(0.3, 3, null, null),
+        sample(0.4, 4, null, null),
+        sample(0.5, 5, null, null),
+      ]);
+      s.samples[0].left = { degrees: null, reason: 'no-pose' };
+      s.samples[1].left = { degrees: null, reason: 'low-visibility' };
+      s.samples[2].left = { degrees: null, reason: 'outside-image' };
+      s.samples[3].left = { degrees: null, reason: 'degenerate-geometry' };
+      s.samples[4].left = { degrees: null, reason: 'missing-joint' };
+
+      const result = summarizeElbows(s);
+      expect(result.totalSamples).toBe(5);
+      expect(result.left).toEqual({ measurableSamples: 0, unavailableSamples: 5, lowest: null, highest: null });
+      expect(result.right).toEqual({ measurableSamples: 0, unavailableSamples: 5, lowest: null, highest: null });
+    });
+
+    it('summarizes clips where one side is completely unavailable and the other is fully measurable', () => {
+      const s = series([
+        sample(0.1, 0, null, 60),
+        sample(0.2, 1, null, 110),
+        sample(0.3, 2, null, 85),
+      ]);
+      const result = summarizeElbows(s);
+      expect(result.left).toEqual({ measurableSamples: 0, unavailableSamples: 3, lowest: null, highest: null });
+      expect(result.right).toEqual({
+        measurableSamples: 3,
+        unavailableSamples: 0,
+        lowest: { degrees: 60, time: 0.1, frameIndex: 0 },
+        highest: { degrees: 110, time: 0.2, frameIndex: 1 },
+      });
+    });
+  });
+
+  describe('ties for lowest and highest angle', () => {
+    it('preserves the earliest observation when all samples have the identical angle', () => {
+      const s = series([
+        sample(0.1, 1, 90, 90),
+        sample(0.2, 2, 90, 90),
+        sample(0.3, 3, 90, 90),
+        sample(0.4, 4, 90, 90),
+      ]);
+      const result = summarizeElbows(s);
+      expect(result.left.lowest).toEqual({ degrees: 90, time: 0.1, frameIndex: 1 });
+      expect(result.left.highest).toEqual({ degrees: 90, time: 0.1, frameIndex: 1 });
+      expect(result.right.lowest).toEqual({ degrees: 90, time: 0.1, frameIndex: 1 });
+      expect(result.right.highest).toEqual({ degrees: 90, time: 0.1, frameIndex: 1 });
+    });
+
+    it('keeps the earliest sample on ties for lowest angle', () => {
+      const s = series([
+        sample(0.1, 0, 45, 90),
+        sample(0.2, 1, 80, 90),
+        sample(0.3, 2, 45, 90),
+        sample(0.4, 3, 120, 90),
+      ]);
+      const result = summarizeElbows(s);
+      expect(result.left.lowest).toEqual({ degrees: 45, time: 0.1, frameIndex: 0 });
+      expect(result.left.highest).toEqual({ degrees: 120, time: 0.4, frameIndex: 3 });
+    });
+
+    it('keeps the earliest sample on ties for highest angle', () => {
+      const s = series([
+        sample(0.1, 0, 70, 90),
+        sample(0.2, 1, 140, 90),
+        sample(0.3, 2, 80, 90),
+        sample(0.4, 3, 140, 90),
+      ]);
+      const result = summarizeElbows(s);
+      expect(result.left.lowest).toEqual({ degrees: 70, time: 0.1, frameIndex: 0 });
+      expect(result.left.highest).toEqual({ degrees: 140, time: 0.2, frameIndex: 1 });
+    });
+
+    it('preserves earliest ties across alternating extrema', () => {
+      const s = series([
+        sample(0.1, 0, 40, 160),
+        sample(0.2, 1, 150, 50),
+        sample(0.3, 2, 40, 160),
+        sample(0.4, 3, 150, 50),
+      ]);
+      const result = summarizeElbows(s);
+      expect(result.left.lowest).toEqual({ degrees: 40, time: 0.1, frameIndex: 0 });
+      expect(result.left.highest).toEqual({ degrees: 150, time: 0.2, frameIndex: 1 });
+      expect(result.right.lowest).toEqual({ degrees: 50, time: 0.2, frameIndex: 1 });
+      expect(result.right.highest).toEqual({ degrees: 160, time: 0.1, frameIndex: 0 });
+    });
+
+    it('preserves earliest tie when identical extrema are separated by unavailable observations', () => {
+      const s = series([
+        sample(0.1, 0, 60, 60),
+        sample(0.2, 1, null, null),
+        sample(0.3, 2, 60, 60),
+      ]);
+      const result = summarizeElbows(s);
+      expect(result.left.lowest).toEqual({ degrees: 60, time: 0.1, frameIndex: 0 });
+      expect(result.left.highest).toEqual({ degrees: 60, time: 0.1, frameIndex: 0 });
+    });
+  });
+
+  describe('0 and 180 degree angles and range boundaries', () => {
+    it('records 0 degrees as the lowest angle without treating 0 as falsy or unset', () => {
+      const s = series([
+        sample(0.1, 0, 90, 100),
+        sample(0.2, 1, 0, 50),
+        sample(0.3, 2, 45, 0),
+      ]);
+      const result = summarizeElbows(s);
+      expect(result.left.lowest).toEqual({ degrees: 0, time: 0.2, frameIndex: 1 });
+      expect(result.right.lowest).toEqual({ degrees: 0, time: 0.3, frameIndex: 2 });
+    });
+
+    it('records 180 degrees as the highest angle', () => {
+      const s = series([
+        sample(0.1, 0, 120, 180),
+        sample(0.2, 1, 180, 130),
+        sample(0.3, 2, 90, 80),
+      ]);
+      const result = summarizeElbows(s);
+      expect(result.left.highest).toEqual({ degrees: 180, time: 0.2, frameIndex: 1 });
+      expect(result.right.highest).toEqual({ degrees: 180, time: 0.1, frameIndex: 0 });
+    });
+
+    it('supports 0 and 180 degrees occurring in the same clip', () => {
+      const s = series([
+        sample(0.1, 0, 0, 180),
+        sample(0.2, 1, 90, 90),
+        sample(0.3, 2, 180, 0),
+      ]);
+      const result = summarizeElbows(s);
+      expect(result.left.lowest).toEqual({ degrees: 0, time: 0.1, frameIndex: 0 });
+      expect(result.left.highest).toEqual({ degrees: 180, time: 0.3, frameIndex: 2 });
+      expect(result.right.lowest).toEqual({ degrees: 0, time: 0.3, frameIndex: 2 });
+      expect(result.right.highest).toEqual({ degrees: 180, time: 0.1, frameIndex: 0 });
+    });
+
+    it('keeps earliest sample on ties at 0 degrees and ties at 180 degrees', () => {
+      const s = series([
+        sample(0.1, 0, 0, 180),
+        sample(0.2, 1, 45, 90),
+        sample(0.3, 2, 0, 180),
+      ]);
+      const result = summarizeElbows(s);
+      expect(result.left.lowest).toEqual({ degrees: 0, time: 0.1, frameIndex: 0 });
+      expect(result.right.highest).toEqual({ degrees: 180, time: 0.1, frameIndex: 0 });
+    });
+
+    it.each([0.0001, 179.9999])('accepts near-boundary angle %s', (degrees) => {
+      const s = series([sample(0.1, 0, degrees, degrees)]);
+      const result = summarizeElbows(s);
+      expect(result.left.lowest?.degrees).toBe(degrees);
+      expect(result.left.highest?.degrees).toBe(degrees);
+    });
+
+    it.each([-0.0001, 180.0001])('rejects just-out-of-bounds angle %s', (degrees) => {
+      expect(() => summarizeElbows(series([sample(0, 0, degrees, 90)]))).toThrow(RangeError);
+    });
+  });
+});
