@@ -31,6 +31,17 @@ native sync (20 files/platform). Browser: 45/48 in the full run; all four cases
 in affected specs passed after two test-readiness fixes. Fresh source review found
 no significant defects. Full evidence and the initial timeout are in STATUS.
 
+## Prior art: openGym (read before copying anything)
+
+openGym (github.com/DuarteSantos8/openGym, about 20k stars, in the App Store) is a
+self-hosted workout tracker. It has no pose or video analysis, which is our difference.
+It is **AGPL v3**; its App Store exception is the owner's and does not pass to us, so
+**do not copy or adapt its code**. Safe: write our own Strong/Hevy/FitNotes import from
+the apps' export formats; use MuscleMap (MIT, credit it) for a muscle diagram; use the
+MIT exercise dataset hasaneyldrm/exercises-dataset after checking its own licence.
+Never use its Gym visual exercise animations or stills. Contributing there needs
+its CLA; propose first. Based on its NOTICE, CLA, roadmap and file list only.
+
 ## Next work
 
 1. Screens for schema6: body log (weight, measurements, trend), exercise notes in
