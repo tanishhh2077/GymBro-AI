@@ -58,12 +58,12 @@ export function WorkoutImport({ store, onClose }: { store: WorkoutStore; onClose
     <p className="text-sm text-slate-400">Only external-load weight-and-reps sets are supported. Bodyweight, assisted, timed and distance sets stop the entire import. No records are saved until you confirm the preview.</p>
     {!available && <p role="status">Reload saved workouts to import.</p>}
     <label className="block text-sm">Strong file weight unit
-      <select aria-label="Strong file weight unit" className="input ml-2" value={unit} disabled={state.busy} onChange={event => { clear(); setUnit(event.target.value as WeightUnit | ''); }}>
+      <select aria-label="Strong file weight unit" className="mt-2 w-full min-w-0 rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white disabled:opacity-60" value={unit} disabled={state.busy} onChange={event => { clear(); setUnit(event.target.value as WeightUnit | ''); }}>
         <option value="">Choose if importing Strong</option><option value="kg">kg</option><option value="lb">lb</option>
       </select>
     </label>
     <label className="block text-sm">Source UTC offset in minutes
-      <input aria-label="Source UTC offset in minutes" className="input ml-2" type="number" min={-840} max={840} step={1} value={offset} disabled={state.busy}
+      <input aria-label="Source UTC offset in minutes" className="mt-2 w-full min-w-0 rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white disabled:opacity-60" type="number" min={-840} max={840} step={1} value={offset} disabled={state.busy}
         onChange={event => { clear(); setOffset(event.target.value); }} />
     </label>
     <p className="text-xs text-slate-400">For example, UTC is 0 and Chicago standard time is -360. A fixed offset cannot recover daylight-saving changes across a long export. FitNotes date-only rows use midnight at this offset and have unknown duration.</p>
