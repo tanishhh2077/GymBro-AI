@@ -193,4 +193,43 @@ describe("ClipDropzone", () => {
     act(() => root.render(<></>));
     expect(pageEvent("drop", ["Files"]).defaultPrevented).toBe(false);
   });
+
+  it("restores keyboard focus to Choose video when disabled transitions from true to false", () => {
+    render(() => null, true);
+    expect(chooseButton().disabled).toBe(true);
+    expect(document.activeElement).not.toBe(chooseButton());
+
+    render(() => null, false);
+    expect(chooseButton().disabled).toBe(false);
+    expect(document.activeElement).toBe(chooseButton());
+  });
+
+  it("activates file picker when clicking the drop area directly or using Enter/Space", () => {
+    render(() => null);
+    const click = vi.spyOn(fileInput(), "click").mockImplementation(() => {});
+
+    act(() => dropArea().click());
+    expect(click).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      dropArea().dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    });
+    expect(click).toHaveBeenCalledTimes(2);
+
+    act(() => {
+      dropArea().dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    });
+    expect(click).toHaveBeenCalledTimes(3);
+  });
+
+  it("does not activate file picker from drop area when disabled", () => {
+    render(() => null, true);
+    const click = vi.spyOn(fileInput(), "click").mockImplementation(() => {});
+
+    act(() => dropArea().click());
+    act(() => {
+      dropArea().dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    });
+    expect(click).not.toHaveBeenCalled();
+  });
 });

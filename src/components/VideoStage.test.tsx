@@ -245,4 +245,71 @@ describe("VideoStage", () => {
     expect(container.querySelector('[aria-label="Left elbow angle"]')?.textContent).toBe('Unavailable');
     expect(play().disabled).toBe(false);
   });
+
+  it("provides accessible valuetext and bounds on the range scrubber", () => {
+    render();
+    emit("loadedmetadata");
+    expect(range().getAttribute("aria-valuetext")).toBe("0:00 of 0:05");
+    expect(range().getAttribute("aria-valuemin")).toBe("0");
+    expect(range().getAttribute("aria-valuemax")).toBe("5");
+    expect(range().getAttribute("aria-valuenow")).toBe("0");
+  });
+
+  it("supports keyboard scrubbing and toggle play with Space on the scrubber", async () => {
+    render();
+    emit("loadedmetadata");
+    act(() => {
+      range().dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    });
+    expect(state(video()).paused).toBe(false);
+
+    act(() => {
+      range().dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    });
+    expect(video().currentTime).toBeCloseTo(0.1, 2);
+
+    act(() => {
+      range().dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", shiftKey: true, bubbles: true }));
+    });
+    expect(video().currentTime).toBeCloseTo(1.1, 2);
+
+    act(() => {
+      range().dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    });
+    expect(video().currentTime).toBe(5);
+
+    act(() => {
+      range().dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    });
+    expect(video().currentTime).toBe(0);
+  });
+
+  it("toggles playback when clicking the video element directly", async () => {
+    render();
+    emit("loadedmetadata");
+    await act(async () => { video().click(); });
+    expect(state(video()).paused).toBe(false);
+    await act(async () => { video().click(); });
+    expect(state(video()).paused).toBe(true);
+  });
+
+  it("groups speed buttons with an accessible name and sets visible focus classes", () => {
+    render();
+    const group = container.querySelector('[role="group"][aria-label="Playback speed"]');
+    expect(group).not.toBeNull();
+    const toolbar = container.querySelector('[role="toolbar"][aria-label="Video controls"]');
+    expect(toolbar).not.toBeNull();
+  });
+
+  it("announces processing progress with status and progressbar roles", () => {
+    const c = clip("processing", "proc");
+    c.progress = { fraction: 0.42, processedFrames: 21, estimatedTotalFrames: 50, currentTime: 1.5, duration: 5 };
+    render(c);
+    const progressbar = container.querySelector('[role="progressbar"]');
+    expect(progressbar).not.toBeNull();
+    expect(progressbar?.getAttribute("aria-valuenow")).toBe("42");
+    expect(progressbar?.getAttribute("aria-label")).toBeTruthy();
+    const status = container.querySelector('[role="status"]');
+    expect(status).not.toBeNull();
+  });
 });
