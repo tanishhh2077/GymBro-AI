@@ -52,7 +52,7 @@ export function ExercisePicker({ id, label, value, onChange, data, children }: P
             {EXERCISE_EQUIPMENT.map(item => <option key={item} value={item}>{item}</option>)}
           </select></div>
         <p className="text-xs text-slate-400">Custom exercises stay searchable with any filter. Favorites appear first among matches and stay on this device, outside backups and sync.</p>
-        {favoriteState.notice && <p role="status" className="text-xs text-amber-300">{favoriteState.notice}</p>}
+        {favoriteState.notice && <p role="status" className="text-xs text-warn">{favoriteState.notice}</p>}
         <p role="status" className="text-xs text-slate-400">Showing {Math.min(limit, matches.length)} of {matches.length} matching exercises.</p>
         <ul className="divide-y divide-white/10">{matches.slice(0, limit).map(exercise => <li key={exercise.name} className="flex items-center gap-2">
           <button type="button" aria-label={`Use ${exercise.name}`} onClick={() => choose(exercise.name)}

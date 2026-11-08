@@ -23,6 +23,7 @@ it('favorites without selecting or submitting, filters equipment and exposes ses
   expect(change).not.toHaveBeenCalled();
   expect(container.querySelector('li')!.textContent).toContain('Bench press');
   expect(container.textContent).toContain('session');
+  expect(container.querySelector('[role=status]')!.classList.contains('text-warn')).toBe(true);
   const select = container.querySelector('select')!;
   act(() => { select.value = 'Dumbbell'; select.dispatchEvent(new Event('change', { bubbles: true })); });
   expect(container.querySelector('[aria-label="Use Bench press"]')).toBeNull();

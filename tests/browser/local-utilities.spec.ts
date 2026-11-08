@@ -42,6 +42,8 @@ test('weekly reminder revisits due state and requests a JSON backup at 390px', a
   expect(download.suggestedFilename()).toMatch(/\.json$/);
   await download.delete();
   await expect(page.getByText('Download requested. Keep the JSON file for recovery.', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Back up now', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Mark as done', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Back up now', exact: true })).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

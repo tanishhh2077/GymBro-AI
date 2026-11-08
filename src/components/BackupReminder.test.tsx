@@ -2,10 +2,10 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { BackupReminder } from './BackupReminder';
-import { readReminder, saveReminder, WEEK, DAY } from '@/core/localUtilities';
+import { readReminder, saveReminder, WEEK, DAY, REMINDER_KEY } from '@/core/localUtilities';
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 let root: Root, host: HTMLDivElement;
-beforeEach(() => { localStorage.clear(); host = document.createElement('div'); document.body.append(host); root = createRoot(host); vi.useFakeTimers(); vi.setSystemTime(100000); });
+beforeEach(() => { vi.restoreAllMocks(); localStorage.clear(); host = document.createElement('div'); document.body.append(host); root = createRoot(host); vi.useFakeTimers(); vi.setSystemTime(100000); });
 afterEach(async () => { await act(async () => root.unmount()); host.remove(); vi.useRealTimers(); });
 const button = (name: string) => [...host.querySelectorAll('button')].find(b => b.textContent === name)!;
 it('opts in with first due in a week, then snoozes one day', async () => {
@@ -30,7 +30,7 @@ it('guards repeated export and keeps failed requests due', async () => {
   await act(async () => button('Dismiss for 1 week').click());
   expect(readReminder().value.nextDue).toBe(Date.now() + WEEK);
 });
-it('respects disabled export and postpones only after a request succeeds', async () => {
+it('keeps successful export requests due until explicitly marked done', async () => {
   saveReminder({ enabled: true, nextDue: 0 });
   const exportFile = vi.fn(async () => true);
   await act(async () => root.render(<BackupReminder blocked onBackup={exportFile} />));
@@ -38,8 +38,26 @@ it('respects disabled export and postpones only after a request succeeds', async
   await act(async () => root.render(<BackupReminder blocked={false} onBackup={exportFile} />));
   await act(async () => button('Back up now').click());
   expect(exportFile).toHaveBeenCalledTimes(1);
+  expect(readReminder().value.nextDue).toBe(0);
+  expect(button('Back up now')).toBeTruthy();
+  await act(async () => button('Mark as done').click());
   expect(readReminder().value.nextDue).toBe(Date.now() + WEEK);
   expect(button('Back up now')).toBeUndefined();
   await act(async () => host.querySelector('input')!.click());
   expect(readReminder().value).toEqual({ enabled: false, nextDue: null });
+});
+
+it('keeps reminder writes screen-only after a failed write and another tab saves', async () => {
+  await act(async () => root.render(<BackupReminder blocked={false} onBackup={async () => true} />));
+  const failed = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('quota'); });
+  await act(async () => host.querySelector('input')!.click());
+  expect(host.textContent).toContain('screen is open');
+  failed.mockRestore();
+  saveReminder({ enabled: true, nextDue: 123456 });
+  const persisted = localStorage.getItem(REMINDER_KEY);
+  const write = vi.spyOn(Storage.prototype, 'setItem');
+  await act(async () => host.querySelector('input')!.click());
+  expect(write).not.toHaveBeenCalled();
+  expect(localStorage.getItem(REMINDER_KEY)).toBe(persisted);
+  expect(host.textContent).toContain('screen is open');
 });
