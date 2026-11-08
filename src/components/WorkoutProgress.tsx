@@ -15,11 +15,15 @@ import { groupLabel, weightParts } from './weightText';
 interface Props {
   data: WorkoutData;
   available: boolean;
-  onHome: () => void;
-  onWorkout: () => void;
+  onHome?: () => void;
+  onWorkout?: () => void;
+  onStartWorkout?: () => void;
+  onNavigate?: (view: string) => void;
   onHistory: (id: string) => void;
   /** Enables adding, editing and deleting goals; without it goals are listed read-only. */
   store?: WorkoutStore;
+  /** When true, displays an accessible loading status. */
+  loading?: boolean;
 }
 
 /** The exact name/unit group a detail view shows; kept by value so a deletion can be explained. */
@@ -29,7 +33,19 @@ function finishedDate(record: RecordedSet): string {
   return new Date(record.finishedAt).toLocaleDateString();
 }
 
-export function WorkoutProgress({ data, available, onHome, onWorkout, onHistory, store }: Props) {
+export function WorkoutProgress({
+  data,
+  available,
+  onHome,
+  onWorkout,
+  onStartWorkout,
+  onNavigate,
+  onHistory,
+  store,
+  loading = false,
+}: Props) {
+  const handleWorkout = onWorkout ?? onStartWorkout ?? (onNavigate ? () => onNavigate('workout') : () => {});
+  const handleHome = onHome ?? (onNavigate ? () => onNavigate('home') : () => {});
   const groups = useMemo(() => buildWorkoutProgress(data.history), [data.history]);
   const [selectedKey, setSelectedKey] = useState('');
   const [{ period, now }, setRange] = useState(() => ({ period: 'all' as ProgressPeriod, now: Date.now() }));
@@ -53,23 +69,53 @@ export function WorkoutProgress({ data, available, onHome, onWorkout, onHistory,
       .find(item => item.dataset.groupKey === key)?.focus();
   }, [detail]);
 
-  if (available && detail) {
+  if (available && detail && !loading) {
     return <ExerciseDetail target={detail} data={data} groups={groups} period={period} now={now} periodLabel={periodLabel}
-      onPeriod={choosePeriod} onHistory={onHistory} store={store} onBack={() => { returnKey.current = detail.key; setDetail(null); }} />;
+      onPeriod={choosePeriod} onHistory={onHistory} store={store} onBack={() => { returnKey.current = detail.key; setDetail(null); }}
+      onWorkout={handleWorkout} />;
   }
 
   return <div className="space-y-6">
-    <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={onHome}>Back to Home</button>
+    <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={handleHome}>Back to Home</button>
     <div>
       <h1 className="text-3xl font-bold text-white">Progress</h1>
       <p className="mt-2 text-sm text-slate-400">Personal records from regular sets in completed workouts saved on this device. Warm-ups are excluded.</p>
     </div>
-    {!available && <p className="text-slate-400">Reload saved workouts to view progress.</p>}
-    {available && !selected && <div className="space-y-4">
-      <p className="text-slate-400">Complete a workout with a regular set to see your progress.</p>
-      <button type="button" className="btn-primary" onClick={onWorkout}>{data.active ? 'Resume workout' : 'Start workout'}</button>
-    </div>}
-    {available && groups.length > 0 && <section aria-labelledby="progress-exercises-title" className="space-y-3">
+    {loading && (
+      <div role="status" aria-live="polite" data-progress-status className="card space-y-2 p-6 text-center">
+        <p className="text-base font-semibold text-white">Loading progress…</p>
+        <p className="text-sm text-slate-400">Loading workout history and personal records.</p>
+      </div>
+    )}
+    {!loading && !available && (
+      <div role="status" data-progress-status className="card space-y-3 p-6 text-center">
+        <p className="text-base font-semibold text-white">Workout data unavailable</p>
+        <p className="text-sm text-slate-400">Reload saved workouts to view progress.</p>
+        {store && (
+          <button type="button" className="btn-primary mx-auto" onClick={() => { void store.getState().load(); }}>
+            Reload saved workouts
+          </button>
+        )}
+      </div>
+    )}
+    {!loading && available && !selected && (
+      <div role="status" data-progress-status className="card space-y-4 p-6 text-center">
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-white">
+            {data.history.length === 0 ? 'No workouts logged yet' : 'No regular sets logged'}
+          </h2>
+          <p className="text-sm text-slate-400">
+            {data.history.length === 0
+              ? 'No workouts logged yet. Complete your first workout to see progress charts and records. Complete a workout with a regular set to see your progress.'
+              : 'Complete a workout with a regular set to see your progress. Warm-ups are excluded from personal records.'}
+          </p>
+        </div>
+        <button type="button" className="btn-primary mx-auto" onClick={handleWorkout}>
+          {data.active ? 'Resume workout' : 'Start workout'}
+        </button>
+      </div>
+    )}
+    {!loading && available && groups.length > 0 && <section aria-labelledby="progress-exercises-title" className="space-y-3">
       <h2 id="progress-exercises-title" className="text-xl font-semibold text-white">Exercise details</h2>
       <p className="text-sm text-slate-400">Open one exact exercise name and unit for its records, chart and completed workouts.</p>
       <ul ref={exerciseList} aria-label="Exercises" className="divide-y divide-white/10 rounded-lg border border-white/10">
@@ -83,9 +129,9 @@ export function WorkoutProgress({ data, available, onHome, onWorkout, onHistory,
         </li>)}
       </ul>
     </section>}
-    {available && <WorkoutGoals data={data} store={store} onHistory={onHistory} />}
-    {available && <WeeklyConsistency history={data.history} now={openedAt} />}
-    {available && selected && <>
+    {!loading && available && <WorkoutGoals data={data} store={store} onHistory={onHistory} />}
+    {!loading && available && <WeeklyConsistency history={data.history} now={openedAt} />}
+    {!loading && available && selected && <>
       <div>
         <label htmlFor="progress-exercise" className="text-sm text-slate-300">Exercise and unit</label>
         <select id="progress-exercise" value={selected.key} onChange={event => setSelectedKey(event.target.value)}
@@ -97,8 +143,27 @@ export function WorkoutProgress({ data, available, onHome, onWorkout, onHistory,
       <PeriodControl period={period} now={now} onChange={choosePeriod} />
       <div aria-live="polite">
         <p className="mb-3 text-sm text-slate-300">{period === 'all' ? 'All-time records' : `Records for ${periodLabel}`}</p>
-        {periodGroup ? <ProgressDetails key={`${selected.key}:${data.revision}:${period}`} group={periodGroup} onHistory={onHistory} /> :
-          <p className="text-slate-400">No regular sets for {groupLabel(selected)} in {periodLabel}. Choose a longer period or All time to see earlier progress.</p>}
+        {periodGroup ? <ProgressDetails key={`${selected.key}:${data.revision}:${period}`} group={periodGroup} onHistory={onHistory} /> : (
+          <div role="status" data-progress-status className="card space-y-3 p-6 text-center">
+            <p className="text-base font-semibold text-white">
+              {period === 'all' ? 'No regular sets logged' : 'No workouts in the selected time range'}
+            </p>
+            <p className="text-sm text-slate-400">
+              {period === 'all'
+                ? `No data for the selected exercise. No regular sets for ${groupLabel(selected)}. Complete a workout with a regular set to see earlier progress.`
+                : `No workouts in the selected time range. Try selecting a different period or all time. No regular sets for ${groupLabel(selected)} in ${periodLabel}. Choose a longer period or All time to see earlier progress.`}
+            </p>
+            {period !== 'all' ? (
+              <button type="button" className="btn-ghost mx-auto" onClick={() => choosePeriod('all')}>
+                Show all time
+              </button>
+            ) : (
+              <button type="button" className="btn-primary mx-auto" onClick={handleWorkout}>
+                {data.active ? 'Resume workout' : 'Start workout'}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </>}
   </div>;
@@ -117,7 +182,7 @@ function PeriodControl({ period, now, onChange }: { period: ProgressPeriod; now:
   </div>;
 }
 
-function ExerciseDetail({ target, data, groups, period, now, periodLabel, onPeriod, onHistory, store, onBack }: {
+function ExerciseDetail({ target, data, groups, period, now, periodLabel, onPeriod, onHistory, store, onBack, onWorkout }: {
   target: DetailTarget;
   data: WorkoutData;
   groups: readonly ExerciseProgress[];
@@ -128,6 +193,7 @@ function ExerciseDetail({ target, data, groups, period, now, periodLabel, onPeri
   onHistory: (id: string) => void;
   store?: WorkoutStore;
   onBack: () => void;
+  onWorkout?: () => void;
 }) {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => heading.current?.focus(), []);
@@ -149,12 +215,46 @@ function ExerciseDetail({ target, data, groups, period, now, periodLabel, onPeri
       <p className="mt-2 text-sm text-slate-400">Only this exact saved exercise name and {target.unit} unit. Other names and units stay separate and are never converted.{target.bodyweight ? ' Weights are added load on top of bodyweight; negative values are assistance. Loaded entries of this name are listed separately.' : ''}</p>
     </div>
     <WorkoutGoals data={data} store={store} scope={target} onHistory={onHistory} />
-    {!remaining ? <p className="text-slate-400">No completed workouts remain for {label}. They may have been deleted.</p> : <>
+    {!remaining ? (
+      <div role="status" data-progress-status className="card space-y-3 p-6 text-center">
+        <h2 className="text-lg font-semibold text-white">No data for the selected exercise</h2>
+        <p className="text-sm text-slate-400">
+          No data for the selected exercise. No completed workouts remain for {label}. They may have been deleted.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <button type="button" className="btn-ghost" onClick={onBack}>Back to Progress</button>
+          {onWorkout && (
+            <button type="button" className="btn-primary" onClick={onWorkout}>
+              {data.active ? 'Resume workout' : 'Start workout'}
+            </button>
+          )}
+        </div>
+      </div>
+    ) : <>
       <PeriodControl period={period} now={now} onChange={onPeriod} />
       <div aria-live="polite" className="space-y-3">
         <p className="text-sm text-slate-300">{period === 'all' ? 'All-time records' : `Records for ${periodLabel}`} from regular sets. Warm-ups are excluded.</p>
-        {periodGroup ? <ProgressDetails key={`${data.revision}:${period}`} group={periodGroup} onHistory={onHistory} showTitle={false} /> :
-          <p className="text-slate-400">No regular sets for {label} in {periodLabel}. Choose a longer period or All time to see earlier progress.</p>}
+        {periodGroup ? <ProgressDetails key={`${data.revision}:${period}`} group={periodGroup} onHistory={onHistory} showTitle={false} /> : (
+          <div role="status" data-progress-status className="card space-y-3 p-6 text-center">
+            <p className="text-base font-semibold text-white">
+              {period === 'all' ? 'No regular sets logged' : 'No workouts in the selected time range'}
+            </p>
+            <p className="text-sm text-slate-400">
+              {period === 'all'
+                ? `No data for the selected exercise. No regular sets for ${label}. Complete a workout with a regular set to see personal records.`
+                : `No workouts in the selected time range. Try selecting a different period or all time. No regular sets for ${label} in ${periodLabel}. Choose a longer period or All time to see earlier progress.`}
+            </p>
+            {period !== 'all' ? (
+              <button type="button" className="btn-ghost mx-auto" onClick={() => onPeriod('all')}>
+                Show all time
+              </button>
+            ) : onWorkout ? (
+              <button type="button" className="btn-primary mx-auto" onClick={onWorkout}>
+                {data.active ? 'Resume workout' : 'Start workout'}
+              </button>
+            ) : null}
+          </div>
+        )}
       </div>
       <ExerciseWorkoutHistory key={`${data.revision}:${period}`} entries={entries} name={target.name} unit={target.unit}
         bodyweight={target.bodyweight} periodLabel={periodLabel} onHistory={onHistory} />
