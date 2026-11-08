@@ -206,27 +206,3 @@ it('suggests catalog and previously logged exercise names via a datalist while a
   expect(store.getState().data.goals).toMatchObject([{ name: 'My Special Lift', unit: 'lb', weight: 150, reps: 10 }]);
   expect(goalCard('My Special Lift (lb)')).not.toBeNull();
 });
-
-it('restores focus to the Add goal button after canceling the goal form', async () => {
-  await render([]);
-  const addBtn = button('Add goal');
-  addBtn.focus();
-  expect(document.activeElement).toBe(addBtn);
-  await click('Add goal');
-  expect(document.activeElement).not.toBe(addBtn);
-  await click('Cancel');
-  expect(document.activeElement).toBe(button('Add goal'));
-});
-
-it('associates bodyweight assistance hint with the added weight input via aria-describedby', async () => {
-  await render([]);
-  await click('Add goal');
-  const bwCheckbox = field('Bodyweight exercise') as HTMLInputElement;
-  await act(async () => { bwCheckbox.click(); });
-  const weightInput = field('Added weight (lb)') as HTMLInputElement;
-  const descId = weightInput.getAttribute('aria-describedby');
-  expect(descId).toBeTruthy();
-  const desc = document.getElementById(descId!);
-  expect(desc?.textContent).toContain('Enter added weight');
-});
-

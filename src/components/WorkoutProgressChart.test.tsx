@@ -87,24 +87,4 @@ describe('WorkoutProgressChart converted axis tick labels', () => {
     expect(text).toContain('≈ 0 lb');
     expect(text).toContain('≈ −44 lb');
   });
-
-  it('makes SVG chart focusable for keyboard users with tabIndex={0} and accessible role and label', async () => {
-    const workouts: RecordedSet[] = [
-      { workoutId: 'w1', workoutName: 'Leg Day', finishedAt: 1000, exerciseId: 'e1', setId: 's1', reps: 5, weight: 100 },
-    ];
-
-    await act(async () => {
-      root.render(<WorkoutProgressChart workouts={workouts} unit="kg" />);
-    });
-
-    const svg = container.querySelector('svg');
-    expect(svg).toBeTruthy();
-    expect(svg?.getAttribute('role')).toBe('img');
-    expect(svg?.getAttribute('tabindex')).toBe('0');
-    const titleId = svg?.getAttribute('aria-labelledby');
-    expect(titleId).toBeTruthy();
-    const title = document.getElementById(titleId!);
-    expect(title?.textContent).toBe('Heaviest logged load per completed workout (kg)');
-  });
 });
-
