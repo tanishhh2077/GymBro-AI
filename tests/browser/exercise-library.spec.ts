@@ -33,7 +33,8 @@ test('selects built-in and custom exercises in workouts and routines at phone wi
   await page.getByLabel('Search exercise library', { exact: true }).fill('ZZZZ');
   await page.getByRole('button', { name: `Use ${custom}`, exact: true }).click();
   await expect(page.getByLabel('Exercise name', { exact: true })).toHaveValue(custom);
-  await expect(page.locator('section[aria-label]')).toHaveCount(2);
+  await expect(page.getByRole('region', { name: 'Bench press', exact: true })).toHaveCount(1);
+  await expect(page.getByRole('region', { name: custom, exact: true })).toHaveCount(1);
 
   await page.getByRole('button', { name: 'Routines', exact: true }).click();
   await page.getByRole('button', { name: 'New routine', exact: true }).click();
