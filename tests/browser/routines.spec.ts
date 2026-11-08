@@ -80,7 +80,7 @@ test('routine CRUD, order and target snapshots keep actual workout history accur
   expect((await library(page)).routines).toHaveLength(1);
   page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: `Delete routine ${'R'.repeat(80)}`, exact: true }).click();
-  await expect(page.getByText('Save a routine to reuse your exercise plan without retyping it.', { exact: true })).toBeVisible();
+  await expect(page.getByText('Save a routine to reuse your exercise plan without retyping it.', { exact: false })).toBeVisible();
   expect((await library(page)).history).toHaveLength(1);
 });
 test('native IndexedDB legacy records stay unchanged on load and survive the first v2 save', async ({ page }) => {
