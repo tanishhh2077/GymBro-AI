@@ -158,13 +158,27 @@ it('shows a friendly empty state with a create routine action when no routines e
   expect(name.value).toBe('');
 });
 
-it('disables the empty-state create routine button when library is unavailable', async () => {
+it.each([{ busy: true }, { needsReload: true }])('disables the empty-state create routine button when library is unavailable (%j)', async unavailable => {
   const emptyRepository = createWorkoutRepository(new IDBFactory());
   const emptyStore = createWorkoutStore(emptyRepository, { id: () => 'id-1', now: () => 1000 });
   await emptyStore.getState().load();
-  emptyStore.setState({ busy: true });
+  emptyStore.setState(unavailable);
   await act(async () => root.render(<WorkoutRoutines store={emptyStore} onStarted={() => {}} onResume={() => {}} />));
 
   expect(button('Create routine').disabled).toBe(true);
+});
+
+it('transitions to empty state after deleting the only routine and clears notice on create action', async () => {
+  await render();
+  vi.spyOn(window, 'confirm').mockReturnValue(true);
+  await click('Delete routine Upper day');
+  expect(container.querySelector('[role="status"]')?.textContent).toContain('Routine deleted');
+  expect(container.textContent).toContain('No routines yet');
+  const createBtn = button('Create routine');
+  expect(createBtn.disabled).toBe(false);
+
+  await act(async () => { createBtn.click(); });
+  expect(container.textContent).not.toContain('Routine deleted');
+  expect(container.querySelector('form')).not.toBeNull();
 });
 
