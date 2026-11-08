@@ -18,7 +18,7 @@ function workout(): Workout {
 function data(): WorkoutData { return { ...emptyWorkoutData(), version: 3, history: [workout()] }; }
 it.each([1, 2])('reads strict schema%s by changing only its version digit', version => {
   const original = { ...emptyWorkoutData(), version };
-  expect(validateWorkoutData(original)).toEqual({ ...original, version: 5 });
+  expect(validateWorkoutData(original)).toEqual({ ...original, version: 6 });
   expect(original.version).toBe(version);
 });
 it('accepts schema3 labels and rejects labels in older schemas and unknown values', () => {
@@ -53,7 +53,7 @@ it('carries set kinds through sync and exposes concurrent type-versus-value edit
 it('merges current set kinds into a valid legacy schema2 device library', () => {
   const legacy = { ...emptyWorkoutData(), version: 2 as const };
   const result = mergeWorkoutSync(legacy, legacy, data());
-  expect(result.data.version).toBe(5);
+  expect(result.data.version).toBe(6);
   expect(result.data.history[0].exercises[0].sets[0].kind).toBe('warmup');
 });
 it('saves, reloads and edits set kinds while preserving old call behavior', async () => {

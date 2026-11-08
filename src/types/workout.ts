@@ -1,3 +1,5 @@
+import type { BodyEntry } from './body';
+
 export type WeightUnit = 'lb' | 'kg';
 export type SetKind = 'regular' | 'warmup';
 /** Schema5 rpe is the lifter's 1-10 effort rating in 0.5 steps; it never changes records, progress or volume. */
@@ -40,7 +42,7 @@ export interface WorkoutGoal extends Omit<WorkoutGoalInput, 'bodyweight'> {
   readonly createdAt: number;
 }
 export interface WorkoutData {
-  readonly version: 2 | 3 | 4 | 5;
+  readonly version: 2 | 3 | 4 | 5 | 6;
   readonly revision: number;
   readonly active: Workout | null;
   readonly history: readonly Workout[];
@@ -48,5 +50,9 @@ export interface WorkoutData {
   readonly routines?: readonly WorkoutRoutine[];
   /** Schema5 goals; omitted until the first goal is created. */
   readonly goals?: readonly WorkoutGoal[];
+  /** Schema6 body weight and measurements; omitted until the first entry. Never feeds workout metrics. */
+  readonly bodyLog?: readonly BodyEntry[];
+  /** Schema6 standing notes keyed by exact exercise name (no fuzzy matching); omitted until the first note. */
+  readonly exerciseNotes?: Readonly<Record<string, string>>;
 }
 export type WorkoutResult = { ok: true } | { ok: false; message: string };

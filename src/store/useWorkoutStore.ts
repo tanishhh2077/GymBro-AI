@@ -1,9 +1,10 @@
 import { createStore } from 'zustand/vanilla';
-import { emptyWorkoutData, validateGroupId, validateRpe, validateSetKind, validateSetValues, validateWorkoutData, validateWorkoutNote, WorkoutError } from '@/core/workouts';
+import { BODY_MEASUREMENT_NAMES, emptyWorkoutData, MAX_BODY_ENTRIES, MAX_EXERCISE_NOTES, validateBodyNote, validateExerciseNote, validateGroupId, validateRpe, validateSetKind, validateSetValues, validateWorkoutData, validateWorkoutNote, WorkoutError } from '@/core/workouts';
 import type { RoutineExerciseInput, RoutineInput, SetKind, WeightUnit, Workout, WorkoutData, WorkoutExercise, WorkoutGoal, WorkoutGoalInput, WorkoutResult, WorkoutRoutine, WorkoutSet } from '@/types/workout';
 import { createWorkoutRepository, type WorkoutRepository, type SyncedWorkoutRepository } from './workoutRepository';
 import { mergeWorkoutBackup, type WorkoutBackup } from '@/core/workoutBackup';
-import { mergeWorkoutSync, sameSyncData, syncSnapshot, validateSharedSnapshot, type SyncChoice, type SyncPreview, type WorkoutCloud } from '@/core/workoutSync';
+import type { BodyEntry, BodyEntryInput } from '@/types/body';
+import { hasSyncConflicts, mergeWorkoutSync, sameSyncData, syncSnapshot, validateSharedSnapshot, type SyncChoice, type SyncPreview, type WorkoutCloud } from '@/core/workoutSync';
 interface WorkoutDeps { id: () => string; now: () => number }
 export interface CompletedWorkoutCorrection {
   name: string;
@@ -46,6 +47,13 @@ export interface WorkoutState {
   /** Pass the revision the goal editor opened with so a newer goal is never overwritten. */
   updateGoal: (id: string, expectedRevision: number, input: WorkoutGoalInput) => Promise<WorkoutResult>;
   deleteGoal: (id: string) => Promise<WorkoutResult>;
+  /** Blank weight or measurements drop their unit selector; at most 1000 entries. */
+  addBodyEntry: (input: BodyEntryInput) => Promise<WorkoutResult>;
+  /** Replaces every field but the ID. Pass the revision the editor opened with. */
+  updateBodyEntry: (id: string, expectedRevision: number, input: BodyEntryInput) => Promise<WorkoutResult>;
+  deleteBodyEntry: (id: string) => Promise<WorkoutResult>;
+  /** Note for one exact (trimmed) exercise name; blank removes it, same text is a no-op. */
+  setExerciseNote: (name: string, note: string, expectedRevision?: number) => Promise<WorkoutResult>;
   restoreBackup: (backup: WorkoutBackup, expectedRevision: number) => Promise<WorkoutResult>;
   previewSync: (cloud: WorkoutCloud) => Promise<SyncPreview>;
   confirmSync: (preview: SyncPreview, choices: Readonly<Record<string, SyncChoice>>, cloud: WorkoutCloud) => Promise<WorkoutResult>;
@@ -60,6 +68,29 @@ function cleanName(value: string) {
   const name = value.trim();
   if (!name || name.length > 80) invalid('Enter a name with 1 to 80 characters.');
   return name;
+}
+function noteInput(note: unknown, label: string): string {
+  if (typeof note !== 'string') invalid(`Enter the ${label} as text.`);
+  return note.replace(/\r\n?/g, '\n').trim();
+}
+/** Store-side input cleanup; validateWorkoutData then checks the stored entry strictly. */
+function preparedBodyEntry(id: string, input: BodyEntryInput): BodyEntry {
+  if (!input || typeof input !== 'object') invalid('Enter a date and a body weight or measurement for this entry.');
+  const measurements = input.measurements !== undefined && input.measurements !== null && typeof input.measurements === 'object'
+    ? Object.fromEntries(Object.entries(input.measurements).filter(([, value]) => value !== undefined)) : input.measurements;
+  const hasMeasurements = measurements !== undefined && !(typeof measurements === 'object' && measurements !== null && !Object.keys(measurements).length);
+  if (hasMeasurements && typeof measurements === 'object' && measurements !== null) {
+    for (const [name, value] of Object.entries(measurements)) {
+      if (!(BODY_MEASUREMENT_NAMES as readonly string[]).includes(name)) invalid(`Unknown body measurement "${name.slice(0, 40)}". Use ${BODY_MEASUREMENT_NAMES.join(', ')}.`);
+      if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0 || value > 500) invalid('Enter each measurement greater than 0 and at most 500.');
+    }
+  }
+  const note = input.note === undefined ? '' : noteInput(input.note, 'body log note');
+  if (note) validateBodyNote(note);
+  return { id, date: input.date,
+    ...(input.weight !== undefined ? { weight: input.weight, ...(input.unit !== undefined ? { unit: input.unit } : {}) } : {}),
+    ...(hasMeasurements ? { measurements: measurements as BodyEntry['measurements'], ...(input.lengthUnit !== undefined ? { lengthUnit: input.lengthUnit } : {}) } : {}),
+    ...(note ? { note } : {}) };
 }
 function active(data: WorkoutData): Workout {
   if (!data.active) invalid('Start a workout first.');
@@ -188,7 +219,7 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
       confirmSync: (preview, choices, cloud) => commit(data => {
         if (data.revision !== preview.localRevision) invalid('Workouts changed after the preview. Preview sync again.');
         const merged = mergeWorkoutSync(preview.base, data, preview.remote.data, choices);
-        if (merged.conflicts.length || merged.goalConflicts.length) invalid('Choose a version for each conflict before confirming sync.');
+        if (hasSyncConflicts(merged)) invalid('Choose a version for each conflict before confirming sync.');
         return merged.data;
       }, async (revision, next) => {
         const syncRepository = repository as SyncedWorkoutRepository;
@@ -374,6 +405,39 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
         const source = goal(data, id), updated = preparedGoal(data, id, source.createdAt, input);
         if (JSON.stringify(updated) === JSON.stringify(source)) return data;
         return { ...data, goals: data.goals!.map(g => g.id === id ? updated : g) };
+      }),
+      addBodyEntry: input => commit(data => {
+        if ((data.bodyLog?.length ?? 0) >= MAX_BODY_ENTRIES) {
+          invalid(`Your body log already has ${MAX_BODY_ENTRIES} entries. Delete an old entry before adding another.`);
+        }
+        return { ...data, bodyLog: [...(data.bodyLog ?? []), preparedBodyEntry(deps.id(), input)] };
+      }),
+      updateBodyEntry: (id, expectedRevision, input) => commit(data => {
+        if (data.revision !== expectedRevision) invalid('Body log changed. Reopen this entry before saving your edits.');
+        const source = data.bodyLog?.find(e => e.id === id);
+        if (!source) invalid('This body log entry is no longer available.');
+        const updated = preparedBodyEntry(id, input);
+        if (JSON.stringify(updated) === JSON.stringify(source)) return data;
+        return { ...data, bodyLog: data.bodyLog!.map(e => e.id === id ? updated : e) };
+      }),
+      deleteBodyEntry: id => commit(data => {
+        if (!data.bodyLog?.some(e => e.id === id)) invalid('This body log entry is no longer available.');
+        return { ...data, bodyLog: data.bodyLog.filter(e => e.id !== id) };
+      }),
+      setExerciseNote: (name, note, expectedRevision) => commit(data => {
+        if (expectedRevision !== undefined && data.revision !== expectedRevision) invalid('Exercise notes changed. Reopen the note before saving.');
+        const exercise = cleanName(typeof name === 'string' ? name : '');
+        const text = noteInput(note, 'exercise note');
+        if (text) validateExerciseNote(text);
+        const notes = data.exerciseNotes ?? {}, saved = Object.prototype.hasOwnProperty.call(notes, exercise) ? notes[exercise] : '';
+        if (saved === text) return data;
+        if (!saved && Object.keys(notes).length >= MAX_EXERCISE_NOTES) {
+          invalid(`You already have notes for ${MAX_EXERCISE_NOTES} exercises. Remove one before adding another.`);
+        }
+        // fromEntries keeps every name, including "__proto__", as an ordinary own key.
+        const rest = Object.entries(notes).filter(([key]) => key !== exercise);
+        return { ...data, exerciseNotes: Object.fromEntries(text ? (saved ? Object.entries(notes).map(([key, value]) => [key, key === exercise ? text : value])
+          : [...rest, [exercise, text]]) : rest) };
       }),
       deleteGoal: id => commit(data => {
         goal(data, id);

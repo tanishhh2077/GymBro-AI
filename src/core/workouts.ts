@@ -1,13 +1,28 @@
+import type { BodyMeasurementName } from '@/types/body';
 import type { SetKind, WorkoutData } from '@/types/workout';
 
-export const WORKOUT_SCHEMA_VERSION = 5;
+export const WORKOUT_SCHEMA_VERSION = 6;
+export const MAX_BODY_ENTRIES = 1000;
+export const MAX_EXERCISE_NOTES = 200;
+/** The schema6 tape measurements, in display order. */
+export const BODY_MEASUREMENT_NAMES: readonly BodyMeasurementName[] =
+  ['neck', 'chest', 'waist', 'hips', 'leftArm', 'rightArm', 'leftThigh', 'rightThigh'];
 
 export class WorkoutError extends Error {
   constructor(readonly kind: 'validation' | 'storage' | 'conflict', message: string) {
     super(message); this.name = 'WorkoutError';
   }
 }
-export function emptyWorkoutData(): WorkoutData { return { version: 5, revision: 0, active: null, history: [] }; }
+export function emptyWorkoutData(): WorkoutData { return { version: 6, revision: 0, active: null, history: [] }; }
+/** Restore, guest copy and sync explain that combining two libraries, not one save, crossed a limit. */
+export function requireMergeLimits(bodyEntries: number, exerciseNotes: number): void {
+  if (bodyEntries > MAX_BODY_ENTRIES) {
+    throw new WorkoutError('validation', `Merging these would exceed the limit of ${MAX_BODY_ENTRIES} body log entries. Delete some entries first.`);
+  }
+  if (exerciseNotes > MAX_EXERCISE_NOTES) {
+    throw new WorkoutError('validation', `Merging these would exceed the limit of ${MAX_EXERCISE_NOTES} exercise notes. Remove some notes first.`);
+  }
+}
 
 function requireValue(condition: unknown, message = 'Saved workout data is invalid or exceeds the supported limits.'): asserts condition {
   if (!condition) throw new WorkoutError('validation', message);
@@ -64,12 +79,62 @@ export function validateSetKind(kind: unknown): asserts kind is SetKind {
 }
 // Newline and tab are the only control characters a multi-line note needs.
 const noteControl = /(?![\n\t])\p{Cc}/u;
-export function validateWorkoutNote(value: unknown): asserts value is string {
+function noteText(value: unknown, label: string, max: number): asserts value is string {
   requireValue(typeof value === 'string' && value.length > 0 && value.trim() === value);
-  requireValue(value.length <= 1000, 'Keep the workout note to 1000 characters or fewer.');
-  requireValue(!noteControl.test(value), 'Remove control characters from the workout note. Line breaks and tabs are allowed.');
+  requireValue(value.length <= max, `Keep the ${label} to ${max} characters or fewer.`);
+  requireValue(!noteControl.test(value), `Remove control characters from the ${label}. Line breaks and tabs are allowed.`);
   // An unpaired surrogate is valid in a JS string but rejected by the sync database.
-  requireValue(!/\p{Cs}/u.test(value), 'Remove unsupported characters from the workout note.');
+  requireValue(!/\p{Cs}/u.test(value), `Remove unsupported characters from the ${label}.`);
+}
+export function validateWorkoutNote(value: unknown): asserts value is string { noteText(value, 'workout note', 1000); }
+export function validateExerciseNote(value: unknown): asserts value is string { noteText(value, 'exercise note', 500); }
+export function validateBodyNote(value: unknown): asserts value is string { noteText(value, 'body log note', 500); }
+const own = (item: object, key: string) => Object.prototype.hasOwnProperty.call(item, key);
+const bodyFields = ['weight', 'unit', 'measurements', 'lengthUnit', 'note'];
+/** A unit appears exactly when its values do, so a stored unit never describes a missing value. */
+function bodyValues(item: Record<string, unknown>) {
+  requireValue(typeof item.date === 'number' && Number.isSafeInteger(item.date) && item.date >= 0 && item.date <= 8.64e15,
+    'Choose a valid date for this body log entry.');
+  requireValue(own(item, 'weight') || own(item, 'measurements'), 'Enter a body weight or at least one measurement for this entry.');
+  if (own(item, 'weight')) {
+    requireValue(typeof item.weight === 'number' && Number.isFinite(item.weight) && item.weight > 0 && item.weight <= 1000,
+      'Enter a body weight greater than 0 and at most 1000.');
+    requireValue(item.unit === 'kg' || item.unit === 'lb', 'Choose kg or lb for the body weight.');
+  } else requireValue(!own(item, 'unit'), 'Choose kg or lb only with a body weight.');
+  if (own(item, 'measurements')) {
+    const values = item.measurements;
+    requireValue(values !== null && typeof values === 'object' && !Array.isArray(values), 'Enter the measurements as named values.');
+    const names = Object.keys(values);
+    requireValue(names.length > 0, 'Enter at least one measurement, or leave measurements out.');
+    for (const name of names) {
+      requireValue((BODY_MEASUREMENT_NAMES as readonly string[]).includes(name),
+        `Unknown body measurement "${name.slice(0, 40)}". Use ${BODY_MEASUREMENT_NAMES.join(', ')}.`);
+      const value = (values as Record<string, unknown>)[name];
+      requireValue(typeof value === 'number' && Number.isFinite(value) && value > 0 && value <= 500,
+        'Enter each measurement greater than 0 and at most 500.');
+    }
+    requireValue(item.lengthUnit === 'cm' || item.lengthUnit === 'in', 'Choose cm or in for the measurements.');
+  } else requireValue(!own(item, 'lengthUnit'), 'Choose cm or in only with measurements.');
+  if (own(item, 'note')) validateBodyNote(item.note);
+}
+function bodyLog(value: unknown) {
+  requireValue(Array.isArray(value) && value.length <= MAX_BODY_ENTRIES, `Save up to ${MAX_BODY_ENTRIES} body log entries on this device.`);
+  const ids = new Set<string>();
+  for (const entry of value) {
+    const item = record(entry, ['id', 'date'], bodyFields);
+    identifier(item.id, ids); bodyValues(item);
+  }
+}
+/** Keys are exact exercise names, so a note follows only that spelling, like Progress groups. */
+function exerciseNotes(value: unknown) {
+  requireValue(value !== null && typeof value === 'object' && !Array.isArray(value), 'Save exercise notes as exercise names with notes.');
+  const entries = Object.entries(value);
+  requireValue(entries.length <= MAX_EXERCISE_NOTES, `Save notes for up to ${MAX_EXERCISE_NOTES} exercises on this device.`);
+  for (const [key, note] of entries) {
+    requireValue(key.length > 0 && key.length <= 80 && key.trim() === key, 'Each exercise note needs an exercise name with 1 to 80 characters.');
+    requireValue(!/\p{Cs}/u.test(key), 'Remove unsupported characters from the exercise name.');
+    validateExerciseNote(note);
+  }
 }
 function targets(item: Record<string, unknown>) {
   // A bodyweight target is added load, so a negative value plans assistance.
@@ -133,9 +198,10 @@ function workout(value: unknown, complete: boolean, ids: Set<string>, version: n
 /** Reject unknown fields as well as bad values; media/pose objects never cross this boundary. */
 export function validateWorkoutData(value: unknown): WorkoutData {
   const version = value !== null && typeof value === 'object' ? (value as Record<string, unknown>).version : undefined;
-  const known = version === 1 || version === 2 || version === 3 || version === 4 || version === 5;
+  const known = version === 1 || version === 2 || version === 3 || version === 4 || version === 5 || version === 6;
   const item = record(value, ['version', 'revision', 'active', 'history'],
-    version === 5 ? ['routines', 'goals'] : known && version !== 1 ? ['routines'] : []);
+    version === 6 ? ['routines', 'goals', 'bodyLog', 'exerciseNotes'] : version === 5 ? ['routines', 'goals']
+      : known && version !== 1 ? ['routines'] : []);
   requireValue(known && typeof item.revision === 'number' && Number.isSafeInteger(item.revision) && item.revision >= 0);
   requireValue(Array.isArray(item.history) && item.history.length <= 1000);
   const ids = new Set<string>();
@@ -159,6 +225,8 @@ export function validateWorkoutData(value: unknown): WorkoutData {
     }
   }
   if (Object.prototype.hasOwnProperty.call(item, 'goals')) goals(item.goals);
+  if (own(item, 'bodyLog')) bodyLog(item.bodyLog);
+  if (own(item, 'exerciseNotes')) exerciseNotes(item.exerciseNotes);
   requireValue(JSON.stringify(value).length <= 1_000_000);
   // No defaults or writes: a valid legacy record at the size cap stays readable.
   return (version === WORKOUT_SCHEMA_VERSION ? value : { ...item, version: WORKOUT_SCHEMA_VERSION }) as WorkoutData;

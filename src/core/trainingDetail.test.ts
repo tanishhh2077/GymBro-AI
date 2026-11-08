@@ -30,7 +30,7 @@ function withSet(change: (set: Loose, exercise: Loose) => void): WorkoutData {
 }
 
 it('starts at schema5 and accepts RPE, supersets, bodyweight loads and goals', () => {
-  expect(emptyWorkoutData().version).toBe(5);
+  expect(emptyWorkoutData().version).toBe(6);
   const data = library({ active: workout(null, 'live'), history: [workout()], routines: [routine()],
     goals: [goal(), goal({ id: 'goal2', bodyweight: undefined, name: 'Pull-up', weight: 0 })] });
   delete (data.goals![1] as unknown as Loose).bodyweight;
@@ -91,13 +91,13 @@ it.each([1, 2, 3, 4])('rejects every schema5 field in schema%s and rejects futur
   for (const exercise of grouped.active!.exercises as unknown as Loose[]) { delete exercise.bodyweight; for (const set of exercise.sets as unknown as Loose[]) { delete set.rpe; set.weight = 1; } }
   fields.push(grouped, library({ routines: [{ ...routine(), exercises: [{ id: 'x', name: 'Dip', bodyweight: true }] }] }));
   for (const value of fields) expect(() => validateWorkoutData({ ...value, version })).toThrow();
-  const future = { ...library(), version: 6 };
+  const future = { ...library(), version: 7 };
   expect(() => validateWorkoutData(future)).toThrow();
-  expect(future.version).toBe(6);
+  expect(future.version).toBe(7);
 });
 it('reads strict schema4 by changing only its version digit, including at the exact size cap', () => {
   const legacy = { version: 4, revision: 2, active: null, history: [] as unknown[] };
-  expect(validateWorkoutData(legacy)).toEqual({ ...legacy, version: 5 });
+  expect(validateWorkoutData(legacy)).toEqual({ ...legacy, version: 6 });
   expect(legacy.version).toBe(4);
   const record = (index: number) => ({ id: `w-${index}`, name: 'W', unit: 'kg', startedAt: 1, finishedAt: 2, note: 'n',
     exercises: [{ id: `e-${index}`, name: 'E', targetWeight: 1, sets: Array.from({ length: 100 }, (_, i) => ({ id: `s-${i}`, reps: 1, weight: 1, kind: 'warmup' })) }] });
@@ -109,7 +109,7 @@ it('reads strict schema4 by changing only its version digit, including at the ex
   last.exercises[0].name += 'x'.repeat(Math.min(79, 1_000_000 - JSON.stringify(full).length));
   expect(JSON.stringify(full).length).toBe(1_000_000);
   const normalized = validateWorkoutData(full);
-  expect(normalized.version).toBe(5);
+  expect(normalized.version).toBe(6);
   expect(JSON.stringify(normalized).length).toBe(1_000_000);
   expect(full.version).toBe(4);
 });
@@ -140,7 +140,7 @@ it('adds backup goals to a library without goals and still restores schema4 back
   expect(result).toMatchObject({ addedGoals: 1, addedWorkouts: 0, duplicates: 0 });
   expect(result.data.goals).toEqual([goal()]);
   const legacy = { format: 'gymbro-ai-workout-backup', version: 1, exportedAt: 0, data: { version: 4, revision: 3, active: null, history: [] } };
-  expect(mergeWorkoutBackup(library({ goals: [goal()] }), parseWorkoutBackup(JSON.stringify(legacy))).data.version).toBe(5);
+  expect(mergeWorkoutBackup(library({ goals: [goal()] }), parseWorkoutBackup(JSON.stringify(legacy))).data.version).toBe(6);
 });
 it('merges goals through sync as records and exposes concurrent goal edits', () => {
   const base = library({ history: [workout()], goals: [goal()] });

@@ -64,7 +64,7 @@ select public.test_denied($q$select public.sync_workout_library(4, '{"version":4
 select public.test_denied($q$select public.sync_workout_library(4, '{"version":3,"revision":0,"active":{"id":"w","name":"W","unit":"kg","startedAt":1,"finishedAt":null,"exercises":[{"id":"e","name":"Bench","sets":[]}],"note":"n"},"history":[]}')$q$, 'note rejected in schema3');
 select public.test_denied($q$select public.sync_workout_library(4, '{"version":3,"revision":0,"active":{"id":"w","name":"W","unit":"kg","startedAt":1,"finishedAt":null,"exercises":[{"id":"e","name":"Bench","sets":[],"targetWeight":5}]},"history":[]}')$q$, 'target weight rejected in schema3');
 select public.test_denied($q$select public.sync_workout_library(4, '{"version":2,"revision":0,"active":{"id":"w","name":"W","unit":"kg","startedAt":1,"finishedAt":null,"exercises":[{"id":"e","name":"Bench","sets":[],"targetWeight":5}]},"history":[]}')$q$, 'target weight rejected in schema2');
-select public.test_denied($q$select public.sync_workout_library(4, '{"version":6,"revision":0,"active":null,"history":[]}')$q$, 'future schema6');
+select public.test_denied($q$select public.sync_workout_library(4, '{"version":7,"revision":0,"active":null,"history":[]}')$q$, 'future schema7');
 select public.test_assert((public.sync_workout_library(4, replace('{"version":4,"revision":0,"active":{"id":"w","name":"W","unit":"kg","startedAt":1,"finishedAt":null,"exercises":[{"id":"e","name":"Bench","sets":[{"id":"s","reps":5,"weight":20,"kind":"warmup"}],"targetWeight":10000}],"note":"LONG"},"history":[]}', 'LONG', repeat('x', 1000))::jsonb)->>'revision')::int=5, 'schema4 set kinds, 1000-character note and maximum target weight');
 select public.test_assert((select revision=5 from public.workout_libraries where user_id='11111111-1111-4111-8111-111111111111'), 'invalid schema4 writes preserve latest revision');
 select public.test_assert((public.sync_workout_library(5, '{"version":3,"revision":0,"active":null,"history":[]}'::jsonb)->>'revision')::int=6, 'schema3 writes still accepted');
@@ -109,4 +109,68 @@ select public.test_assert((public.sync_workout_library(8, '{"version":4,"revisio
 select public.test_denied($q$select public.sync_workout_library(9, '{"version":5,"revision":0,"active":null,"history":[],"routines":[{"id":"r","name":"Pull","unit":"kg","exercises":[{"id":"re","name":"Row","targetWeight":-20}]}]}')$q$, 'negative target weight on a non-bodyweight routine exercise');
 select public.test_denied($q$select public.sync_workout_library(9, '{"version":5,"revision":0,"active":null,"history":[],"routines":[{"id":"r","name":"Pull","unit":"kg","exercises":[{"id":"re","name":"Pull-up","bodyweight":true,"targetWeight":-1001}]}]}')$q$, 'bodyweight target below -1000');
 select public.test_assert((public.sync_workout_library(9, '{"version":5,"revision":0,"active":null,"history":[],"routines":[{"id":"r","name":"Pull","unit":"kg","exercises":[{"id":"re","name":"Pull-up","bodyweight":true,"targetWeight":-20}]}]}'::jsonb)->'data'->'routines'->0->'exercises'->0->>'targetWeight')::numeric=-20, 'assisted bodyweight target weight round trip');
+-- Schema6 body log and exact-name exercise notes.
+select public.test_assert((public.sync_workout_library(10, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b1","date":1700000000000,"weight":80.5,"unit":"kg","measurements":{"neck":0.5,"chest":500,"waist":82,"hips":95,"leftArm":35.5,"rightArm":35,"leftThigh":58,"rightThigh":58},"lengthUnit":"cm","note":"Morning.\nBefore food."},{"id":"b2","date":0,"weight":1000,"unit":"lb"},{"id":"b3","date":8640000000000000,"measurements":{"waist":32},"lengthUnit":"in"}],"exerciseNotes":{"Bench press":"Tuck elbows.\n\tDrive feet.","__proto__":"Odd name.","Row":"Pause."}}'::jsonb)->'data'->'bodyLog'->0->'measurements'->>'chest')::numeric=500, 'schema6 body log and exercise notes round trip');
+select public.test_assert((select (data->'bodyLog'->1->>'weight')::numeric=1000 and data->'bodyLog'->2->>'lengthUnit'='in' and data->'exerciseNotes'->>'Bench press'=E'Tuck elbows.\n\tDrive feet.' and data->'exerciseNotes'->>'__proto__'='Odd name.' from public.workout_libraries where user_id='11111111-1111-4111-8111-111111111111'), 'schema6 fields stored');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":0,"unit":"kg"}]}')$q$, 'body weight 0');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":1000.5,"unit":"kg"}]}')$q$, 'body weight above 1000');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":"80","unit":"kg"}]}')$q$, 'string body weight');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":80}]}')$q$, 'weight without unit');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"unit":"kg","measurements":{"waist":80},"lengthUnit":"cm"}]}')$q$, 'unit without weight');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":80,"unit":"st"}]}')$q$, 'invalid weight unit');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"measurements":{},"lengthUnit":"cm"}]}')$q$, 'empty measurements');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"measurements":{"calf":40},"lengthUnit":"cm"}]}')$q$, 'unknown measurement');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"measurements":{"waist":0},"lengthUnit":"cm"}]}')$q$, 'measurement 0');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"measurements":{"waist":500.5},"lengthUnit":"cm"}]}')$q$, 'measurement above 500');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"measurements":{"waist":"80"},"lengthUnit":"cm"}]}')$q$, 'string measurement');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"measurements":[80],"lengthUnit":"cm"}]}')$q$, 'measurement array');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"measurements":{"waist":80}}]}')$q$, 'measurements without length unit');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"measurements":{"waist":80},"lengthUnit":"mm"}]}')$q$, 'invalid length unit');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":80,"unit":"kg","lengthUnit":"cm"}]}')$q$, 'length unit without measurements');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"note":"Only a note"}]}')$q$, 'entry without values');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":-1,"weight":80,"unit":"kg"}]}')$q$, 'negative date');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1.5,"weight":80,"unit":"kg"}]}')$q$, 'fractional date');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b b","date":1,"weight":80,"unit":"kg"}]}')$q$, 'invalid body entry id');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":80,"unit":"kg"},{"id":"b","date":2,"weight":81,"unit":"kg"}]}')$q$, 'duplicate body entry id');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":80,"unit":"kg","bodyFat":20}]}')$q$, 'unknown body entry field');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":80,"unit":"kg","note":""}]}')$q$, 'empty body note');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":80,"unit":"kg","note":" padded"}]}')$q$, 'untrimmed body note');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":80,"unit":"kg","note":"a\u0007b"}]}')$q$, 'body note control character');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":80,"unit":"kg","note":5}]}')$q$, 'non-string body note');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"bodyLog":{"b":1}}')$q$, 'body log object');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":[]}')$q$, 'exercise notes array');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":{" Row":"n"}}')$q$, 'untrimmed note name');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":{"":"n"}}')$q$, 'empty note name');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":{"Row":""}}')$q$, 'empty exercise note');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":{"Row":"n "}}')$q$, 'untrimmed exercise note');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":{"Row":"a\rb"}}')$q$, 'exercise note carriage return');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":{"Row":"a\u009fb"}}')$q$, 'exercise note C1 control');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":{"Row":5}}')$q$, 'numeric exercise note');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":{"Row":null}}')$q$, 'null exercise note');
+select public.test_denied($q$select public.sync_workout_library(11, replace('{"version":6,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":80,"unit":"kg","note":"LONG"}]}', 'LONG', repeat('x', 501))::jsonb)$q$, 'body note over 500 characters');
+select public.test_denied($q$select public.sync_workout_library(11, replace('{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":{"Row":"LONG"}}', 'LONG', repeat('x', 501))::jsonb)$q$, 'exercise note over 500 characters');
+select public.test_denied($q$select public.sync_workout_library(11, replace('{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":{"LONG":"n"}}', 'LONG', repeat('x', 81))::jsonb)$q$, 'note name over 80 characters');
+select public.test_denied($q$select public.sync_workout_library(11, (select jsonb_build_object('version',6,'revision',0,'active',null,'history','[]'::jsonb,'bodyLog',jsonb_agg(jsonb_build_object('id','b'||i,'date',i,'weight',80,'unit','kg'))) from generate_series(1,1001) as i))$q$, '1001 body entries');
+select public.test_denied($q$select public.sync_workout_library(11, (select jsonb_build_object('version',6,'revision',0,'active',null,'history','[]'::jsonb,'exerciseNotes',jsonb_object_agg('Exercise '||i,'n')) from generate_series(1,201) as i))$q$, '201 exercise notes');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":5,"revision":0,"active":null,"history":[],"bodyLog":[]}')$q$, 'body log rejected in schema5');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":5,"revision":0,"active":null,"history":[],"exerciseNotes":{}}')$q$, 'exercise notes rejected in schema5');
+select public.test_denied($q$select public.sync_workout_library(11, '{"version":4,"revision":0,"active":null,"history":[],"bodyLog":[{"id":"b","date":1,"weight":80,"unit":"kg"}]}')$q$, 'body log rejected in schema4');
+-- PostgreSQL refuses an unpaired surrogate escape before the RPC runs; the client rejects it first.
+do $$ begin
+  begin
+    perform public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":{"Row":"a\ud800b"}}'::jsonb);
+  exception when invalid_text_representation or untranslatable_character then return;
+  end;
+  raise exception 'Expected rejection: unpaired surrogate in exercise note';
+end $$;
+do $$ begin
+  begin
+    perform public.sync_workout_library(11, '{"version":6,"revision":0,"active":null,"history":[],"exerciseNotes":{"a\udc00":"n"}}'::jsonb);
+  exception when invalid_text_representation or untranslatable_character then return;
+  end;
+  raise exception 'Expected rejection: unpaired surrogate in note name';
+end $$;
+select public.test_assert((select revision=11 from public.workout_libraries where user_id='11111111-1111-4111-8111-111111111111'), 'invalid schema6 writes preserve latest revision');
+select public.test_assert((public.sync_workout_library(11, jsonb_build_object('version',6,'revision',0,'active',null,'history','[]'::jsonb,'bodyLog',(select jsonb_agg(jsonb_build_object('id','b'||i,'date',i,'weight',80,'unit','kg')) from generate_series(1,1000) as i),'exerciseNotes',(select jsonb_object_agg('Exercise '||i, repeat('x', 500)) from generate_series(1,200) as i)))->>'revision')::int=12, '1000 body entries and 200 500-character notes accepted');
+select public.test_assert((public.sync_workout_library(12, '{"version":5,"revision":0,"active":null,"history":[],"goals":[]}'::jsonb)->>'revision')::int=13, 'schema5 writes still accepted');
 reset role;
