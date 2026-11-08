@@ -10,24 +10,58 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+### 2026-11-08 — Task B imports and reverted account accessibility completion
+
+Codex (root gpt-6.1-sol) assembled original import commits f1656dc/68b34a2/
+0a0fe24 as dbb0c25/667c3f2/19518e2, with normal Backup navigation and consistent
+input styling. Formats and primary export-header evidence are recorded in
+WORKOUT_IMPORT_FORMATS.md. No OpenGym code or Gym visual assets were accessed.
+The bounded reader, original CSV tokenizer, strict schema6 validation, additive
+backup merge and revision-bound preview/save reuse existing storage boundaries.
+Fresh import review findings were fixed with regression tests for hidden name
+controls and missing Strong duration. FitNotes evidence was corrected to actual
+Android 25.1 export observation. Unsupported metric Hevy and unverified variants
+are explicitly rejected. Unit/offset/date-only limits remain visible before save.
+
+Restored the previously reverted accessibility changes and resolved AccountPanel
+against Task A, then fixed unsafe conflict-key IDs and disabled-button focus.
+Source commit fbcc2fd was applied as ba2a8d3. Safe IDs cover body/note conflicts,
+and token-bound focus runs only after controls re-enable. 82 focused tests and
+11 final guard tests passed. Fresh source review found no material regressions.
+One low-priority backlog item remains account radio arrow wrapping/modifier keys.
+
+Final combined tests pass 1842 cases with 3 existing skips/130 files in 82.35
+seconds using four workers. Full lint and all build/type checks pass. Native sync
+verifies 27 files/platform with service workers removed and three plugins.
+Vite transforms 541 modules, entry JS 356.01 kB/107.89 kB gzip. Full Chromium
+156.0.8078.4 run passed 50/51 in 4.4 minutes; the new import test used an ambiguous
+root status selector. Scoping it to the importer region passed the affected rerun
+(1 case/6.4 seconds), browser types and scoped lint. Thus all 51 cases have passing
+evidence across the full run and affected rerun. Source was steady during each
+suite, one coordinator owned4179, and GPU/120-sample no-person checks passed.
+
+Both fresh reviews were source-only. Fixtures were synthetic, no private exports
+or human media were used/uploaded. Physical native sharing, live cloud/account
+sync and real-bench acceptance remain unverified. Optional Task C was deferred.
+Task4 and all other worker branches/worktrees remain. Shared docs updated once
+for this final integration, with local link and diff checks.
+
+
 ### 2026-11-08 — Task A schema6 screen integration
 
-Codex (gpt-6.1-sol) wired BodyLog/Home navigation, ExerciseNoteField, body/note
-sync choosers with hasSyncConflicts, restore counts and RoutineShare. Source
-commit106e70c includes focused97-test coverage and two normal-route browser flows.
-One fresh independent sharing review found adjacent superset group loss and
-stale-preview retention. V2 numeric group tokens preserve distinct adjacent
-groups while strict v1 reads remain supported. Source-identity preview checks
-and native validated export locking/cleanup resolved the findings. Re-review
-found no remaining significant defects. No OpenGym code/assets were used.
+Codex wired BodyLog/Home navigation, ExerciseNoteField, body/note sync choosers
+with hasSyncConflicts, restore counts and RoutineShare. Source commit 106e70c
+includes 97 focused tests and two normal-route browser flows. Fresh sharing
+review found adjacent superset loss and stale previews. V2 numeric group tokens
+preserve adjacent groups while strict v1 reads remain supported. Source-identity
+preview checks and native validated export locking/cleanup resolved findings.
+Re-review found no significant defects. No openGym code/assets were used.
 
-Full checks pass1790 tests with3 existing skips/126files (76.45s), lint, complete
-build and native sync26files/platform. Vite transforms538modules, entry353.91kB/
-107.36kB gzip. Chromium156.0.8078.4 GPU/120-sample no-person suite passes50/50
-in3.8minutes, including body/note/save/reload/unsaved guards and routine file
-roundtrip. No human footage, uploads, live account setup or phone validation.
-Task B importer, reverted account a11y restoration and optional Task C remain.
-
+Full checks pass 1790 tests with 3 existing skips/126 files (76.45 seconds), lint,
+build and native sync (26 files/platform). Vite transforms 538 modules, entry
+353.91 kB/107.36 kB gzip. Chromium 156.0.8078.4 GPU/120-sample no-person suite
+passes 50/50 in 3.8 minutes. Native sharing and live sync remain device prerequisites.
+Task A was pushed and fast-forwarded to master at 01f8c28 before Task B wiring.
 
 ### 2026-11-07 — Q42–Q48 integration and review fixes (D-060)
 
