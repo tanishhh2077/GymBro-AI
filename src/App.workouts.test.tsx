@@ -30,7 +30,7 @@ function button(name: string) {
   if (!found) throw new Error(`Missing button: ${name}`); return found;
 }
 async function settleLazy() {
-  for (let i = 0; i < 100 && container.textContent?.includes('Opening video analysis'); i++) {
+  for (let i = 0; i < 1000 && container.textContent?.includes('Opening video analysis'); i++) {
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
   }
 }

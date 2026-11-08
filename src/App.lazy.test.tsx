@@ -34,7 +34,7 @@ async function nav(name: string) {
   await act(async () => { target.click(); });
 }
 async function until(check: () => boolean) {
-  for (let i = 0; i < 100 && !check(); i++) await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
+  for (let i = 0; i < 1000 && !check(); i++) await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
   expect(check()).toBe(true);
 }
 

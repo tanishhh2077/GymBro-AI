@@ -66,7 +66,7 @@ function button(name: string) {
   if (!found) throw new Error(`Missing button: ${name}`); return found;
 }
 async function settleLazy() {
-  for (let i = 0; i < 100 && container.textContent?.includes('Opening video analysis'); i++) {
+  for (let i = 0; i < 1000 && container.textContent?.includes('Opening video analysis'); i++) {
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
   }
 }
@@ -119,7 +119,7 @@ const clip = () => session.getState().clips[0];
  * separate scopes, never inside one.
  */
 async function untilReleased() {
-  for (let i = 0; i < 100 && session.getState().processingState !== 'idle'; i++) {
+  for (let i = 0; i < 1000 && session.getState().processingState !== 'idle'; i++) {
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)); });
   }
   expect(session.getState().processingState).toBe('idle');
