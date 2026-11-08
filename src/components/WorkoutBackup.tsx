@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useStore } from 'zustand';
 import { createWorkoutBackup, mergeWorkoutBackup, type BackupMerge, type WorkoutBackup as BackupFile } from '@/core/workoutBackup';
 import { readWorkoutBackup } from '@/core/workoutBackupFile';
@@ -10,10 +10,13 @@ import type { WorkoutData } from '@/types/workout';
 import { BackupBodyNoteCounts } from './BodyNoteConflicts';
 import { BackupReminder } from './BackupReminder';
 
+const WorkoutImport = lazy(() => import('./WorkoutImport').then(module => ({ default: module.WorkoutImport })));
+
 interface Preview { backup: BackupFile; source: WorkoutData; merge: BackupMerge; filename: string }
 
 export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: () => void }) {
   const state = useStore(store);
+  const [importing, setImporting] = useState(false);
   const [preview, setPreview] = useState<Preview | null>(null);
   const [reading, setReading] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -95,6 +98,10 @@ export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: 
     else if (!store.getState().error) setError(result.message);
   }
 
+  if (importing) return <Suspense fallback={<p role="status">Opening CSV import…</p>}>
+    <WorkoutImport store={store} onClose={() => setImporting(false)} />
+  </Suspense>;
+
   return <div className="space-y-6">
     <button type="button" className="text-sm text-accent underline underline-offset-4" onClick={onHome}>Back to Home</button>
     <div>
@@ -114,6 +121,14 @@ export function WorkoutBackup({ store, onHome }: { store: WorkoutStore; onHome: 
       <p className="text-sm text-slate-400">All completed actual sets, including warm-ups, with workout and exercise names, IDs, UTC timestamps, original units and entered values. Oldest completions appear first.</p>
       <p className="text-sm text-slate-400">Open the CSV in a spreadsheet. Use a JSON backup for recovery and restore. Names beginning with spreadsheet formula characters receive a protective apostrophe.</p>
       <button type="button" className="btn-ghost" disabled={blocked} onClick={() => { void exportRecords('csv'); }}>Export workout CSV</button>
+    </section>
+    <section aria-labelledby="workout-csv-import-title" className="card space-y-3 p-4 sm:p-5">
+      <h2 id="workout-csv-import-title" className="text-lg font-semibold text-white">Import from another workout app</h2>
+      <p className="text-sm text-slate-400">Review supported Strong, Hevy or FitNotes CSV additions before saving them locally. Keep the original export for any information this importer cannot carry across.</p>
+      <button type="button" className="btn-ghost" disabled={blocked} onClick={() => {
+        reader.current?.abort(); reader.current = null;
+        setReading(false); setPreview(null); setError(''); setNotice(''); setImporting(true);
+      }}>Import workout CSV</button>
     </section>
     <section aria-labelledby="backup-import-title" className="card min-w-0 space-y-3 p-4 sm:p-5">
       <h2 id="backup-import-title" className="text-lg font-semibold text-white">Restore from a file</h2>

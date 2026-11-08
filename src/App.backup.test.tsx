@@ -11,7 +11,7 @@ import type { Workout, WorkoutData } from '@/types/workout';
 import App from './App';
 
 // Progress and Backup load on demand; warm the module cache so tests wait on rendering, not on loading.
-beforeAll(async () => { await import('@/components/WorkoutBackup'); await import('@/components/WorkoutProgress'); });
+beforeAll(async () => { await import('@/components/WorkoutBackup'); await import('@/components/WorkoutImport'); await import('@/components/WorkoutProgress'); });
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 let root: Root;
@@ -165,4 +165,39 @@ it('previews schema6 body and note additions and explains skipped notes', async 
   await click('Restore additions');
   expect(store.getState().data.bodyLog).toHaveLength(1);
   expect(store.getState().data.exerciseNotes).toEqual({ Bench: 'Device note', Row: 'Seat 2' });
+});
+it('opens the CSV importer from Backup and returns to JSON recovery', async () => {
+  await render(); await click('Backup and restore'); await click('Import workout CSV');
+  expect(container.querySelector('#workout-import-title')?.textContent).toBe('Import workout CSV');
+  expect(container.querySelector('#workout-backup-file')).toBeNull();
+  await click('Back to backup and restore');
+  expect(container.querySelector('h1')?.textContent).toBe('Backup and restore');
+  expect(container.querySelector('#workout-backup-file')).not.toBeNull();
+});
+it('drops a JSON restore preview when opening the separate CSV importer', async () => {
+  await render(); await click('Backup and restore'); await choose();
+  expect(container.textContent).toContain('Restore preview');
+  await click('Import workout CSV'); await click('Back to backup and restore');
+  expect(container.textContent).not.toContain('Restore preview');
+  expect((await repository.load()).history).toHaveLength(0);
+});
+it('cancels an importer read when returning to backup without showing a stale preview', async () => {
+  await render(); await click('Backup and restore'); await click('Import workout CSV');
+  await act(async () => {
+    const offset = container.querySelector<HTMLInputElement>('input[type="number"]')!;
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(offset, '0');
+    offset.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  const abort = vi.spyOn(FileReader.prototype, 'abort');
+  await act(async () => {
+    const input = container.querySelector('input[type="file"]')!;
+    Object.defineProperty(input, 'files', { configurable: true, value: [new File(['Date,Exercise'], 'synthetic.csv')] });
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    button('Back to backup and restore').click();
+  });
+  expect(abort).toHaveBeenCalledTimes(1);
+  expect(container.querySelector('h1')?.textContent).toBe('Backup and restore');
+  expect(container.textContent).not.toContain('Import preview');
+  expect(container.querySelector('[role="alert"]')).toBeNull();
+  expect((await repository.load()).history).toHaveLength(0);
 });
