@@ -124,22 +124,40 @@ own designed contract.
 
 ## Getting started
 
-Use **Node 22+** (`.nvmrc` pins 22.23.2), required by the pinned Capacitor CLI.
+Use **Node 22+** (`.nvmrc` pins 22.23.2), required by the pinned Capacitor CLI
+and `package.json` engines. On Windows with nvm, select it for the current
+session in PowerShell: `$env:PATH = "$env:NVM_HOME\v22.23.2;$env:PATH"` (or in
+Command Prompt: `set "PATH=%NVM_HOME%\v22.23.2;%PATH%"`). On macOS/Linux with
+nvm, run `nvm use`. Confirm with `node -v` (must print `v22.23.2`).
 
 ```bash
-npm ci
+npm ci --no-audit --no-fund
 npm run dev
 ```
 
 Then open the printed local URL (default `http://localhost:5173`).
 
-A temporary clean copy passed `npm ci --no-audit --no-fund` and `npm run build`
-on Node 20.20.2 / npm 10.8.2; development-server HTTP checks also passed during
-the initial baseline. ESLint and its plugins are now declared. `npm run lint`
-and `npm run build` pass as of 2026-11-02.
-The current mobile setup also passes the shared checks on Node 22.23.2. These
-checks do not establish successful real-video inference or native compilation. See
-[current status](docs/STATUS.md).
+To preview the production build locally:
+
+```bash
+npm run preview
+```
+
+To verify the project locally:
+
+```bash
+npm test -- --maxWorkers=4
+npm run lint
+npm run build
+```
+
+The `--maxWorkers=4` flag limits Vitest worker concurrency to prevent jsdom
+timeouts on multi-core systems. `npm run build` runs four TypeScript project
+checks (`tsconfig.json`, `tsconfig.mobile.json`, `tsconfig.node.json`, and
+`tsconfig.browser.json`) before the Vite production bundle. `npm run lint`
+runs ESLint across the repository. The mobile setup also passes the shared
+checks on Node 22.23.2. These checks do not establish successful real-video
+inference or native compilation. See [current status](docs/STATUS.md).
 
 ### Native projects
 
@@ -149,7 +167,9 @@ npm run mobile:sync
 
 This builds the shared app, copies it and the local model/WASM into both native
 projects, and verifies bundle identity/integrity; it does not compile an APK or
-iOS app. `npm run mobile:verify` checks existing copies without modifying them.
+iOS app. In a fresh clone or worktree, `npm run mobile:sync` must be run before
+`npm run mobile:verify` so that the native assets and config are generated.
+`npm run mobile:verify` checks existing copies without modifying them.
 `npm run build` also type-checks `capacitor.config.ts`, and `vite.config.ts` and
 `vitest.config.ts` with Node types only. Playwright's config and browser-test
 sources have a separate type-check project with browser and Node types.
@@ -173,29 +193,40 @@ inference still need platform checks.
 
 ### Automated tests
 
-Task 14 currently passes **448 tests / 22 files**, lint and guarded mobile sync.
-Manual-workout schema/repository/store and App-flow tests supplement the media
-tests below. The browser suite additionally checks synthetic logging and two-tab
-conflicts; consult STATUS for the latest full-browser/hosted/native results.
+The automated test suite currently passes **1,082 tests / 88 files**, lint and
+guarded mobile sync. Manual-workout schema/repository/store and App-flow tests
+supplement the media tests below. The browser suite additionally checks
+synthetic logging, two-tab conflicts, and feature workflows; consult STATUS for
+the latest full-browser/hosted/native results.
 
 ```bash
-npm test
+npm test -- --maxWorkers=4
 ```
 
 Vitest runs `src/**/*.test.{ts,tsx}` once using jsdom's simulated browser
 objects and the app's existing Vite settings, including the `@` source alias.
 It also runs `scripts/**/*.test.mjs` in Node for synthetic packaging fixtures
-and `tests/browser/**/*.test.ts` for fixed-pattern integrity checks. Task 13
-adds 6 fixture-preflight cases to the previous 385 tests. Task 12 adds 2 lift/view metadata cases to Task 11's 383,
-which added 2 build-configuration cases to Task 10's 381.
-Task 10 added 11 store timing and 4 player badge cases to
-Task 9's 366, which added 34 summary-contract, 9 summary-panel and 3 timeline
-integration cases to the previous320. That baseline includes 10 native lifecycle,
-2 App integration and 21 package guard cases plus the preceding287:
-40 elbow-measurement, 9 timeline component,
-58 media-helper cases, 55 pose-engine contract cases, 22
-selection-check cases, 12 session-store cases, 11 dropzone component cases, and
-56 pure display-calculation cases, 10 overlay cases, and 14 player cases.
+and `tests/browser/**/*.test.ts` for fixed-pattern integrity checks. Always pass
+`--maxWorkers=4` when running the full suite: without concurrency limits,
+Vitest spawns worker threads for all CPU cores, causing worker starvation and
+jsdom test timeouts on multi-core systems.
+
+The test suite covers:
+- **Video & pose analysis**: video metadata loading, frame seeking, pose
+  engine lifecycle (GPU initialization with CPU fallback, busy rejection,
+  deadlines, cleanup), 2D elbow trigonometry, extrema navigation, clip
+  summary contracts, and player/skeleton overlay controls.
+- **Workout logging & editing**: transactional IndexedDB storage, schema
+  migrations, active workout editing (sets, reps, weights, Warm-up vs Regular
+  labels, supersets, notes), session-only rest timer with auto-rest, routine
+  templates, and previous-workout autofill.
+- **Progress & records**: exercise history filtering, calendar navigation,
+  personal records, estimated 1RM, load charts, and plate calculator.
+- **Backup & sync**: JSON file backup/restore (web download and native share
+  sheet) and Supabase database sync protocols.
+- **Native & accessibility**: mobile config validation, asset integrity,
+  native lifecycle handlers, and WCAG AA 4.5:1 color contrast across themes.
+
 See [current status](docs/STATUS.md) for exact results. The canvas uses bounded
 display sampling and video-content geometry. Player tests cover seeks, playback
 failures, source replacement, leases, and accessible control state. These simulated
@@ -228,9 +259,12 @@ npm run test:browser
 ```
 
 This uses fixed first-party black patterns, the actual local model/runtime and
-an owned loopback development server. See [browser setup and limits](tests/browser/README.md).
-No human footage or captures enter this suite. Phone/native and real-bench
-acceptance remain separate; check STATUS for actual results.
+an owned loopback development server on port 4179 (ensure port 4179 is free
+before starting). On Linux, install system browser dependencies with
+`npx playwright install --with-deps chromium`. See
+[browser setup and limits](tests/browser/README.md). No human footage or
+captures enter this suite. Phone/native and real-bench acceptance remain
+separate; check STATUS for actual results.
 
 ### Model & WASM assets
 
@@ -246,8 +280,10 @@ so the app has **no runtime dependency on any third-party CDN**:
 runtime copy in the same reviewed change:
 
 ```bash
-# from the project root
+# from the project root (bash / PowerShell)
 cp node_modules/@mediapipe/tasks-vision/wasm/* public/wasm/
+# or Windows cmd:
+# copy node_modules\@mediapipe\tasks-vision\wasm\* public\wasm\
 ```
 
 Vite publishes everything in `public/` unchanged, so that folder holds no
