@@ -3,6 +3,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { Capacitor } from '@capacitor/core';
 import { IDBFactory } from 'fake-indexeddb';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { isAppearancePreference } from '@/store/useAppearance';
 import { createWorkoutRepository } from '@/store/workoutRepository';
 import { createWorkoutStore, type WorkoutStore } from '@/store/useWorkoutStore';
 import App from './App';
@@ -115,4 +116,82 @@ it('releases the system-change listener and restores owned document changes on u
   expect(listeners.size).toBe(0);
   expect(document.documentElement.dataset.theme).toBe(previous);
   expect(meta.content).toBe('#123456');
+});
+
+it('validates appearance preferences strictly in isAppearancePreference', () => {
+  expect(isAppearancePreference('system')).toBe(true);
+  expect(isAppearancePreference('light')).toBe(true);
+  expect(isAppearancePreference('dark')).toBe(true);
+
+  const invalid = [
+    null, undefined, 0, 1, true, false, NaN, Infinity,
+    {}, [], () => {}, Symbol('dark'),
+    '', '   ', 'system ', ' system', ' light', 'light ', ' dark', 'dark ',
+    'SYSTEM', 'System', 'LIGHT', 'Light', 'DARK', 'Dark',
+    'auto', 'sepia', 'normal', 'dark\0',
+    'dark'.repeat(10_000), JSON.stringify({ preference: 'dark' }),
+  ];
+  for (const value of invalid) {
+    expect(isAppearancePreference(value), `expected ${String(value).slice(0, 20)} to be invalid`).toBe(false);
+  }
+});
+
+it('treats corrupt, oversized or JSON stored values as System without rewriting them', async () => {
+  const corruptValues = [
+    '',
+    '{"preference":"dark"}',
+    '["dark"]',
+    'DARK',
+    'Dark',
+    ' dark ',
+    'auto',
+    'dark\0',
+    'dark'.repeat(20_000),
+  ];
+  for (const corrupt of corruptValues) {
+    localStorage.setItem('gymbro-ai:appearance', corrupt);
+    await render();
+    expect(selection().value).toBe('system');
+    expect(document.documentElement.dataset.theme).toBe('light');
+    expect(localStorage.getItem('gymbro-ai:appearance')).toBe(corrupt);
+    await act(async () => root.unmount());
+    root = createRoot(container);
+  }
+});
+
+it('handles QuotaExceededError when saving preference, preserves session choice and clears notice on recovery', async () => {
+  await render();
+  const setItemSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    throw new DOMException('The quota has been exceeded.', 'QuotaExceededError');
+  });
+  await choose('dark');
+  expect(document.documentElement.dataset.theme).toBe('dark');
+  expect(meta.content).toBe('#05070d');
+  expect(selection().value).toBe('dark');
+  expect(container.textContent).toContain('Appearance applies for this session');
+  expect(store.getState().needsReload).toBe(false);
+
+  // Storage recovers: next change saves successfully and notice clears
+  setItemSpy.mockRestore();
+  await choose('light');
+  expect(document.documentElement.dataset.theme).toBe('light');
+  expect(meta.content).toBe('#f5f7fb');
+  expect(selection().value).toBe('light');
+  expect(localStorage.getItem('gymbro-ai:appearance')).toBe('light');
+  expect(container.textContent).not.toContain('Appearance applies for this session');
+});
+
+it('handles SecurityError and blocked window.localStorage property access gracefully', async () => {
+  const spy = vi.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
+    throw new DOMException('localStorage is disabled', 'SecurityError');
+  });
+  try {
+    await render();
+    expect(selection().value).toBe('system');
+    expect(document.documentElement.dataset.theme).toBe('light');
+    expect(container.textContent).toContain('Appearance applies for this session');
+    expect(store.getState().loaded).toBe(true);
+  } finally {
+    spy.mockRestore();
+  }
 });
