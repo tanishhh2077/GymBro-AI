@@ -1,4 +1,4 @@
-import { useId, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useStore } from 'zustand';
 import { buildExerciseLibrary } from '@/core/exerciseCatalog';
 import { goalProgress, type GoalProgress } from '@/core/goalProgress';
@@ -45,9 +45,24 @@ export function WorkoutGoals({ data, store, scope, onHistory }: {
     (goal.name === scope.name && goal.unit === scope.unit && (goal.bodyweight === true) === (scope.bodyweight === true)));
   const [editing, setEditing] = useState<Editing | null>(null);
   const [notice, setNotice] = useState('');
+  const addBtnRef = useRef<HTMLButtonElement | null>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const wasEditing = useRef(false);
 
-  function open(goal?: WorkoutGoal) {
+  useEffect(() => {
+    if (wasEditing.current && !editing) {
+      if (triggerRef.current && document.body.contains(triggerRef.current)) {
+        triggerRef.current.focus();
+      } else {
+        addBtnRef.current?.focus();
+      }
+    }
+    wasEditing.current = !!editing;
+  }, [editing]);
+
+  function open(goal?: WorkoutGoal, trigger?: HTMLElement | null) {
     setNotice('');
+    triggerRef.current = trigger ?? (document.activeElement as HTMLElement | null);
     setEditing({ id: goal?.id ?? null, revision: data.revision, draft: goal ? draftOf(goal) :
       { name: scope?.name ?? '', unit: scope?.unit ?? 'lb', bodyweight: scope?.bodyweight === true, weight: '', reps: '' } });
   }
@@ -55,6 +70,9 @@ export function WorkoutGoals({ data, store, scope, onHistory }: {
     if (!store || !window.confirm(`Delete the goal for ${groupLabel(goal)}? Logged workouts stay saved.`)) return;
     const result = await store.getState().deleteGoal(goal.id);
     setNotice(result.ok ? 'Goal deleted.' : result.message);
+    if (result.ok) {
+      addBtnRef.current?.focus();
+    }
   }
 
   return <section aria-labelledby={titleId} className="space-y-3">
@@ -65,7 +83,7 @@ export function WorkoutGoals({ data, store, scope, onHistory }: {
     {!goals.length && <p className="text-slate-400">{scope ? 'No goal for this exercise yet.' : 'No goals yet.'}</p>}
     {goals.length > 0 && <ul className="space-y-3">{goals.map(goal => <li key={goal.id}>
       <GoalCard goal={goal} progress={goalProgress(data.history, goal)} onHistory={onHistory}
-        onEdit={store && !editing ? () => open(goal) : undefined} onDelete={store && !editing ? () => { void remove(goal); } : undefined} />
+        onEdit={store && !editing ? trigger => open(goal, trigger) : undefined} onDelete={store && !editing ? () => { void remove(goal); } : undefined} />
     </li>)}</ul>}
     {store && editing && <GoalForm key={`${editing.id}:${editing.revision}`} store={store} editing={editing}
       onReopen={() => {
@@ -73,12 +91,12 @@ export function WorkoutGoals({ data, store, scope, onHistory }: {
         if (saved) open(saved); else { setEditing(null); setNotice('This goal was deleted on another screen.'); }
       }}
       onClose={saved => { setEditing(null); if (saved) setNotice('Goal saved.'); }} />}
-    {store && !editing && <button type="button" className="btn-ghost" onClick={() => open()}>Add goal</button>}
+    {store && !editing && <button ref={addBtnRef} type="button" className="btn-ghost" onClick={e => open(undefined, e.currentTarget)}>Add goal</button>}
   </section>;
 }
 
 function GoalCard({ goal, progress, onHistory, onEdit, onDelete }: {
-  goal: WorkoutGoal; progress: GoalProgress; onHistory: (id: string) => void; onEdit?: () => void; onDelete?: () => void;
+  goal: WorkoutGoal; progress: GoalProgress; onHistory: (id: string) => void; onEdit?: (trigger?: HTMLElement | null) => void; onDelete?: () => void;
 }) {
   const label = groupLabel(goal);
   const bodyweight = goal.bodyweight === true;
@@ -100,7 +118,7 @@ function GoalCard({ goal, progress, onHistory, onEdit, onDelete }: {
         onClick={() => onHistory(progress.set.workoutId)}>View workout</button>
     </div>}
     {(onEdit || onDelete) && <div className="flex flex-wrap gap-2">
-      {onEdit && <button type="button" className="btn-ghost" aria-label={`Edit goal for ${label}`} onClick={onEdit}>Edit</button>}
+      {onEdit && <button type="button" className="btn-ghost" aria-label={`Edit goal for ${label}`} onClick={e => onEdit(e.currentTarget)}>Edit</button>}
       {onDelete && <button type="button" className="btn-ghost" aria-label={`Delete goal for ${label}`} onClick={onDelete}>Delete</button>}
     </div>}
   </article>;
@@ -112,6 +130,7 @@ function GoalForm({ store, editing, onReopen, onClose }: {
   const state = useStore(store);
   const id = useId();
   const listId = `${id}-exercise-suggestions`;
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
   const suggestions = useMemo(() => exerciseSuggestions(state.data), [state.data]);
   const [draft, setDraft] = useState(editing.draft);
   const [error, setError] = useState('');
@@ -119,6 +138,10 @@ function GoalForm({ store, editing, onReopen, onClose }: {
   useUnsavedChanges(dirty);
   const disabled = !state.loaded || state.busy || state.needsReload;
   const change = (field: keyof Draft, value: string | boolean) => setDraft(current => ({ ...current, [field]: value }));
+
+  useEffect(() => {
+    nameInputRef.current?.focus();
+  }, []);
 
   async function save(event: FormEvent) {
     event.preventDefault(); setError('');
@@ -130,13 +153,13 @@ function GoalForm({ store, editing, onReopen, onClose }: {
   return <form aria-label="Save goal" onSubmit={save} className="card min-w-0 space-y-4 p-4">
     <h3 className="font-semibold text-white">{editing.id ? 'Edit goal' : 'Add goal'}</h3>
     <p className="text-xs text-slate-500">A goal is a target you set. It is never counted as a logged set.</p>
-    {error && <div role="alert" className="space-y-2 text-sm text-warn"><p className="break-words">{error}</p>
+    {error && <div id={`${id}-error`} role="alert" className="space-y-2 text-sm text-warn"><p className="break-words">{error}</p>
       {editing.id && error.startsWith(STALE) && <p>Your draft is kept below. Reopen the goal to load the saved version, then edit again.</p>}</div>}
     {editing.id && error.startsWith(STALE) && <button type="button" className="btn-ghost" onClick={onReopen}>Reopen goal</button>}
     <fieldset disabled={disabled} className="min-w-0 space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div><label htmlFor={`${id}-name`} className="text-sm text-slate-300">Exercise name</label>
-          <input id={`${id}-name`} required maxLength={80} className={inputClass} value={draft.name} onChange={e => change('name', e.target.value)}
+          <input ref={nameInputRef} id={`${id}-name`} required maxLength={80} className={inputClass} value={draft.name} onChange={e => change('name', e.target.value)}
             list={suggestions.length ? listId : undefined} autoComplete="off" />
           {suggestions.length > 0 && <datalist id={listId}>{suggestions.map(name => <option key={name} value={name} />)}</datalist>}</div>
         <div><label htmlFor={`${id}-unit`} className="text-sm text-slate-300">Weight unit</label>
@@ -148,10 +171,11 @@ function GoalForm({ store, editing, onReopen, onClose }: {
         <input id={`${id}-bodyweight`} type="checkbox" checked={draft.bodyweight} onChange={e => change('bodyweight', e.target.checked)} />
         <label htmlFor={`${id}-bodyweight`} className="text-sm text-slate-300">Bodyweight exercise</label>
       </div>
-      {draft.bodyweight && <p className="text-xs text-slate-500">Enter added weight: 0 for bodyweight only, a negative number for assistance.</p>}
+      {draft.bodyweight && <p id={`${id}-weight-desc`} className="text-xs text-slate-500">Enter added weight: 0 for bodyweight only, a negative number for assistance.</p>}
       <div className="grid grid-cols-2 gap-4">
         <div><label htmlFor={`${id}-weight`} className="text-sm text-slate-300">{draft.bodyweight ? 'Added weight' : 'Goal weight'} ({draft.unit})</label>
           <input id={`${id}-weight`} type="number" inputMode="decimal" min={draft.bodyweight ? -1000 : 0} max={10000} step="any"
+            aria-describedby={draft.bodyweight ? `${id}-weight-desc` : undefined}
             className={inputClass} value={draft.weight} onChange={e => change('weight', e.target.value)} /></div>
         <div><label htmlFor={`${id}-reps`} className="text-sm text-slate-300">Goal reps</label>
           <input id={`${id}-reps`} type="number" inputMode="numeric" min={1} max={1000} step={1}

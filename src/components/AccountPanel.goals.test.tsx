@@ -100,3 +100,45 @@ it('shows a deleted goal version plainly', async () => {
   await act(async () => root.render(<GoalVersion value={{ ...goal, bodyweight: undefined, unit: 'kg', weight: 100 }} />));
   expect(container.textContent).toContain('Pull-up (kg) · 5 reps × 100 kg');
 });
+
+it('provides role="radiogroup", aria-checked and arrow key navigation for conflict radio options', async () => {
+  await act(async () => root.render(<AccountPanel service={service()} account={{ id: 'a', email: 'lifter@example.test' }}
+    store={store} guest={createWorkoutRepository(new IDBFactory(), 'guest')} />));
+  await act(async () => button('Preview sync').click());
+  await settle();
+  const preview = container.querySelector('[aria-label="Sync preview"]')!;
+  const fieldset = preview.querySelector('fieldset')!;
+  expect(fieldset.getAttribute('role')).toBe('radiogroup');
+  const legendId = fieldset.querySelector('legend')?.id;
+  expect(legendId).toBeTruthy();
+  expect(fieldset.getAttribute('aria-labelledby')).toBe(legendId);
+
+  const deviceRadio = fieldset.querySelector<HTMLInputElement>('input[value="device"]')!;
+  const cloudRadio = fieldset.querySelector<HTMLInputElement>('input[value="cloud"]')!;
+  expect(deviceRadio.getAttribute('aria-checked')).toBe('false');
+  expect(cloudRadio.getAttribute('aria-checked')).toBe('false');
+
+  // Navigate using arrow keys
+  deviceRadio.focus();
+  await act(async () => {
+    deviceRadio.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+  });
+  expect(cloudRadio.checked).toBe(true);
+  expect(cloudRadio.getAttribute('aria-checked')).toBe('true');
+});
+
+it('restores focus to Preview sync button after canceling sync preview', async () => {
+  await act(async () => root.render(<AccountPanel service={service()} account={{ id: 'a', email: 'lifter@example.test' }}
+    store={store} guest={createWorkoutRepository(new IDBFactory(), 'guest')} />));
+  const previewBtn = button('Preview sync');
+  previewBtn.focus();
+  await act(async () => previewBtn.click());
+  await settle();
+
+  const cancelBtn = button('Cancel sync');
+  await act(async () => cancelBtn.click());
+  await settle();
+
+  expect(document.activeElement).toBe(button('Preview sync'));
+});
+
