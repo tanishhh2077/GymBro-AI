@@ -3,7 +3,7 @@ import type { BodyEntry } from '@/types/body';
 import type { WorkoutData } from '@/types/workout';
 import { BODY_MEASUREMENT_NAMES, emptyWorkoutData, validateWorkoutData } from './workouts';
 import { createWorkoutBackup, mergeWorkoutBackup, parseWorkoutBackup } from './workoutBackup';
-import { mergeWorkoutSync, syncSnapshot } from './workoutSync';
+import { mergeWorkoutSync, sameSyncData, syncSnapshot } from './workoutSync';
 import { bodyLogNewestFirst, bodyTrend, exerciseNoteFor } from './bodyLog';
 
 type Loose = Record<string, unknown>;
@@ -209,3 +209,12 @@ it('merges body entries and notes through sync and exposes concurrent edits as c
   const odd = clone(base) as unknown as Loose; Object.defineProperty(odd.exerciseNotes, 'constructor', { value: 'Own.', enumerable: true, writable: true, configurable: true });
   expect(mergeWorkoutSync(base, odd as unknown as WorkoutData, base).data.exerciseNotes).toEqual({ Row: 'Pause.', constructor: 'Own.' });
 });
+
+it.each([['Café', 'Café'], ['ab', 'a​b'], ['ab', 'a­b']])(
+  'compares notes for collation-equal names %j and %j independently of insertion order', (one, two) => {
+    expect(one.localeCompare(two)).toBe(0);
+    const first = library({ exerciseNotes: Object.fromEntries([[one, 'A'], [two, 'B']]) });
+    const second = library({ exerciseNotes: Object.fromEntries([[two, 'B'], [one, 'A']]) });
+    expect(sameSyncData(first, second)).toBe(true);
+    expect(sameSyncData(first, library({ exerciseNotes: Object.fromEntries([[one, 'B'], [two, 'A']]) }))).toBe(false);
+  });

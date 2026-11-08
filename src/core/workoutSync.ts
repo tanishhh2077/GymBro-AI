@@ -56,7 +56,9 @@ export interface SyncPreview {
 function canonical(value: unknown): string {
   return JSON.stringify(value, (_key, item: unknown) => {
     if (!item || typeof item !== 'object' || Array.isArray(item)) return item;
-    return Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b)));
+    // Code-unit order: collation can rank two distinct user-typed note names as equal,
+    // which would make the order (and so the comparison) depend on insertion order.
+    return Object.fromEntries(Object.entries(item).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0));
   });
 }
 export function syncSnapshot(data: WorkoutData): WorkoutData {
