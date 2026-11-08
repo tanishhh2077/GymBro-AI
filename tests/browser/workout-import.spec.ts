@@ -14,7 +14,7 @@ test('previews a local CSV then imports only additions and skips a repeat', asyn
   await expect(page.getByRole('button', { name: 'Import additions', exact: true })).toBeDisabled();
   await page.getByLabel('I reviewed the units, times and warnings. All included exercises use external loads.', { exact: true }).check();
   await page.getByRole('button', { name: 'Import additions', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('Imported workout additions saved on this device.');
+  await expect(page.getByRole('region', { name: 'Import workout CSV', exact: true }).getByRole('status')).toContainText('Imported workout additions saved on this device.');
   await page.getByLabel('Choose workout CSV file', { exact: true }).setInputFiles(file);
   await expect(page.getByText('These imported records are already on this device.', { exact: true })).toBeVisible();
   await page.getByLabel('Choose workout CSV file', { exact: true }).setInputFiles({ ...file, buffer: Buffer.from(csv.replace(',60,8,', ',70,8,')) });
