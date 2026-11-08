@@ -10,6 +10,25 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+### 2026-11-08 — Task A schema6 screen integration
+
+Codex (gpt-6.1-sol) wired BodyLog/Home navigation, ExerciseNoteField, body/note
+sync choosers with hasSyncConflicts, restore counts and RoutineShare. Source
+commit106e70c includes focused97-test coverage and two normal-route browser flows.
+One fresh independent sharing review found adjacent superset group loss and
+stale-preview retention. V2 numeric group tokens preserve distinct adjacent
+groups while strict v1 reads remain supported. Source-identity preview checks
+and native validated export locking/cleanup resolved the findings. Re-review
+found no remaining significant defects. No OpenGym code/assets were used.
+
+Full checks pass1790 tests with3 existing skips/126files (76.45s), lint, complete
+build and native sync26files/platform. Vite transforms538modules, entry353.91kB/
+107.36kB gzip. Chromium156.0.8078.4 GPU/120-sample no-person suite passes50/50
+in3.8minutes, including body/note/save/reload/unsaved guards and routine file
+roundtrip. No human footage, uploads, live account setup or phone validation.
+Task B importer, reverted account a11y restoration and optional Task C remain.
+
+
 ### 2026-11-07 — Q42–Q48 integration and review fixes (D-060)
 
 Preserved all eight unfinished files in focused commits and published the branch

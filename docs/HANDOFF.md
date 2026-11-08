@@ -42,21 +42,31 @@ MIT exercise dataset hasaneyldrm/exercises-dataset after checking its own licenc
 Never use its Gym visual exercise animations or stills. Contributing there needs
 its CLA; propose first. Based on its NOTICE, CLA, roadmap and file list only.
 
+## Task A complete, 2026-11-08
+
+Schema6 screens are wired through the app. Home opens Body Log; active exercises
+expose notes; sync confirms only after all workout/goal/body/note choices resolve;
+backup previews show body/note counts; Routines imports/exports individual plans.
+Routine files export v2 numeric superset groups and still read v1 boolean groups.
+Fresh sharing review found adjacent-group loss and stale previews, both corrected.
+Native routine sharing reuses the existing validated export adapter.
+
+Checks pass 1790 tests with 3 existing skips/126 files, lint/build, native sync
+(26 files/platform) and all 50 Chromium cases. Synthetic tests do not establish
+physical-phone sharing, live sync or real-bench accuracy.
+
 ## Next work
 
-1. Screens for schema6: body log (weight, measurements, trend), exercise notes in
-   the editor, sync-conflict choosers for body and note conflicts in AccountPanel,
-   and the new backup counts in the restore preview (`addedBodyEntries`,
-   `addedExerciseNotes`, `skippedExerciseNotes`).
-2. Q55: export and import one routine as a small file.
-3. Q42–Q48 is integrated under D-060. Keep its branch/worktree; no utility work
-   remains pending. The original master checkout was left untouched.
-Q&A resumes at Q57. Q38 needs the user present with private bench videos. Preserve
-all worker branches and the incomplete Task4 branch; one browser suite on 4179.
+1. Restore the reverted fix/goals-account-a11y changes and correct unsafe conflict
+   ARIA IDs and focus restoration after disabled sync/guest-copy buttons re-enable.
+2. Task B standalone Strong/Hevy/FitNotes CSV importer is implemented on
+   feat/workout-export-imports. Wire Backup entry, review final integration,
+   verify and integrate after Task A. See its format provenance document.
+3. Task C muscle diagram is optional and has not been implemented.
 
-Supabase still needs user dashboard setup, all five migrations and email-code
-configuration in [the guide](../supabase/README.md). Live email and real
-cross-device sync remain unverified. Phone/media work requires user presence.
+Keep Task4 and all other worker branches/worktrees. No paid services, media
+uploads, signing or settings changes are authorized. Supabase setup still needs
+the user and all five migrations. Phone/media work requires user presence.
 
 ## Phone and media boundaries
 
