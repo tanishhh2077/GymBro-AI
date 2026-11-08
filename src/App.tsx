@@ -15,8 +15,6 @@ import { WorkoutEditor } from '@/components/WorkoutEditor';
 import { WorkoutHistory } from '@/components/WorkoutHistory';
 import { WorkoutRestTimer, type WorkoutRestTimerHandle } from '@/components/WorkoutRestTimer';
 import { WorkoutRoutines } from '@/components/WorkoutRoutines';
-import { WorkoutProgress } from '@/components/WorkoutProgress';
-import { WorkoutBackup } from '@/components/WorkoutBackup';
 import { WorkoutSummary } from '@/components/WorkoutSummary';
 import { ShieldIcon } from '@/components/icons';
 import { FirstRunIntro, ShowIntroAgain } from '@/components/FirstRunIntro';
@@ -25,14 +23,18 @@ import { confirmDiscard, createUnsavedChanges, UnsavedChangesContext } from '@/c
 
 const AnalysisWorkspace = lazy(() => import('@/components/AnalysisWorkspace').then(module => ({ default: module.AnalysisWorkspace })));
 
-/** Keep logging available if the optional analysis screen cannot be loaded. */
-class AnalysisBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+// Progress and Backup are opened rarely, so they load on demand and keep the first screen small.
+const WorkoutProgress = lazy(() => import('@/components/WorkoutProgress').then(module => ({ default: module.WorkoutProgress })));
+const WorkoutBackup = lazy(() => import('@/components/WorkoutBackup').then(module => ({ default: module.WorkoutBackup })));
+
+/** Keep logging available if an optional screen cannot be loaded. */
+class AnalysisBoundary extends Component<{ children: ReactNode; screen?: string }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
   render() {
     if (!this.state.failed) return this.props.children;
     return <div role="alert" className="rounded-xl border border-warn/30 bg-warn/10 p-4 text-sm text-warn">
-      <p>Video analysis could not be opened. Reload the app to try again.</p>
+      <p>{this.props.screen ?? 'Video analysis'} could not be opened. Reload the app to try again.</p>
       <button type="button" className="mt-3 underline underline-offset-4" onClick={() => window.location.reload()}>Reload app</button>
     </div>;
   }
@@ -157,9 +159,13 @@ export default function App({ workouts = workoutStore, session = useSessionStore
           onClearPending={() => setPendingLink(undefined)} onBackToSet={backToSet} />
       </Suspense></AnalysisBoundary>}
       {view === 'routines' && <WorkoutRoutines store={workouts} onStarted={() => navigate('workout')} onResume={() => navigate('workout')} />}
-      {view === 'progress' && <WorkoutProgress data={state.data} available={available} store={workouts} onHome={() => navigate('home')}
-        onWorkout={() => navigate('workout')} onHistory={openHistory} />}
-      {view === 'backup' && <WorkoutBackup store={workouts} onHome={() => navigate('home')} />}
+      {view === 'progress' && <AnalysisBoundary screen="Progress"><Suspense fallback={<p role="status" className="text-sm text-slate-400">Opening progress…</p>}>
+        <WorkoutProgress data={state.data} available={available} store={workouts} onHome={() => navigate('home')}
+          onWorkout={() => navigate('workout')} onHistory={openHistory} />
+      </Suspense></AnalysisBoundary>}
+      {view === 'backup' && <AnalysisBoundary screen="Backup and restore"><Suspense fallback={<p role="status" className="text-sm text-slate-400">Opening backup…</p>}>
+        <WorkoutBackup store={workouts} onHome={() => navigate('home')} />
+      </Suspense></AnalysisBoundary>}
       {view === 'account' && accountPanel}
     </main>
   </div>{intro.open && <FirstRunIntro onClose={intro.close} />}</UnsavedChangesContext.Provider>;

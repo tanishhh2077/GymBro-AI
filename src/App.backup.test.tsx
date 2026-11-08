@@ -2,13 +2,16 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { Capacitor } from '@capacitor/core';
 import { IDBFactory } from 'fake-indexeddb';
-import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { beforeAll, afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { createWorkoutBackup } from '@/core/workoutBackup';
 import { emptyWorkoutData, WorkoutError } from '@/core/workouts';
 import { createWorkoutRepository } from '@/store/workoutRepository';
 import { createWorkoutStore, type WorkoutStore } from '@/store/useWorkoutStore';
 import type { Workout, WorkoutData } from '@/types/workout';
 import App from './App';
+
+// Progress and Backup load on demand; warm the module cache so tests wait on rendering, not on loading.
+beforeAll(async () => { await import('@/components/WorkoutBackup'); await import('@/components/WorkoutProgress'); });
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 let root: Root;
