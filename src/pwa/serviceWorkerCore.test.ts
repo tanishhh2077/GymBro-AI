@@ -103,6 +103,16 @@ describe("install and activate", () => {
     await expect(precacheShell(config, value)).rejects.toThrow(/app-abc\.css/);
     expect(await caches.keys()).not.toContain(names.shell);
   });
+  it("install failure with an unchanged version keeps the active cache", async () => {
+    const { caches, value } = runtime({
+      fetch: async (input) => new Response("x", { status: String(input).endsWith(".css") ? 503 : 200 }),
+    });
+    const active = await caches.open(names.shell);
+    active.entries.set(scope, new Response("active shell"));
+    await expect(precacheShell(config, value)).rejects.toThrow(/app-abc\.css/);
+    expect(await caches.keys()).toContain(names.shell);
+    expect(await (await caches.open(names.shell)).match(scope)).toBeDefined();
+  });
   it("stores a redirected shell response without its redirect flag", async () => {
     const { caches, value } = runtime({
       fetch: async () => {

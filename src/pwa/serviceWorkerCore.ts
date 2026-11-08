@@ -75,6 +75,9 @@ async function withoutRedirect(response: Response): Promise<Response> {
 
 export async function precacheShell(config: ServiceWorkerConfig, runtime: WorkerRuntime): Promise<void> {
   const { shell } = cacheNamesFor(config);
+  // A cache with this name may belong to the active worker (same build
+  // content); a failed install must never delete what that worker serves.
+  const createdHere = !(await runtime.caches.keys()).includes(shell);
   const cache = await runtime.caches.open(shell);
   try {
     await Promise.all(config.precache.map(async (path) => {
@@ -85,8 +88,8 @@ export async function precacheShell(config: ServiceWorkerConfig, runtime: Worker
       await cache.put(url, await withoutRedirect(response));
     }));
   } catch (error) {
-    // A half-filled shell must not survive; the previous worker stays in charge.
-    await runtime.caches.delete(shell);
+    // A half-filled new shell must not survive; the previous worker stays in charge.
+    if (createdHere) await runtime.caches.delete(shell);
     throw error;
   }
 }

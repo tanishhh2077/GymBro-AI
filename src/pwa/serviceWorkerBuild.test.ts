@@ -1,9 +1,17 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from "vitest";
 import { runInNewContext } from "node:vm";
-import { buildServiceWorkerSource, selectPrecache } from "../../vite.serviceWorker";
+import { buildServiceWorkerSource, selectPrecache, shellVersion } from "../../vite.serviceWorker";
 
 describe("service worker build", () => {
+  it("gives a new shell cache version when only the worker's own code changes", () => {
+    const files = new Map<string, string>([["index.html", "<html>"], ["assets/a.js", "a"]]);
+    expect(shellVersion(files, "worker code v1")).toBe(shellVersion(new Map(files), "worker code v1"));
+    expect(shellVersion(files, "worker code v2")).not.toBe(shellVersion(files, "worker code v1"));
+    expect(shellVersion(new Map([...files, ["assets/a.js", "b"]]), "worker code v1"))
+      .not.toBe(shellVersion(files, "worker code v1"));
+  });
+
   it("precaches the start page, build assets and shell files but not the worker, maps or vendor runtime", () => {
     expect(selectPrecache([
       "index.html", "assets/index-a1.js", "assets/index-a1.js.map", "assets/index-b2.css",

@@ -47,13 +47,31 @@ function hashEntries(entries: Iterable<[string, string | Uint8Array]>): string {
   return hash.digest("hex").slice(0, 16);
 }
 
-export async function buildServiceWorkerSource(config: ServiceWorkerBuildConfig): Promise<string> {
+const BOOTSTRAP = "GymBroServiceWorker.startServiceWorker(self, GYMBRO_SW_CONFIG);\n";
+
+async function compileWorkerCore(): Promise<string> {
   const core = await transformWithEsbuild(readFileSync(CORE_PATH, "utf8"), CORE_PATH, {
     format: "iife", globalName: "GymBroServiceWorker", target: "es2020", loader: "ts",
   });
+  return core.code;
+}
+
+/**
+ * The shell cache name. It covers the worker's own code as well as the built
+ * files, so a deploy that changes only the worker still gets a fresh cache
+ * instead of sharing (and risking) the active worker's cache.
+ */
+export function shellVersion(files: ReadonlyMap<string, string | Uint8Array>, workerCode: string): string {
+  return hashEntries([...files, ["\0service-worker", workerCode + BOOTSTRAP]]);
+}
+
+export async function buildServiceWorkerSource(
+  config: ServiceWorkerBuildConfig,
+  workerCode?: string,
+): Promise<string> {
+  const code = workerCode ?? await compileWorkerCore();
   // The verifier reads this single line to check the list against dist/.
-  return `${core.code}\nconst GYMBRO_SW_CONFIG = ${JSON.stringify(config)};\n`
-    + "GymBroServiceWorker.startServiceWorker(self, GYMBRO_SW_CONFIG);\n";
+  return `${code}\nconst GYMBRO_SW_CONFIG = ${JSON.stringify(config)};\n${BOOTSTRAP}`;
 }
 
 export function serviceWorkerPlugin(): Plugin {
@@ -77,11 +95,12 @@ export function serviceWorkerPlugin(): Plugin {
       }
       if (!contents.has("index.html")) this.error("index.html is not in the bundle; the offline start page would be missing.");
       if (contents.has(SERVICE_WORKER_FILE)) this.error(`${SERVICE_WORKER_FILE} is generated; remove the copy in public/.`);
+      const workerCode = await compileWorkerCore();
       const source = await buildServiceWorkerSource({
-        version: hashEntries(contents),
+        version: shellVersion(contents, workerCode),
         runtimeVersion: hashEntries(runtime),
         precache: selectPrecache([...contents.keys()]),
-      });
+      }, workerCode);
       this.emitFile({ type: "asset", fileName: SERVICE_WORKER_FILE, source });
     },
   };
