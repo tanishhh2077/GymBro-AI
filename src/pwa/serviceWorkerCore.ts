@@ -134,6 +134,14 @@ function networkFirst(
   });
 }
 
+// Hosts that answer unknown paths with the app's index.html and status 200
+// would otherwise get that page stored, permanently, as a model or script.
+// Other or missing content types are accepted because hosts label them loosely.
+function isCacheableFile(response: Response): boolean {
+  const type = response.headers.get("content-type") ?? "";
+  return response.status === 200 && !/^\s*text\/html\b/i.test(type);
+}
+
 async function cacheFirst(
   request: Request,
   runtime: WorkerRuntime,
@@ -143,7 +151,7 @@ async function cacheFirst(
   const cached = await lookup(runtime, cacheName, request);
   if (cached) return cached;
   const response = await runtime.fetch(request);
-  if (response.status === 200) {
+  if (isCacheableFile(response)) {
     const copy = response.clone();
     // A failed store (for example over quota) must not fail the page's request.
     waitUntil(runtime.caches.open(cacheName).then((cache) => cache.put(request, copy)).catch(() => undefined));

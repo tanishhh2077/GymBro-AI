@@ -11,6 +11,8 @@ const config: ServiceWorkerConfig = {
   precache: ["", "assets/app-abc.js", "assets/app-abc.css", "manifest.webmanifest", "icons/icon-192.png"],
 };
 const names = cacheNamesFor(config);
+const runtimeCache = () => names.runtime;
+const shellCache = () => names.shell;
 
 class FakeCache {
   entries = new Map<string, Response>();
@@ -218,6 +220,36 @@ describe("handleFetch", () => {
     expect(await again.text()).toBe(`network ${model.url}`);
     expect(offlineFetch).not.toHaveBeenCalled();
   });
+  it.each([
+    ["the model", "/models/pose_landmarker_full.task", runtimeCache],
+    ["the MediaPipe runtime", "/wasm/vision_wasm_internal.wasm", runtimeCache],
+    ["a build asset", "/assets/lazy-9.js", shellCache],
+  ])("never caches an HTML fallback page served for %s", async (_label, path, cacheOf) => {
+    const { caches, value } = runtime({
+      fetch: async () => new Response("<!doctype html>", {
+        status: 200, headers: { "content-type": "text/html; charset=utf-8" },
+      }),
+    });
+    const work = waitUntil();
+    const response = await handleFetch(get(path), config, value, work.add)!;
+    await Promise.all(work.pending);
+    expect(response.status).toBe(200);
+    expect((await caches.open(cacheOf())).entries.size).toBe(0);
+  });
+  it.each(["application/wasm", "application/octet-stream", ""])(
+    "caches runtime files served as %j",
+    async (type) => {
+      const { caches, value } = runtime({
+        fetch: async () => new Response(new Uint8Array([1, 2]), {
+          status: 200, headers: type ? { "content-type": type } : {},
+        }),
+      });
+      const work = waitUntil();
+      await handleFetch(get("/wasm/vision_wasm_internal.wasm"), config, value, work.add);
+      await Promise.all(work.pending);
+      expect((await caches.open(names.runtime)).entries.size).toBe(1);
+    },
+  );
   it("still returns the model when storing it fails, for example over quota", async () => {
     const { caches, value } = runtime();
     (await caches.open(names.runtime)).failPut = true;
