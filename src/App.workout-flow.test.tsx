@@ -51,7 +51,7 @@ it('opens a saved-workout summary only after a successful finish and reopens it 
 });
 it('keeps the active workout visible if finish fails', async () => {
   await click('Finish workout'); expect(container.querySelector('h1')?.textContent).toBe('Upper');
-  expect(container.textContent).toContain('Log a set for each exercise');
+  expect(container.textContent).toContain('Bench press has no logged sets');
 });
 it('logs, edits and repeats warm-ups with visible types and a correct completion breakdown', async () => {
   await enter('Set type', 'warmup'); await enter('Reps', '10'); await enter('Weight (kg)', '20'); await click('Log set');

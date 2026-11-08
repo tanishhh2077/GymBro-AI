@@ -119,10 +119,53 @@ export function WorkoutEditor({ store, onFinished, onSetLogged, analysis, restSe
         </ExercisePicker>
       </form>
       <PlateCalculator key={workout.id} unit={workout.unit} />
-      <button type="button" className="btn-primary w-full sm:w-auto" onClick={async () => {
-        if (confirmLeave() && (await state.finishWorkout()).ok) onFinished(workout.id);
-      }}>Finish workout</button>
+      <FinishWorkout store={store} workout={workout} confirmLeave={confirmLeave} onFinished={onFinished} />
     </fieldset>
+  </div>;
+}
+
+/**
+ * The store refuses to finish with an empty exercise, and its error banner sits at the top of a
+ * long page. Name the empty exercises beside the button and offer to remove them, so the tap
+ * never appears to do nothing.
+ */
+function FinishWorkout({ store, workout, confirmLeave, onFinished }: {
+  store: WorkoutStore; workout: Workout; confirmLeave: () => boolean; onFinished: (workoutId: string) => void;
+}) {
+  const [problem, setProblem] = useState('');
+  const [empty, setEmpty] = useState<readonly WorkoutExercise[]>([]);
+  const finish = async () => {
+    const result = await store.getState().finishWorkout();
+    if (result.ok) onFinished(workout.id); else setProblem(result.message);
+  };
+  const removeEmptyAndFinish = async () => {
+    for (const exercise of empty) {
+      const result = await store.getState().removeExercise(exercise.id);
+      if (!result.ok) { setProblem(result.message); return; }
+    }
+    setEmpty([]); setProblem('');
+    await finish();
+  };
+  return <div className="space-y-3">
+    {problem && <div role="alert" className="rounded-xl border border-warn/30 bg-warn/10 p-4 text-sm text-warn">
+      <p>{problem}</p>
+      {empty.length > 0 && <button type="button" className="btn-ghost mt-3" onClick={() => { void removeEmptyAndFinish(); }}>
+        {empty.length === 1 ? 'Remove empty exercise and finish' : `Remove ${empty.length} empty exercises and finish`}
+      </button>}
+    </div>}
+    <button type="button" className="btn-primary w-full sm:w-auto" onClick={async () => {
+      if (!confirmLeave()) return;
+      const missing = workout.exercises.filter(exercise => !exercise.sets.length);
+      setEmpty(missing);
+      if (!workout.exercises.length) { setProblem('Add an exercise and log a set before finishing.'); return; }
+      if (missing.length) {
+        const names = missing.map(exercise => exercise.name).join(', ');
+        setProblem(`${names} ${missing.length === 1 ? 'has' : 'have'} no logged sets. Log a set or remove ${missing.length === 1 ? 'it' : 'them'} to finish.`);
+        return;
+      }
+      setProblem('');
+      await finish();
+    }}>Finish workout</button>
   </div>;
 }
 
