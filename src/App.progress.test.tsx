@@ -62,7 +62,8 @@ async function click(name: string) {
   await act(async () => { button(name).click(); await idle(); });
 }
 async function selectGroup(label: string) {
-  const select = container.querySelector('select')!;
+  // The weekly target control is also a select, so pick the one that offers this group.
+  const select = [...container.querySelectorAll('select')].find(item => [...item.options].some(o => o.textContent === label))!;
   const option = [...select.options].find(item => item.textContent === label)!;
   await act(async () => {
     Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value')!.set!.call(select, option.value);
