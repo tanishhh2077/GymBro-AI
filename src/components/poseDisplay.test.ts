@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import type { PoseFrame } from "@/types";
+import type { NormalizedLandmark, PoseFrame } from "@/types";
 import { isDrawableLandmark, samplePose, videoContentRect } from "./poseDisplay";
 
 describe("samplePose", () => {
@@ -113,6 +113,79 @@ describe("samplePose", () => {
   it.each([-1, NaN, Infinity])("returns no pose for invalid playback time %s", (time) => {
     expect(samplePose(frames, time, 30)).toBeNull();
   });
+
+  it("returns null when an observation has an empty landmarks array", () => {
+    frames[0].landmarks = [];
+    expect(samplePose(frames, 0, 30)).toBeNull();
+    expect(samplePose(frames, .01, 30)).toBeNull();
+  });
+
+  it("returns null during interpolation when either frame has an empty landmarks array", () => {
+    frames[0].landmarks = [];
+    expect(samplePose(frames, .025, 30)).toBeNull();
+    frames[0].landmarks = [{ x: .25, y: .25, z: -.25, visibility: .8 }];
+    frames[1].landmarks = [];
+    expect(samplePose(frames, .025, 30)).toBeNull();
+  });
+
+  it("returns null when an observation has undefined landmarks", () => {
+    frames[0].landmarks = undefined as unknown as null;
+    expect(samplePose(frames, 0, 30)).toBeNull();
+  });
+
+  it("samples at t=0 when first frame is at t=0", () => {
+    const pose = samplePose(frames, 0, 30);
+    expect(pose).toEqual({
+      landmarks: [{ x: .25, y: .25, z: -.25, visibility: .8 }],
+      sampleTime: 0,
+      interpolated: false,
+    });
+  });
+
+  it("holds first observation at t=0 when first frame is within endpoint hold", () => {
+    frames[0].time = .02;
+    frames[1].time = .06;
+    const pose = samplePose(frames, 0, 30);
+    expect(pose).toMatchObject({ sampleTime: .02, interpolated: false });
+  });
+
+  it("returns null at t=0 when first frame is beyond endpoint hold", () => {
+    frames[0].time = .05;
+    frames[1].time = .1;
+    expect(samplePose(frames, 0, 30)).toBeNull();
+  });
+
+  it("samples t < first frame within endpoint hold and returns null beyond endpoint hold", () => {
+    frames[0].time = .5;
+    frames[1].time = .55;
+    expect(samplePose(frames, .5 - .5 / 30, 30)).toMatchObject({ sampleTime: .5, interpolated: false });
+    expect(samplePose(frames, .5 - 1.5 / 30, 30)).toBeNull();
+  });
+
+  it("samples t > last frame within endpoint hold and returns null beyond endpoint hold", () => {
+    frames[0].time = 1;
+    frames[1].time = 1.05;
+    expect(samplePose(frames, 1.05 + .5 / 30, 30)).toMatchObject({ sampleTime: 1.05, interpolated: false });
+    expect(samplePose(frames, 1.05 + 1.5 / 30, 30)).toBeNull();
+  });
+
+  it("handles a single-frame sequence at exact time, within endpoint hold, and beyond endpoint hold", () => {
+    const single = [frames[0]];
+    expect(samplePose(single, 0, 30)).toMatchObject({ sampleTime: 0, interpolated: false });
+    expect(samplePose(single, .5 / 30, 30)).toMatchObject({ sampleTime: 0, interpolated: false });
+    expect(samplePose(single, 1.5 / 30, 30)).toBeNull();
+  });
+
+  it.each([.5 / 30, 1 / 30, 1.5 / 30, 2 / 30])("interpolates short gaps where span <= 2 intervals (span = %s)", (span) => {
+    frames[1].time = span;
+    const pose = samplePose(frames, span / 2, 30);
+    expect(pose?.interpolated).toBe(true);
+  });
+
+  it.each([2 / 30 + .0001, 3 / 30, .5, 1])("returns null and does not invent observations across long gaps (span = %s)", (span) => {
+    frames[1].time = span;
+    expect(samplePose(frames, span / 2, 30)).toBeNull();
+  });
 });
 
 describe("isDrawableLandmark", () => {
@@ -141,6 +214,32 @@ describe("isDrawableLandmark", () => {
   it.each([NaN, -1, 1.1])("does not draw using an invalid visibility floor %s", (floor) => {
     expect(isDrawableLandmark({ x: .5, y: .5, z: 0, visibility: .9 }, floor)).toBe(false);
   });
+
+  it.each([0, .1, .299999])("rejects landmarks below default visibility floor 0.3 (visibility = %s)", (vis) => {
+    expect(isDrawableLandmark({ x: .5, y: .5, z: 0, visibility: vis }, .3)).toBe(false);
+  });
+
+  it("evaluates boundaries against custom minVisibility thresholds", () => {
+    const pt = { x: .5, y: .5, z: 0, visibility: .5 };
+    expect(isDrawableLandmark(pt, .5)).toBe(true);
+    expect(isDrawableLandmark(pt, .50001)).toBe(false);
+    expect(isDrawableLandmark(pt, .49999)).toBe(true);
+    expect(isDrawableLandmark({ x: .5, y: .5, z: 0, visibility: .7 }, .7)).toBe(true);
+    expect(isDrawableLandmark({ x: .5, y: .5, z: 0, visibility: .699 }, .7)).toBe(false);
+  });
+
+  it("allows minVisibility = 0 and requires visibility to be a valid non-negative number", () => {
+    expect(isDrawableLandmark({ x: .5, y: .5, z: 0, visibility: 0 }, 0)).toBe(true);
+    expect(isDrawableLandmark({ x: .5, y: .5, z: 0, visibility: -.01 }, 0)).toBe(false);
+  });
+
+  it("returns false for undefined point or missing coordinate properties", () => {
+    expect(isDrawableLandmark(undefined, .3)).toBe(false);
+    expect(isDrawableLandmark({} as unknown as NormalizedLandmark, .3)).toBe(false);
+    expect(isDrawableLandmark({ x: .5 } as unknown as NormalizedLandmark, .3)).toBe(false);
+    expect(isDrawableLandmark({ x: .5, y: null as unknown as number, z: 0, visibility: .8 }, .3)).toBe(false);
+    expect(isDrawableLandmark({ x: null as unknown as number, y: .5, z: 0, visibility: .8 }, .3)).toBe(false);
+  });
 });
 
 describe("videoContentRect", () => {
@@ -167,5 +266,25 @@ describe("videoContentRect", () => {
     [-1, 900, 80, 140], [1600, NaN, 80, 140], [1600, 900, Infinity, 140],
   ])("declines invalid source or box dimensions %s,%s,%s,%s", (sourceW, sourceH, boxW, boxH) => {
     expect(videoContentRect(sourceW, sourceH, boxW, boxH)).toBeNull();
+  });
+
+  it.each([
+    [0, 100, 100, 100], [100, 0, 100, 100], [100, 100, 0, 100], [100, 100, 100, 0],
+    [0, 0, 100, 100], [100, 100, 0, 0], [0, 0, 0, 0],
+  ])("returns null when any dimension is zero (%s, %s, %s, %s)", (sourceW, sourceH, boxW, boxH) => {
+    expect(videoContentRect(sourceW, sourceH, boxW, boxH)).toBeNull();
+  });
+
+  it.each([
+    [-10, 100, 100, 100], [100, -10, 100, 100], [100, 100, -10, 100], [100, 100, 100, -10],
+    [-50, -50, -50, -50],
+  ])("returns null when any dimension is negative (%s, %s, %s, %s)", (sourceW, sourceH, boxW, boxH) => {
+    expect(videoContentRect(sourceW, sourceH, boxW, boxH)).toBeNull();
+  });
+
+  it("returns null for non-finite or subnormal dimensions", () => {
+    expect(videoContentRect(-0, 100, 100, 100)).toBeNull();
+    expect(videoContentRect(100, 100, -Infinity, 100)).toBeNull();
+    expect(videoContentRect(NaN, 100, 100, 100)).toBeNull();
   });
 });
