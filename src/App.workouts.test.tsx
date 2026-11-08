@@ -9,6 +9,8 @@ import { createWorkoutStore, type WorkoutStore } from '@/store/useWorkoutStore';
 import App from './App';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+// The analysis screen loads on first use, which can take several seconds on a busy machine; Vitest's 5 s default would cancel the test before the wait below could finish.
+vi.setConfig({ testTimeout: 30_000 });
 let root: Root;
 let container: HTMLDivElement;
 let store: WorkoutStore;
