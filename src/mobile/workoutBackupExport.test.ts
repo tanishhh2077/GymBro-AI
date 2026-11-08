@@ -120,3 +120,91 @@ it('serializes CSV and JSON together and validates CSV sources before allocating
   await expect(saveWorkoutBackup(text())).rejects.toThrow(/already|finish/i);
   resume(); await pending;
 });
+
+it('propagates share sheet cancellation or dismissal and cleans up the temporary cache file', async () => {
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+  vi.mocked(Share.share).mockRejectedValueOnce(new Error('User cancelled'));
+  await expect(saveWorkoutBackup(text())).rejects.toThrow('User cancelled');
+  expect(Filesystem.deleteFile).toHaveBeenCalledWith(expect.objectContaining({ directory: Directory.Cache }));
+  expect(await saveWorkoutBackup(text())).toBe('share');
+});
+
+it('cleans up temporary CSV file when share sheet is dismissed and allows subsequent export', async () => {
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+  vi.mocked(Share.share).mockRejectedValueOnce(new Error('Share canceled'));
+  await expect(saveWorkoutCsv(emptyWorkoutData(), 1000)).rejects.toThrow('Share canceled');
+  expect(Filesystem.deleteFile).toHaveBeenCalledWith(expect.objectContaining({
+    path: expect.stringMatching(/\.csv$/),
+    directory: Directory.Cache,
+  }));
+  expect(await saveWorkoutCsv(emptyWorkoutData(), 1000)).toBe('share');
+});
+
+it('clears export lock even when share cancellation cleanup fails with unexpected error', async () => {
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+  vi.mocked(Share.share).mockRejectedValueOnce(new Error('share failed'));
+  vi.mocked(Filesystem.deleteFile).mockRejectedValueOnce(new Error('EPERM: operation not permitted'));
+  await expect(saveWorkoutBackup(text())).rejects.toThrow(/File sharing could not be confirmed/);
+  expect(await saveWorkoutBackup(text())).toBe('share');
+});
+
+it('propagates filesystem write failure for CSV export without calling share and allows retry', async () => {
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+  vi.mocked(Filesystem.writeFile).mockRejectedValueOnce(new Error('ENOSPC: no space left on device'));
+  await expect(saveWorkoutCsv(emptyWorkoutData(), 1000)).rejects.toThrow('ENOSPC');
+  expect(Share.share).not.toHaveBeenCalled();
+  expect(Filesystem.deleteFile).toHaveBeenCalledWith(expect.objectContaining({
+    path: expect.stringMatching(/\.csv$/),
+    directory: Directory.Cache,
+  }));
+  expect(await saveWorkoutCsv(emptyWorkoutData(), 1000)).toBe('share');
+});
+
+it('exposes storage error when filesystem write fails and deleteFile throws unexpected error', async () => {
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+  vi.mocked(Filesystem.writeFile).mockRejectedValueOnce(new Error('permission denied'));
+  vi.mocked(Filesystem.deleteFile).mockRejectedValueOnce(new Error('storage failure'));
+  await expect(saveWorkoutBackup(text())).rejects.toThrow(/temporary cache copy could not be removed/);
+  expect(await saveWorkoutBackup(text())).toBe('share');
+});
+
+it('prevents concurrent double invocation from corrupting export state across overlapping calls', async () => {
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+  let resolveShare!: () => void;
+  vi.mocked(Share.share).mockImplementationOnce(() => new Promise(resolve => { resolveShare = () => resolve({}); }));
+
+  const firstExport = saveWorkoutBackup(text());
+  await vi.waitFor(() => expect(Filesystem.writeFile).toHaveBeenCalledTimes(1));
+
+  await expect(saveWorkoutBackup(text())).rejects.toThrow(/already open/i);
+  await expect(saveWorkoutCsv(emptyWorkoutData(), 1000)).rejects.toThrow(/already open/i);
+
+  resolveShare();
+  expect(await firstExport).toBe('share');
+
+  expect(await saveWorkoutBackup(text())).toBe('share');
+});
+
+it('releases concurrency lock when in-flight export fails so subsequent export succeeds', async () => {
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+  let rejectShare!: (err: unknown) => void;
+  vi.mocked(Share.share).mockImplementationOnce(() => new Promise((_, reject) => { rejectShare = reject; }));
+
+  const firstExport = saveWorkoutBackup(text());
+  await vi.waitFor(() => expect(Share.share).toHaveBeenCalledTimes(1));
+
+  await expect(saveWorkoutBackup(text())).rejects.toThrow(/already open/i);
+
+  rejectShare(new Error('share failed'));
+  await expect(firstExport).rejects.toThrow('share failed');
+
+  expect(await saveWorkoutBackup(text())).toBe('share');
+});
+
+it('cleans up anchor, URL, and lock when web CSV download throws during click', async () => {
+  vi.mocked(HTMLAnchorElement.prototype.click).mockImplementationOnce(() => { throw new Error('click blocked'); });
+  await expect(saveWorkoutCsv(emptyWorkoutData(), 1000)).rejects.toThrow('click blocked');
+  expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:backup');
+  expect(document.querySelector('a')).toBeNull();
+  expect(await saveWorkoutCsv(emptyWorkoutData(), 1000)).toBe('download');
+});

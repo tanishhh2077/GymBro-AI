@@ -153,4 +153,147 @@ describe("native lifecycle ownership", () => {
     const f = setup(); f.app.addListener.mockImplementationOnce(() => { throw new Error("bridge failed"); });
     const dispose = f.connect(); expect(f.onError).toHaveBeenCalledOnce(); dispose();
   });
+
+  it("reports failure when listener handle released after disposal fails to remove", async () => {
+    const f = setup();
+    const dispose = f.connect();
+    dispose();
+    f.remove.mockRejectedValueOnce(new Error("delayed remove failed"));
+    f.registration.resolve({ remove: f.remove });
+    await settle();
+    expect(f.remove).toHaveBeenCalledOnce();
+    expect(f.onError).toHaveBeenCalledWith("Could not release the native app-state listener.");
+  });
+
+  it("falls back to console.warn when onError is omitted across registration and removal exit paths", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    // Registration rejection exit path
+    const f1 = setup();
+    const dispose1 = connectNativeLifecycle({ isNative: true, app: f1.app, session: f1.session, document });
+    f1.registration.reject(new Error("no bridge"));
+    await settle();
+    expect(warnSpy).toHaveBeenCalledWith("Native background handling could not be connected.");
+    dispose1();
+
+    // Synchronous registration failure exit path
+    const f2 = setup();
+    f2.app.addListener.mockImplementationOnce(() => { throw new Error("sync failure"); });
+    const dispose2 = connectNativeLifecycle({ isNative: true, app: f2.app, session: f2.session, document });
+    expect(warnSpy).toHaveBeenCalledWith("Native background handling could not be connected.");
+    dispose2();
+
+    // Listener removal rejection exit path
+    const f3 = setup();
+    f3.remove.mockRejectedValueOnce(new Error("remove rejected"));
+    const dispose3 = connectNativeLifecycle({ isNative: true, app: f3.app, session: f3.session, document });
+    f3.registration.resolve({ remove: f3.remove });
+    await settle();
+    dispose3();
+    await settle();
+    expect(warnSpy).toHaveBeenCalledWith("Could not release the native app-state listener.");
+  });
+
+  it("is idempotent on multiple dispose calls without repeating handle removal", async () => {
+    const f = setup();
+    const dispose = f.connect();
+    f.registration.resolve({ remove: f.remove });
+    await settle();
+    dispose();
+    dispose();
+    dispose();
+    expect(f.remove).toHaveBeenCalledOnce();
+  });
+
+  it("pauses playing and paused videos on background transition while idle without resetting session", async () => {
+    const f = setup();
+    const video1 = document.createElement("video");
+    const video2 = document.createElement("video");
+    video2.dataset.paused = "yes";
+    document.body.append(video1, video2);
+    const dispose = f.connect();
+
+    expect(f.session.getState().processingState).toBe("idle");
+    f.emit(false);
+
+    expect(video1.dataset.paused).toBe("yes");
+    expect(video2.dataset.paused).toBe("yes");
+    expect(f.close).not.toHaveBeenCalled();
+    expect(f.session.getState().processingState).toBe("idle");
+
+    // Returning to foreground does not auto-resume videos
+    f.emit(true);
+    expect(video1.dataset.paused).toBe("yes");
+    expect(f.session.getState().processingState).toBe("idle");
+
+    f.registration.resolve({ remove: f.remove });
+    await settle();
+    dispose();
+  });
+
+  it("handles background transitions during processing and repeated background notifications cleanly", async () => {
+    const f = setup();
+    const video = document.createElement("video");
+    document.body.append(video);
+    expect(f.start()).toBeNull();
+    const dispose = f.connect();
+
+    expect(f.session.getState().processingState).toBe("processing");
+
+    // Background transition cancels the processing session
+    f.emit(false);
+    expect(video.dataset.paused).toBe("yes");
+    expect(f.session.getState().processingState).toBe("cancelling");
+
+    // Second background event while cancelling does not throw or corrupt state
+    expect(() => f.emit(false)).not.toThrow();
+    expect(f.session.getState().processingState).toBe("cancelling");
+
+    await settle();
+    expect(f.session.getState().processingState).toBe("idle");
+
+    f.registration.resolve({ remove: f.remove });
+    await settle();
+    dispose();
+  });
+
+  it("handles background transition gracefully when document has no videos", async () => {
+    const f = setup();
+    expect(document.querySelectorAll("video").length).toBe(0);
+    expect(f.start()).toBeNull();
+    const dispose = f.connect();
+
+    expect(f.session.getState().processingState).toBe("processing");
+    f.emit(false);
+    expect(f.signal()?.aborted).toBe(true);
+    expect(f.session.getState().processingState).toBe("cancelling");
+
+    await settle();
+    expect(f.session.getState().processingState).toBe("idle");
+
+    f.registration.resolve({ remove: f.remove });
+    await settle();
+    dispose();
+  });
+
+  it("pauses videos located in nested DOM containers on background transition", async () => {
+    const f = setup();
+    const container = document.createElement("div");
+    const section = document.createElement("section");
+    const nestedVideo1 = document.createElement("video");
+    const nestedVideo2 = document.createElement("video");
+    section.append(nestedVideo1);
+    container.append(section, nestedVideo2);
+    document.body.append(container);
+
+    const dispose = f.connect();
+    f.emit(false);
+
+    expect(nestedVideo1.dataset.paused).toBe("yes");
+    expect(nestedVideo2.dataset.paused).toBe("yes");
+
+    f.registration.resolve({ remove: f.remove });
+    await settle();
+    dispose();
+  });
 });
