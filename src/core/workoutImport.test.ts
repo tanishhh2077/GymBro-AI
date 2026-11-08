@@ -63,3 +63,6 @@ it.each(['Synthetic\u0000 upper', 'Synthetic\u202E upper', 'Synthetic\u2066 uppe
 it('rejects unverified metric Hevy header variants', () => {
   expect(() => parseWorkoutImport(hevy.replace('weight_lbs', 'weight_kg'), options)).toThrow(/variant/i);
 });
+it('rejects missing Strong duration rather than inventing zero elapsed time', () => {
+  expect(() => parseWorkoutImport(strong.replace(',45m,', ',,'), options)).toThrow(/duration/i);
+});

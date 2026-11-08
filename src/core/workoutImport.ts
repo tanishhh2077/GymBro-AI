@@ -57,7 +57,7 @@ function time(text: string, offset: number): number {
   return value - offset * 60_000;
 }
 function duration(text: string): number {
-  if (!text) return 0;
+  if (!text) invalid('Missing Strong duration. Export a complete original CSV; duration cannot be inferred.');
   if (/^\d+$/.test(text)) return Number(text) * 1000;
   const parts = /^(?:(\d+)h\s*)?(?:(\d+)m\s*)?(?:(\d+)s)?$/.exec(text);
   if (parts && parts.slice(1).some(Boolean)) return (Number(parts[1] ?? 0) * 3600 + Number(parts[2] ?? 0) * 60 + Number(parts[3] ?? 0)) * 1000;
