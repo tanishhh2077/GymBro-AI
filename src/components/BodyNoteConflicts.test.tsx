@@ -341,3 +341,25 @@ describe('BackupBodyNoteCounts', () => {
     expect(container.innerHTML).toBe('');
   });
 });
+
+it('uses unique whitespace-free IDs and version references for quoted conflict keys', async () => {
+  const name = 'Bench "wide grip" press';
+  const key = `note/${name}`;
+  const onChoose = vi.fn();
+  const props = { bodyConflicts: [{ key: 'body/quoted "id"', date: sampleBodyEntry.date, device: sampleBodyEntry, cloud: null }],
+    noteConflicts: [{ key, name, device: 'Device cue', cloud: 'Cloud cue' }], choices: {}, onChoose };
+  await act(async () => root.render(<><BodyNoteConflicts {...props} /><BodyNoteConflicts {...props} /></>));
+  const ids = [...container.querySelectorAll('[id]')].map(element => element.id);
+  expect(new Set(ids).size).toBe(ids.length);
+  for (const radio of container.querySelectorAll<HTMLInputElement>('input')) {
+    expect(radio.id).not.toMatch(/\s/);
+    expect([...container.querySelectorAll('label')].find(label => label.htmlFor === radio.id)).toBeTruthy();
+    const description = radio.getAttribute('aria-describedby')!;
+    expect(description).toBeTruthy();
+    expect(description.split(/\s+/)).toHaveLength(1);
+    expect(document.getElementById(description)?.textContent).toBeTruthy();
+  }
+  const noteRadio = [...container.querySelectorAll<HTMLInputElement>('input')].find(input => input.name === key && input.value === 'cloud')!;
+  await act(async () => noteRadio.click());
+  expect(onChoose).toHaveBeenCalledWith(key, 'cloud');
+});

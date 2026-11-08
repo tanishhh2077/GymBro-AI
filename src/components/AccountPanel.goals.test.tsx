@@ -14,12 +14,13 @@ import { AccountPanel, GoalVersion, RecordVersion } from './AccountPanel';
 let root: Root;
 let container: HTMLDivElement;
 let store: WorkoutStore;
+let repository: ReturnType<typeof createWorkoutRepository>;
 let shared: SharedWorkoutSnapshot;
 let cloud: WorkoutCloud;
 const goal: WorkoutGoal = { id: 'g1', name: 'Pull-up', unit: 'lb', bodyweight: true, weight: 25, reps: 5, createdAt: 1 };
 
 beforeEach(async () => {
-  const repository = createWorkoutRepository(new IDBFactory());
+  repository = createWorkoutRepository(new IDBFactory());
   store = createWorkoutStore(repository);
   await repository.save(0, { ...emptyWorkoutData(), goals: [goal] });
   await store.getState().load();
@@ -99,4 +100,137 @@ it('shows a deleted goal version plainly', async () => {
   expect(container.textContent).toBe('Deleted');
   await act(async () => root.render(<GoalVersion value={{ ...goal, bodyweight: undefined, unit: 'kg', weight: 100 }} />));
   expect(container.textContent).toContain('Pull-up (kg) · 5 reps × 100 kg');
+});
+
+it('provides role="radiogroup", aria-checked and arrow key navigation for conflict radio options', async () => {
+  await act(async () => root.render(<AccountPanel service={service()} account={{ id: 'a', email: 'lifter@example.test' }}
+    store={store} guest={createWorkoutRepository(new IDBFactory(), 'guest')} />));
+  await act(async () => button('Preview sync').click());
+  await settle();
+  const preview = container.querySelector('[aria-label="Sync preview"]')!;
+  const fieldset = preview.querySelector('fieldset')!;
+  expect(fieldset.getAttribute('role')).toBe('radiogroup');
+  const legendId = fieldset.querySelector('legend')?.id;
+  expect(legendId).toBeTruthy();
+  expect(fieldset.getAttribute('aria-labelledby')).toBe(legendId);
+
+  const deviceRadio = fieldset.querySelector<HTMLInputElement>('input[value="device"]')!;
+  const cloudRadio = fieldset.querySelector<HTMLInputElement>('input[value="cloud"]')!;
+  expect(deviceRadio.getAttribute('aria-checked')).toBe('false');
+  expect(cloudRadio.getAttribute('aria-checked')).toBe('false');
+
+  // Navigate using arrow keys
+  deviceRadio.focus();
+  await act(async () => {
+    deviceRadio.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+  });
+  expect(cloudRadio.checked).toBe(true);
+  expect(cloudRadio.getAttribute('aria-checked')).toBe('true');
+});
+
+it('restores focus to Preview sync button after canceling sync preview', async () => {
+  await act(async () => root.render(<AccountPanel service={service()} account={{ id: 'a', email: 'lifter@example.test' }}
+    store={store} guest={createWorkoutRepository(new IDBFactory(), 'guest')} />));
+  const previewBtn = button('Preview sync');
+  previewBtn.focus();
+  await act(async () => previewBtn.click());
+  await settle();
+
+  const cancelBtn = button('Cancel sync');
+  await act(async () => cancelBtn.click());
+  await settle();
+
+  expect(document.activeElement).toBe(button('Preview sync'));
+});
+
+
+it('resolves every conflict ARIA reference for a spaced and quoted exercise name', async () => {
+  const name = 'Bench "wide grip" press';
+  expect((await store.getState().updateGoal('g1', store.getState().data.revision, { ...goal, name })).ok).toBe(true);
+  shared = { revision: shared.revision + 1, data: { ...shared.data, goals: [{ ...goal, id: 'g2', name, weight: 40 }] } };
+  await act(async () => root.render(<AccountPanel service={service()} account={{ id: 'a', email: 'lifter@example.test' }}
+    store={store} guest={createWorkoutRepository(new IDBFactory(), 'guest')} />));
+  await act(async () => button('Preview sync').click()); await settle();
+  const groups = [...container.querySelectorAll('[role="radiogroup"]')];
+  expect(groups.some(group => group.textContent?.includes(name))).toBe(true);
+  expect([...container.querySelectorAll('input')].some(input => input.name.startsWith('goal-key/') && input.name.includes('Bench'))).toBe(true);
+  for (const group of groups) {
+    const labelId = group.getAttribute('aria-labelledby')!;
+    expect(labelId.split(/\s+/)).toHaveLength(1);
+    expect(document.getElementById(labelId)).toBe(group.querySelector('legend'));
+    for (const radio of group.querySelectorAll<HTMLInputElement>('input[type="radio"]')) {
+      const detailsId = radio.getAttribute('aria-describedby')!;
+      expect(detailsId.split(/\s+/)).toHaveLength(1);
+      expect(document.getElementById(detailsId)?.textContent).toBeTruthy();
+      expect([...container.querySelectorAll('label')].find(label => label.htmlFor === radio.id)).toBeTruthy();
+    }
+  }
+});
+
+it.each(['sync', 'guest'] as const)('restores focus after the deferred %s save and button re-enable', async action => {
+  const guest = createWorkoutRepository(new IDBFactory(), 'guest');
+  await guest.save(0, { ...emptyWorkoutData(), goals: [{ ...goal, id: 'guest-goal', name: 'Row' }] });
+  await act(async () => root.render(<AccountPanel service={service()} account={{ id: 'a', email: 'lifter@example.test' }} store={store} guest={guest} />));
+  const previewLabel = action === 'sync' ? 'Preview sync' : 'Preview guest copy';
+  const confirmLabel = action === 'sync' ? 'Confirm sync' : 'Copy guest records';
+  await act(async () => button(previewLabel).click()); await settle();
+  if (action === 'sync') await act(async () => container.querySelector<HTMLInputElement>('input[value="cloud"]')!.click());
+  let release: () => void = () => {};
+  const pending = new Promise<void>(resolve => { release = resolve; });
+  if (action === 'sync') {
+    const save = repository.saveSync;
+    vi.spyOn(repository, 'saveSync').mockImplementation(async (...args) => { await pending; return save(...args); });
+  } else {
+    const save = repository.save;
+    vi.spyOn(repository, 'save').mockImplementation(async (...args) => { await pending; return save(...args); });
+  }
+  const destination = button(previewLabel);
+  const focus = destination.focus.bind(destination);
+  // Match browsers: focus on a disabled button does nothing, even in DOM fakes.
+  const focusAttempts: boolean[] = [];
+  vi.spyOn(destination, 'focus').mockImplementation(() => {
+    focusAttempts.push(destination.disabled);
+    if (!destination.disabled) focus();
+  });
+  const confirm = button(confirmLabel); confirm.focus();
+  await act(async () => confirm.click()); await settle();
+  expect(destination.disabled).toBe(true);
+  expect(focusAttempts).toEqual([]);
+  release(); await settle();
+  expect(destination.disabled).toBe(false);
+  expect(focusAttempts).toEqual([false]);
+  expect(document.activeElement).toBe(destination);
+});
+
+it('waits for a required reload before restoring focus after a failed save', async () => {
+  await act(async () => root.render(<AccountPanel service={service()} account={{ id: 'a', email: 'lifter@example.test' }}
+    store={store} guest={createWorkoutRepository(new IDBFactory(), 'guest')} />));
+  await act(async () => button('Preview sync').click()); await settle();
+  await act(async () => container.querySelector<HTMLInputElement>('input[value="cloud"]')!.click());
+  vi.spyOn(repository, 'saveSync').mockRejectedValueOnce(new Error('Storage failed'));
+  const destination = button('Preview sync');
+  const focus = vi.spyOn(destination, 'focus');
+  await act(async () => button('Confirm sync').click()); await settle();
+  expect(store.getState().needsReload).toBe(true);
+  expect(destination.disabled).toBe(true);
+  expect(focus).not.toHaveBeenCalled();
+  await act(async () => { await store.getState().load(); });
+  expect(destination.disabled).toBe(false);
+  expect(document.activeElement).toBe(destination);
+});
+
+it('does not restore focus after the account panel unmounts during a save', async () => {
+  await act(async () => root.render(<AccountPanel service={service()} account={{ id: 'a', email: 'lifter@example.test' }}
+    store={store} guest={createWorkoutRepository(new IDBFactory(), 'guest')} />));
+  await act(async () => button('Preview sync').click()); await settle();
+  await act(async () => container.querySelector<HTMLInputElement>('input[value="cloud"]')!.click());
+  let release: () => void = () => {};
+  const pending = new Promise<void>(resolve => { release = resolve; });
+  const save = repository.saveSync;
+  vi.spyOn(repository, 'saveSync').mockImplementation(async (...args) => { await pending; return save(...args); });
+  const focus = vi.spyOn(button('Preview sync'), 'focus');
+  await act(async () => button('Confirm sync').click()); await settle();
+  await act(async () => root.render(<p>Account panel closed</p>));
+  release(); await settle();
+  expect(focus).not.toHaveBeenCalled();
 });

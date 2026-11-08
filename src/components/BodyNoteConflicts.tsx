@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { BackupMerge } from '@/core/workoutBackup';
 import type { BodySyncConflict, ExerciseNoteSyncConflict } from '@/core/workoutSync';
 import { BODY_MEASUREMENT_NAMES } from '@/core/workouts';
@@ -97,23 +98,25 @@ export function BodyNoteConflicts({
   choices: Readonly<Record<string, 'device' | 'cloud'>>;
   onChoose: (key: string, choice: 'device' | 'cloud') => void;
 }) {
+  const baseId = useId();
   if (bodyConflicts.length === 0 && noteConflicts.length === 0) return null;
 
   return (
     <div className="space-y-4">
-      {bodyConflicts.map(conflict => (
+      {bodyConflicts.map((conflict, index) => (
         <fieldset key={conflict.key} className="min-w-0 max-w-full space-y-3 rounded-lg border border-warn/30 p-3">
           <legend className="max-w-full break-words px-1 text-sm font-semibold text-white">
             Body conflict · {new Date(conflict.date).toLocaleDateString()}
           </legend>
           <div className="grid grid-cols-2 gap-3">
             {(['device', 'cloud'] as const).map(source => {
-              const inputId = `${conflict.key}-${source}`;
+              const inputId = `${baseId}-body-${index}-${source}`;
               return (
                 <div key={source} className="min-w-0 space-y-2">
                   <label htmlFor={inputId} className="flex items-center gap-2 text-sm font-medium text-white">
                     <input
                       id={inputId}
+                      aria-describedby={`${inputId}-details`}
                       type="radio"
                       name={conflict.key}
                       value={source}
@@ -122,7 +125,7 @@ export function BodyNoteConflicts({
                     />
                     {source === 'device' ? 'Keep device' : 'Keep cloud'}
                   </label>
-                  <BodyVersion value={conflict[source]} />
+                  <div id={`${inputId}-details`}><BodyVersion value={conflict[source]} /></div>
                 </div>
               );
             })}
@@ -130,7 +133,7 @@ export function BodyNoteConflicts({
         </fieldset>
       ))}
 
-      {noteConflicts.map(conflict => {
+      {noteConflicts.map((conflict, index) => {
         const timestamp = getNoteTimestamp(conflict);
         return (
           <fieldset key={conflict.key} className="min-w-0 max-w-full space-y-3 rounded-lg border border-warn/30 p-3">
@@ -141,12 +144,13 @@ export function BodyNoteConflicts({
               {(['device', 'cloud'] as const).map(source => {
                 const noteVal = conflict[source];
                 const sourceTs = getNoteTimestamp(conflict, noteVal) ?? timestamp;
-                const inputId = `${conflict.key}-${source}`;
+                const inputId = `${baseId}-note-${index}-${source}`;
                 return (
                   <div key={source} className="min-w-0 space-y-2">
                     <label htmlFor={inputId} className="flex items-center gap-2 text-sm font-medium text-white">
                       <input
                         id={inputId}
+                        aria-describedby={`${inputId}-details`}
                         type="radio"
                         name={conflict.key}
                         value={source}
@@ -155,7 +159,7 @@ export function BodyNoteConflicts({
                       />
                       {source === 'device' ? 'Keep device' : 'Keep cloud'}
                     </label>
-                    <ExerciseNoteVersion name={conflict.name} value={noteVal} timestamp={sourceTs} />
+                    <div id={`${inputId}-details`}><ExerciseNoteVersion name={conflict.name} value={noteVal} timestamp={sourceTs} /></div>
                   </div>
                 );
               })}
