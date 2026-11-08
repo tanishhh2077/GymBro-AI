@@ -14,6 +14,15 @@ export class WorkoutError extends Error {
   }
 }
 export function emptyWorkoutData(): WorkoutData { return { version: 6, revision: 0, active: null, history: [] }; }
+/** Restore, guest copy and sync explain that combining two libraries, not one save, crossed a limit. */
+export function requireMergeLimits(bodyEntries: number, exerciseNotes: number): void {
+  if (bodyEntries > MAX_BODY_ENTRIES) {
+    throw new WorkoutError('validation', `Merging these would exceed the limit of ${MAX_BODY_ENTRIES} body log entries. Delete some entries first.`);
+  }
+  if (exerciseNotes > MAX_EXERCISE_NOTES) {
+    throw new WorkoutError('validation', `Merging these would exceed the limit of ${MAX_EXERCISE_NOTES} exercise notes. Remove some notes first.`);
+  }
+}
 
 function requireValue(condition: unknown, message = 'Saved workout data is invalid or exceeds the supported limits.'): asserts condition {
   if (!condition) throw new WorkoutError('validation', message);

@@ -1,6 +1,6 @@
 import type { BodyEntry } from '@/types/body';
 import type { Workout, WorkoutData, WorkoutGoal, WorkoutRoutine } from '@/types/workout';
-import { BODY_MEASUREMENT_NAMES, validateWorkoutData, WorkoutError } from './workouts';
+import { BODY_MEASUREMENT_NAMES, requireMergeLimits, validateWorkoutData, WorkoutError } from './workouts';
 
 export const MAX_BACKUP_BYTES = 4 * 1024 * 1024;
 
@@ -112,6 +112,7 @@ export function mergeWorkoutBackup(current: WorkoutData, backup: WorkoutBackup):
   const duplicates = incoming.history.length + (incoming.routines?.length ?? 0) + incomingGoals.length +
     Number(incoming.active !== null) - addedWorkouts - addedRoutines - addedGoals - Number(addedActive) +
     (incoming.bodyLog?.length ?? 0) - addedBodyEntries + incomingNotes.length - addedExerciseNotes - skippedExerciseNotes;
+  requireMergeLimits(bodyLog.length, Object.keys(exerciseNotes).length);
   // An existing empty body log or notes field is kept so a restore never changes its saved shape.
   const data = addedWorkouts || addedRoutines || addedGoals || addedActive || addedBodyEntries || addedExerciseNotes ? validateWorkoutData({
     ...destination, active, history, ...(routines.length ? { routines } : {}), ...(goals.length ? { goals } : {}),

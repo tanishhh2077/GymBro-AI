@@ -1,6 +1,6 @@
 import type { BodyEntry } from '@/types/body';
 import type { Workout, WorkoutData, WorkoutGoal, WorkoutRoutine } from '@/types/workout';
-import { validateWorkoutData, WorkoutError } from './workouts';
+import { requireMergeLimits, validateWorkoutData, WorkoutError } from './workouts';
 
 export type SyncChoice = 'device' | 'cloud';
 export interface SyncConflict {
@@ -141,6 +141,7 @@ export function mergeWorkoutSync(base: WorkoutData, device: WorkoutData, cloud: 
   if (active.length > 1) throw new WorkoutError('conflict', 'There are two different active workouts. Finish one on its device, then preview sync again.');
   const history = merged.filter(value => value.finishedAt !== null)
     .sort((a, b) => b.finishedAt! - a.finishedAt! || a.id.localeCompare(b.id));
+  requireMergeLimits(bodyLog.length, Object.keys(exerciseNotes).length);
   const data = validateWorkoutData({ ...device, active: active[0] ?? null, history,
     ...((routines.length || device.routines || cloud.routines) ? { routines } : {}),
     ...((goals.length || device.goals || cloud.goals) ? { goals } : {}),

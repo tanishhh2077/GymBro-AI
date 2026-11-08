@@ -176,7 +176,7 @@ it('restores schema5 backups into a schema6 library and keeps an empty body log 
   expect(result.data).toEqual({ ...current, goals: legacy.data.goals });
   expect(result).toMatchObject({ addedGoals: 1, addedBodyEntries: 0, addedExerciseNotes: 0 });
   expect(() => mergeWorkoutBackup(library({ bodyLog: Array.from({ length: 1000 }, (_, i) => entry({ id: `x${i}` })) }),
-    parseWorkoutBackup(createWorkoutBackup(library({ bodyLog: [entry()] }), 1)))).toThrow(/1000 body log entries/);
+    parseWorkoutBackup(createWorkoutBackup(library({ bodyLog: [entry()] }), 1)))).toThrow('Merging these would exceed the limit of 1000 body log entries. Delete some entries first.');
 });
 
 it('merges body entries and notes through sync and exposes concurrent edits as choosable conflicts', () => {
@@ -218,3 +218,19 @@ it.each([['Café', 'Café'], ['ab', 'a​b'], ['ab', 'a­b']])(
     expect(sameSyncData(first, second)).toBe(true);
     expect(sameSyncData(first, library({ exerciseNotes: Object.fromEntries([[one, 'B'], [two, 'A']]) }))).toBe(false);
   });
+it('says a merge would exceed the body log or note limit on restore and sync, keeping the plain read message', () => {
+  const entries = (prefix: string, count: number) => Array.from({ length: count }, (_, i) => entry({ id: `${prefix}${i}` }));
+  const notes = (prefix: string, count: number) => Object.fromEntries(Array.from({ length: count }, (_, i) => [`${prefix} ${i}`, 'n']));
+  const bodyLimit = 'Merging these would exceed the limit of 1000 body log entries. Delete some entries first.';
+  const noteLimit = 'Merging these would exceed the limit of 200 exercise notes. Remove some notes first.';
+  expect(() => mergeWorkoutBackup(library({ bodyLog: entries('a', 600) }),
+    parseWorkoutBackup(createWorkoutBackup(library({ bodyLog: entries('b', 401) }), 1)))).toThrow(bodyLimit);
+  expect(() => mergeWorkoutBackup(library({ exerciseNotes: notes('A', 150) }),
+    parseWorkoutBackup(createWorkoutBackup(library({ exerciseNotes: notes('B', 51) }), 1)))).toThrow(noteLimit);
+  expect(mergeWorkoutBackup(library({ bodyLog: entries('a', 600), exerciseNotes: notes('A', 150) }),
+    parseWorkoutBackup(createWorkoutBackup(library({ bodyLog: entries('b', 400), exerciseNotes: notes('B', 50) }), 1))))
+    .toMatchObject({ addedBodyEntries: 400, addedExerciseNotes: 50 });
+  expect(() => mergeWorkoutSync(library(), library({ bodyLog: entries('a', 600) }), library({ bodyLog: entries('b', 401) }))).toThrow(bodyLimit);
+  expect(() => mergeWorkoutSync(library(), library({ exerciseNotes: notes('A', 150) }), library({ exerciseNotes: notes('B', 51) }))).toThrow(noteLimit);
+  expect(() => validateWorkoutData(library({ bodyLog: entries('a', 1001) }))).toThrow('Save up to 1000 body log entries on this device.');
+});
