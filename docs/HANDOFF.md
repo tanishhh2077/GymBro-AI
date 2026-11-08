@@ -25,8 +25,11 @@ browser or on a phone: installing, offline start, offline analysis, iOS storage.
 Equipment profiles, custom/adjustable rest, favourites/equipment filters, Home
 Help and opt-in weekly reminders are integrated on codex/q42-q48. Export requests
 leave reminders due; Mark as done explicitly schedules the next week. Device-local
-settings remain outside schema6 workout records, backup and sync. Combined checks
-and final integration are pending. Historical utility evidence remains in STATUS.
+settings remain outside schema6 workout records, backup and sync. Pushed to master
+as dc63adc after merging df88032. Checks: 1360 tests/111 files, lint, build and
+native sync (20 files/platform). Browser: 45/48 in the full run; all four cases
+in affected specs passed after two test-readiness fixes. Fresh source review found
+no significant defects. Full evidence and the initial timeout are in STATUS.
 
 ## Next work
 
@@ -35,7 +38,8 @@ and final integration are pending. Historical utility evidence remains in STATUS
    and the new backup counts in the restore preview (`addedBodyEntries`,
    `addedExerciseNotes`, `skippedExerciseNotes`).
 2. Q55: export and import one routine as a small file.
-3. Complete combined verification and fast-forward integration of codex/q42-q48.
+3. Q42–Q48 is integrated under D-060. Keep its branch/worktree; no utility work
+   remains pending. The original master checkout was left untouched.
 Q&A resumes at Q57. Q38 needs the user present with private bench videos. Preserve
 all worker branches and the incomplete Task4 branch; one browser suite on 4179.
 

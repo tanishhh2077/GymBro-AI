@@ -10,6 +10,34 @@ usage, and these documents are the only handoff; see D-016 in
 
 ## Current stage
 
+### 2026-11-07 — Q42–Q48 integration and review fixes (D-060)
+
+Preserved all eight unfinished files in focused commits and published the branch
+first. Home exposes Help and due reminders. Export requests leave reminders due;
+Mark as done explicitly schedules the next week. Reminder writes retain sticky
+screen-only fallback, with another-tab regression coverage. Favourites use
+text-warn. Merged schema6 master df88032, preserving both batches and entries;
+renumbered the utility decision to D-060 and retired colliding draft task numbers.
+Utility keys remain outside workout records, backups and sync. Core schema6,
+App and README changes from master were retained. Fast-forward-pushed dc63adc to
+master and codex/q42-q48; other branches/worktrees and original checkout untouched.
+
+Codex implemented these fixes. A fresh read-only Codex reviewer found no significant
+utility defects (model identifier unavailable; source inspection, no device tests).
+Node22.23.2 per process: locked install, 1360 tests/111 files, lint, build and native
+sync pass (20 files/platform, three plugins; no native service worker). Initial
+full tests had one 5-second large-library timeout; its 16-test file and a complete
+1360-test rerun passed unchanged. Full Chromium156.0.8078.4 suite: 45/48 passed;
+accounts hit an initial page-load timeout, reduced-motion read before React mounted,
+and custom rest froze the clock before the saved workout rendered. Accounts passed
+unchanged; readiness fixes passed all four affected-spec cases, scoped lint and
+browser TypeScript. Every browser case has passing evidence across these runs.
+Synthetic GPU inference produced 120 no-person samples. Diff and documentation
+links pass. Install reports 21 existing dependency vulnerabilities (16 moderate,
+5 high); package versions unchanged. Phone/native sharing, installation/offline
+behavior, real sync and private-bench validation remain unverified. Next work is
+schema6 UI and Q55 per HANDOFF; phone/account setup waits for the user.
+
 Q49–Q56 phase 1 (D-059) is integrated on master: warm-up suggestions, workout time,
 display settings, weekly target, schema6 storage and the installable app. Two fresh
 reviews (schema6, installable app) found no Blocker/High; their Medium and Low
