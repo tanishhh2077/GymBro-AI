@@ -126,7 +126,8 @@ own designed contract.
 
 Use **Node 22+** (`.nvmrc` pins 22.23.2), required by the pinned Capacitor CLI
 and `package.json` engines. On Windows with nvm, select it for the current
-session: `$env:PATH = "$env:NVM_HOME\v22.23.2;$env:PATH"`. On macOS/Linux with
+session in PowerShell: `$env:PATH = "$env:NVM_HOME\v22.23.2;$env:PATH"` (or in
+Command Prompt: `set "PATH=%NVM_HOME%\v22.23.2;%PATH%"`). On macOS/Linux with
 nvm, run `nvm use`. Confirm with `node -v` (must print `v22.23.2`).
 
 ```bash
@@ -135,6 +136,12 @@ npm run dev
 ```
 
 Then open the printed local URL (default `http://localhost:5173`).
+
+To preview the production build locally:
+
+```bash
+npm run preview
+```
 
 To verify the project locally:
 
@@ -200,18 +207,26 @@ Vitest runs `src/**/*.test.{ts,tsx}` once using jsdom's simulated browser
 objects and the app's existing Vite settings, including the `@` source alias.
 It also runs `scripts/**/*.test.mjs` in Node for synthetic packaging fixtures
 and `tests/browser/**/*.test.ts` for fixed-pattern integrity checks. Always pass
-`--maxWorkers=4` when running the full suite to prevent worker thread saturation
-and jsdom timeouts on high-core machines. Task 13
-adds 6 fixture-preflight cases to the previous 385 tests. Task 12 adds 2 lift/view metadata cases to Task 11's 383,
-which added 2 build-configuration cases to Task 10's 381.
-Task 10 added 11 store timing and 4 player badge cases to
-Task 9's 366, which added 34 summary-contract, 9 summary-panel and 3 timeline
-integration cases to the previous320. That baseline includes 10 native lifecycle,
-2 App integration and 21 package guard cases plus the preceding287:
-40 elbow-measurement, 9 timeline component,
-58 media-helper cases, 55 pose-engine contract cases, 22
-selection-check cases, 12 session-store cases, 11 dropzone component cases, and
-56 pure display-calculation cases, 10 overlay cases, and 14 player cases.
+`--maxWorkers=4` when running the full suite: without concurrency limits,
+Vitest spawns worker threads for all CPU cores, causing worker starvation and
+jsdom test timeouts on multi-core systems.
+
+The test suite covers:
+- **Video & pose analysis**: video metadata loading, frame seeking, pose
+  engine lifecycle (GPU initialization with CPU fallback, busy rejection,
+  deadlines, cleanup), 2D elbow trigonometry, extrema navigation, clip
+  summary contracts, and player/skeleton overlay controls.
+- **Workout logging & editing**: transactional IndexedDB storage, schema
+  migrations, active workout editing (sets, reps, weights, Warm-up vs Regular
+  labels, supersets, notes), session-only rest timer with auto-rest, routine
+  templates, and previous-workout autofill.
+- **Progress & records**: exercise history filtering, calendar navigation,
+  personal records, estimated 1RM, load charts, and plate calculator.
+- **Backup & sync**: JSON file backup/restore (web download and native share
+  sheet) and Supabase database sync protocols.
+- **Native & accessibility**: mobile config validation, asset integrity,
+  native lifecycle handlers, and WCAG AA 4.5:1 color contrast across themes.
+
 See [current status](docs/STATUS.md) for exact results. The canvas uses bounded
 display sampling and video-content geometry. Player tests cover seeks, playback
 failures, source replacement, leases, and accessible control state. These simulated
