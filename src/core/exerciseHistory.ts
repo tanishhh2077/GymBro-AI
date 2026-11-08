@@ -7,12 +7,14 @@ export interface ExerciseHistoryWorkout {
   readonly exercises: readonly WorkoutExercise[];
 }
 
-/** Read validated history using the same start-time boundary as previous values. */
-export function buildExerciseHistory(history: readonly Workout[], startedAt: number, name: string, unit: WeightUnit): readonly ExerciseHistoryWorkout[] {
+/** Read validated history using the same start-time boundary as previous values; bodyweight entries are read separately. */
+export function buildExerciseHistory(history: readonly Workout[], startedAt: number, name: string, unit: WeightUnit,
+  bodyweight = false): readonly ExerciseHistoryWorkout[] {
   const entries: ExerciseHistoryWorkout[] = [];
   for (const workout of history) {
     if (workout.finishedAt === null || workout.finishedAt > startedAt || workout.unit !== unit) continue;
-    const exercises = workout.exercises.filter(exercise => exercise.name === name && exercise.sets.length > 0);
+    const exercises = workout.exercises.filter(exercise => exercise.name === name && exercise.sets.length > 0 &&
+      (exercise.bodyweight === true) === bodyweight);
     if (!exercises.length) continue;
     entries.push({ workoutId: workout.id, workoutName: workout.name, finishedAt: workout.finishedAt, exercises });
   }

@@ -1,14 +1,17 @@
 import { useId, useState } from 'react';
 import type { ExerciseHistoryWorkout } from '@/core/exerciseHistory';
 import type { WeightUnit } from '@/types/workout';
+import { AlternateWeight } from './AlternateWeight';
+import { weightParts } from './weightText';
 
 const PAGE_SIZE = 10;
 
 /** Actual logged sets, including warm-ups, from each completed workout with one exact name and unit. */
-export function ExerciseWorkoutHistory({ entries, name, unit, periodLabel, onHistory }: {
+export function ExerciseWorkoutHistory({ entries, name, unit, bodyweight = false, periodLabel, onHistory }: {
   entries: readonly ExerciseHistoryWorkout[];
   name: string;
   unit: WeightUnit;
+  bodyweight?: boolean;
   periodLabel: string;
   onHistory: (id: string) => void;
 }) {
@@ -33,7 +36,8 @@ export function ExerciseWorkoutHistory({ entries, name, unit, periodLabel, onHis
         {entry.exercises.map((exercise, exerciseIndex) => <div key={exercise.id} className="mt-2">
           {entry.exercises.length > 1 && <p className="text-xs text-slate-400">Entry {exerciseIndex + 1}</p>}
           <ol className="space-y-1 text-sm text-slate-300">{exercise.sets.map((set, setIndex) => <li key={set.id} className="tabular-nums">
-            {setIndex + 1}. {set.kind === 'warmup' ? 'Warm-up' : 'Regular'} · {set.reps} reps × {set.weight} {unit}
+            {setIndex + 1}. {set.kind === 'warmup' ? 'Warm-up' : 'Regular'} · {set.reps} reps × {weightParts(set.weight, unit, bodyweight).text}
+            <AlternateWeight weight={set.weight} unit={unit} bodyweight={bodyweight} />
           </li>)}</ol>
         </div>)}
       </article>)}

@@ -17,7 +17,7 @@ function library(overrides: Partial<WorkoutData> = {}): WorkoutData { return { .
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
 it('starts at schema4 and accepts notes and planned target weights', () => {
-  expect(emptyWorkoutData().version).toBe(4);
+  expect(emptyWorkoutData().version).toBe(6);
   const data = library({ active: workout({ note: 'Felt strong.\n\tPause reps next week.' }, null),
     history: [{ ...workout({ note: 'Done' }), id: 'done' }], routines: [routine()] });
   expect(validateWorkoutData(data)).toBe(data);
@@ -49,14 +49,14 @@ it.each([1, 2, 3])('rejects schema4 fields in schema%s and leaves future version
   const target = clone(library({ active: workout({}, null) }));
   expect(() => validateWorkoutData({ ...target, version })).toThrow();
   if (version > 1) expect(() => validateWorkoutData({ ...library({ routines: [routine()] }), version })).toThrow();
-  const future = { ...library(), version: 5 };
+  const future = { ...library(), version: 7 };
   expect(() => validateWorkoutData(future)).toThrow();
-  expect(future.version).toBe(5);
+  expect(future.version).toBe(7);
 });
 it('reads strict schema3 by changing only its version digit, including at the exact size cap', () => {
   const legacy = { version: 3, revision: 2, active: null, history: [] as unknown[] };
   const snapshot = JSON.stringify(legacy);
-  expect(validateWorkoutData(legacy)).toEqual({ ...legacy, version: 4 });
+  expect(validateWorkoutData(legacy)).toEqual({ ...legacy, version: 6 });
   expect(JSON.stringify(legacy)).toBe(snapshot);
   const record = (index: number) => ({ id: `w-${index}`, name: 'W', unit: 'kg', startedAt: 1, finishedAt: 2,
     exercises: [{ id: `e-${index}`, name: 'E', sets: Array.from({ length: 100 }, (_, i) => ({ id: `s-${i}`, reps: 1, weight: 1, kind: 'warmup' })) }] });
@@ -68,7 +68,7 @@ it('reads strict schema3 by changing only its version digit, including at the ex
   last.exercises[0].name += 'x'.repeat(Math.min(79, 1_000_000 - JSON.stringify(full).length));
   expect(JSON.stringify(full).length).toBe(1_000_000);
   const normalized = validateWorkoutData(full);
-  expect(normalized.version).toBe(4);
+  expect(normalized.version).toBe(6);
   expect(JSON.stringify(normalized).length).toBe(1_000_000);
   expect(full.version).toBe(3);
 });
@@ -95,7 +95,7 @@ it('still restores schema3 backups into a schema4 library', () => {
       exercises: [{ id: 'e', name: 'Squat', sets: [{ id: 's', reps: 5, weight: 225, kind: 'warmup' }] }] }] } };
   const result = mergeWorkoutBackup(library({ history: [workout({ note: 'Mine' })] }), parseWorkoutBackup(JSON.stringify(legacy)));
   expect(result.addedWorkouts).toBe(1);
-  expect(result.data.version).toBe(4);
+  expect(result.data.version).toBe(6);
   expect(result.data.history.map(w => w.id)).toEqual(['w', 'old']);
 });
 it('round-trips notes and target weights through sync and exposes concurrent note edits', () => {
@@ -119,6 +119,6 @@ it('merges a schema3 cloud library with a schema4 device library', () => {
   const cloud = { version: 3, revision: 0, active: null, history: [{ ...workout(), id: 'cloud',
     exercises: [{ id: 'e', name: 'Bench press', sets: [{ id: 's', reps: 5, weight: 60 }] }] }] } as unknown as WorkoutData;
   const result = mergeWorkoutSync(library(), library({ history: [workout({ note: 'Mine' })] }), cloud);
-  expect(result.data.version).toBe(4);
+  expect(result.data.version).toBe(6);
   expect(result.data.history.map(w => w.id).sort()).toEqual(['cloud', 'w']);
 });

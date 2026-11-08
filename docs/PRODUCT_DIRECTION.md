@@ -41,6 +41,14 @@ and brief reason.
 | 31. Routine target weights | A: optional target weight per exercise, separate from actual results |
 | 32. Training consistency | A: weekly completed-workout counts for the last 12 weeks |
 | 33. Workout names | A: suggest previous names while allowing custom names |
+| 34. Effort per set | A: optional RPE 1–10 per set |
+| 35. Supersets | A: group adjacent exercises as a superset |
+| 36. Bodyweight exercises | A: optional weight; added or assisted load |
+| 37. Progress goals | A: optional goal per exercise, progress from actual sets |
+| 38. Rep counting from video | A: not yet; validate on the user's own videos first |
+| 39. First-run onboarding | A: short skippable three-screen intro |
+| 40. Unit display | A: converted unit shown beside weights, display only |
+| 41. Health app export | A: not now; revisit after the phone session |
 | 42. Calculator equipment | A: named device-local bar/plate profiles |
 | 43. Running rest adjustment | A: minus/plus 15 seconds |
 | 44. Custom rest | A: custom minutes/seconds alongside presets |
@@ -49,15 +57,14 @@ and brief reason.
 | 47. Permanent help | A: searchable logging/routines/backup/video reference |
 | 48. Backup reminders | A: optional weekly in-app reminder with backup/snooze/dismiss |
 
-Q34–Q41 are reserved for Claude's unfinished effort/superset/bodyweight/goals,
-video-validation/onboarding/unit-display/health-export batch. Inspect its existing
-branches and edits before resuming. Q42–Q48 were separately approved and are
-implemented as Tasks46–52 under D-058. Further questions can start at Q49.
+Q42–Q48 are implemented under D-060, separately from D-058 training detail.
 
 Q20–Q25 were accepted together with an explicit instruction to build all
 recommended options. Tasks32–37 implement them under D-051–D-056.
 Q26–Q33 are implemented as Tasks38–45 under D-057.
-Questions can resume at Q34.
+Q34–Q41 were accepted with "start with recommended" (D-058); Q34–Q37, Q39 and
+Q40 are implemented as Tasks46–51. Q38 and Q41 are deferred. Q42–Q48 use
+D-060; Q49–Q56 phase 1 uses D-059. New questions resume at Q57.
 
 Q17–Q19 were accepted together. Tasks27–29 integrate their three separate agent
 branches under D-046–D-048. Questions can resume at Q20.

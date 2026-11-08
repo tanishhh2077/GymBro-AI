@@ -7,6 +7,8 @@ import { SetAnalysisButton, type SetAnalysisActions } from './SetAnalysisButton'
 import type { Workout } from '@/types/workout';
 import { CompletedWorkoutEditor } from './CompletedWorkoutEditor';
 import { WorkoutCalendar } from './WorkoutCalendar';
+import { RpeText, WeightText } from './trainingDetail';
+import { supersetNames } from './trainingDetailText';
 
 const inputClass = 'w-full min-w-0 rounded-lg border border-white/15 bg-ink-900 px-3 py-2 text-base text-white';
 
@@ -32,6 +34,7 @@ export function WorkoutHistory({ store, initialId, analysis, onSummary, onWorkou
   }
   // Direct links resolve against all saved workouts, even when filters exclude them.
   const selected = state.data.history.find(w => w.id === selectedId);
+  const total = state.data.history.filter(w => typeof w.finishedAt === 'number' && w.finishedAt > 0).length;
   const { workouts: history, error } = filterWorkoutHistory(state.data.history, filters);
   function changeFilter(field: keyof HistoryFilters, value: string) {
     setFilters(current => ({ ...current, [field]: value }));
@@ -59,9 +62,12 @@ export function WorkoutHistory({ store, initialId, analysis, onSummary, onWorkou
     </section>}
     {selected.exercises.map(e => <section key={e.id} className="border-t border-white/10 pt-4">
       <h2 className="break-words text-xl font-semibold text-white">{e.name}</h2>
+      {(e.superset !== undefined || e.bodyweight) && <p className="text-xs text-accent">
+        {[e.superset !== undefined ? supersetNames(selected.exercises).get(e.superset) : '', e.bodyweight ? 'Bodyweight exercise' : ''].filter(Boolean).join(' · ')}</p>}
       <table className="mt-3 w-full text-left text-sm"><caption className="sr-only">Saved sets for {e.name}</caption>
-        <thead className="text-slate-400"><tr><th className="py-2">Set</th><th>Reps</th><th>Weight</th>{analysis && isBenchPressName(e.name) && <th><span className="sr-only">Actions</span></th>}</tr></thead>
-        <tbody>{e.sets.map((set, i) => <tr key={set.id} id={`set-row-${set.id}`} tabIndex={-1}><td className="py-2">{i + 1}<span className="block text-xs text-slate-400">{set.kind === 'warmup' ? 'Warm-up' : 'Regular'}</span></td><td>{set.reps}</td><td>{set.weight} {selected.unit}</td>
+        <thead className="text-slate-400"><tr><th className="py-2">Set</th><th>Reps</th><th>{e.bodyweight ? 'Added weight' : 'Weight'}</th><th>RPE</th>{analysis && isBenchPressName(e.name) && <th><span className="sr-only">Actions</span></th>}</tr></thead>
+        <tbody>{e.sets.map((set, i) => <tr key={set.id} id={`set-row-${set.id}`} tabIndex={-1}><td className="py-2">{i + 1}<span className="block text-xs text-slate-400">{set.kind === 'warmup' ? 'Warm-up' : 'Regular'}</span></td><td>{set.reps}</td>
+          <td><WeightText weight={set.weight} unit={selected.unit} bodyweight={e.bodyweight} /></td><td><RpeText rpe={set.rpe} /></td>
           {analysis && isBenchPressName(e.name) && <td className="text-right"><SetAnalysisButton link={{ workoutId: selected.id, exerciseId: e.id, setId: set.id }}
             exerciseName={e.name} setNumber={i + 1} actions={analysis} disabled={state.busy || state.needsReload || !state.loaded} /></td>}</tr>)}</tbody>
       </table></section>)}
@@ -76,8 +82,13 @@ export function WorkoutHistory({ store, initialId, analysis, onSummary, onWorkou
     }} />}
     <section aria-label="History filters" className="space-y-3">
       <div><label htmlFor={`${filterId}-search`} className="mb-1 block text-sm text-slate-400">Search workouts or exercises</label>
-        <input id={`${filterId}-search`} type="search" className={inputClass} value={filters.query}
-          onChange={event => changeFilter('query', event.target.value)} /></div>
+        <div className="flex gap-2">
+          <input id={`${filterId}-search`} type="search" className={`${inputClass} flex-1`} value={filters.query}
+            placeholder="Search by workout or exercise"
+            onChange={event => changeFilter('query', event.target.value)}
+            onKeyDown={event => { if (event.key === 'Escape' && filters.query) { changeFilter('query', ''); } }} />
+          {filters.query && <button type="button" aria-label="Clear search" className="btn-ghost shrink-0" onClick={() => changeFilter('query', '')}>Clear search</button>}
+        </div></div>
       <p id={`${filterId}-dates`} className="text-xs text-slate-400">Completion dates, inclusive, in your local time.</p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {(['from', 'to'] as const).map(field => <div key={field} className="min-w-0">
@@ -89,8 +100,8 @@ export function WorkoutHistory({ store, initialId, analysis, onSummary, onWorkou
       </div>
       <button type="button" className="btn-ghost" onClick={() => { setFilters({ query: '', from: '', to: '' }); setVisible(20); }}>Clear filters</button>
     </section>
-    {error ? <p id={`${filterId}-error`} role="alert" className="text-sm text-warn">{error}</p> : <p role="status" className="text-sm text-slate-400">{history.length} of {state.data.history.length} workouts match</p>}
-    {!state.data.history.length ? <p className="text-slate-400">Finish a workout to see it here.</p> : !error && (!history.length ? <p className="text-slate-400">No workouts match these filters.</p> : <ul className="divide-y divide-white/10">{history.slice(0, visible).map(w => <li key={w.id}>
+    {error ? <p id={`${filterId}-error`} role="alert" className="text-sm text-warn">{error}</p> : <p role="status" className="text-sm text-slate-400">{history.length} of {total} workouts match</p>}
+    {!total ? <p className="text-slate-400">Finish a workout to see it here.</p> : !error && (!history.length ? <p className="text-slate-400">No workouts match these filters.</p> : <ul className="divide-y divide-white/10">{history.slice(0, visible).map(w => <li key={w.id}>
       <button type="button" className="w-full py-4 text-left" onClick={() => setSelectedId(w.id)}><span className="block break-words font-semibold text-white">{w.name}</span><span className="mt-1 block text-sm text-slate-400">{new Date(w.finishedAt!).toLocaleDateString()} · {w.exercises.length} exercises · {w.unit}</span></button>
     </li>)}</ul>)}
     {history.length > visible && <button type="button" className="btn-ghost" onClick={() => setVisible(n => n + 20)}>Show more workouts</button>}

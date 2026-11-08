@@ -47,6 +47,10 @@ export function ClipDropzone({
     setIssue(validateSelection(list) ?? onSelect(list[0]));
   };
 
+  const openPicker = () => {
+    if (!disabled) inputRef.current?.click();
+  };
+
   return (
     <div className="space-y-2">
       <div
@@ -72,7 +76,7 @@ export function ClipDropzone({
         }`}
       >
         <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 text-accent">
-          <UploadIcon width={28} height={28} />
+          <UploadIcon width={28} height={28} aria-hidden="true" />
         </span>
         <div>
           <div className="text-sm font-semibold text-white">
@@ -86,7 +90,7 @@ export function ClipDropzone({
         <button
           type="button"
           disabled={disabled}
-          onClick={() => inputRef.current?.click()}
+          onClick={openPicker}
           className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40"
         >
           Choose video

@@ -4,6 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, unlinkSync,
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { verifyMobile } from "./verify-mobile.mjs";
+import { removeNativeServiceWorker } from "./remove-native-service-worker.mjs";
 
 const parent = fileURLToPath(new URL("../.superpowers/mobile-package-tests/", import.meta.url));
 const copies = ["dist", "ios/App/App/public", "android/app/src/main/assets/public"];
@@ -13,6 +14,10 @@ function write(path, content) {
   mkdirSync(dirname(target), { recursive: true }); writeFileSync(target, content);
 }
 function copyToBundles(path, content) { for (const dir of copies) write(`${dir}/${path}`, content); }
+const shellFiles = ["", "assets/app.js", "assets/app.css", "manifest.webmanifest", "icons/icon-192.png"];
+function writeWorker(precache = shellFiles) {
+  write("dist/sw.js", `var core;\nconst GYMBRO_SW_CONFIG = ${JSON.stringify({ version: "v", runtimeVersion: "r", precache })};\n`);
+}
 function patchConfig(path, patch) {
   write(path, JSON.stringify({ ...JSON.parse(readFileSync(join(fixture, path), "utf8")), ...patch }));
 }
@@ -27,8 +32,11 @@ beforeEach(() => {
   for (const dir of copies.slice(1)) {
     write(`${dir}/cordova.js`, ""); write(`${dir}/cordova_plugins.js`, "");
   }
-  copyToBundles("index.html", '<html><head><link rel="stylesheet" href="/assets/app.css"></head><body><div id="root"></div><script type="module" src="/assets/app.js"></script></body></html>');
+  copyToBundles("index.html", '<html><head><link rel="stylesheet" href="/assets/app.css"><link rel="manifest" href="/manifest.webmanifest"></head><body><div id="root"></div><script type="module" src="/assets/app.js"></script></body></html>');
   copyToBundles("assets/app.js", "export {};"); copyToBundles("assets/app.css", "body { color: white; }");
+  copyToBundles("manifest.webmanifest", JSON.stringify({ icons: [{ src: "icons/icon-192.png" }] }));
+  copyToBundles("icons/icon-192.png", "synthetic icon");
+  writeWorker();
   // These bytes test packaging, not actual model or WASM validity.
   copyToBundles("models/pose_landmarker_full.task", "synthetic model");
   write("public/models/pose_landmarker_full.task", "synthetic model");
@@ -117,5 +125,52 @@ describe("mobile package verification", () => {
   it("rejects missing local script references even when the trees match", () => {
     for (const dir of copies) unlinkSync(join(fixture, dir, "assets/app.js"));
     expect(() => verifyMobile(fixture)).toThrow(/app\.js/i);
+  });
+});
+
+describe("web service worker packaging", () => {
+  it("requires the built web bundle to contain the service worker", () => {
+    unlinkSync(join(fixture, "dist/sw.js"));
+    expect(() => verifyMobile(fixture)).toThrow(/sw\.js/i);
+  });
+  it("rejects a service worker copied into a native bundle", () => {
+    write("android/app/src/main/assets/public/sw.js", readFileSync(join(fixture, "dist/sw.js")));
+    expect(() => verifyMobile(fixture)).toThrow(/Android.*sw\.js/i);
+  });
+  it("removes copied service workers from both native bundles, and nothing else", () => {
+    for (const dir of copies.slice(1)) write(`${dir}/sw.js`, readFileSync(join(fixture, "dist/sw.js")));
+    removeNativeServiceWorker(fixture);
+    expect(() => verifyMobile(fixture)).not.toThrow();
+    expect(readFileSync(join(fixture, "dist/sw.js"), "utf8")).toMatch(/GYMBRO_SW_CONFIG/);
+  });
+  it("accepts native bundles that already lack the service worker when removing", () => {
+    expect(() => removeNativeServiceWorker(fixture)).not.toThrow();
+  });
+  it("rejects a precache list that names a file missing from the build", () => {
+    writeWorker([...shellFiles, "assets/old-123.js"]);
+    expect(() => verifyMobile(fixture)).toThrow(/old-123\.js/);
+  });
+  it("rejects a built shell file the worker would not precache", () => {
+    writeWorker(shellFiles.filter((path) => path !== "assets/app.css"));
+    expect(() => verifyMobile(fixture)).toThrow(/app\.css/);
+  });
+  it.each(["models/pose_landmarker_full.task", "wasm/vision_wasm_internal.wasm", "sw.js"])(
+    "rejects precaching %s",
+    (path) => {
+      writeWorker([...shellFiles, path]);
+      expect(() => verifyMobile(fixture)).toThrow(/precache/i);
+    },
+  );
+  it("rejects a service worker without a readable precache list", () => {
+    write("dist/sw.js", "self.addEventListener('fetch', () => {});");
+    expect(() => verifyMobile(fixture)).toThrow(/precache/i);
+  });
+  it("rejects a remote manifest icon", () => {
+    copyToBundles("manifest.webmanifest", JSON.stringify({ icons: [{ src: "https://cdn.example.invalid/i.png" }] }));
+    expect(() => verifyMobile(fixture)).toThrow(/remote|external/i);
+  });
+  it("rejects a manifest icon missing from the build", () => {
+    copyToBundles("manifest.webmanifest", JSON.stringify({ icons: [{ src: "icons/missing.png" }] }));
+    expect(() => verifyMobile(fixture)).toThrow(/missing\.png/);
   });
 });

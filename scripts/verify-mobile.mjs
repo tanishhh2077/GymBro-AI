@@ -4,7 +4,12 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const appId = "com.gymbroai.app";
-const platforms = [
+const serviceWorker = "sw.js";
+// The native app serves its own local copy; see remove-native-service-worker.mjs.
+export const NATIVE_EXCLUDED = [serviceWorker];
+const runtimeOnly = /^(?:models|wasm)\//;
+const remote = /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i;
+export const platforms = [
   { name: "iOS", assets: "ios/App/App/public", config: "ios/App/App/capacitor.config.json" },
   { name: "Android", assets: "android/app/src/main/assets/public", config: "android/app/src/main/assets/capacitor.config.json" },
 ];
@@ -45,6 +50,38 @@ function compare(expected, actual, label) {
   }
 }
 
+// The installed web app starts offline only from what the worker precached, so
+// its list must match the build exactly; large vendor files stay runtime-only.
+function verifyWebInstall(root, built) {
+  if (!built.has(serviceWorker)) fail(`Missing built service worker ${serviceWorker}.`);
+  const embedded = read(root, `dist/${serviceWorker}`).toString().match(/^const GYMBRO_SW_CONFIG = (.*);$/m);
+  let precache;
+  try { precache = JSON.parse(embedded[1]).precache; } catch { precache = undefined; }
+  if (!Array.isArray(precache) || precache.some(path => typeof path !== "string")) {
+    fail(`Unreadable service worker precache list in ${serviceWorker}.`);
+  }
+  const listed = new Set(precache.map(path => (path === "" ? "index.html" : path)));
+  for (const path of listed) {
+    if (path === serviceWorker || runtimeOnly.test(path)) fail(`Service worker must not precache ${path}.`);
+    if (!built.has(path)) fail(`Service worker precache names missing built file ${path}.`);
+  }
+  for (const path of built.keys()) {
+    if (path === serviceWorker || runtimeOnly.test(path) || path.endsWith(".map")) continue;
+    if (!listed.has(path)) fail(`Built file ${path} is missing from the service worker precache list.`);
+  }
+  const manifestPath = "manifest.webmanifest";
+  if (!built.has(manifestPath)) return;
+  let icons;
+  try { icons = JSON.parse(read(root, `dist/${manifestPath}`).toString()).icons ?? []; }
+  catch { fail(`Unreadable ${manifestPath}.`); }
+  for (const icon of icons) {
+    const src = String(icon?.src ?? "");
+    if (remote.test(src)) fail(`Remote/external manifest icon: ${src}.`);
+    const path = decodeURIComponent(new URL(src, `https://bundle.invalid/${manifestPath}`).pathname).slice(1);
+    if (!built.has(path)) fail(`Missing manifest icon: ${path}.`);
+  }
+}
+
 export function verifyMobile(rootDir = process.cwd()) {
   const root = resolve(rootDir);
   const built = snapshot(root, "dist");
@@ -56,7 +93,7 @@ export function verifyMobile(rootDir = process.cwd()) {
   for (const tag of html.matchAll(/<(?:script|link|img|source|iframe|base)\b[^>]*>/gi)) {
     for (const attribute of tag[0].matchAll(/\b(?:src|href)\s*=\s*["']([^"']+)["']/gi)) {
       const value = attribute[1];
-      if (/^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(value)) fail(`Remote/external index resource: ${value}.`);
+      if (remote.test(value)) fail(`Remote/external index resource: ${value}.`);
       const path = decodeURIComponent(new URL(value, "https://bundle.invalid/").pathname).slice(1);
       if (!built.has(path)) fail(`Missing local index resource: ${path}.`);
     }
@@ -68,6 +105,8 @@ export function verifyMobile(rootDir = process.cwd()) {
       fail(`Remote/external CSS resource in ${path}.`);
     }
   }
+  verifyWebInstall(root, built);
+  const nativeExpected = new Map([...built].filter(([path]) => !NATIVE_EXCLUDED.includes(path)));
 
   const runtime = snapshot(root, "node_modules/@mediapipe/tasks-vision/wasm");
   if (![...runtime.keys()].some(path => path.endsWith(".wasm"))) fail("Installed MediaPipe runtime is empty.");
@@ -99,9 +138,12 @@ export function verifyMobile(rootDir = process.cwd()) {
       if (nativeFiles.get(stub) !== digest(Buffer.alloc(0))) fail(`Unexpected content in ${platform.name} ${stub}.`);
       nativeFiles.delete(stub);
     }
-    compare(built, nativeFiles, `${platform.name} bundle`);
+    for (const path of NATIVE_EXCLUDED) {
+      if (nativeFiles.has(path)) fail(`${platform.name} bundle must not contain the web-only ${path}.`);
+    }
+    compare(nativeExpected, nativeFiles, `${platform.name} bundle`);
   }
-  return { files: built.size, runtimeFiles: runtime.size };
+  return { files: nativeExpected.size, runtimeFiles: runtime.size };
 }
 
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {

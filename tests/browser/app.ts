@@ -5,8 +5,14 @@ import process from 'node:process';
 // Set the pinned runner's error-snapshot switch in this worker as well.
 process.env.PLAYWRIGHT_NO_COPY_PROMPT = '1';
 
-export const test = base.extend({
-  page: async ({ page, context, baseURL }, run, testInfo) => {
+export const test = base.extend<{ firstRunIntro: boolean }>({
+  // Specs start as a returning user so the first-run intro does not cover Home.
+  // intro.spec.ts opts in with test.use({ firstRunIntro: true }).
+  firstRunIntro: [false, { option: true }],
+  page: async ({ page, context, baseURL, firstRunIntro }, run, testInfo) => {
+    if (!firstRunIntro) await context.addInitScript(() => {
+      try { window.localStorage.setItem('gymbro-intro-v1', 'seen'); } catch { /* storage-failure specs */ }
+    });
     const origin = new URL(baseURL!).origin;
     const outgoing: string[] = [];
     const errors: string[] = [];

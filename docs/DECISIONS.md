@@ -750,10 +750,47 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   sequence shared storage changes and obtain fresh review of persistence changes.
   No additional phone/account/service setup is implied.
 
-### D-058 Independent utility batch Q42–Q48
+### D-058 Training detail, goals and onboarding
+
+- On 2026-11-07 the user accepted all recommended Q34–Q41 options with "start
+  with recommended". Claude Code implemented Q34–Q37, Q39 and Q40 as Tasks46–51.
+- Schema5 adds set RPE (1–10 in 0.5 steps), superset groups of two or more
+  adjacent exercises, bodyweight exercises whose weight is added load (−1000 to
+  10000, negative for assistance) and library goals unique per exercise name,
+  unit and bodyweight setting. Versions 1–4 stay readable without writes.
+  Backup restores skip a duplicate goal for an exercise instead of failing;
+  sync turns two devices' goals for one exercise into a choice. A fourth
+  Supabase migration accepts schema5.
+- Goal progress, records and volume use only actual logged Regular sets;
+  bodyweight sets are left out of load volume. Converted units are display
+  only. The intro preference is device-local and separate from workout data.
+- Q38 (video rep counting) waits for validation on the user's own private
+  videos, with the user present; Q41 (health export) waits for the phone session.
+
+### D-059 Body log, exercise notes, installable app and small conveniences
+
+- On 2026-11-07 the user accepted Q49–Q56: Q49 A (installable web app), Q50 C
+  (body weight plus measurements), Q51 A, Q52 A, Q53 A, Q54 A, Q55 A and Q56 A.
+- Schema6 adds a library `bodyLog` (weight and eight fixed measurements, units
+  stored only with their values) and `exerciseNotes` keyed by exact exercise name.
+  Versions 1–5 stay readable without writes. A backup note that differs from a
+  saved note is skipped and counted; sync turns body and note differences into
+  choosable conflicts. A fifth Supabase migration accepts schema6. Body data never
+  feeds records, progress, volume or CSV.
+- The web app is installable: `public/manifest.webmanifest`, `public/icons/`, and a
+  generated `sw.js` that works offline after the first visit. It never handles
+  other origins, uploads or video, never registers in the native app (removed from
+  native copies by `mobile:sync`) and never calls `skipWaiting`. iOS may keep an
+  installed app's storage separate from Safari, so users should back up first.
+- Warm-up suggestions, elapsed workout time, reduced motion, a text-size choice
+  and a weekly workout target are UI or device-local only. Q55 routine sharing and
+  the body log and notes screens are still to be built.
+
+### D-060 Independent utility batch Q42–Q48
 
 - The user approved all seven recommended options while reserving Claude's
-  unfinished Q34–Q41 work. Tasks46–52 implement Q42–Q48 respectively.
+  then-unfinished Q34–Q41 work. This utility batch implements Q42–Q48;
+  its draft Tasks46–52 numbers collided with D-058 and are retired.
 - Named equipment profiles save unit, bar weight and inventory locally. Builder
   bounds are 20 profiles, with explicit load/delete and target drafts preserved.
 - Running rest supports minus/plus 15 seconds. Custom whole minutes/seconds
@@ -764,10 +801,13 @@ The [original brief](PRODUCT_BRIEF.md) is preserved as received. The decisions b
   backup and current bench-video requirements without new analysis claims.
 - Weekly reminders are opt-in and device-local, first due seven days after
   enabling. Builder choices are one-day snooze and seven-day dismissal. Due
-  reminders appear on Home and Backup. Navigation does not claim an export.
+  reminders appear on Home and Backup. Navigation and export requests leave the
+  reminder due; Mark as done explicitly confirms the user kept a file and
+  schedules the next week.
 - Malformed/unsupported settings are preserved. Profile/reminder storage failure
   retains explicit screen-only fallback until unmount. Favorites use a shared
-  session fallback. Saved workout schema and Claude-owned files are unaffected.
+  session fallback. Device-local utilities remain separate from the schema6
+  workout library.
 
 ## Specification-author defaults and later acceptance
 

@@ -19,6 +19,6 @@ export function WeeklyTrainingSummary({ data }: { data: WorkoutData }) {
     <dl className="grid grid-cols-2 gap-4">{stats.map(([label, value]) => <div className="min-w-0" key={label}>
       <dt className="text-sm text-slate-400">{label}</dt><dd className="mt-1 break-words text-2xl font-semibold text-white">{value}</dd>
     </div>)}</dl>
-    <p className="text-xs leading-relaxed text-slate-500">Includes Regular and Warm-up sets. Volume sums reps × entered load separately by unit. Zero means no entered-load volume. Elapsed time includes rests and time away. This window is captured when you open Home.</p>
+    <p className="text-xs leading-relaxed text-slate-500">Includes Regular and Warm-up sets. Volume sums reps × entered load separately by unit; bodyweight exercises are left out because their sets record only added or assisted load. Zero means no entered-load volume. Elapsed time includes rests and time away. This window is captured when you open Home.</p>
   </section>;
 }

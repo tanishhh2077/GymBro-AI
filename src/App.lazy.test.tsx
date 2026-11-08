@@ -13,6 +13,8 @@ vi.mock('@/components/AnalysisWorkspace', async importOriginal => {
 });
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+// The analysis screen loads on first use, which can take several seconds on a busy machine; Vitest's 5 s default would cancel the test before the wait below could finish.
+vi.setConfig({ testTimeout: 30_000 });
 let root: Root;
 let container: HTMLDivElement;
 beforeEach(() => {
@@ -34,7 +36,7 @@ async function nav(name: string) {
   await act(async () => { target.click(); });
 }
 async function until(check: () => boolean) {
-  for (let i = 0; i < 100 && !check(); i++) await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
+  for (let i = 0; i < 1000 && !check(); i++) await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
   expect(check()).toBe(true);
 }
 

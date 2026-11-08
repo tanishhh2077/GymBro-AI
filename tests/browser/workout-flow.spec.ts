@@ -33,6 +33,6 @@ test('warm-up labels, saved exercise rest and finish summary survive the normal 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole('button', { name: 'Back to Home', exact: true }).click();
   await page.getByRole('button', { name: 'View progress', exact: true }).click();
-  await expect(page.getByRole('region', { name: 'Heaviest logged set', exact: true }).getByText('60.5 kg × 8 reps', { exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Heaviest logged set', exact: true }).getByText(/^60\.5 kg × 8 reps/)).toBeVisible();
   await expect(page.getByRole('region', { name: 'Most reps in a set', exact: true })).toContainText('8 reps at 60.5 kg');
 });

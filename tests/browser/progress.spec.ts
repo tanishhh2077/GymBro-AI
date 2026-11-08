@@ -14,7 +14,7 @@ async function logWorkout(page: Page, name: string, unit: WeightUnit, reps: numb
   await exercise.getByLabel('Reps', { exact: true }).fill(String(reps));
   await exercise.getByLabel(`Weight (${unit})`, { exact: true }).fill(String(weight));
   await exercise.getByRole('button', { name: 'Log set', exact: true }).click();
-  await expect(exercise.getByRole('cell', { name: `${weight} ${unit}`, exact: true })).toBeVisible();
+  await expect(exercise.getByRole('cell', { name: new RegExp(`^${String(weight).replace(/\./g, '\\.')} ${unit}`) })).toBeVisible();
   await page.getByRole('button', { name: 'Finish workout', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Workout saved.' })).toBeVisible();
   await page.getByRole('button', { name: 'Back to Home', exact: true }).click();
@@ -44,7 +44,7 @@ test('completed workout records survive reload and follow their actual source th
   await page.getByLabel('Exercise and unit', { exact: true }).selectOption({ label: 'Bench press (kg)' });
   await page.getByRole('button', { name: 'View workout for heaviest set', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Synthetic heavy day', exact: true })).toBeVisible();
-  await expect(page.getByRole('cell', { name: '50 kg', exact: true })).toBeVisible();
+  await expect(page.getByRole('cell', { name: /^50 kg/ })).toBeVisible();
   page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: 'Delete workout', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Workout history', exact: true })).toBeVisible();
@@ -53,7 +53,7 @@ test('completed workout records survive reload and follow their actual source th
   await expect(page.getByRole('region', { name: 'Heaviest logged set', exact: true })).toContainText('30 kg × 12 reps');
   await page.getByRole('button', { name: 'View record at 30 kg', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Synthetic rep day', exact: true })).toBeVisible();
-  await expect(page.getByRole('cell', { name: '30 kg', exact: true })).toBeVisible();
+  await expect(page.getByRole('cell', { name: /^30 kg/ })).toBeVisible();
 });
 
 test('long names, full chart history, paging and a zero-load point work at phone width', async ({ page }) => {

@@ -48,3 +48,12 @@ it('preserves zero loads and decimal precision without copying or modifying save
   expect(previous?.sets).toBe(source.exercises[0].sets);
   expect(previous?.sets).toEqual([{ id: 'zero', reps: 5, weight: 0 }, { id: 'decimal', reps: 7, weight: 62.125 }]);
 });
+
+it('keeps bodyweight and loaded entries of one name apart so previous values never mix', () => {
+  const loaded = { ...recent, id: 'loaded', finishedAt: 4_500, exercises: [{ ...exercise, id: 'loaded-e', sets: [{ id: 'l', reps: 5, weight: 40 }] }] };
+  const assisted = { ...older, id: 'assisted', exercises: [{ ...exercise, id: 'bw-e', bodyweight: true as const, sets: [{ id: 'a', reps: 8, weight: -20 }] }] };
+  expect(findPreviousExercise([loaded, assisted], current, 'Bench press')?.workoutId).toBe('loaded');
+  expect(findPreviousExercise([loaded, assisted], current, 'Bench press', 'regular', true)?.sets).toEqual([{ id: 'a', reps: 8, weight: -20 }]);
+  expect(findPreviousExercise([loaded], current, 'Bench press', 'regular', true)).toBeNull();
+  expect(findPreviousExercise([assisted], current, 'Bench press')).toBeNull();
+});

@@ -50,7 +50,7 @@ test('routine CRUD, order and target snapshots keep actual workout history accur
     await exercise.getByLabel('Reps', { exact: true }).fill('5');
     await exercise.getByLabel('Weight (kg)', { exact: true }).fill('20');
     await exercise.getByRole('button', { name: 'Log set', exact: true }).click();
-    await expect(exercise.getByRole('cell', { name: '20 kg', exact: true })).toBeVisible();
+    await expect(exercise.getByRole('cell', { name: /^20 kg/ })).toBeVisible();
   }
   await page.getByRole('button', { name: 'Finish workout', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Workout saved.' })).toBeVisible();
@@ -80,7 +80,7 @@ test('routine CRUD, order and target snapshots keep actual workout history accur
   expect((await library(page)).routines).toHaveLength(1);
   page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: `Delete routine ${'R'.repeat(80)}`, exact: true }).click();
-  await expect(page.getByText('Save a routine to reuse your exercise plan without retyping it.', { exact: true })).toBeVisible();
+  await expect(page.getByText('Save a routine to reuse your exercise plan without retyping it.', { exact: false })).toBeVisible();
   expect((await library(page)).history).toHaveLength(1);
 });
 test('native IndexedDB legacy records stay unchanged on load and survive the first v2 save', async ({ page }) => {
@@ -94,12 +94,12 @@ test('native IndexedDB legacy records stay unchanged on load and survive the fir
   await draft(page, 'Migration routine'); await page.getByRole('button', { name: 'Save routine', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Migration routine', exact: true })).toBeVisible();
   const upgraded = await library(page);
-  expect(upgraded.version).toBe(4); expect(upgraded.revision).toBe(8);
+  expect(upgraded.version).toBe(6); expect(upgraded.revision).toBe(8);
   expect(upgraded.active).toEqual(legacy.active); expect(upgraded.history).toEqual(legacy.history);
   await expect(page.getByRole('button', { name: 'Start routine Migration routine', exact: true })).toBeDisabled();
   await page.reload(); await page.getByRole('button', { name: 'View workout history', exact: true }).click();
   await page.getByRole('button', { name: /Legacy finished/ }).click();
-  await expect(page.getByRole('cell', { name: '20 kg', exact: true })).toBeVisible();
+  await expect(page.getByRole('cell', { name: /^20 kg/ })).toBeVisible();
 });
 test('a stale routine editor cannot overwrite another tab after conflict and reload', async ({ page, context }) => {
   await page.goto('/'); await expect(page.getByRole('button', { name: 'Start workout', exact: true })).toBeEnabled();

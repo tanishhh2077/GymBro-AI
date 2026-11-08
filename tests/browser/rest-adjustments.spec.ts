@@ -8,9 +8,10 @@ test('custom rest and running adjustments survive navigation at 390px and reset 
   await page.getByRole('button', { name: 'Start workout', exact: true }).click();
   await page.getByLabel('Workout name', { exact: true }).fill('Synthetic custom rest');
   await page.getByRole('button', { name: 'Start workout', exact: true }).click();
-  await page.clock.pauseAt(epoch + 60_000);
   const timer = page.getByRole('region', { name: 'Rest timer', exact: true });
   const remaining = timer.getByLabel('Rest time remaining', { exact: true });
+  await expect(remaining).toHaveText('1:30');
+  await page.clock.pauseAt(epoch + 60_000);
   await timer.getByLabel('Rest duration', { exact: true }).selectOption('custom');
   await timer.getByLabel('Custom minutes', { exact: true }).fill('0');
   await timer.getByLabel('Custom seconds', { exact: true }).fill('0');

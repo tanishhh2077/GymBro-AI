@@ -15,7 +15,7 @@
     --body-rgb: 226 232 240;
     --secondary-rgb: 203 213 225;
     --muted-rgb: 148 163 184;
-    --subtle-rgb: 100 116 139;
+    --subtle-rgb: 118 133 155;
     --accent-rgb: 74 222 128;
     --accent-hover-rgb: 108 242 168;
     --accent-soft-rgb: 209 250 223;
@@ -161,5 +161,18 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+}
+
+/* Device-local text size: every rem-based size scales from the root. */
+html[data-text-size="large"] { font-size: 112.5%; }
+html[data-text-size="larger"] { font-size: 125%; }
+
+/* Respect the system "reduce motion" setting: no animated or eased movement. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

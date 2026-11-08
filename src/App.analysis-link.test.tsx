@@ -12,6 +12,8 @@ import { createSessionStore, type SessionEngine, type SessionStore } from '@/sto
 import App from './App';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+// The analysis screen loads on first use, which can take several seconds on a busy machine; Vitest's 5 s default would cancel the test before the wait below could finish.
+vi.setConfig({ testTimeout: 30_000 });
 let root: Root;
 let container: HTMLDivElement;
 let store: WorkoutStore;
@@ -66,7 +68,7 @@ function button(name: string) {
   if (!found) throw new Error(`Missing button: ${name}`); return found;
 }
 async function settleLazy() {
-  for (let i = 0; i < 100 && container.textContent?.includes('Opening video analysis'); i++) {
+  for (let i = 0; i < 1000 && container.textContent?.includes('Opening video analysis'); i++) {
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
   }
 }
@@ -119,7 +121,7 @@ const clip = () => session.getState().clips[0];
  * separate scopes, never inside one.
  */
 async function untilReleased() {
-  for (let i = 0; i < 100 && session.getState().processingState !== 'idle'; i++) {
+  for (let i = 0; i < 1000 && session.getState().processingState !== 'idle'; i++) {
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)); });
   }
   expect(session.getState().processingState).toBe('idle');

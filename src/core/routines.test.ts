@@ -7,7 +7,7 @@ const routine = () => ({ id: 'r-1', name: 'Upper day', unit: 'kg', exercises: [
 ] });
 const document = () => ({ ...emptyWorkoutData(), version: 2, routines: [routine()] });
 it('accepts ordered routines with independent optional targets and explicit units', () => {
-  expect(validateWorkoutData(document())).toEqual({ ...document(), version: 4 });
+  expect(validateWorkoutData(document())).toEqual({ ...document(), version: 6 });
   const value = document();
   expect(validateWorkoutData({ ...value, routines: [{ ...routine(), unit: 'lb', exercises: [
     { id: 'e1', name: 'Bench', targetSets: 1 }, { id: 'e2', name: 'Row', targetReps: 1000 },
@@ -16,7 +16,7 @@ it('accepts ordered routines with independent optional targets and explicit unit
 it('normalizes strict legacy data without mutating it or adding size overhead', () => {
   const legacy = { version: 1, revision: 7, active: null, history: [] };
   const snapshot = JSON.stringify(legacy);
-  expect(validateWorkoutData(legacy)).toEqual({ ...legacy, version: 4 });
+  expect(validateWorkoutData(legacy)).toEqual({ ...legacy, version: 6 });
   expect(JSON.stringify(validateWorkoutData(legacy)).length).toBe(snapshot.length);
   expect(JSON.stringify(legacy)).toBe(snapshot);
   expect(Object.prototype.hasOwnProperty.call(validateWorkoutData(legacy), 'routines')).toBe(false);
@@ -45,7 +45,7 @@ it('rejects unknown keys, duplicate IDs, invalid units and empty routines withou
     { ...value, routines: [{ ...routine(), exercises: [] }] },
     { ...value, routines: undefined },
     { ...value, routines: [{ ...routine(), exercises: [{ ...routine().exercises[0], completed: true }] }] },
-    { ...value, version: 5 },
+    { ...value, version: 7 },
     { ...value, version: 1 },
   ]) expect(() => validateWorkoutData(bad)).toThrow();
 });

@@ -138,3 +138,47 @@ it('sorts a copy by name and restores saved creation order while retaining origi
   expect(store.getState().data).toEqual(before);
   await click('Clear routine filters'); expect(names()).toEqual(['Upper day', 'Alpha']);
 });
+
+it('shows a friendly empty state with a create routine action when no routines exist', async () => {
+  const emptyRepository = createWorkoutRepository(new IDBFactory());
+  const emptyStore = createWorkoutStore(emptyRepository, { id: () => 'id-1', now: () => 1000 });
+  await emptyStore.getState().load();
+  await act(async () => root.render(<WorkoutRoutines store={emptyStore} onStarted={() => {}} onResume={() => {}} />));
+
+  expect(container.textContent).toContain('No routines yet');
+  expect(container.textContent).toContain('Save a routine to reuse your exercise plan');
+  const createBtn = button('Create routine');
+  expect(createBtn).toBeDefined();
+  expect(createBtn.disabled).toBe(false);
+
+  await act(async () => { createBtn.click(); });
+  expect(container.querySelector('form')).not.toBeNull();
+  const label = [...container.querySelectorAll('label')].find(el => el.textContent === 'Routine name')!;
+  const name = document.getElementById(label.htmlFor) as HTMLInputElement;
+  expect(name.value).toBe('');
+});
+
+it.each([{ busy: true }, { needsReload: true }])('disables the empty-state create routine button when library is unavailable (%j)', async unavailable => {
+  const emptyRepository = createWorkoutRepository(new IDBFactory());
+  const emptyStore = createWorkoutStore(emptyRepository, { id: () => 'id-1', now: () => 1000 });
+  await emptyStore.getState().load();
+  emptyStore.setState(unavailable);
+  await act(async () => root.render(<WorkoutRoutines store={emptyStore} onStarted={() => {}} onResume={() => {}} />));
+
+  expect(button('Create routine').disabled).toBe(true);
+});
+
+it('transitions to empty state after deleting the only routine and clears notice on create action', async () => {
+  await render();
+  vi.spyOn(window, 'confirm').mockReturnValue(true);
+  await click('Delete routine Upper day');
+  expect(container.querySelector('[role="status"]')?.textContent).toContain('Routine deleted');
+  expect(container.textContent).toContain('No routines yet');
+  const createBtn = button('Create routine');
+  expect(createBtn.disabled).toBe(false);
+
+  await act(async () => { createBtn.click(); });
+  expect(container.textContent).not.toContain('Routine deleted');
+  expect(container.querySelector('form')).not.toBeNull();
+});
+

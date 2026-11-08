@@ -1,13 +1,15 @@
 import { createStore } from 'zustand/vanilla';
-import { emptyWorkoutData, validateSetKind, validateSetValues, validateWorkoutData, validateWorkoutNote, WorkoutError } from '@/core/workouts';
-import type { RoutineInput, SetKind, WeightUnit, Workout, WorkoutData, WorkoutExercise, WorkoutResult, WorkoutRoutine } from '@/types/workout';
+import { BODY_MEASUREMENT_NAMES, emptyWorkoutData, MAX_BODY_ENTRIES, MAX_EXERCISE_NOTES, validateBodyNote, validateExerciseNote, validateGroupId, validateRpe, validateSetKind, validateSetValues, validateWorkoutData, validateWorkoutNote, WorkoutError } from '@/core/workouts';
+import type { RoutineExerciseInput, RoutineInput, SetKind, WeightUnit, Workout, WorkoutData, WorkoutExercise, WorkoutGoal, WorkoutGoalInput, WorkoutResult, WorkoutRoutine, WorkoutSet } from '@/types/workout';
 import { createWorkoutRepository, type WorkoutRepository, type SyncedWorkoutRepository } from './workoutRepository';
 import { mergeWorkoutBackup, type WorkoutBackup } from '@/core/workoutBackup';
-import { mergeWorkoutSync, sameSyncData, syncSnapshot, validateSharedSnapshot, type SyncChoice, type SyncPreview, type WorkoutCloud } from '@/core/workoutSync';
+import type { BodyEntry, BodyEntryInput } from '@/types/body';
+import { hasSyncConflicts, mergeWorkoutSync, sameSyncData, syncSnapshot, validateSharedSnapshot, type SyncChoice, type SyncPreview, type WorkoutCloud } from '@/core/workoutSync';
 interface WorkoutDeps { id: () => string; now: () => number }
 export interface CompletedWorkoutCorrection {
   name: string;
-  exercises: readonly { id: string; sets: readonly { id: string; reps: number; weight: number; kind?: SetKind }[] }[];
+  /** rpe: omitted keeps the saved rating, null clears it, a number replaces it. */
+  exercises: readonly { id: string; sets: readonly { id: string; reps: number; weight: number; kind?: SetKind; rpe?: number | null }[] }[];
 }
 export interface WorkoutState {
   data: WorkoutData; loaded: boolean; busy: boolean; needsReload: boolean; error: string | null;
@@ -15,9 +17,17 @@ export interface WorkoutState {
   startWorkout: (name: string, unit: WeightUnit) => Promise<WorkoutResult>;
   addExercise: (name: string) => Promise<WorkoutResult>;
   removeExercise: (id: string) => Promise<WorkoutResult>;
+  /** Moves a superset as one unit and steps over a neighbouring superset as one unit. */
   moveExercise: (exerciseId: string, direction: 'up' | 'down') => Promise<WorkoutResult>;
-  addSet: (exerciseId: string, reps: number, weight: number, kind?: SetKind) => Promise<WorkoutResult>;
-  updateSet: (exerciseId: string, setId: string, reps: number, weight: number, kind?: SetKind) => Promise<WorkoutResult>;
+  /** Groups two or more neighbouring, ungrouped active exercises under a fresh superset ID. */
+  groupSuperset: (exerciseIds: readonly string[]) => Promise<WorkoutResult>;
+  ungroupSuperset: (groupId: string) => Promise<WorkoutResult>;
+  /** Bodyweight sets store added load; negative weight is assistance. Switching off is refused while a set is negative. */
+  setExerciseBodyweight: (exerciseId: string, on: boolean) => Promise<WorkoutResult>;
+  /** rpe is optional; omitted means no rating. */
+  addSet: (exerciseId: string, reps: number, weight: number, kind?: SetKind, rpe?: number) => Promise<WorkoutResult>;
+  /** Omitted kind or rpe keeps the saved value; rpe null clears the rating. */
+  updateSet: (exerciseId: string, setId: string, reps: number, weight: number, kind?: SetKind, rpe?: number | null) => Promise<WorkoutResult>;
   removeSet: (exerciseId: string, setId: string) => Promise<WorkoutResult>;
   finishWorkout: () => Promise<WorkoutResult>;
   discardWorkout: () => Promise<WorkoutResult>;
@@ -33,6 +43,17 @@ export interface WorkoutState {
   updateRoutine: (id: string, expectedRevision: number, input: RoutineInput) => Promise<WorkoutResult>;
   deleteRoutine: (id: string) => Promise<WorkoutResult>;
   startRoutine: (id: string) => Promise<WorkoutResult>;
+  createGoal: (input: WorkoutGoalInput) => Promise<WorkoutResult>;
+  /** Pass the revision the goal editor opened with so a newer goal is never overwritten. */
+  updateGoal: (id: string, expectedRevision: number, input: WorkoutGoalInput) => Promise<WorkoutResult>;
+  deleteGoal: (id: string) => Promise<WorkoutResult>;
+  /** Blank weight or measurements drop their unit selector; at most 1000 entries. */
+  addBodyEntry: (input: BodyEntryInput) => Promise<WorkoutResult>;
+  /** Replaces every field but the ID. Pass the revision the editor opened with. */
+  updateBodyEntry: (id: string, expectedRevision: number, input: BodyEntryInput) => Promise<WorkoutResult>;
+  deleteBodyEntry: (id: string) => Promise<WorkoutResult>;
+  /** Note for one exact (trimmed) exercise name; blank removes it, same text is a no-op. */
+  setExerciseNote: (name: string, note: string, expectedRevision?: number) => Promise<WorkoutResult>;
   restoreBackup: (backup: WorkoutBackup, expectedRevision: number) => Promise<WorkoutResult>;
   previewSync: (cloud: WorkoutCloud) => Promise<SyncPreview>;
   confirmSync: (preview: SyncPreview, choices: Readonly<Record<string, SyncChoice>>, cloud: WorkoutCloud) => Promise<WorkoutResult>;
@@ -48,9 +69,50 @@ function cleanName(value: string) {
   if (!name || name.length > 80) invalid('Enter a name with 1 to 80 characters.');
   return name;
 }
+function noteInput(note: unknown, label: string): string {
+  if (typeof note !== 'string') invalid(`Enter the ${label} as text.`);
+  return note.replace(/\r\n?/g, '\n').trim();
+}
+/** Store-side input cleanup; validateWorkoutData then checks the stored entry strictly. */
+function preparedBodyEntry(id: string, input: BodyEntryInput): BodyEntry {
+  if (!input || typeof input !== 'object') invalid('Enter a date and a body weight or measurement for this entry.');
+  const measurements = input.measurements !== undefined && input.measurements !== null && typeof input.measurements === 'object'
+    ? Object.fromEntries(Object.entries(input.measurements).filter(([, value]) => value !== undefined)) : input.measurements;
+  const hasMeasurements = measurements !== undefined && !(typeof measurements === 'object' && measurements !== null && !Object.keys(measurements).length);
+  if (hasMeasurements && typeof measurements === 'object' && measurements !== null) {
+    for (const [name, value] of Object.entries(measurements)) {
+      if (!(BODY_MEASUREMENT_NAMES as readonly string[]).includes(name)) invalid(`Unknown body measurement "${name.slice(0, 40)}". Use ${BODY_MEASUREMENT_NAMES.join(', ')}.`);
+      if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0 || value > 500) invalid('Enter each measurement greater than 0 and at most 500.');
+    }
+  }
+  const note = input.note === undefined ? '' : noteInput(input.note, 'body log note');
+  if (note) validateBodyNote(note);
+  return { id, date: input.date,
+    ...(input.weight !== undefined ? { weight: input.weight, ...(input.unit !== undefined ? { unit: input.unit } : {}) } : {}),
+    ...(hasMeasurements ? { measurements: measurements as BodyEntry['measurements'], ...(input.lengthUnit !== undefined ? { lengthUnit: input.lengthUnit } : {}) } : {}),
+    ...(note ? { note } : {}) };
+}
 function active(data: WorkoutData): Workout {
   if (!data.active) invalid('Start a workout first.');
   return data.active;
+}
+function without<T extends object, K extends keyof T>(value: T, key: K): Omit<T, K> {
+  const copy = { ...value }; delete copy[key]; return copy;
+}
+function setRpe(set: WorkoutSet, rpe: number | null | undefined): WorkoutSet {
+  if (rpe === undefined) return set;
+  if (rpe === null) return without(set, 'rpe');
+  validateRpe(rpe);
+  return { ...set, rpe };
+}
+/** The index range of the superset containing `index`, or just that exercise when it is not grouped. */
+function unit(exercises: readonly WorkoutExercise[], index: number): [number, number] {
+  const group = exercises[index].superset;
+  let start = index, end = index;
+  if (group === undefined) return [start, end];
+  while (start > 0 && exercises[start - 1].superset === group) start -= 1;
+  while (end < exercises.length - 1 && exercises[end + 1].superset === group) end += 1;
+  return [start, end];
 }
 function editExercise(data: WorkoutData, id: string, change: (value: WorkoutExercise) => WorkoutExercise): WorkoutData {
   const draft = active(data);
@@ -58,9 +120,39 @@ function editExercise(data: WorkoutData, id: string, change: (value: WorkoutExer
   return { ...data, active: { ...draft, exercises: draft.exercises.map(e => e.id === id ? change(e) : e) } };
 }
 export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutDeps = browserDeps) {
+  /** Copies give every superset a fresh ID so later edits never touch the source's group. */
+  function freshGroups() {
+    const groups = new Map<string, string>();
+    return <T extends { readonly superset?: string; readonly bodyweight?: boolean }>(value: T) => {
+      const { superset, bodyweight, ...rest } = value;
+      if (bodyweight !== undefined && typeof bodyweight !== 'boolean') invalid('Choose whether this exercise is bodyweight.');
+      if (superset !== undefined) validateGroupId(superset);
+      if (superset !== undefined && !groups.has(superset)) groups.set(superset, deps.id());
+      return { ...rest, ...(superset !== undefined ? { superset: groups.get(superset)! } : {}), ...(bodyweight ? { bodyweight: true as const } : {}) };
+    };
+  }
   function preparedRoutine(id: string, input: RoutineInput): WorkoutRoutine {
     if (!Array.isArray(input.exercises) || !input.exercises.length || input.exercises.length > 100) invalid('Add 1 to 100 named exercises to each routine.');
-    return { ...input, id, name: cleanName(input.name), exercises: input.exercises.map(e => ({ ...e, id: deps.id(), name: cleanName(e.name) })) };
+    const copy = freshGroups();
+    return { ...input, id, name: cleanName(input.name),
+      exercises: input.exercises.map((e: RoutineExerciseInput) => ({ ...copy(e), id: deps.id(), name: cleanName(e.name) })) };
+  }
+  function preparedGoal(data: WorkoutData, id: string, createdAt: number, input: WorkoutGoalInput): WorkoutGoal {
+    if (!input || typeof input !== 'object') invalid('Enter an exercise, unit, weight and reps for this goal.');
+    const name = cleanName(typeof input.name === 'string' ? input.name : '');
+    if (input.unit !== 'kg' && input.unit !== 'lb') invalid('Choose kg or lb for this goal.');
+    if (input.bodyweight !== undefined && typeof input.bodyweight !== 'boolean') invalid('Choose whether this goal is for a bodyweight exercise.');
+    const bodyweight = input.bodyweight === true;
+    validateSetValues(input.reps, input.weight, bodyweight);
+    if (data.goals?.some(g => g.id !== id && g.name === name && g.unit === input.unit && (g.bodyweight === true) === bodyweight)) {
+      invalid(`You already have a goal for "${name}" in ${input.unit}${bodyweight ? ' (bodyweight)' : ''}. Edit that goal instead.`);
+    }
+    return { id, name, unit: input.unit, ...(bodyweight ? { bodyweight: true as const } : {}), weight: input.weight, reps: input.reps, createdAt };
+  }
+  function goal(data: WorkoutData, id: string): WorkoutGoal {
+    const found = data.goals?.find(g => g.id === id);
+    if (!found) invalid('This goal is no longer available. Reopen goals to continue.');
+    return found;
   }
   function routine(data: WorkoutData, id: string): WorkoutRoutine {
     const found = data.routines?.find(r => r.id === id);
@@ -127,7 +219,7 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
       confirmSync: (preview, choices, cloud) => commit(data => {
         if (data.revision !== preview.localRevision) invalid('Workouts changed after the preview. Preview sync again.');
         const merged = mergeWorkoutSync(preview.base, data, preview.remote.data, choices);
-        if (merged.conflicts.length) invalid('Choose a version for each conflict before confirming sync.');
+        if (hasSyncConflicts(merged)) invalid('Choose a version for each conflict before confirming sync.');
         return merged.data;
       }, async (revision, next) => {
         const syncRepository = repository as SyncedWorkoutRepository;
@@ -155,32 +247,68 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
         return { ...data, active: { ...draft, exercises: [...draft.exercises, { id: deps.id(), name: cleanName(name), sets: [] }] } };
       }),
       removeExercise: id => commit(data => {
-        const draft = active(data);
-        if (!draft.exercises.some(e => e.id === id)) invalid('This exercise is no longer in the active workout.');
-        return { ...data, active: { ...draft, exercises: draft.exercises.filter(e => e.id !== id) } };
+        const draft = active(data), removed = draft.exercises.find(e => e.id === id);
+        if (!removed) invalid('This exercise is no longer in the active workout.');
+        let exercises = draft.exercises.filter(e => e.id !== id);
+        // A superset needs two members, so the last remaining member returns to a plain exercise.
+        if (removed.superset !== undefined && exercises.filter(e => e.superset === removed.superset).length === 1) {
+          exercises = exercises.map(e => e.superset === removed.superset ? without(e, 'superset') : e);
+        }
+        return { ...data, active: { ...draft, exercises } };
       }),
-      addSet: (exerciseId, reps, weight, kind = 'regular') => commit(data => editExercise(data, exerciseId, exercise => {
-        validateSetValues(reps, weight); validateSetKind(kind);
+      addSet: (exerciseId, reps, weight, kind = 'regular', rpe) => commit(data => editExercise(data, exerciseId, exercise => {
+        validateSetValues(reps, weight, exercise.bodyweight === true); validateSetKind(kind);
         if (exercise.sets.length >= 100) invalid('This exercise already has 100 sets. Remove one before adding another.');
-        return { ...exercise, sets: [...exercise.sets, { id: deps.id(), reps, weight, ...(kind === 'warmup' ? { kind } : {}) }] };
+        return { ...exercise, sets: [...exercise.sets, setRpe({ id: deps.id(), reps, weight, ...(kind === 'warmup' ? { kind } : {}) }, rpe)] };
       })),
-      updateSet: (exerciseId, setId, reps, weight, kind) => commit(data => editExercise(data, exerciseId, exercise => {
-        validateSetValues(reps, weight);
+      updateSet: (exerciseId, setId, reps, weight, kind, rpe) => commit(data => editExercise(data, exerciseId, exercise => {
+        validateSetValues(reps, weight, exercise.bodyweight === true);
         if (kind !== undefined) validateSetKind(kind);
         if (!exercise.sets.some(s => s.id === setId)) invalid('This set is no longer in the workout.');
-        return { ...exercise, sets: exercise.sets.map(s => s.id === setId ? { id: s.id, reps, weight,
-          ...((kind ?? s.kind) === 'warmup' ? { kind: 'warmup' as const } : {}) } : s) };
+        return { ...exercise, sets: exercise.sets.map(s => s.id === setId ? setRpe({ id: s.id, reps, weight,
+          ...((kind ?? s.kind) === 'warmup' ? { kind: 'warmup' as const } : {}), ...(s.rpe !== undefined ? { rpe: s.rpe } : {}) }, rpe) : s) };
       })),
       moveExercise: (exerciseId, direction) => commit(data => {
         const draft = active(data), index = draft.exercises.findIndex(e => e.id === exerciseId);
         if (index < 0) invalid('This exercise is no longer in the active workout.');
         if (direction !== 'up' && direction !== 'down') invalid('Choose up or down to move this exercise.');
-        const target = direction === 'up' ? index - 1 : index + 1;
-        if (target < 0) invalid('This exercise is already first.');
-        if (target >= draft.exercises.length) invalid('This exercise is already last.');
-        const exercises = [...draft.exercises];
-        [exercises[index], exercises[target]] = [exercises[target], exercises[index]];
-        return { ...data, active: { ...draft, exercises } };
+        const exercises = draft.exercises, [start, end] = unit(exercises, index);
+        if (direction === 'up' && start === 0) invalid('This exercise is already first.');
+        if (direction === 'down' && end === exercises.length - 1) invalid('This exercise is already last.');
+        const [before, after] = direction === 'up' ? [unit(exercises, start - 1), [start, end]] : [[start, end], unit(exercises, end + 1)];
+        return { ...data, active: { ...draft, exercises: [...exercises.slice(0, before[0]), ...exercises.slice(after[0], after[1] + 1),
+          ...exercises.slice(before[0], before[1] + 1), ...exercises.slice(after[1] + 1)] } };
+      }),
+      groupSuperset: exerciseIds => commit(data => {
+        const draft = active(data);
+        if (!Array.isArray(exerciseIds) || new Set(exerciseIds).size < 2 || new Set(exerciseIds).size !== exerciseIds.length) {
+          invalid('Choose at least two exercises to group as a superset.');
+        }
+        const indexes = exerciseIds.map(id => draft.exercises.findIndex(e => e.id === id)).sort((a, b) => a - b);
+        if (indexes.some(index => index < 0)) invalid('This exercise is no longer in the active workout.');
+        if (indexes.some(index => draft.exercises[index].superset !== undefined)) invalid('One of these exercises is already in a superset. Ungroup it first.');
+        if (indexes.some((index, position) => index !== indexes[0] + position)) {
+          invalid('Choose exercises that are next to each other. Move them together first, then group them.');
+        }
+        const group = deps.id(), members = new Set(exerciseIds);
+        return { ...data, active: { ...draft, exercises: draft.exercises.map(e => members.has(e.id) ? { ...e, superset: group } : e) } };
+      }),
+      ungroupSuperset: groupId => commit(data => {
+        const draft = active(data);
+        if (!draft.exercises.some(e => e.superset === groupId)) invalid('This superset is no longer in the active workout.');
+        return { ...data, active: { ...draft, exercises: draft.exercises.map(e => e.superset === groupId ? without(e, 'superset') : e) } };
+      }),
+      setExerciseBodyweight: (exerciseId, on) => commit(data => {
+        if (typeof on !== 'boolean') invalid('Choose whether this exercise is bodyweight.');
+        const found = active(data).exercises.find(e => e.id === exerciseId);
+        if (found && (found.bodyweight === true) === on) return data;
+        return editExercise(data, exerciseId, exercise => {
+          if (on) return { ...exercise, bodyweight: true };
+          if (exercise.sets.some(s => s.weight < 0)) {
+            invalid('Change assisted (negative weight) sets to 0 or more before turning off bodyweight for this exercise.');
+          }
+          return without(exercise, 'bodyweight');
+        });
       }),
       removeSet: (exerciseId, setId) => commit(data => editExercise(data, exerciseId, exercise => {
         if (!exercise.sets.some(s => s.id === setId)) invalid('This set is no longer in the workout.');
@@ -214,11 +342,11 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
         if (data.active) invalid('Finish or discard the active workout before repeating another.');
         const source = data.history.find(w => w.id === workoutId);
         if (!source) invalid('This saved workout is no longer available.');
-        const id = deps.id();
-        // Copy only the plan: names, order and targets. Notes and actual sets stay with the source record.
-        const exercises = source.exercises.map(({ name, targetSets, targetReps, targetWeight }) => ({ id: deps.id(), name,
+        const id = deps.id(), copy = freshGroups();
+        // Copy only the plan: names, order, targets, supersets and bodyweight. Notes and actual sets stay with the source record.
+        const exercises = source.exercises.map(({ name, targetSets, targetReps, targetWeight, superset, bodyweight }) => ({ id: deps.id(), name,
           ...(targetSets !== undefined ? { targetSets } : {}), ...(targetReps !== undefined ? { targetReps } : {}),
-          ...(targetWeight !== undefined ? { targetWeight } : {}), sets: [] }));
+          ...(targetWeight !== undefined ? { targetWeight } : {}), sets: [], ...copy({ superset, bodyweight }) }));
         return { ...data, active: { id, name: source.name, unit: source.unit, startedAt: deps.now(), finishedAt: null, exercises } };
       }),
       correctCompletedWorkout: (id, expectedRevision, input) => commit(data => {
@@ -232,9 +360,10 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
           return { ...exercise, sets: exercise.sets.map((saved, setIndex) => {
             const set = row.sets[setIndex];
             if (set.id !== saved.id) invalid('Keep the existing set order when correcting a workout.');
-            validateSetValues(set.reps, set.weight);
+            validateSetValues(set.reps, set.weight, exercise.bodyweight === true);
             const kind = set.kind === undefined ? 'regular' : set.kind; validateSetKind(kind);
-            return { id: saved.id, reps: set.reps, weight: set.weight, ...(kind === 'warmup' ? { kind } : {}) };
+            return setRpe({ id: saved.id, reps: set.reps, weight: set.weight, ...(kind === 'warmup' ? { kind } : {}),
+              ...(saved.rpe !== undefined ? { rpe: saved.rpe } : {}) }, set.rpe);
           }) };
         }) };
         return { ...data, history: data.history.map(w => w.id === id ? updated : w) };
@@ -263,9 +392,56 @@ export function createWorkoutStore(repository: WorkoutRepository, deps: WorkoutD
       }),
       startRoutine: id => commit(data => {
         if (data.active) invalid('Finish or discard the active workout before starting another routine.');
-        const source = routine(data, id);
+        const source = routine(data, id), copy = freshGroups();
         return { ...data, active: { id: deps.id(), name: source.name, unit: source.unit, startedAt: deps.now(), finishedAt: null,
-          exercises: source.exercises.map(e => ({ ...e, id: deps.id(), sets: [] })) } };
+          exercises: source.exercises.map(e => ({ ...copy(e), id: deps.id(), sets: [] })) } };
+      }),
+      createGoal: input => commit(data => {
+        if ((data.goals?.length ?? 0) >= 100) invalid('You already have 100 goals. Delete one before adding another.');
+        return { ...data, goals: [...(data.goals ?? []), preparedGoal(data, deps.id(), deps.now(), input)] };
+      }),
+      updateGoal: (id, expectedRevision, input) => commit(data => {
+        if (data.revision !== expectedRevision) invalid('Saved goals changed. Reopen this goal before saving your edits.');
+        const source = goal(data, id), updated = preparedGoal(data, id, source.createdAt, input);
+        if (JSON.stringify(updated) === JSON.stringify(source)) return data;
+        return { ...data, goals: data.goals!.map(g => g.id === id ? updated : g) };
+      }),
+      addBodyEntry: input => commit(data => {
+        if ((data.bodyLog?.length ?? 0) >= MAX_BODY_ENTRIES) {
+          invalid(`Your body log already has ${MAX_BODY_ENTRIES} entries. Delete an old entry before adding another.`);
+        }
+        return { ...data, bodyLog: [...(data.bodyLog ?? []), preparedBodyEntry(deps.id(), input)] };
+      }),
+      updateBodyEntry: (id, expectedRevision, input) => commit(data => {
+        if (data.revision !== expectedRevision) invalid('Body log changed. Reopen this entry before saving your edits.');
+        const source = data.bodyLog?.find(e => e.id === id);
+        if (!source) invalid('This body log entry is no longer available.');
+        const updated = preparedBodyEntry(id, input);
+        if (JSON.stringify(updated) === JSON.stringify(source)) return data;
+        return { ...data, bodyLog: data.bodyLog!.map(e => e.id === id ? updated : e) };
+      }),
+      deleteBodyEntry: id => commit(data => {
+        if (!data.bodyLog?.some(e => e.id === id)) invalid('This body log entry is no longer available.');
+        return { ...data, bodyLog: data.bodyLog.filter(e => e.id !== id) };
+      }),
+      setExerciseNote: (name, note, expectedRevision) => commit(data => {
+        if (expectedRevision !== undefined && data.revision !== expectedRevision) invalid('Exercise notes changed. Reopen the note before saving.');
+        const exercise = cleanName(typeof name === 'string' ? name : '');
+        const text = noteInput(note, 'exercise note');
+        if (text) validateExerciseNote(text);
+        const notes = data.exerciseNotes ?? {}, saved = Object.prototype.hasOwnProperty.call(notes, exercise) ? notes[exercise] : '';
+        if (saved === text) return data;
+        if (!saved && Object.keys(notes).length >= MAX_EXERCISE_NOTES) {
+          invalid(`You already have notes for ${MAX_EXERCISE_NOTES} exercises. Remove one before adding another.`);
+        }
+        // fromEntries keeps every name, including "__proto__", as an ordinary own key.
+        const rest = Object.entries(notes).filter(([key]) => key !== exercise);
+        return { ...data, exerciseNotes: Object.fromEntries(text ? (saved ? Object.entries(notes).map(([key, value]) => [key, key === exercise ? text : value])
+          : [...rest, [exercise, text]]) : rest) };
+      }),
+      deleteGoal: id => commit(data => {
+        goal(data, id);
+        return { ...data, goals: data.goals!.filter(g => g.id !== id) };
       }),
     };
   });

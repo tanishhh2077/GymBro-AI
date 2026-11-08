@@ -1,43 +1,47 @@
 # GymBro AI current handoff
 
-Updated 2026-11-06, America/Chicago. Read root/scoped AGENTS.md first.
+Updated 2026-11-07, America/Chicago. Read root/scoped AGENTS.md first.
 Follow D-024/D-036. Detailed evidence is in [STATUS.md](STATUS.md).
 
-## Completed utility batch
+## Completed approved work (Q49–Q56 phase 1, D-059)
 
-Tasks46–52 implement Q42–Q48 under D-058.
-- Named device-local equipment profiles in the plate calculator.
-- Running rest minus/plus 15 seconds and custom durations from 1 second to 60 minutes.
-- Device-local exercise favorites and built-in equipment filters.
-- Searchable Help accessible from Home.
-- Optional weekly backup reminders, due on Home/Backup with one-day snooze
-  and seven-day dismissal. Export requests remain distinct from confirmed files.
+Claude Code (Opus 5.5) built these with separate agents and worktrees, each
+merged after its checks; storage and the installable app also got a fresh review.
+- Warm-up suggestions (Q52) and elapsed workout time (Q53).
+- Reduced motion, text size (Q56) and a weekly workout target (Q54), all device-local.
+- Schema6 storage (Q50, Q51): body log and exercise notes, backup, sync and the
+  fifth Supabase migration. **No screens use it yet.**
+- Installable web app (Q49): manifest, icons, offline-start service worker.
+Gemini (Antigravity) delivered small test and accessibility branches, reviewed and
+merged. Q38 rep counting and Q41 health export are deferred (D-058).
 
-Three isolated Codex workers and one fresh source review completed this batch.
-A profile recovery overwrite was reproduced, fixed and independently re-reviewed.
-945 tests/79 files, lint/build and native sync pass. Browser evidence covers all
-43 cases across the full run (42 passed) and one affected test rerun after its
-broad section-count assertion was scoped to actual exercise regions.
+Checks on the integrated master: 1314 tests/106 files with four workers, lint,
+native sync (20 files per platform), database tests and all 42 Chromium cases.
+**Supabase needs all five migrations in order** before sync. Not verified in a real
+browser or on a phone: installing, offline start, offline analysis, iOS storage.
 
-## Transfer back to Claude
+## Utility integration (Q42–Q48, D-060)
 
-Q34–Q41 remain Claude's unfinished batch. Preserve schema5/training-detail UI,
-progress-goals UI and onboarding branches and their worktrees. They were not
-merged by this utility batch. Inspect their current changes before resuming.
-Tasks46–52 and D-058 are now allocated to utilities. Assign later task/decision
-numbers from current master at integration. Further product questions start Q49.
+Equipment profiles, custom/adjustable rest, favourites/equipment filters, Home
+Help and opt-in weekly reminders are integrated on codex/q42-q48. Export requests
+leave reminders due; Mark as done explicitly schedules the next week. Device-local
+settings remain outside schema6 workout records, backup and sync. Combined checks
+and final integration are pending. Historical utility evidence remains in STATUS.
 
-The original checkout retains Claude edits in src/core/previousWorkout.ts,
-src/core/workoutCsv.ts and src/core/workoutSummary.ts. Do not accidentally stage
-these with unrelated work. Utility verification used an isolated clean checkout.
-Integrate against current origin/master, preserving utility additions. App.tsx,
-workout storage/schema and unfinished Claude source files were left to Claude.
-Keep worker branches/checkouts and incomplete Task4. Use one browser suite on4179.
+## Next work
 
-Master still uses schema4. Supabase setup needs user dashboard actions, all three
-integrated migrations and email-code configuration in [the guide](../supabase/README.md).
-Claude's pending schema5 migration needs verification with that later integration.
-Phone, native sharing/alerts and real cloud sync remain unverified.
+1. Screens for schema6: body log (weight, measurements, trend), exercise notes in
+   the editor, sync-conflict choosers for body and note conflicts in AccountPanel,
+   and the new backup counts in the restore preview (`addedBodyEntries`,
+   `addedExerciseNotes`, `skippedExerciseNotes`).
+2. Q55: export and import one routine as a small file.
+3. Complete combined verification and fast-forward integration of codex/q42-q48.
+Q&A resumes at Q57. Q38 needs the user present with private bench videos. Preserve
+all worker branches and the incomplete Task4 branch; one browser suite on 4179.
+
+Supabase still needs user dashboard setup, all five migrations and email-code
+configuration in [the guide](../supabase/README.md). Live email and real
+cross-device sync remain unverified. Phone/media work requires user presence.
 
 ## Phone and media boundaries
 

@@ -133,7 +133,7 @@ function VideoStagePlayer({
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/5 bg-ink-900">
+    <div role="region" aria-label="Video player" className="overflow-hidden rounded-2xl border border-white/5 bg-ink-900">
       <div className="flex w-full justify-center bg-black">
         <div className="relative min-h-[220px]">
           <video
@@ -141,8 +141,10 @@ function VideoStagePlayer({
             playsInline
             muted
             preload="auto"
+            aria-label="Uploaded video"
             style={{ objectFit: "contain" }}
-            className="block max-h-[70vh] max-w-full"
+            className={`block max-h-[70vh] max-w-full ${playable ? "cursor-pointer" : ""}`}
+            onClick={playable ? togglePlay : undefined}
           />
           {ready && (
             <SkeletonOverlay
@@ -162,37 +164,62 @@ function VideoStagePlayer({
       {playbackError && <div role="alert" className="px-4 pt-3 text-sm text-warn">{playbackError}</div>}
 
       {/* Controls */}
-      <div className="flex flex-col gap-3 px-4 py-3">
+      <div role="toolbar" aria-label="Video controls" className="flex flex-col gap-3 px-4 py-3">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={togglePlay}
             disabled={!playable}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-on-accent shadow-glow transition-transform hover:scale-105 disabled:opacity-40"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-on-accent shadow-glow transition-transform hover:scale-105 disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             aria-label={playing ? "Pause" : "Play"}
           >
-            {playing ? <PauseIcon width={20} /> : <PlayIcon width={20} />}
+            {playing ? <PauseIcon width={20} aria-hidden="true" /> : <PlayIcon width={20} aria-hidden="true" />}
           </button>
           <button
             type="button"
             onClick={() => void startPlayback(true)}
             disabled={!playable}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-slate-300 transition-colors hover:bg-white/10 disabled:opacity-40"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-slate-300 transition-colors hover:bg-white/10 disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             aria-label="Restart"
           >
-            <RestartIcon width={18} />
+            <RestartIcon width={18} aria-hidden="true" />
           </button>
 
           <input
             type="range"
             aria-label="Video position"
-            className="scrubber min-w-0 flex-1"
+            className="scrubber min-w-0 flex-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             min={0}
             max={displayDuration}
             step={0.01}
             value={time}
             disabled={!playable}
+            aria-valuemin={0}
+            aria-valuemax={displayDuration}
+            aria-valuenow={time}
+            aria-valuetext={`${fmt(time)} of ${fmt(displayDuration)}`}
             onChange={(e) => scrub(parseFloat(e.target.value))}
+            onKeyDown={(e) => {
+              if (!playable) return;
+              if (e.key === " " || e.key === "k" || e.key === "K") {
+                e.preventDefault();
+                togglePlay();
+              } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+                e.preventDefault();
+                const delta = e.shiftKey ? 1 : 0.1;
+                scrub(Math.max(0, time - delta));
+              } else if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+                e.preventDefault();
+                const delta = e.shiftKey ? 1 : 0.1;
+                scrub(Math.min(displayDuration, time + delta));
+              } else if (e.key === "Home") {
+                e.preventDefault();
+                scrub(0);
+              } else if (e.key === "End") {
+                e.preventDefault();
+                scrub(displayDuration);
+              }
+            }}
           />
 
           <span className="shrink-0 font-mono text-xs tabular-nums text-slate-400">
@@ -201,8 +228,8 @@ function VideoStagePlayer({
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] uppercase tracking-wider text-slate-500">
+          <div role="group" aria-label="Playback speed" className="flex items-center gap-1.5">
+            <span className="text-[11px] uppercase tracking-wider text-slate-400">
               Speed
             </span>
             {SPEEDS.map((s) => (
@@ -212,7 +239,7 @@ function VideoStagePlayer({
                 onClick={() => setSpeed(s)}
                 aria-pressed={speed === s}
                 disabled={!playable}
-                className={`rounded-md px-2 py-1 text-xs font-medium transition-colors disabled:opacity-40 ${
+                className={`rounded-md px-2 py-1 text-xs font-medium transition-colors disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
                   speed === s
                     ? "bg-accent/20 text-accent-100"
                     : "bg-white/5 text-slate-400 hover:bg-white/10"
@@ -240,10 +267,19 @@ function ProcessingLayer({ clip, accent }: { clip: Clip; accent: string }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          role="status"
+          aria-live="polite"
           className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-ink-950/80 backdrop-blur-sm"
         >
-          <div className="relative h-20 w-20">
-            <svg className="h-20 w-20 -rotate-90" viewBox="0 0 80 80">
+          <div
+            role="progressbar"
+            aria-valuenow={pct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Estimating pose progress"
+            className="relative h-20 w-20"
+          >
+            <svg className="h-20 w-20 -rotate-90" viewBox="0 0 80 80" aria-hidden="true">
               <circle
                 cx="40"
                 cy="40"
@@ -310,7 +346,7 @@ function ErrorLayer({ clip }: { clip: Clip }) {
       <div className="max-w-sm text-sm">
         <div className="font-semibold text-white">{title}</div>
         <div className="mt-1 text-slate-300">{clip.error}</div>
-        <div className="mt-2 text-xs text-slate-500">Remove the clip to try another.</div>
+        <div className="mt-2 text-xs text-slate-400">Remove the clip to try another.</div>
       </div>
     </div>
   );
@@ -347,9 +383,9 @@ function CoverageBadges({ clip }: { clip: Clip }) {
   const pose = clip.pose!;
   const rate = Math.round(pose.coverage.detectionRate * 100);
   return (
-    <div className="flex flex-wrap items-center gap-2 text-[11px]">
+    <div role="group" aria-label="Pose coverage summary" className="flex flex-wrap items-center gap-2 text-[11px]">
       <span className="chip bg-white/5 text-slate-300">
-        <CpuIcon width={13} /> {pose.delegate}
+        <CpuIcon width={13} aria-hidden="true" /> {pose.delegate}
       </span>
       <span className="chip bg-white/5 text-slate-300">
         Sampling target: {pose.fps} samples/s
