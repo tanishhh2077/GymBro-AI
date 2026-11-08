@@ -20,10 +20,11 @@ export function filterWorkoutHistory(history: readonly Workout[], filters: Histo
   const fromKey = from ? Number(from.replace(/-/g, '')) : null;
   const toKey = to ? Number(to.replace(/-/g, '')) : null;
   const workouts = history.filter(workout => {
-    if (!workout.finishedAt) return false;
+    if (typeof workout.finishedAt !== 'number' || workout.finishedAt <= 0 || Number.isNaN(workout.finishedAt)) return false;
     const day = localDateKey(new Date(workout.finishedAt));
+    const workoutName = (workout.name ?? '').toLowerCase();
     return (fromKey === null || day >= fromKey) && (toKey === null || day <= toKey) &&
-      (!query || workout.name.toLowerCase().includes(query) || workout.exercises.some(e => e.name.toLowerCase().includes(query)));
-  }).sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0));
+      (!query || workoutName.includes(query) || workout.exercises.some(e => Boolean(e.name && e.name.toLowerCase().includes(query))));
+  }).sort((a, b) => b.finishedAt! - a.finishedAt!);
   return { workouts, error: null };
 }
