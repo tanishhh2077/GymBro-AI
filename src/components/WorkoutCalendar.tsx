@@ -26,6 +26,11 @@ export function WorkoutCalendar({ history, from, to, onSelect }: {
     return new Date(date.getFullYear(), date.getMonth(), 1);
   });
   const [focusedDay, setFocusedDay] = useState<number | null>(null);
+  const [prevSelection, setPrevSelection] = useState(`${from}|${to}`);
+  if (prevSelection !== `${from}|${to}`) {
+    setPrevSelection(`${from}|${to}`);
+    setFocusedDay(null);
+  }
 
   const counts = new Map<string, number>();
   for (const workout of history) {
@@ -42,6 +47,7 @@ export function WorkoutCalendar({ history, from, to, onSelect }: {
   const activeDay = Math.min(totalDays, Math.max(1, focusedDay ?? selectedDay ?? 1));
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLButtonElement>, dayNumber: number) {
+    if (event.altKey || event.metaKey) return;
     const navKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
     if (!navKeys.includes(event.key)) return;
     event.preventDefault();
@@ -76,7 +82,7 @@ export function WorkoutCalendar({ history, from, to, onSelect }: {
     <div className="grid grid-cols-7 gap-1 text-center text-xs text-slate-400" aria-hidden="true">
       {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => <span key={day}>{day}</span>)}
     </div>
-    <div ref={gridRef} aria-labelledby={id} className="grid grid-cols-7 gap-1">
+    <div ref={gridRef} role="group" aria-labelledby={id} className="grid grid-cols-7 gap-1">
       {Array.from({ length: month.getDay() }, (_, i) => <span key={`blank-${i}`} aria-hidden="true" />)}
       {days.map(day => {
         const d = day.getDate();

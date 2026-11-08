@@ -126,6 +126,42 @@ it('supports keyboard navigation with arrow keys, Home/End, roving tabIndex and 
       day30.dispatchEvent(tabEvent);
     });
     expect(tabEvent.defaultPrevented).toBe(false);
+
+    // Modifier keys (e.g. Alt+ArrowLeft for browser history navigation) are not intercepted
+    const altLeftEvent = new KeyboardEvent('keydown', { key: 'ArrowLeft', altKey: true, bubbles: true, cancelable: true });
+    await act(async () => {
+      day30.dispatchEvent(altLeftEvent);
+    });
+    expect(altLeftEvent.defaultPrevented).toBe(false);
+    expect(document.activeElement).toBe(day30);
+
+    // Boundary on interior days: ArrowUp on day 5 (5 - 7 < 1) stays on day 5
+    const day5 = getDayBtn(5);
+    await act(async () => {
+      day5.focus();
+    });
+    expect(document.activeElement).toBe(day5);
+    await act(async () => {
+      day5.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }));
+    });
+    expect(document.activeElement).toBe(day5);
+
+    // Boundary on interior days: ArrowDown on day 25 (25 + 7 > 30) stays on day 25
+    const day25 = getDayBtn(25);
+    await act(async () => {
+      day25.focus();
+    });
+    expect(document.activeElement).toBe(day25);
+    await act(async () => {
+      day25.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
+    });
+    expect(document.activeElement).toBe(day25);
+
+    // Days grid is an accessible group labelled by month title
+    const group = container.querySelector('[role="group"]')!;
+    expect(group).not.toBeNull();
+    const heading = container.querySelector('h2')!;
+    expect(group.getAttribute('aria-labelledby')).toBe(heading.id);
   } finally {
     await act(async () => root.unmount());
     container.remove();
@@ -159,6 +195,20 @@ it('defaults active tabIndex to day 1 without selection, updates on click, and r
     const decDay5 = [...container.querySelectorAll('button')].find(b => b.getAttribute('aria-label')?.includes('December 5, 2026'))!;
     expect(decDay1.getAttribute('tabindex')).toBe('0');
     expect(decDay5.getAttribute('tabindex')).toBe('-1');
+
+    // External filter updates sync roving tabIndex rather than retaining stale focusedDay
+    await act(async () => container.querySelector<HTMLButtonElement>('[aria-label="Previous month"]')!.click());
+    await act(async () => root.render(<WorkoutCalendar history={history} from="2026-11-20" to="2026-11-20" onSelect={onSelect} />));
+    const day20 = [...container.querySelectorAll('button')].find(b => b.getAttribute('aria-label')?.includes('November 20, 2026'))!;
+    const novDay5 = [...container.querySelectorAll('button')].find(b => b.getAttribute('aria-label')?.includes('November 5, 2026'))!;
+    expect(day20.getAttribute('tabindex')).toBe('0');
+    expect(novDay5.getAttribute('tabindex')).toBe('-1');
+
+    // Clearing filters externally resets tabIndex back to day 1
+    await act(async () => root.render(<WorkoutCalendar history={history} from="" to="" onSelect={onSelect} />));
+    const novDay1 = [...container.querySelectorAll('button')].find(b => b.getAttribute('aria-label')?.includes('November 1, 2026'))!;
+    expect(novDay1.getAttribute('tabindex')).toBe('0');
+    expect(day20.getAttribute('tabindex')).toBe('-1');
   } finally {
     await act(async () => root.unmount());
     container.remove();
