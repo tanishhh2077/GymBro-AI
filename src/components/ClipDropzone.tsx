@@ -21,20 +21,9 @@ export function ClipDropzone({
   disabledMessage = "Remove the current clip to choose another",
 }: ClipDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const prevDisabled = useRef(disabled);
   const [dragging, setDragging] = useState(false);
   const [issue, setIssue] = useState<SelectionIssue | null>(null);
   const alertTitleId = useId();
-
-  // Restore keyboard focus to the "Choose video" button when the dropzone becomes
-  // re-enabled (e.g. after removing a clip or finishing the clip's release).
-  useEffect(() => {
-    if (prevDisabled.current && !disabled) {
-      buttonRef.current?.focus();
-    }
-    prevDisabled.current = disabled;
-  }, [disabled]);
 
   // A file dropped anywhere else on the page would be opened by the browser,
   // unloading the app and its in-memory result.
@@ -78,25 +67,12 @@ export function ClipDropzone({
           setDragging(false);
           handleFiles(e.dataTransfer.files);
         }}
-        onClick={(e) => {
-          if (disabled) return;
-          if (e.target instanceof HTMLElement && !e.target.closest("button")) {
-            openPicker();
-          }
-        }}
-        onKeyDown={(e) => {
-          if (disabled) return;
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            openPicker();
-          }
-        }}
         className={`flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-10 text-center transition-colors ${
           disabled
             ? "border-white/5 bg-ink-900/30 opacity-60"
             : dragging
-              ? "border-accent/60 bg-accent/10 cursor-pointer"
-              : "border-white/10 bg-ink-900/50 cursor-pointer"
+              ? "border-accent/60 bg-accent/10"
+              : "border-white/10 bg-ink-900/50"
         }`}
       >
         <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 text-accent">
@@ -112,7 +88,6 @@ export function ClipDropzone({
           </div>
         </div>
         <button
-          ref={buttonRef}
           type="button"
           disabled={disabled}
           onClick={openPicker}
@@ -120,7 +95,7 @@ export function ClipDropzone({
         >
           Choose video
         </button>
-        {/* Reached through the button above or direct activation of the drop area. */}
+        {/* Reached only through the button above, which is the keyboard path. */}
         <input
           ref={inputRef}
           type="file"
