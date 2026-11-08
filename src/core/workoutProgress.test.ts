@@ -1,4 +1,4 @@
-import { expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { WeightUnit, Workout, WorkoutSet } from '@/types/workout';
 import { buildWorkoutProgress } from './workoutProgress';
 
@@ -129,3 +129,185 @@ it('retains the full supported history without truncating chart points or record
   expect(group.loggedSetCount).toBe(1000);
   expect(group.heaviestSet).toMatchObject({ weight: 999, workoutId: 'w-999' });
 });
+
+describe('buildWorkoutProgress edge cases', () => {
+  it('excludes warm-up sets completely from progress, PRs, and workout points', () => {
+    // Only warm-up sets -> no progress groups generated
+    const warmupOnly = workout('w1', 1000, [
+      { id: 's1', reps: 10, weight: 150, kind: 'warmup' },
+      { id: 's2', reps: 12, weight: 160, kind: 'warmup' },
+    ]);
+    expect(buildWorkoutProgress([warmupOnly])).toEqual([]);
+
+    // Heavy warm-up with lighter regular set -> only regular set counted
+    const mixed = workout('w2', 2000, [
+      { id: 's-warm', reps: 10, weight: 200, kind: 'warmup' },
+      { id: 's-reg', reps: 5, weight: 80, kind: 'regular' },
+    ]);
+    const groups = buildWorkoutProgress([mixed]);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].loggedSetCount).toBe(1);
+    expect(groups[0].heaviestSet).toMatchObject({ setId: 's-reg', weight: 80, reps: 5 });
+    expect(groups[0].mostRepsSet).toMatchObject({ setId: 's-reg', weight: 80, reps: 5 });
+    expect(groups[0].workouts).toHaveLength(1);
+    expect(groups[0].workouts[0]).toMatchObject({ setId: 's-reg' });
+    expect(groups[0].repRecords).toHaveLength(1);
+    expect(groups[0].repRecords[0]).toMatchObject({ setId: 's-reg' });
+
+    // One workout purely warm-up, one regular -> only regular workout appears in workouts
+    const combined = buildWorkoutProgress([warmupOnly, mixed]);
+    expect(combined[0].workouts.map(w => w.workoutId)).toEqual(['w2']);
+  });
+
+  it('handles empty workouts, exercises without sets, and uncompleted workouts', () => {
+    const emptyEx: Workout = {
+      id: 'empty-ex',
+      name: 'Empty Exercises',
+      unit: 'kg',
+      startedAt: 0,
+      finishedAt: 1000,
+      exercises: [],
+    };
+    const emptySets: Workout = {
+      id: 'empty-sets',
+      name: 'Empty Sets',
+      unit: 'kg',
+      startedAt: 0,
+      finishedAt: 1000,
+      exercises: [{ id: 'e1', name: 'Bench press', sets: [] }],
+    };
+    const uncompleted: Workout = {
+      id: 'uncompleted',
+      name: 'Uncompleted',
+      unit: 'kg',
+      startedAt: 0,
+      finishedAt: null,
+      exercises: [{ id: 'e1', name: 'Bench press', sets: [loggedSet('s1', 5, 100)] }],
+    };
+    expect(buildWorkoutProgress([emptyEx, emptySets, uncompleted])).toEqual([]);
+  });
+
+  it('resolves ties in heaviestSet and mostRepsSet deterministically', () => {
+    // heaviestSet: tied weight & reps -> earlier finish wins
+    const earlierVsLater = [
+      workout('late', 2000, [loggedSet('s-late', 5, 100)]),
+      workout('early', 1000, [loggedSet('s-early', 5, 100)]),
+    ];
+    expect(buildWorkoutProgress(earlierVsLater)[0].heaviestSet).toMatchObject({
+      workoutId: 'early',
+      setId: 's-early',
+    });
+
+    // heaviestSet: tied weight, reps, AND finishedAt across workouts -> source string wins
+    const sameTime = [
+      workout('w-b', 1000, [loggedSet('s1', 5, 100)]),
+      workout('w-a', 1000, [loggedSet('s1', 5, 100)]),
+    ];
+    expect(buildWorkoutProgress(sameTime)[0].heaviestSet).toMatchObject({
+      workoutId: 'w-a',
+    });
+
+    // mostRepsSet: tied reps & weight -> earlier finish wins
+    const repTie = [
+      workout('late', 2000, [loggedSet('s-late', 12, 50)]),
+      workout('early', 1000, [loggedSet('s-early', 12, 50)]),
+    ];
+    expect(buildWorkoutProgress(repTie)[0].mostRepsSet).toMatchObject({
+      workoutId: 'early',
+      setId: 's-early',
+    });
+
+    // mostRepsSet: tied reps, weight, AND finishedAt -> source string wins
+    const repTimeTie = [
+      workout('w-y', 1000, [loggedSet('s1', 12, 50)]),
+      workout('w-x', 1000, [loggedSet('s1', 12, 50)]),
+    ];
+    expect(buildWorkoutProgress(repTimeTie)[0].mostRepsSet).toMatchObject({
+      workoutId: 'w-x',
+    });
+  });
+
+  it('resolves ties in per-workout best set and per-weight rep records', () => {
+    // Within one workout: two identical sets -> setId breaks tie
+    const withinWorkout = workout('w1', 1000, [
+      loggedSet('s-z', 5, 100),
+      loggedSet('s-a', 5, 100),
+    ]);
+    const group = buildWorkoutProgress([withinWorkout])[0];
+    expect(group.workouts[0].setId).toBe('s-a');
+    expect(group.repRecords[0].setId).toBe('s-a');
+
+    // Across workouts for repRecords: same weight and reps -> earlier finish wins
+    const crossRepRecords = [
+      workout('w-later', 2000, [loggedSet('s2', 8, 80)]),
+      workout('w-earlier', 1000, [loggedSet('s1', 8, 80)]),
+    ];
+    expect(buildWorkoutProgress(crossRepRecords)[0].repRecords[0]).toMatchObject({
+      workoutId: 'w-earlier',
+      setId: 's1',
+    });
+  });
+
+  it('orders assisted bodyweight loads mathematically (less assistance is heavier)', () => {
+    const bwWorkout: Workout = {
+      id: 'bw-1',
+      name: 'Bodyweight Workout',
+      unit: 'kg',
+      startedAt: 0,
+      finishedAt: 1000,
+      exercises: [{
+        id: 'e1',
+        name: 'Pull-up',
+        bodyweight: true,
+        sets: [
+          loggedSet('s-assist-heavy', 5, -20),
+          loggedSet('s-assist-light', 5, -5),
+          loggedSet('s-unassisted', 5, 0),
+          loggedSet('s-weighted', 5, 10),
+        ],
+      }],
+    };
+    const groups = buildWorkoutProgress([bwWorkout]);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].bodyweight).toBe(true);
+    // +10kg is heaviest
+    expect(groups[0].heaviestSet).toMatchObject({ setId: 's-weighted', weight: 10 });
+    // repRecords sorted descending by weight: 10, 0, -5, -20
+    expect(groups[0].repRecords.map(r => r.weight)).toEqual([10, 0, -5, -20]);
+  });
+
+  it('orders progress groups by name, then unit, then loaded before bodyweight', () => {
+    const w1: Workout = {
+      id: 'w1',
+      name: 'Mixed',
+      unit: 'kg',
+      startedAt: 0,
+      finishedAt: 1000,
+      exercises: [
+        { id: 'e1', name: 'Squat', sets: [loggedSet('s1', 5, 100)] },
+        { id: 'e2', name: 'Pull-up', bodyweight: true, sets: [loggedSet('s2', 5, 0)] },
+        { id: 'e3', name: 'Pull-up', sets: [loggedSet('s3', 5, 20)] },
+        { id: 'e4', name: 'Bench press', sets: [loggedSet('s4', 5, 80)] },
+      ],
+    };
+    const wLb: Workout = {
+      id: 'w2',
+      name: 'Pounds',
+      unit: 'lb',
+      startedAt: 0,
+      finishedAt: 2000,
+      exercises: [
+        { id: 'e5', name: 'Bench press', sets: [loggedSet('s5', 5, 180)] },
+      ],
+    };
+    const groups = buildWorkoutProgress([w1, wLb]);
+    expect(groups.map(g => [g.name, g.unit, g.bodyweight ?? false])).toEqual([
+      ['Bench press', 'kg', false],
+      ['Bench press', 'lb', false],
+      ['Pull-up', 'kg', false],
+      ['Pull-up', 'kg', true],
+      ['Squat', 'kg', false],
+    ]);
+  });
+});
+
